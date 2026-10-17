@@ -80,3 +80,13 @@ it('hides an exact external-ID provenance token in list comments and tooltip onl
  expect(h).toContain('#AF-1');
  expect(JSON.stringify(row)).toBe(before);
 });
+
+it('hides exact compound partner external references without changing stored provenance',()=>{
+ const row=Object.freeze({...b,external_id:'Flughafenstellplatz | DP-EVJ5U9Z',comment:'Flughafenstellplatz | DP-EVJ5U9Z | Travel Valet Parking | Online vorausbezahlt, keine Barzahlung vor Ort.'}),before=JSON.stringify(row);
+ const h=r(<BookingListRow {...P({b:row})}/>);
+ expect(h).not.toContain('DP-EVJ5U9Z');
+ expect(h).toContain('Travel Valet Parking');
+ expect(h).toContain('Online vorausbezahlt, keine Barzahlung vor Ort.');
+ expect(h).toContain('#AF-1');
+ expect(JSON.stringify(row)).toBe(before);
+});

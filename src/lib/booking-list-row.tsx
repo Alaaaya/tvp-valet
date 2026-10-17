@@ -41,7 +41,15 @@ export function directionCounts(events:readonly {kind:'in'|'out';completed?:bool
 export function rowComment(b:Pick<Booking,'comment'|'external_id'|'code'>){
  const text=displayComment(b.comment,true).text.trim(),id=b.external_id?.trim();
  if(!id||id===b.code)return text;
- return text.split('\n').map(line=>line.split('|').filter(part=>part.trim()!==id).join('|')).join('\n').trim();
+ const reference=id.split('|').map(part=>part.trim());
+ return text.split('\n').map(line=>{
+  const parts=line.split('|'),kept:string[]=[];
+  for(let i=0;i<parts.length;){
+   if(reference.every((part,j)=>parts[i+j]?.trim()===part))i+=reference.length;
+   else kept.push(parts[i++]);
+  }
+  return kept.join('|').trim();
+ }).filter(Boolean).join('\n').trim();
 }
 export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b);
