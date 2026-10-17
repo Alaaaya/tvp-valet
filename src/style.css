@@ -37,3 +37,11 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .list-heading{height:auto!important;min-height:28px}.list-heading .export-btn{min-height:26px!important;height:26px!important;padding:0 12px}
 .flight-status{display:inline-block;margin-top:2px;padding:1px 5px;border-radius:6px;background:#fff;font-weight:700}.st-delayed{color:#b45309}.st-landed{color:#15803d}.st-approaching{color:#1d4ed8}.st-cancelled{color:#b91c1c}.st-diverted{color:#b91c1c}.st-scheduled,.st-unknown,.st-none{color:#475569}
 .provenance{margin-top:8px;font-size:12px;color:#475569}.provenance dl{margin:6px 0;display:grid;gap:4px}.provenance dt{font-weight:700}.provenance dd{margin:0;word-break:break-word}.refs.ext{display:block}
+.ops-panel{display:grid;gap:10px;margin:14px 0;padding:14px;border:1px solid var(--line,#2a3140);border-radius:14px}
+.ops-panel h3{margin:0;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.op-btn{min-height:48px;border-radius:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+.op-btn.ride{width:100%;min-height:56px}
+.op-btn:disabled{opacity:.7}
+.op-btn[aria-busy=true]{opacity:.6;cursor:progress}
+.filter-chips button[aria-pressed=true]{outline:2px solid currentColor}
