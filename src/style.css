@@ -108,3 +108,16 @@ html:root{background:#0f6b67}
 .header-actions>button{width:44px;min-height:44px;flex:none;color:#fff;padding:0}
 .header-actions>.new-booking{background:transparent;border:0;border-radius:6px}
 .header-actions>button:hover{background:#2d7e7a}
+/* 44px touch targets for date, search and filter controls */
+.date-strip{height:48px}
+.date-strip button{min-height:44px;min-width:44px;padding:0 6px}
+.date-strip .today-btn{padding:0 10px}
+.date-strip input{min-height:44px;width:150px}
+.search-row{height:60px;padding-bottom:8px}
+.now-button{min-height:44px;padding:0 12px}
+.search{height:44px}.search input{height:44px;min-height:44px}
+.filter{min-height:44px;min-width:44px}
+.filter-group input[type=date]{min-height:44px;width:150px}
+.filter-group input[type=number]{min-height:44px}
+.filter-chips button{min-height:44px}
+.list-heading .export-btn{min-height:44px!important;height:44px!important}
