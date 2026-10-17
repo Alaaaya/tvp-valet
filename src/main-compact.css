@@ -33,3 +33,14 @@
 .app.fixed-top .blr-cover{font-size:11px;padding:0 6px;border-width:1px}
 .app.fixed-top .blr-pay{font-size:11px;padding:0 7px;border-width:1px}
 .app.fixed-top .blr-check{top:2px;left:3px}.app.fixed-top .blr-check svg{width:14px;height:14px}
+/* Explicit line boxes preserve the full metadata stack within reference proportions. */
+.app.fixed-top .blr-body{gap:1px;padding:2px 0;line-height:11px}
+.app.fixed-top .blr-l1{min-height:13px;line-height:11px}
+.app.fixed-top .blr-badge{line-height:11px}
+.app.fixed-top .blr-l2{min-height:15px;line-height:15px}
+.app.fixed-top .blr-l3{min-height:14px;line-height:14px}
+.app.fixed-top .blr-flight,.app.fixed-top .blr-flight .flight-status,.app.fixed-top .blr-comment{line-height:11px}
+.app.fixed-top .blr-flight svg{width:11px;height:11px;vertical-align:middle}
+.app.fixed-top .blr-calls{min-height:12px;line-height:12px}
+.app.fixed-top .blr-calls .call-counter,.app.fixed-top .blr-calls .call-counter *{line-height:12px}
+.app.fixed-top .blr-side{line-height:14px}
