@@ -51,12 +51,20 @@ export function createPlateOcr(paths:OcrPaths=bundledPaths()):PlateOcr{
 export async function preparePlatePhoto(file:Blob):Promise<Blob>{
   if(file.size>MAX_OCR_BYTES)throw new Error('Das Foto ist zu groß (max. 15 MB).');
   if(file.type&&!file.type.startsWith('image/'))throw new Error('Bitte ein Foto auswählen.');
-  const bmp=await createImageBitmap(file,{imageOrientation:'from-image'} as never);
+  let bmp:ImageBitmap|HTMLImageElement;
+  try{
+    if(typeof createImageBitmap!=='function')throw new Error('fallback');
+    bmp=await createImageBitmap(file,{imageOrientation:'from-image'} as never);
+  }catch{
+    const url=URL.createObjectURL(file);
+    try{bmp=await new Promise<HTMLImageElement>((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Foto konnte nicht gelesen werden.'));img.src=url})}
+    finally{URL.revokeObjectURL(url)}
+  }
   try{
     const k=Math.min(1,OCR_SIDE/Math.max(bmp.width,bmp.height));
     const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*k));c.height=Math.max(1,Math.round(bmp.height*k));
     const g=c.getContext('2d');if(!g)throw new Error('Bildverarbeitung nicht verfügbar.');
     g.drawImage(bmp,0,0,c.width,c.height);
     return await new Promise<Blob>((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Bild konnte nicht verarbeitet werden.')),'image/png'));
-  }finally{bmp.close?.()}
+  }finally{if('close' in bmp)bmp.close()}
 }

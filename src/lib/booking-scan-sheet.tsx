@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
-import {parseQrPayload,normalizePlate,type PlateCandidate} from './booking-scan-parse';
+import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} from './booking-scan-parse';
 import {createQrDecoder,decodeQrFromFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
 import '../booking-scan.css';
@@ -49,7 +49,7 @@ export function BookingScanSheet(p:BookingScanSheetProps){
 }
 
 function Confirm({f,onLookup,onRetry}:{f:Found;onLookup:(r:ScanLookup)=>void;onRetry:()=>void}){
-  const[v,setV]=useState(f.value);const ok=f.kind==='qr'?v.trim().length>=3:normalizePlate(v).length>=2;
+  const[v,setV]=useState(f.value);const ok=f.kind==='qr'?isValidBookingCode(v.trim()):normalizePlate(v).length>=2;
   const go=()=>{if(!ok)return;onLookup({kind:f.kind,value:v.trim()})};
   return <form className="bsc-body" onSubmit={e=>{e.preventDefault();go()}}>
     <label className="bsc-lab">{f.kind==='qr'?'Buchungscode':'Kennzeichen'}
@@ -65,9 +65,9 @@ function Confirm({f,onLookup,onRetry}:{f:Found;onLookup:(r:ScanLookup)=>void;onR
 function useMounted(){const m=useRef(true);useEffect(()=>{m.current=true;return()=>{m.current=false}},[]);return m}
 
 function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
-  const video=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),gen=useRef(0),mounted=useMounted(),file=useRef<HTMLInputElement>(null),dec=useRef<QrDecoder|null>(null);
+  const video=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),gen=useRef(0),mounted=useMounted(),file=useRef<HTMLInputElement>(null),dec=useRef<QrDecoder|null>(null),fileJob=useRef(0);
   const[state,setState]=useState<'starting'|'live'|'nocam'>('starting');const[err,setErr]=useState('');const[manual,setManual]=useState('');
-  const stop=useCallback(()=>{gen.current++;stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(video.current)video.current.srcObject=null},[]);
+  const stop=useCallback(()=>{gen.current++;fileJob.current++;stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(video.current)video.current.srcObject=null},[]);
   const handle=useCallback((raw:string):boolean=>{
     const r=parseQrPayload(raw,{expectedHosts:hosts});
     if(!r.ok){setErr(r.reason);return false}
@@ -105,9 +105,9 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
   const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
-    const f=e.target.files?.[0];e.target.value='';if(!f)return;setErr('');
-    try{const raw=await decodeQrFromFile(f,dec.current||undefined);if(!mounted.current)return;if(!raw)setErr('Kein QR-Code im Foto erkannt.');else handle(raw)}
-    catch(x){if(mounted.current)setErr(x instanceof Error?x.message:'Foto konnte nicht gelesen werden.')}
+    const f=e.target.files?.[0];e.target.value='';if(!f)return;const job=++fileJob.current;setErr('');
+    try{const raw=await decodeQrFromFile(f,dec.current||undefined);if(!mounted.current||job!==fileJob.current)return;if(!raw)setErr('Kein QR-Code im Foto erkannt.');else handle(raw)}
+    catch(x){if(mounted.current&&job===fileJob.current)setErr(x instanceof Error?x.message:'Foto konnte nicht gelesen werden.')}
   };
   return <div className="bsc-body">
     <div className={'bsc-view'+(state==='live'?' live':'')}>
@@ -133,6 +133,7 @@ function PlatePane({onFound}:{onFound:(f:Found)=>void}){
   useEffect(()=>()=>{if(preview)URL.revokeObjectURL(preview)},[preview]);
   const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];e.target.value='';if(!f)return;
+    if(f.size>15*1024*1024||!f.type.startsWith('image/')){setErr('Bitte ein Foto bis 15 MB auswählen.');return}
     ctl.current?.abort();const c=ctl.current=new AbortController();const my=++job.current;setErr('');setBusy(true);setPreview(URL.createObjectURL(f));
     try{
       const m=await import('./booking-scan-ocr');
