@@ -30,3 +30,5 @@ it('booking-list is a positioned containing block so absolute children cannot ex
 it('scan focus fills search with code, scrolls row, never opens detail or touches filters',()=>{const m=readFileSync('src/main.tsx','utf8');expect(m).toContain('const focusBooking=(b:Booking)=>{setQuery(b.code);setFocusId(b.id)}');expect(m).toMatch(/if\(o\.status==='single'\)\{setScanOut\(null\);focusBooking\(o\.booking\)\}/);expect(m).not.toMatch(/focusBooking=[^;]*open\(/);expect(m).not.toMatch(/focusBooking=[^;]*setMf/);expect(m).toContain('return day(resolveEventTime(b,k,mf.flights')});
 
 it('direction chips persist through the user filter setter',()=>{expect(s).toContain("const setType=(t:MainBookingFilters['type'])=>changeMf({...mf,type:t})");expect(s).not.toContain('setType=(t:string)=>setMf')});
+
+it('choosing a hidden ambiguous match asks for its explicit date jump before touching search',()=>{expect(s).toContain("if(visible.some(e=>e.b.id===b.id)){setScanOut(null);focusBooking(b)}else setScanOut({status:'outside',bookings:[b],jumpDate:scanBookingDay(b)})");expect(s).toContain('rows,scanBookingDay')});
