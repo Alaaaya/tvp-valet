@@ -22,5 +22,6 @@ describe('BookingScanSheet',()=>{
   it('lookup only after explicit confirmation submit',()=>{
     expect(src.match(/onLookup\(/g)?.length).toBe(1);expect(src).toMatch(/onSubmit=\{e=>\{e\.preventDefault\(\);go\(\)\}\}/);
   });
+  it('image loader falls back to HTMLImageElement and guards pixels',()=>{const q=readFileSync(new URL('./booking-scan-qr.ts',import.meta.url),'utf8');expect(q).toMatch(/typeof createImageBitmap==='function'/);expect(q).toContain('new Image()');expect(q).toContain('URL.revokeObjectURL(url)');expect(q).toContain('MAX_PIXELS')});
   it('file input uses environment capture',()=>{expect(src.match(/capture="environment"/g)?.length).toBe(2)});
 });

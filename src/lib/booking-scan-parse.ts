@@ -3,7 +3,7 @@ export const MAX_CODE_LEN=40;
 const CODE_RE=/^[A-Za-z0-9][A-Za-z0-9-]{2,39}$/;
 const PARAM_KEYS=['code','booking','bookingcode','booking_code','b','id'];
 
-export type QrParse={ok:true;code:string;source:'plain'|'url-param'|'url-path'}|{ok:false;reason:string};
+export type QrParse={ok:true;code:string;source:'plain'|'url-param'|'url-path';alternatives?:string[]}|{ok:false;reason:string};
 
 /** letters/digits/hyphen only, 3..40 chars, must contain a digit or letter (never URL/markup chars) */
 export function isValidBookingCode(s:string):boolean{return CODE_RE.test(s)}
@@ -20,9 +20,14 @@ export function parseQrPayload(raw:string,opts:{expectedHosts?:string[]}={}):QrP
   try{u=new URL(t)}catch{return{ok:false,reason:'QR-Inhalt ist kein Buchungscode: '+preview(t)}}
   if(u.protocol!=='https:'&&u.protocol!=='http:')return{ok:false,reason:'QR-Inhalt ist kein Buchungscode: '+preview(t)};
   if(opts.expectedHosts&&!opts.expectedHosts.map(h=>h.toLowerCase()).includes(u.hostname.toLowerCase()))return{ok:false,reason:'Unbekannter Link ('+u.hostname+'). Nur Buchungscodes werden übernommen.'};
-  for(const k of PARAM_KEYS){
-    for(const [name,v] of u.searchParams)if(name.toLowerCase()===k){const c=v.trim().replace(/^#/,'');if(isValidBookingCode(c))return{ok:true,code:c.toUpperCase(),source:'url-param'}}
+  const found:string[]=[];
+  for(const [name,v] of u.searchParams){
+    if(!PARAM_KEYS.includes(name.toLowerCase()))continue;
+    const c=v.trim().replace(/^#/,'');
+    if(isValidBookingCode(c)&&!found.includes(c.toUpperCase()))found.push(c.toUpperCase());
   }
+  if(found.length===1)return{ok:true,code:found[0],source:'url-param'};
+  if(found.length>1)return{ok:true,code:found[0],source:'url-param',alternatives:found.slice(1)};
   const seg=u.pathname.split('/').filter(Boolean).pop();
   if(seg){let d=seg;try{d=decodeURIComponent(seg)}catch{/* keep raw */}d=d.replace(/^#/,'');if(isValidBookingCode(d)&&/\d/.test(d))return{ok:true,code:d.toUpperCase(),source:'url-path'}}
   return{ok:false,reason:'Link ohne erkennbaren Buchungscode: '+preview(t)};
