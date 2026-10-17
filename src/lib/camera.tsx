@@ -39,8 +39,8 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     const base:MediaTrackConstraints={facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}};
     try{
       if(wantAudio){try{s=await navigator.mediaDevices.getUserMedia({video:base,audio:true});audio=true}catch{/* no microphone: record video without sound */}}
-      if(!s)s=await navigator.mediaDevices.getUserMedia({video:base,audio:false});
-    }catch(e){if(my!==gen.current)return;setFallback(true);const n=(e as DOMException)?.name;setErr(n==='NotAllowedError'||n==='SecurityError'?'Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App.':'Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App.');return}
+      if(!s){if(my!==gen.current||!mounted.current)return;s=await navigator.mediaDevices.getUserMedia({video:base,audio:false})}
+    }catch(e){if(my!==gen.current||!mounted.current)return;setFallback(true);const n=(e as DOMException)?.name;setErr(n==='NotAllowedError'||n==='SecurityError'?'Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App.':'Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App.');return}
     if(my!==gen.current||!mounted.current){s.getTracks().forEach(t=>t.stop());return}
     stream.current=s;setHasAudio(audio);setFallback(false);setErr('');
     const track=s.getVideoTracks()[0];let c:Caps={};
@@ -51,7 +51,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   },[stopStream]);
 
   useEffect(()=>{mounted.current=true;start(false);
-    const vis=()=>{if(document.visibilityState==='hidden'){stopRecorder(false);stopStream()}else if(!stream.current&&!fallbackRef.current)start(false)};
+    const vis=()=>{if(document.visibilityState==='hidden'){gen.current++;stopRecorder(false);stopStream()}else if(!stream.current&&!fallbackRef.current)start(false)};
     document.addEventListener('visibilitychange',vis);
     return()=>{mounted.current=false;gen.current++;document.removeEventListener('visibilitychange',vis);stopRecorder(true);stopStream()}},[]);
   const fallbackRef=useRef(false);fallbackRef.current=fallback;
