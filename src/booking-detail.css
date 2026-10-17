@@ -22,3 +22,4 @@
 .detail-media .mg-grid img{width:100%;height:100%;object-fit:cover;border-radius:7px}
 .bd-comments p{font-size:14px}
 .bd input,.bd textarea,.bd select{font-size:16px;min-height:44px}
+.bd-sticky{position:sticky;top:62px;z-index:1}

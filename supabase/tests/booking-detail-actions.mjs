@@ -31,7 +31,7 @@ async function fresh(){
  await db.exec('reset role');
  return (await db.query("insert into public.bookings(customer_name,arrival_at,departure_at,spot) values('Isolated test','2026-10-17T07:00:00Z','2026-10-20T07:00:00Z','A1') returning *")).rows[0];
 }
-function snapshot(b,revision=0){return {status:b.status,checked_in_at:b.checked_in_at,checked_out_at:b.checked_out_at,spot:b.spot,lifecycle_revision:revision};}
+function snapshot(b,revision=0){return {status:b.status,checked_in_at:b.checked_in_at,checked_out_at:b.checked_out_at,spot:b.spot,lifecycle_revision:revision,detail_revision:b.detail_revision};}
 async function action(b,kind,target,request=randomUUID(),expected=snapshot(b)){
  return (await db.query('select * from public.apply_booking_detail_action($1,$2,$3,$4,$5)',[request,b.id,kind,target,JSON.stringify(expected)])).rows[0];
 }
@@ -44,13 +44,17 @@ let moved=await action(b,'spot','B2',req);assert.equal(moved.spot,'B2');checks++
 assert.deepEqual(await action(b,'spot','B2',req),moved);checks++;
 await reject(()=>action(b,'spot','C3',req),'23514');
 await reject(()=>action(b,'spot','C3'),'40001');
+// Spot ABA must not accept the original snapshot, even after returning to A1.
+const back=await action(moved,'spot','A1');
+await reject(()=>action(b,'spot','D4'),'40001');
+moved=await action(back,'spot','B2');
 await reject(()=>action(moved,'spot',''),'22023');
 await reject(()=>action(moved,'spot','x'.repeat(101)),'22023');
 await reject(()=>action(moved,'spot',' B2'),'22023');
 await reject(()=>action(moved,'spot','B2'),'22023');
 await reject(()=>action(moved,'status','confirmed'),'42501');
 const locations=(await db.query('select * from public.booking_location_history($1)',[b.id])).rows;
-assert.equal(locations.length,2);assert.equal(locations[1].old_spot,'A1');assert.equal(locations[1].new_spot,'B2');assert.equal(locations[1].actor_id,driver);checks+=4;
+assert.equal(locations.length,4);assert.equal(locations[1].old_spot,'A1');assert.equal(locations[1].new_spot,'B2');assert.equal(locations[1].actor_id,driver);checks+=4;
 assert.deepEqual(Object.keys(locations[1]).sort(),['id','occurred_at','actor_id','actor_name','old_spot','new_spot'].sort());checks++;
 assert.equal((await db.query('select * from public.booking_call_history($1)',[b.id])).rows.length,0);checks++;
 await db.query("select public.record_booking_operation($1,'customer_called')",[b.id]);
@@ -64,6 +68,13 @@ const c=await action(moved,'status','cancelled');assert.equal(c.status,'cancelle
 assert.equal(c.checked_in_at,null);assert.equal(c.checked_out_at,null);checks+=2;
 await reject(()=>action(c,'spot','C3'),'23514');
 await reject(()=>action(c,'status','no_show'),'23514');
+// Existing direct writes also increment and cannot spoof the revision.
+b=await fresh();await user(admin);
+await db.query("update public.bookings set spot='A2',detail_revision=9999 where id=$1",[b.id]);
+await db.query(`select public.update_booking_ops($1,'{"spot":"A1"}')`,[b.id]);
+const afterABA=(await db.query('select * from public.bookings where id=$1',[b.id])).rows[0];
+assert.equal(Number(afterABA.detail_revision),2);checks++;
+await reject(()=>action(b,'spot','D4'),'40001');
 // Preserve historical timestamps and reject both no_show and cancel after check-in/out.
 for(const complete of [false,true]){
  b=await fresh();await user(admin);

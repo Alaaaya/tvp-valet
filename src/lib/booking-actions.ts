@@ -1,7 +1,7 @@
 import {db} from '../api';
 import type {Booking} from '../model';
 
-type ActionBooking=Booking&{lifecycle_revision?:number};
+type ActionBooking=Booking&{lifecycle_revision?:number;detail_revision?:number};
 type ActionInput={booking:ActionBooking;requestId:string};
 export type BookingLocationHistory={id:number;occurred_at:string;actor_id:string|null;actor_name:string|null;old_spot:string|null;new_spot:string|null};
 export type BookingCallHistory={id:number;occurred_at:string;actor_id:string;actor_name:string|null};
@@ -15,14 +15,15 @@ function failure(error:{code?:string;message?:string}):Error{
 async function apply({booking,requestId}:ActionInput,action:'status'|'spot',target:string):Promise<ActionBooking>{
  validId(requestId);validId(booking.id);
  if(!db)throw new Error('Backend nicht eingerichtet');
- const revision=booking.lifecycle_revision??0;
- if(!Number.isSafeInteger(revision)||revision<0)throw new Error('Ungültiger Buchungsstand');
+ const revision=booking.lifecycle_revision;
+ const detailRevision=booking.detail_revision;
+ if(revision===undefined||!Number.isSafeInteger(revision)||revision<0||detailRevision===undefined||!Number.isSafeInteger(detailRevision)||detailRevision<0)throw new Error('Ungültiger Buchungsstand. Bitte neu laden.');
  const {data,error}=await db.rpc('apply_booking_detail_action',{
   p_request_id:requestId,p_booking_id:booking.id,p_action:action,p_target:target,
-  p_expected:{status:booking.status,checked_in_at:booking.checked_in_at,checked_out_at:booking.checked_out_at,spot:booking.spot??'',lifecycle_revision:revision}
+  p_expected:{status:booking.status,checked_in_at:booking.checked_in_at,checked_out_at:booking.checked_out_at,spot:booking.spot??'',lifecycle_revision:revision,detail_revision:detailRevision}
  });
  if(error)throw failure(error);
- if(!data||data.id!==booking.id)throw new Error('Keine Bestätigung vom Server');
+ if(!data||data.id!==booking.id||!Number.isSafeInteger(data.detail_revision)||data.detail_revision<0)throw new Error('Keine Bestätigung vom Server');
  return {...data,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,data[k]??''])),lifecycle_revision:revision} as ActionBooking;
 }
 export async function transitionBookingStatus(input:ActionInput&{status:'no_show'|'cancelled'}):Promise<ActionBooking>{
