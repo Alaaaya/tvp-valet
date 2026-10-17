@@ -4,6 +4,7 @@ it('scales list layout without transforms while preserving plate and touch safet
  expect(c).toContain('height:calc(85px * var(--list-scale))');
  expect(c).toContain('calc(55px * var(--list-scale))');
  expect(c).toContain('color:#111');
+ expect(c).toContain('list-size-preview{--list-scale:inherit;');
  expect(c).toContain('font-size:max(16px,16px * var(--list-scale))');
  expect(c).toContain('height:max(44px,44px * var(--list-scale))');
  expect(c).not.toMatch(/transform\s*:/);
