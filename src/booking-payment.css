@@ -1,0 +1,18 @@
+.bpay{background:#fff;padding:12px;border-bottom:1px solid #d5dcdc;color:#17302f}
+.bpay-h{margin:0 0 8px;font-size:16px}
+.bpay-sum{margin:0 0 10px;display:grid;gap:4px}.bpay-sum div{display:flex;justify-content:space-between;font-size:16px}.bpay-sum dt,.bpay-sum dd{margin:0}
+.bpay-sum .due dd{color:#c0392b;font-weight:700}.bpay-sum .ok dd{color:#2e9e5b;font-weight:700}
+.bpay button{min-height:44px;font:inherit;font-size:16px;border-radius:8px;border:1px solid #2c5f62;background:#fff;color:#2c5f62;padding:0 14px;cursor:pointer}
+.bpay-main,.bpay .bpay-ok{background:#1d7f84;color:#fff;border-color:#1d7f84;width:auto}
+.bpay-main{width:100%}
+.bpay button:disabled{opacity:.5;cursor:not-allowed}
+.bpay-note{font-size:14px;color:#51666a;margin:6px 0}
+.bpay-soon{display:grid;gap:6px;margin-top:10px}.bpay-soon button{text-align:left;border-color:#c5d0d0;color:#6b7c7e}.bpay-soon em{font-style:normal;font-size:12px;background:#e6eded;border-radius:8px;padding:2px 8px;margin-left:6px}
+.bpay-sheet{position:fixed;inset:0;z-index:60;background:rgba(10,30,30,.55);display:flex;align-items:flex-end}
+.bpay-card{background:#fff;width:100%;max-height:90vh;overflow:auto;padding:16px;border-radius:14px 14px 0 0;box-sizing:border-box}
+.bpay-card h4{margin:0 0 8px;font-size:17px}
+.bpay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.bpay-methods .on{background:#1d7f84;color:#fff;border-color:#1d7f84}
+.bpay-l{display:block;margin:12px 0 4px;font-size:14px;color:#51666a}
+.bpay-in{width:100%;box-sizing:border-box;min-height:44px;font-size:16px;padding:0 12px;border:1px solid #9fb0b0;border-radius:8px}
+.bpay-err{color:#c0392b;font-size:14px;margin:6px 0}.bpay-conf{background:#e8f3f3;padding:10px;border-radius:8px;font-size:15px}
+.bpay-act{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
