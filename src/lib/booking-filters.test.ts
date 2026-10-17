@@ -54,3 +54,13 @@ describe('main booking filters',()=>{
  it('survives corrupt storage, unavailable storage and unsigned identity',()=>{const storage={getItem:()=>'{invalid',setItem:()=>{throw Error('quota')}};expect(readMainFilters(storage,'u')).toEqual(defaultMainFilters());expect(()=>writeMainFilters(storage,'u',defaultMainFilters())).not.toThrow();expect(readMainFilters(storage,'')).toEqual(defaultMainFilters())});
  it.each(['','bad','2026-02-30'])('handles incomplete/invalid date %s without crashing',date=>{expect(events([row()],{},date)).toEqual([])});
 });
+
+describe('counter population',()=>{
+ const rows=[row({id:'a',status:'confirmed',checked_in_at:'2026-10-17T08:00:00Z'}),row({id:'b',status:'cancelled'}),row({id:'c',status:'no_show'})];
+ const pop=(f:Partial<ReturnType<typeof defaultMainFilters>>)=>mainBookingEvents(rows,'2026-10-17',{...defaultMainFilters(),...f,done:true,type:'all'},'u').filter(e=>e.kind==='in');
+ it('honors cancelled/no_show toggles, same as list except done/type',()=>{
+  expect(pop({}).map(e=>e.b.id)).toEqual(['a']);
+  expect(pop({cancelled:true}).map(e=>e.b.id).sort()).toEqual(['a','b']);
+  expect(pop({cancelled:true,noshow:true}).map(e=>e.b.id).sort()).toEqual(['a','b','c']);
+ });
+});
