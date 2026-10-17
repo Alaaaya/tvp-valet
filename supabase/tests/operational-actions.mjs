@@ -19,23 +19,24 @@ await db.query("insert into public.profiles(id,full_name,role) values($1,'Test A
 const booking=(await db.query("insert into public.bookings(customer_name,arrival_at,departure_at) values('Isolated test','2026-10-17T07:00:00Z','2026-10-20T07:00:00Z') returning *")).rows[0];
 async function user(id,role='authenticated'){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role '+role);}
 let checks=0;
-async function patch(value){return db.query('select * from public.update_booking_ops($1,$2::jsonb)',[booking.id,JSON.stringify(value)]);}
-async function fail(value,code){checks++;await assert.rejects(patch(value),e=>{assert.equal(e.code,code);return true;});}
+async function action(value){return db.query('select * from public.record_booking_operation($1,$2)',[booking.id,value]);}
+async function fail(value,code){checks++;await assert.rejects(action(value),e=>{assert.equal(e.code,code);return true;});}
 await user(driver);
-await fail({total:0},'22023');await fail({checked_in_at:null},'22023');
-await fail({taken_away_at:true},'22023');await fail({taken_away_at:'2026-10-17T08:00:00'},'22023');
-await fail({taken_away_at:'2026-10-17T08:00:00Z'},'23514');
-const checkin=(await db.query("select * from public.check_booking($1,'in')",[booking.id])).rows[0].checked_in_at;
-await fail({taken_away_at:'2026-10-17T00:00:00Z'},'23514');
-const called=new Date().toISOString();
-const after=(await patch({taken_away_at:called,customer_called_at:called,ride_started_at:called})).rows[0];
-for(const k of ['taken_away_at','customer_called_at','ride_started_at']) {assert.equal(new Date(after[k]).toISOString(),called);checks++;}
-assert.ok(checkin);assert.equal(after.total,'0.00');checks++;
-const direct=(await db.query('update public.bookings set total=999 where id=$1 returning *',[booking.id])).rows;
-assert.equal(direct.length,0);checks++;
+await fail('total','22023');await fail(null,'22023');await fail('taken_away','23514');await fail('ride_started','23514');
+const baseline=(await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0];
+const called=(await action('customer_called')).rows[0];assert.ok(called.customer_called_at);checks++;
+const retry=(await action('customer_called')).rows[0];assert.deepEqual(retry,called);checks++;
+assert.deepEqual((await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0],baseline);checks++;
+await db.query("select public.check_booking($1,'in')",[booking.id]);
+const afterCheck=(await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0];
+for(const name of ['taken_away','ride_started']){const op=(await action(name)).rows[0];assert.ok(op[name+'_at']);checks++;}
+assert.deepEqual((await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0],afterCheck);checks++;
+assert.equal((await db.query('select * from public.booking_operation_events')).rows.length,3);checks++;
+for(const sql of ["update public.booking_operations set updated_at=now()","delete from public.booking_operation_events","insert into public.booking_operations(booking_id,performed_by) values($1,$2)"]){await assert.rejects(db.query(sql,sql.includes('$1')?[booking.id,driver]:[]),e=>e.code==='42501');checks++;}
 await db.query("select public.check_booking($1,'out')",[booking.id]);
-await fail({ride_started_at:new Date(Date.now()+86400000).toISOString()},'23514');
-await patch({taken_away_at:null,customer_called_at:null,ride_started_at:null});checks++;
-await user('', 'anon');await fail({},'42501');
+await action('taken_away');checks++;
+await user('', 'anon');await fail('customer_called','42501');
+await db.exec('reset role');
+assert.ok((await db.query("select * from public.audit_log where entity='booking_operation_events'")).rows.length>=3);checks++;
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveBookingWrites:0}));
 await db.close();
