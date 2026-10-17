@@ -107,3 +107,10 @@ describe('truthful employee cash projection',()=>{
   expect(employeeCashTotals([{...booking,paid:100,total:100}],[]).previewTotalCents).toBe(0);
  });
 });
+
+it('never mistakes an explicit unpaid note for a cash recipient',()=>{
+ for(const note of ['20 Muss zahlen','10€ offen','30 nicht bezahlt','20 unpaid']){
+ const report=employeeCashTotals([{...booking,key_cash:note}],[]);
+ expect(report.totals).toEqual([]);expect(report.unparsedBookingIds).toEqual([booking.id]);expect(report.previewTotalCents).toBeNull();
+ }
+});

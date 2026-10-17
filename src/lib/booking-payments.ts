@@ -108,7 +108,7 @@ export function employeeCashTotals(bookings:readonly Booking[],payments:readonly
   if(cashBookings.has(b.id)){conflictBookingIds.push(b.id);continue;}
   // Conservative legacy grammar: one nonnegative amount, optional €, then a name.
   const match=/^(\d+(?:[.,]\d{1,2})?)\s*€?\s*([^\d€]*)$/.exec(raw);
-  if(!match){unparsedBookingIds.push(b.id);continue;}
+  if(!match||/muss\s+zahlen|noch\s+(?:zu\s+)?zahlen|nicht\s+bezahlt|unbezahlt|offen|unpaid|due/i.test(raw)){unparsedBookingIds.push(b.id);continue;}
   const amount=cents(Number(match[1].replace(',','.')));
   let name=match[2].trim().replace(/^ok/i,'').trim()||'Wael';
   if(name.toLowerCase()==='alaa')name='Alaa';
