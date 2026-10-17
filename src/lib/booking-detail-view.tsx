@@ -69,7 +69,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
     </section>
     <div className="split-handover">{(['in','out'] as const).map(k=>{const at=k==='in'?b.checked_in_at:b.checked_out_at,when=k==='in'?b.arrival_at:b.departure_at;return <section className={k} key={k}>
       <h3><Car size={17}/>{k==='in'?'PARKING DATE':'RETURN DATE'}</h3>
-      <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>Mileage: {b.km||0}</span>
+      <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>Mileage: {b.km==null?"–":b.km}</span>
         <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={15}/> {k==='in'?'Checked-in:':'Checked-out:'} {clock(at)}</>:k==='in'?'Check-in':'Check-out'}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         {k==='in'?act('taken_away','Mark as taken away',o?.taken_away_at,'fp-act'):act('retrieved','Mark as retrieved',o?.retrieved_at,'fp-act')}
