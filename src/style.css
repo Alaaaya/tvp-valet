@@ -80,7 +80,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .cash-row>*,.staff-row>*{overflow-wrap:anywhere}
 .identity-grid,.split-handover,.ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .admin-grid{grid-template-columns:minmax(0,1fr)}
-@media(min-width:651px) and (max-width:900px){.sidebar{padding-top:calc(26px + env(safe-area-inset-top));padding-bottom:calc(26px + env(safe-area-inset-bottom))}}
+.sidebar{padding-top:calc(26px + env(safe-area-inset-top))!important;padding-bottom:calc(26px + env(safe-area-inset-bottom))!important}
 @media(max-width:650px){
 input,select,textarea,.date-strip input,.filter-group input[type=date],.filter-group input[type=number],.form-grid input{font-size:16px!important;min-width:0;max-width:100%}
 input[type=datetime-local]{width:100%;display:block;-webkit-appearance:none;appearance:none}
