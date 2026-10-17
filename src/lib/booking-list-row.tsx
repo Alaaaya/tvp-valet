@@ -23,7 +23,7 @@ export function partnerBadge(b:{product?:string|null;platform?:string|null}):Par
 export function moneyState(b:Pick<Booking,'total'|'paid'>):{kind:'paid'|'due'|'none';text:string}{
  const due=Math.max(0,(b.total||0)-(b.paid||0));
  if(!b.total)return{kind:'none',text:''};
- return due>0?{kind:'due',text:money(due)+' offen'}:{kind:'paid',text:'Bezahlt '+money(b.total)};
+ return due>0?{kind:'due',text:'Offen | '+money(due)}:{kind:'paid',text:'Bezahlt | '+money(b.paid||0)};
 }
 export interface BookingListRowProps{
  b:Booking;kind:'in'|'out';time:string;completed:boolean;onOpen:(b:Booking)=>void;
