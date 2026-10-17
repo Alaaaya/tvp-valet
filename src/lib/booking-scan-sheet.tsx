@@ -14,7 +14,7 @@ export interface BookingScanSheetProps{
   expectedHosts?:string[];
 }
 type View='menu'|'qr'|'plate';
-type Found={kind:'qr'|'plate';value:string;note?:string;confidence?:number;alts?:PlateCandidate[]};
+type Found={kind:'qr'|'plate';value:string;note?:string;confidence?:number;alts?:{display:string;key:string}[]};
 
 export function BookingScanSheet(p:BookingScanSheetProps){
   const[view,setView]=useState<View>('menu');const[found,setFound]=useState<Found|null>(null);
@@ -71,7 +71,7 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   const handle=useCallback((raw:string):boolean=>{
     const r=parseQrPayload(raw,{expectedHosts:hosts});
     if(!r.ok){setErr(r.reason);return false}
-    stop();onFound({kind:'qr',value:r.code,note:r.source==='plain'?undefined:'Code aus QR-Link gelesen. Es wird kein Link geöffnet.'});return true;
+    stop();onFound({kind:'qr',value:r.code,note:r.alternatives?.length?'Mehrere Codes im QR-Link gefunden. Bitte den richtigen auswählen. Es wird kein Link geöffnet.':r.source==='plain'?undefined:'Code aus QR-Link gelesen. Es wird kein Link geöffnet.',alts:r.alternatives?.map(c=>({display:c,key:c}))});return true;
   },[hosts,onFound,stop]);
   useEffect(()=>{
     const my=++gen.current;let raf=0,timer=0,last='';

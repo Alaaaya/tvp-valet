@@ -54,6 +54,12 @@ describe('plate OCR (real tesseract.js, on-device, generated plate photos)',()=>
   it('finds no plate in an image without one',async()=>{
     const r=await ocr.recognize(readFileSync(fx('blank.png')));expect(r.candidates.filter(c=>c.score>=2)).toEqual([]);
   },120000);
+  it('aborting an in-flight job terminates the worker and the next job still works',async()=>{
+    const a=new AbortController();const t0=Date.now();
+    const p=ocr.recognize(readFileSync(fx('plate-de.png')),a.signal);setTimeout(()=>a.abort(),2);
+    await expect(p).rejects.toThrow('abgebrochen');expect(Date.now()-t0).toBeLessThan(500);
+    const r=await ocr.recognize(readFileSync(fx('plate-de.png')));expect(r.candidates.map(c=>c.key)).toContain('DAB1234');
+  },120000);
   it('rejects aborted jobs and after dispose',async()=>{
     const a=new AbortController();a.abort();await expect(ocr.recognize(readFileSync(fx('blank.png')),a.signal)).rejects.toThrow('abgebrochen');
     const o2=createPlateOcr({langPath,gzip:true} as never);await o2.dispose();await expect(o2.recognize(readFileSync(fx('blank.png')))).rejects.toThrow('abgebrochen');

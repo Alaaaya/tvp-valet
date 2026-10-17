@@ -20,6 +20,11 @@ describe('parseQrPayload',()=>{
     const r=parseQrPayload('https://travel.example/?code=ABC123',{expectedHosts:['TRAVEL.example']});
     expect(r.ok&&r.code).toBe('ABC123');expect(JSON.stringify(r)).not.toContain('http');
   });
+  it('multiple different codes are surfaced as alternatives, never silently one',()=>{
+    const r=parseQrPayload('https://x.example/?code=AAA111&booking=BBB222&code=AAA111');
+    expect(r).toMatchObject({ok:true,code:'AAA111',alternatives:['BBB222']});
+    expect(parseQrPayload('https://x.example/?code=AAA111&id=aaa111')).toEqual({ok:true,code:'AAA111',source:'url-param'});
+  });
   it('code validation',()=>{expect(isValidBookingCode('AF-YA4TQSG')).toBe(true);expect(isValidBookingCode('a/b')).toBe(false);expect(isValidBookingCode('-AB')).toBe(false)});
 });
 describe('plates',()=>{
