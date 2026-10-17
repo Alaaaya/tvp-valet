@@ -14,3 +14,10 @@ describe('scan lookup',()=>{
  });
  it('dedupes duplicate visible rows (in+out events)',()=>{expect(resolveScan({kind:'qr',value:'BKYBR'},[A,A],[A]).status).toBe('single')});
 });
+
+import {scanAfterJump} from './scan-lookup';
+it('post-jump visibility distinguishes a visible row from a still-filtered booking',()=>{
+ const booking={...blank(),id:'jump-target',code:'TARGET'};
+ expect(scanAfterJump(booking,[booking])).toBeNull();
+ expect(scanAfterJump(booking,[])).toEqual({status:'outside',bookings:[booking],jumpDate:null,filteredAfterJump:true});
+});
