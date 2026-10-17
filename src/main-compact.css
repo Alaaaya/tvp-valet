@@ -44,3 +44,10 @@
 .app.fixed-top .blr-calls{min-height:12px;line-height:12px}
 .app.fixed-top .blr-calls .call-counter,.app.fixed-top .blr-calls .call-counter *{line-height:12px}
 .app.fixed-top .blr-side{line-height:14px}
+/* Keep controls touchable at reference scale without shrinking their hit areas. */
+.app.fixed-top .search-row{height:48px}
+.app.fixed-top .search,.app.fixed-top .search input{height:44px;min-height:44px}
+.app.fixed-top .cam-search{width:44px;min-width:44px;min-height:44px}
+.app.fixed-top .now-button{min-height:44px}
+.app.fixed-top .date-strip{height:44px}
+.app.fixed-top .date-strip button,.app.fixed-top .date-strip .today-btn,.app.fixed-top .date-pick,.app.fixed-top .date-pick input{min-height:44px}
