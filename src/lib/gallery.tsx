@@ -24,6 +24,7 @@ export function useSignedUrls(){
   return{map,errs,ensure,bad,good,retry};
 }
 
+type Undo={undone_at?:string|null;undone_by?:string|null};const undone=(m:MediaItem)=>(m as MediaItem&Undo).undone_at||null;
 export function MediaGallery({bookingId,demo,refreshKey,local}:{bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[]}){
   const[items,setItems]=useState<MediaItem[]>([]),[err,setErr]=useState(''),[open,setOpen]=useState<number|null>(null),[loading,setLoading]=useState(false);
   const{map,errs,ensure,bad,good,retry}=useSignedUrls();const[reload,setReload]=useState(0);
@@ -35,8 +36,8 @@ export function MediaGallery({bookingId,demo,refreshKey,local}:{bookingId:string
     {err&&<p className="mg-err" role="alert">Medien konnten nicht geladen werden: {err} <button type="button" className="mg-retry" onClick={()=>setReload(x=>x+1)}>Erneut versuchen</button></p>}
     {loading&&!items.length&&<p className="mg-note" role="status">Medien werden geladen …</p>}
     {!loading&&!err&&!items.length&&<p className="mg-note">Noch keine Medien.</p>}
-    <div className="mg-grid">{items.map((m,i)=><button type="button" key={m.id} className="mg-tile" aria-label={'Medium '+(i+1)+' öffnen, '+kindLabel(m.kind)} onClick={()=>setOpen(i)}>
-      {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b></button>)}</div>
+    <div className="mg-grid">{items.map((m,i)=><button type="button" key={m.id} className={'mg-tile'+(undone(m)?' undone':'')} aria-label={'Medium '+(i+1)+' öffnen, '+kindLabel(m.kind)+(undone(m)?', rückgängig gemacht':'')} onClick={()=>setOpen(i)}>
+      {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b>{undone(m)&&<span className="mg-undone">Rückgängig gemacht</span>}</button>)}</div>
     {open!==null&&items[open]&&<Viewer items={items} index={open} setIndex={setOpen} onClose={()=>setOpen(null)} map={map} errs={errs} ensure={ensure} bad={bad} good={good} retry={retry}/>}
   </div>;
 }
@@ -65,7 +66,7 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
       <button type="button" className="gv-fs" aria-label={full?'Vollbild beenden':'Vollbild'} onClick={toggleFull}>{full?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button>
       {items.length>1&&<><button type="button" className="gv-nav l" aria-label="Zurück" onClick={()=>go(-1)}><ChevronLeft size={22}/></button><button type="button" className="gv-nav r" aria-label="Weiter" onClick={()=>go(1)}><ChevronRight size={22}/></button></>}
     </div>
-    <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.action&&<span>{m.action==='in'?'Check-in':'Check-out'}</span>}</div>
+    <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.action&&<span>{m.action==='in'?'Check-in':'Check-out'}</span>}{undone(m)&&<span>Rückgängig gemacht · {fmt(undone(m)!)}</span>}</div>
       <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label="Teilen" disabled={!!busy} onClick={share}><Share2 size={18}/></button>}<button type="button" className="gv-round" aria-label="Herunterladen" disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
     {msg&&<p className="gv-msg" role="alert">{msg}</p>}
     <h3 className="gv-title">Media ({items.filter(i=>i.kind==='photo').length} photos{items.some(i=>i.kind==='video')?', '+items.filter(i=>i.kind==='video').length+' videos':''})</h3>
