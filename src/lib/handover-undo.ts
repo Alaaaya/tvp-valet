@@ -13,7 +13,7 @@ export async function undoHandover({requestId,booking,action}:{requestId:string;
   p_request_id:requestId,p_booking_id:booking.id,p_action:action,
   p_expected_at:action==='in'?booking.checked_in_at:booking.checked_out_at
  });
- if(error)throw Error(error.code==='40001'?'Die Buchung wurde inzwischen geändert. Bitte schließen, neu laden und erneut prüfen.':error.message);
+ if(error)throw Error(['PT409','40001'].includes(error.code)?'Die Buchung wurde inzwischen geändert. Bitte schließen, neu laden und erneut prüfen.':error.message);
  if(!data)throw Error('Keine Bestätigung erhalten. Bitte mit derselben Rücknahme erneut versuchen.');
  const revision=await db.from('bookings').select('*,booking_handover_undos(count)').eq('id',booking.id).single();
  if(revision.error)throw revision.error;
