@@ -33,6 +33,10 @@ Legacy key_cash is historical and may already mean money received, even when pai
 says zero. Its relationship to price/paid is NOT inferred. Any digit-containing note
 blocks a new CASH payment, deliberately including ambiguous numeric key codes.
 Card/bank collections still increase paid but do not enter cash totals.
+Any preexisting digit-containing key_cash note is protected from ordinary changes
+or removal, including clearing to null, empty text or a nonnumeric note. Unchanged
+legacy notes and unrelated edits remain allowed. This protection applies before
+and after ledger creation and to staff RPCs, admin edits and service writes.
 Once cash ledger exists, adding a digit-containing key_cash note is prohibited.
 No note is auto-cleared, subtracted, allocated, rewritten or backfilled.
 Resolving such legacy cases requires a future explicit, reviewed reconciliation
@@ -45,8 +49,16 @@ legacy identity namespace, visibly marked source=legacy, not a guessed profile.
 Legacy amount-without-name means Wael; okAlaa means Alaa, matching the owner's rule.
 It does not silently merge identical display names across the two namespaces.
 A booking somehow containing both legacy numeric notes and cash receipts is flagged,
-never added twice. Unparseable numeric notes are flagged. In either case totalCents
-is null, so UI must show reconciliation required rather than an authoritative sum.
+never added twice. Unparseable numeric notes are flagged. In either case previewTotalCents
+is null, so UI must show reconciliation required rather than a summed preview.
+All client-computed reports are explicitly NON-SNAPSHOT previews. Separate booking
+reads and offset-paginated payment reads cannot guarantee a consistent view under
+concurrent commits. totalCents is ALWAYS null and snapshotConsistent is always false.
+previewTotalCents is only a best-effort preview, not a financial statement. UI MUST
+label the entire report and employee rows as Vorschau / kein konsistenter Stand,
+using the returned label, and must not describe previewTotalCents as authoritative.
+A future single-statement authenticated database aggregate/snapshot is required
+before an authoritative report is exposed. No such RPC is claimed here.
 Per-source rows remain available for explanation. No claim of all-time employee
 cash is valid unless the caller supplies all relevant bookings/receipts.
 Manual off-system cash adjustments (such as the separately reported €180) are not
@@ -68,3 +80,7 @@ precision validation, snapshots, legacy guards, audit and forced-write rollback.
 It never reads .env files or opens a network connection. Real multi-session lock
 contention is not simulated by PGlite; booking FOR UPDATE and advisory request
 locks are present, while actual production concurrency testing remains separate.
+
+Client decimal conversion uses a two-decimal string and exact numeric roundtrip,
+not a binary value*100 epsilon. The NUMERIC(12,2) upper values 9999999999.97
+and 9999999999.99 are accepted; fractional-cent inputs are rejected.

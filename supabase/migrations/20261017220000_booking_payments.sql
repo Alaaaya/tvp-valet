@@ -41,6 +41,10 @@ begin
    and p.transaction_id=txid_current() and p.actor_id=auth.uid()
    and p.expected_paid_cents=old.paid*100 and p.paid_after_cents=new.paid*100
  ) then raise exception 'Use record_booking_payment to change paid' using errcode='42501'; end if;
+ -- Historical numeric notes cannot be erased/changed to bypass legacy cash protection.
+ -- No ordinary edit path may reconcile history; unchanged notes remain allowed.
+ if new.key_cash is distinct from old.key_cash and coalesce(old.key_cash,'') ~ '[0-9]'
+ then raise exception 'Historical cash/key note requires explicit reconciliation' using errcode='23514'; end if;
  -- A later legacy note cannot double-count new cash. Nonmonetary notes remain editable.
  if new.key_cash is distinct from old.key_cash and coalesce(new.key_cash,'') ~ '[0-9]'
   and exists(select 1 from public.booking_payments where booking_id=old.id and method='cash')

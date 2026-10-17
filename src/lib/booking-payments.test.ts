@@ -32,6 +32,18 @@ describe('atomic payments client',()=>{
   await expect(recordBookingPayment({booking,requestId:'oops',amountCents:1,method:'cash'})).rejects.toThrow('ID');
   await expect(recordBookingPayment({booking:{...booking,status:'cancelled'},requestId,amountCents:1,method:'cash'})).rejects.toThrow('bestätigt');
  });
+ it('converts full NUMERIC(12,2) range without binary cent tolerance errors',()=>{
+  expect(outstandingCents({total:9999999999.97,paid:0})).toBe(999999999997);
+  expect(outstandingCents({total:9999999999.99,paid:0})).toBe(999999999999);
+  expect(outstandingCents({total:0.29,paid:0})).toBe(29);
+  expect(()=>outstandingCents({total:10000000000,paid:0})).toThrow();
+  expect(()=>outstandingCents({total:1.001,paid:0})).toThrow();
+ });
+ it('never presents offset-loaded inputs as a consistent authoritative sum',()=>{
+  const report=employeeCashTotals([booking],[receipt]);
+  expect(report.totalCents).toBeNull();expect(report.previewTotalCents).toBe(1000);
+  expect(report.snapshotConsistent).toBe(false);expect(report.label).toContain('Vorschau');
+ });
  it('does not infer payment from a provider or total',()=>{
   expect(outstandingCents(booking)).toBe(9015);
   expect(outstandingCents({...booking,paid:110})).toBe(0);
@@ -68,14 +80,14 @@ describe('truthful employee cash projection',()=>{
  it('uses server actor, separates legacy identity and ignores card/provider/paid',()=>{
   const legacy={...blank(),key_cash:'30€ okAlaa'};
   const report=employeeCashTotals([booking,legacy],[receipt,{...receipt,id:'card',method:'card',amount_cents:9000}]);
-  expect(report.totalCents).toBe(4000);
+  expect(report.previewTotalCents).toBe(4000);
   expect(report.totals).toEqual([
    {employeeId:'actor',employeeName:'Server Name',source:'ledger',cashCents:1000},
    {employeeId:'legacy:alaa',employeeName:'Alaa',source:'legacy',cashCents:3000}
   ]);
  });
  it('deduplicates rows and receipts, scopes all amounts to selected bookings',()=>{
-  expect(employeeCashTotals([booking,booking],[receipt,receipt,{...receipt,id:'other',booking_id:'other'}]).totalCents).toBe(1000);
+  expect(employeeCashTotals([booking,booking],[receipt,receipt,{...receipt,id:'other',booking_id:'other'}]).previewTotalCents).toBe(1000);
  });
  it('defaults unnamed historical cash to Wael without matching a server identity',()=>{
   expect(employeeCashTotals([{...booking,key_cash:'10€'}],[]).totals[0]).toEqual({
@@ -92,6 +104,6 @@ describe('truthful employee cash projection',()=>{
   expect(report.totalCents).toBeNull();expect(report.unparsedBookingIds).toEqual([booking.id]);
  });
  it('does not count received paid or a price as cash',()=>{
-  expect(employeeCashTotals([{...booking,paid:100,total:100}],[]).totalCents).toBe(0);
+  expect(employeeCashTotals([{...booking,paid:100,total:100}],[]).previewTotalCents).toBe(0);
  });
 });
