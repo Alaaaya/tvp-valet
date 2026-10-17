@@ -3,7 +3,7 @@ const s=readFileSync('src/main.tsx','utf8');
 it('main list is compact and ParkingPro-like',()=>{
  expect(s).not.toMatch(/Aktuelle DUS-Flugtafel|FAHRTEN<|NACH UHRZEIT SORTIERT|className="live-note"|className="list-heading"><span>\{visible/);
  expect(s).not.toContain('className="filter chosen');
- expect(s).toMatch(/className="cam-search"/);expect(s).not.toMatch(/ocr/i);expect(s).toContain("setNotice('Kennzeichenerkennung noch nicht verfügbar')");expect(s).toMatch(/className="cam-search"[^>]*aria-disabled="true"|aria-disabled="true"[^>]*className="cam-search"|className="cam-search" aria-disabled/);
+ expect(s).toMatch(/className="cam-search"/);expect(s).toContain('setScanOpen(true)');expect(s).toContain('<BookingScanSheet onLookup={onScan}');expect(s).not.toContain('Kennzeichenerkennung noch nicht verfügbar');
  expect(s).toMatch(/date\.split\('-'\)\.reverse\(\)\.join\('\.'\)/);expect(s).toMatch(/date!==day\(\)&&<button className="today-btn"/);
  expect(s).toMatch(/const exportCsv=/);expect(s).toMatch(/CSV exportieren/);
  expect((s.match(/aria-label="Filter"/g)||[]).length).toBe(1);
@@ -22,3 +22,5 @@ it('fixed-top shell: only booking-list scrolls, opaque',()=>{
  const blk=c.slice(c.indexOf('/* Main list: header'));expect(blk).not.toMatch(/blur|backdrop|box-shadow|opacity/);
  expect(s.indexOf('className="counters"')).toBeLessThan(s.indexOf('className="booking-list"'));
 });
+
+it('scan wiring + footer hidden in fixed-top shell',()=>{expect(s).toContain('resolveScan(q,visible.map(e=>e.b),rows');expect(s).toContain('<ScanResult outcome={scanOut}');expect(readFileSync('src/main-list.css','utf8')).toContain('.app.fixed-top .page>footer{display:none}')});
