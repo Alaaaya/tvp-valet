@@ -15,3 +15,10 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .booking-row{min-height:108px}
 
 .drawer-close{position:absolute;right:10px;top:14px;color:#64817a;width:35px;min-height:35px}.sidebar>.brand{padding-right:25px}
+
+.nav-badge{margin-left:auto;background:#e03e3e;color:#fff;border-radius:999px;padding:1px 8px;font-size:12px}
+.occupancy{margin:12px 16px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+.occ-bars{display:flex;gap:5px;align-items:flex-end;height:48px}.occ-bars i{flex:1;background:#4ca367;border-radius:3px 3px 0 0}
+.occupancy small{display:block;margin-top:6px;color:#64748b;font-size:12px}
+.export-btn{border:1px solid #2d6a6a;color:#2d6a6a;background:#fff;border-radius:999px;padding:2px 12px;font-weight:600;cursor:pointer}
+.filter-group input[type=number]{width:64px;text-align:center;border:1px solid #80bcb3;border-radius:8px;padding:6px;color:#469a84}
