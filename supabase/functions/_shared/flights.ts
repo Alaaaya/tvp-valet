@@ -22,7 +22,7 @@ export interface FlightUpdatesResult {
 }
 export function normalizeFlightNumber(value: string): string {
   const compact = value.trim().toUpperCase().replace(/[\s-]/g, '');
-  const m = /^([A-Z0-9]{2}|[A-Z]{3})(\d{1,4})([A-Z]?)$/.exec(compact);
+  const m = /^([A-Z0-9]{2}|[A-Z]{3})(0*\d{1,4})([A-Z]?)$/.exec(compact);
   if (!m || !/[A-Z]/.test(m[1])) throw new Error('Ungültige Flugnummer');
   return `${m[1]}${Number(m[2])}${m[3]}`;
 }

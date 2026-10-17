@@ -22,3 +22,11 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .occupancy small{display:block;margin-top:6px;color:#64748b;font-size:12px}
 .export-btn{border:1px solid #2d6a6a;color:#2d6a6a;background:#fff;border-radius:999px;padding:2px 12px;font-weight:600;cursor:pointer}
 .filter-group input[type=number]{width:64px;text-align:center;border:1px solid #80bcb3;border-radius:8px;padding:6px;color:#469a84}
+
+.topbar{background:#0d6e66!important;height:56px!important}
+.search-row{background:#0a5c55!important}
+.counter.incoming{background:#1da463!important}.counter.outgoing{background:#e83d36!important}
+.time-block{background:#9fecca!important;width:64px!important}.booking-row.out .time-block{background:#fdb9bc!important}
+.time-block strong{font-size:13px}.time-block span{font-size:11px}
+.split-handover section.in{background:#509f66!important}.split-handover section.out{background:#d84846!important}
+.flight-panel small{display:block;opacity:.9;font-size:12px}
