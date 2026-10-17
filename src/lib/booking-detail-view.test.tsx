@@ -1,0 +1,19 @@
+import React from 'react';
+import {renderToStaticMarkup as r} from 'react-dom/server';
+import {readFileSync} from 'node:fs';
+import {describe,expect,it} from 'vitest';
+import {BookingDetailView,serviceInfo,parkingDays,personsLabel,NO_COMMENTS,OCR_NOTE} from './booking-detail-view';
+import {blank} from '../model';
+const base={...blank(),code:'AF-1',external_id:'206095322',customer_name:'Latifa',phone:'+31',email:'a@b.c',persons:4,plate:'JNG35R',product:'AG-V-C',covered:true,total:60,paid:60,arrival_at:'2026-10-09T10:00:00Z',departure_at:'2026-10-17T12:20:00Z',checked_in_at:'2026-10-09T10:29:00Z'};
+const props=(b:any,x:any={})=>({booking:b,known:true,flightIn:<i>IN</i>,flightOut:<i>OUT</i>,onBack:()=>{},onEdit:()=>{},onStartCheck:()=>{},onAction:()=>{},...x});
+describe('booking detail view',()=>{
+  it('real balances and days',()=>{const h=r(<BookingDetailView {...props(base)}/>);expect(h).toMatch(/Booking #AF-1/);expect(h).toMatch(/Total due payable/);expect(h).toMatch(/0,00/);expect(h).toContain('9 days');expect(parkingDays(base)).toBe(9);expect(h).not.toMatch(/Outstanding amount/)});
+  it('due banner and persons',()=>{const h=r(<BookingDetailView {...props({...base,paid:10})}/>);expect(h).toMatch(/Outstanding amount/);expect(personsLabel(1)).toBe('1 person');expect(personsLabel(0)).toBe('Add number of persons');expect(r(<BookingDetailView {...props(base)}/>)).toContain('4 persons')});
+  it('check only when checked in; actual statuses only',()=>{expect(r(<BookingDetailView {...props(base)}/>)).toContain('pp-check');const h=r(<BookingDetailView {...props({...base,checked_in_at:null})}/>);expect(h).not.toContain('pp-check');expect(h).not.toMatch(/Mark as taken away · /);expect(h).toMatch(/Not assigned to driver/)});
+  it('ops timestamps shown when real',()=>{const h=r(<BookingDetailView {...props(base,{ops:{booking_id:'x',taken_away_at:'2026-10-09T11:00:00Z',retrieved_at:null,customer_called_at:null,ride_started_at:null,performed_by:'',updated_at:''}})}/>);expect(h).toMatch(/Mark as taken away · /);expect(h).toMatch(/Has called/)});
+  it('service metadata not invented',()=>{expect(serviceInfo({product:'WEB-F',covered:false},'').service).toBe('');expect(serviceInfo({product:'AG-V-C',covered:true},'').service).toBe('Valet');expect(serviceInfo({product:'X',covered:false},'P2 - Überdachte').location).toBe('P2 - Überdachte');expect(serviceInfo({product:'X',covered:false},'').location).toBe('X');const h=r(<BookingDetailView {...props({...base,product:'WEB-F',covered:false})}/>);expect(h).not.toContain('P2')});
+  it('ocr disabled and honest',()=>{const h=r(<BookingDetailView {...props(base)}/>);expect(h).toMatch(/<button[^>]*(disabled=""[^>]*aria-describedby|aria-describedby[^>]*disabled="")[^>]*>[^<]*<svg/);expect(h).toContain(OCR_NOTE)});
+  it('empty comments and slots',()=>{const h=r(<BookingDetailView {...props(base,{undoSlot:<b id="u"/>,mediaAdd:<label className="upload">+</label>})}/>);expect(h).toContain(NO_COMMENTS);expect(h).toContain('id="u"');expect(h).toContain('bd-media')});
+  it('flight green number only region is caller slot',()=>{const h=r(<BookingDetailView {...props(base)}/>);expect(h.indexOf('IN')).toBeLessThan(h.indexOf('OUT'))});
+  it('css solid no fog, 16px fields',()=>{const c=readFileSync('src/booking-detail.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/font-size:16px/)});
+});
