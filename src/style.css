@@ -74,16 +74,24 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 /* mobile bounds */
 *,*::before,*::after{box-sizing:border-box}
 html,body{max-width:100%;overflow-x:hidden}
-#root,main,section,form,label,.login,.login-panel,.login-art{min-width:0;max-width:100%}
+#root,main,section,form,label,.login,.login-panel,.login-art,.filter-content,.filter-group,.detail-section,.identity-grid>div,.split-handover>section,.ops-grid>*,.form-grid>*,.admin-grid>*,.staff-row>*,.cash-row>*{min-width:0;max-width:100%}
+.filter-chips{flex-wrap:wrap}
+.cash-row,.staff-row{flex-wrap:wrap;gap:6px 12px;min-width:0}
+.cash-row>*,.staff-row>*{overflow-wrap:anywhere}
+.identity-grid,.split-handover,.ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.admin-grid{grid-template-columns:minmax(0,1fr)}
+@media(min-width:651px) and (max-width:900px){.sidebar{padding-top:calc(26px + env(safe-area-inset-top));padding-bottom:calc(26px + env(safe-area-inset-bottom))}}
 @media(max-width:650px){
-input,select,textarea{font-size:16px!important;min-width:0;max-width:100%}
-input[type=datetime-local],input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;width:100%;max-width:100%;display:block}
+input,select,textarea,.date-strip input,.filter-group input[type=date],.filter-group input[type=number],.form-grid input{font-size:16px!important;min-width:0;max-width:100%}
+input[type=datetime-local]{width:100%;display:block;-webkit-appearance:none;appearance:none}
+.date-strip input{width:158px}
+.filter-group input[type=date]{width:150px}
 .login{grid-template-columns:minmax(0,1fr)}
 .login-art{padding:calc(28px + env(safe-area-inset-top)) 20px 28px}
 .login-panel{padding:24px 16px calc(24px + env(safe-area-inset-bottom))}
-form,.grid,[class*=grid]{grid-template-columns:minmax(0,1fr)!important}
-.filters,.chips,[class*=filter],[class*=chip]{flex-wrap:wrap;min-width:0}
-h1,h2,h3,p,small,strong,span,td,a{overflow-wrap:anywhere}
-body{padding-bottom:env(safe-area-inset-bottom)}
-header,.topbar,.top{padding-top:max(env(safe-area-inset-top),0px)}
+.form-grid{grid-template-columns:minmax(0,1fr)}
+.topbar{height:calc(56px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
+.detail>header{padding-top:env(safe-area-inset-top);min-height:calc(62px + env(safe-area-inset-top))}
+.filter-screen>header{height:calc(62px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
+h1,h2,h3,p,small,strong,td{overflow-wrap:anywhere}
 }
