@@ -2,7 +2,9 @@ import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 
-export const MAX_MEDIA=40,MAX_VIDEO_SECONDS=120,MAX_VIDEO_BYTES=45*1024*1024;
+import {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES,validateVideoSize,validateFallbackVideo} from './camera-validation';
+export {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES} from './camera-validation';
+export const MAX_MEDIA=40;
 const VIDEO_TYPES=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
 export function pickVideoMime(rec:{isTypeSupported?:(t:string)=>boolean}|undefined):string|null{
   if(!rec||typeof rec.isTypeSupported!=='function')return null;
@@ -77,7 +79,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     r.onerror=ev=>{window.clearInterval(timer.current);setRecording(false);discard.current=true;try{if(r.state!=='inactive')r.stop()}catch{}chunks.current=[];if(mounted.current)setNote('Videoaufnahme fehlgeschlagen'+((ev as any)?.error?.message?': '+(ev as any).error.message:'')+'.')};
     r.ondataavailable=e=>{if(e.data&&e.data.size){chunks.current.push(e.data);bytes.current+=e.data.size;if(bytes.current>=MAX_VIDEO_BYTES&&r.state==='recording'){setNote('Video auf 45 MB begrenzt.');r.stop()}}};
     r.onstop=()=>{window.clearInterval(timer.current);setRecording(false);const drop=discard.current;const type=(r.mimeType||mime||'video/webm').split(';')[0];const parts=chunks.current;chunks.current=[];if(drop||!parts.length)return;
-      const blob=new Blob(parts,{type});try{if(mounted.current)onAdd(createPendingMedia(blob,'video','video-'+stamp()+'.'+(type.includes('mp4')?'mp4':'webm')))}catch(e){setNote(e instanceof Error?e.message:String(e))}};
+      const blob=new Blob(parts,{type});if(!mounted.current)return;try{validateVideoSize(blob.size);onAdd(createPendingMedia(blob,'video','video-'+stamp()+'.'+(type.includes('mp4')?'mp4':'webm')))}catch(e){setNote(e instanceof Error?e.message:String(e))}};
     try{r.start(1000)}catch(e){rec.current=null;setNote('Videoaufnahme konnte nicht gestartet werden'+(e instanceof Error&&e.message?': '+e.message:'')+'.');return}
     setRecording(true);setSecs(0);const t0=Date.now();
     timer.current=window.setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);setSecs(s);if(s>=MAX_VIDEO_SECONDS&&r.state==='recording'){setNote('Video auf 120 Sekunden begrenzt.');r.stop()}},500);
@@ -90,11 +92,11 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     await start(m==='video');
   }
 
-  function onFiles(e:React.ChangeEvent<HTMLInputElement>){
+  async function onFiles(e:React.ChangeEvent<HTMLInputElement>){
     const files=Array.from(e.target.files||[]);e.target.value='';let n=media.length;
     for(const f of files){if(n>=MAX_MEDIA){setNote('Maximal '+MAX_MEDIA+' Medien.');break}
       const kind=f.type.startsWith('video/')?'video':'photo';
-      try{onAdd(createPendingMedia(f,kind,f.name||kind+'-'+stamp()));n++;setNote('')}catch(er){setNote(er instanceof Error?er.message:String(er))}}
+      try{if(kind==='video')await validateFallbackVideo(f);if(!mounted.current)return;onAdd(createPendingMedia(f,kind,f.name||kind+'-'+stamp()));n++;setNote('')}catch(er){if(!mounted.current)return;setNote(er instanceof Error?er.message:String(er))}}
   }
   const zs=caps.zoom;
   return <div className="cam" role="dialog" aria-modal="true" aria-label={title}>
