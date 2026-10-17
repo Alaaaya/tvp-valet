@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.117.3';
-import { readDusDay, selectFlights, validateFlightRequest } from '../_shared/flights.ts';
+import { readDusDay, selectFlights, validateFlightRequest, validateFlightDateRange } from '../_shared/flights.ts';
 import type {FlightUpdate} from '../_shared/flights.ts';
 
 const allowedOrigins = new Set(['https://alaaaya.github.io', 'http://localhost:5173']);
@@ -44,29 +44,30 @@ Deno.serve(async request => {
     try {input = validateFlightRequest(JSON.parse(raw));} catch(error) {
       return reply({error:error instanceof Error ? error.message : 'Ungültige Anfrage'},400);
     }
-    const {date,flightNumbers} = input;
-    // Public board is near-term data, not a historical archive or flight timetable service.
-    const today = new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Berlin'}).format(new Date());
-    if (Math.abs(Date.parse(date)-Date.parse(today)) > 7*86400000)
-      return reply({error:'DUS-Liveflüge nur innerhalb von 7 Tagen verfügbar'},422);
-    if (!flightNumbers.length) return reply(selectFlights([],[],new Date().toISOString(),false));
-    const previous = days.get(date);
+    const {date,flightNumbers,direction} = input;
+    // DUS publishes date-valid schedules too. Empty future days are neutral, never errors or inferred recurrences.
+    try { validateFlightDateRange(date); } catch (error) {
+      return reply({error:(error as Error).message},422);
+    }
+    if (!flightNumbers.length) return reply(selectFlights([],[],new Date().toISOString(),false,direction,date));
+    const cacheKey = `${direction}:${date}`;
+    const previous = days.get(cacheKey);
     let day = previous;
     const cached = !!day && now-day.fetchedAt < CACHE_MS;
     if (!cached) {
-      let job = pending.get(date);
+      let job = pending.get(cacheKey);
       if (!job) {
-        job = readDusDay(date).then(flights => {
+        job = readDusDay(date,fetch,direction).then(flights => {
           const result = {flights,fetchedAt:Date.now(),updatedAt:new Date().toISOString()};
           if (days.size >= 16) days.delete(days.keys().next().value!);
-          days.set(date,result);
+          days.set(cacheKey,result);
           return result;
-        }).finally(() => pending.delete(date));
-        pending.set(date,job);
+        }).finally(() => pending.delete(cacheKey));
+        pending.set(cacheKey,job);
       }
       day = await job;
     }
-    return reply(selectFlights(day!.flights,flightNumbers,day!.updatedAt,cached));
+    return reply(selectFlights(day!.flights,flightNumbers,day!.updatedAt,cached,direction,date));
   } catch {
     // Never expose upstream bodies, JWTs, project keys, or infrastructure error details.
     return reply({error:'DUS-Livequelle momentan nicht erreichbar. Keine aktuellen Flugzeiten verfügbar.'},502);
