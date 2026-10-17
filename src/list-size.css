@@ -1,0 +1,46 @@
+/* Preference scales list geometry, never the viewport or its hit areas. */
+.app{--list-scale:1.2}
+.app.fixed-top .blr-main{grid-template-columns:calc(55px * var(--list-scale)) minmax(0,1fr) auto;gap:calc(4px * var(--list-scale));min-height:calc(85px * var(--list-scale));height:calc(85px * var(--list-scale));max-height:calc(85px * var(--list-scale));padding-right:calc(6px * var(--list-scale))}
+.app.fixed-top .blr-time,.app.fixed-top .blr.done .blr-time{gap:calc(3px * var(--list-scale));padding:calc(4px * var(--list-scale)) calc(1px * var(--list-scale));border-left-width:calc(4px * var(--list-scale))}
+.app.fixed-top .blr-time strong{font-size:calc(13px * var(--list-scale))}
+.app.fixed-top .blr-tf{font-size:calc(10px * var(--list-scale));max-width:100%;gap:calc(2px * var(--list-scale))}
+.app.fixed-top .blr-tf svg{width:calc(11px * var(--list-scale));height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-ico svg{width:calc(14px * var(--list-scale));height:calc(14px * var(--list-scale))}
+.app.fixed-top .blr-body{gap:calc(1px * var(--list-scale));padding:calc(2px * var(--list-scale)) 0;max-height:calc(85px * var(--list-scale));line-height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-line{gap:calc(4px * var(--list-scale))}
+.app.fixed-top .blr-l1{min-height:calc(13px * var(--list-scale));line-height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-l2{min-height:calc(15px * var(--list-scale));line-height:calc(15px * var(--list-scale))}
+.app.fixed-top .blr-l3{min-height:calc(14px * var(--list-scale));line-height:calc(14px * var(--list-scale))}
+.app.fixed-top .blr-badge{font-size:calc(10px * var(--list-scale));line-height:calc(11px * var(--list-scale));padding:0 calc(6px * var(--list-scale))}
+.app.fixed-top .blr-plate{font-size:calc(13px * var(--list-scale));color:#111;letter-spacing:0}
+.app.fixed-top .blr-code,.app.fixed-top .blr-keycode{font-size:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-name{font-size:calc(12px * var(--list-scale))}
+.app.fixed-top .blr-flight,.app.fixed-top .blr-flight .flight-status,.app.fixed-top .blr-actual-flight,.app.fixed-top .blr-comment,.app.fixed-top .blr-calls,.app.fixed-top .blr .call-counter,.app.fixed-top .blr .call-counter *{font-size:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-flight,.app.fixed-top .blr-flight .flight-status,.app.fixed-top .blr-comment{line-height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-comment{max-height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-flight svg,.app.fixed-top .blr-l3 svg,.app.fixed-top .blr-key svg,.app.fixed-top .blr-cc svg,.app.fixed-top .blr-pn svg{width:calc(11px * var(--list-scale));height:calc(11px * var(--list-scale))}
+.app.fixed-top .blr-calls{height:calc(12px * var(--list-scale));min-height:calc(12px * var(--list-scale));max-height:calc(12px * var(--list-scale))}
+.app.fixed-top .blr-calls .call-counter,.app.fixed-top .blr-calls .call-counter *{line-height:calc(12px * var(--list-scale));max-height:calc(12px * var(--list-scale))}
+.app.fixed-top .blr-side{font-size:calc(11px * var(--list-scale));gap:calc(3px * var(--list-scale));line-height:calc(14px * var(--list-scale));max-width:min(90px,23vw);padding:calc(4px * var(--list-scale)) 0}
+.app.fixed-top .blr-cover,.app.fixed-top .blr-pay{font-size:calc(11px * var(--list-scale));padding:0 calc(5px * var(--list-scale))}
+.app.fixed-top .blr-check svg{width:calc(14px * var(--list-scale));height:calc(14px * var(--list-scale))}
+.app.fixed-top .topbar{height:calc(max(44px,44px * var(--list-scale)) + env(safe-area-inset-top))!important}
+.app.fixed-top .topbar>strong{font-size:min(18px,15px * var(--list-scale));white-space:nowrap;min-width:0;letter-spacing:0}
+.app.fixed-top .counter{height:max(44px,44px * var(--list-scale));padding:calc(2px * var(--list-scale)) calc(8px * var(--list-scale))}
+.app.fixed-top .counter>div>span{font-size:calc(12px * var(--list-scale));white-space:nowrap}
+.app.fixed-top .counter strong,.app.fixed-top .counter strong small{font-size:calc(18px * var(--list-scale))}
+.app.fixed-top .counter>div svg{width:calc(16px * var(--list-scale));height:calc(16px * var(--list-scale))}
+.app.fixed-top .now-button{font-size:max(11px,12px * var(--list-scale))}
+.app.fixed-top .date-pick{font-size:max(13px,16px * var(--list-scale))}
+.app.fixed-top .date-strip .today-btn{font-size:max(11px,12px * var(--list-scale))}
+.app.fixed-top .search input,.app.fixed-top .date-pick input{font-size:max(16px,16px * var(--list-scale))}
+.list-size-setting{border:0;padding:0;margin:16px 0}
+.list-size-setting legend{font-weight:700;font-size:18px}
+.list-size-setting p{font-size:14px;line-height:1.5}
+.list-size-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.list-size-options label{display:flex;flex-direction:row;align-items:center;min-height:44px;border:1px solid #0f6b67;border-radius:8px;padding:8px;gap:8px;font-size:14px}
+.list-size-options input{width:20px;height:20px;min-height:20px;padding:0;accent-color:#0f6b67}
+.list-size-options label:has(input:checked){background:#e1f0eb}
+.list-size-value{display:block;font-size:13px;margin:12px 0}
+.app.fixed-top.list-size-preview{height:auto;min-height:0;overflow:hidden;width:100%;border:1px solid #aad3cb;margin-top:16px}
+.list-size-preview .topbar{position:static;justify-content:center;padding:0 4px}
