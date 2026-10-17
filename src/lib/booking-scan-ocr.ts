@@ -43,6 +43,7 @@ export function createPlateOcr(paths:OcrPaths=bundledPaths()):PlateOcr{
         // when no usable candidate was found; never invent or substitute letters.
         // Reset for every job, including jobs following an aborted fallback.
         await wk.setParameters({tessedit_pageseg_mode:'7'});
+        if(signal?.aborted||disposed)throw new Error('abgebrochen');
         let r=await wk.recognize(img);
         if(signal?.aborted||disposed)throw new Error('abgebrochen');
         let candidates=extractPlateCandidates(r.data.text||'');
