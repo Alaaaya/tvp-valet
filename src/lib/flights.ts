@@ -8,7 +8,16 @@ export type {FlightUpdate, FlightUpdatesResult, FlightStatus} from '../../supaba
 export async function fetchFlightUpdates(flightNumbers:string[], date:string):Promise<FlightUpdatesResult> {
   const body = validateFlightRequest({flightNumbers,date});
   if (!db) throw new Error('Backend nicht eingerichtet');
-  const {data,error} = await db.functions.invoke('dus-flights',{body});
+  let auth=await db.auth.getSession();
+  if(auth.error||!auth.data.session)throw new Error('Bitte erneut anmelden, um Live-Flugzeiten zu laden');
+  const request=(token:string)=>db!.functions.invoke('dus-flights',{body,headers:{Authorization:'Bearer '+token}});
+  let {data,error}=await request(auth.data.session.access_token);
+  // One safe refresh/retry only. This is a read-only call, never an operation replay.
+  if(error?.context instanceof Response&&error.context.status===401){
+    const refreshed=await db.auth.refreshSession();
+    if(refreshed.error||!refreshed.data.session)throw new Error('Sitzung abgelaufen. Bitte erneut anmelden.');
+    ({data,error}=await request(refreshed.data.session.access_token));
+  }
   if (error) {
     let message = 'Live-Flugzeiten konnten nicht geladen werden';
     if (error.context instanceof Response) {
