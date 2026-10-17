@@ -9,12 +9,16 @@ export function uniqueNoteLines(note:string):string {
   seen.add(key);return true;
  }).join('\n');
 }
+// Recognize only imported HTML line breaks, never parse or execute markup.
+export function normalizeImportedNoteText(note:string):string {
+ return note.replace(/<br\s*\/?\s*>/gi,'\n').replace(/<br\s*\/?\s*$/gi,'\n');
+}
 /** Presentation only. Original import content remains unchanged in storage. */
 export function displayComment(raw:string,deduplicateImportedNotes=false):DisplayComment {
  const result:DisplayComment={text:'',vehicle:'',location:'',imported:false};const notes:string[]=[],separateNotes:string[]=[];
  const vehicle=(value:unknown)=>{if(value&&typeof value==='object'&&!Array.isArray(value)){const v=value as Record<string,unknown>;result.vehicle=['brand','type','color','description'].map(k=>v[k]).filter(v=>typeof v==='string'&&v.trim()).join(' · ')}};
  const object=(value:unknown):boolean=>{if(!value||typeof value!=='object'||Array.isArray(value))return false;const v=value as Record<string,unknown>;if(!Object.keys(v).some(k=>/^(source|source_id|sourceId|parkingpro|parkingpro_id|vehicle|car|imported_at|importedAt|provenance)$/i.test(k)))return false;result.imported=true;vehicle(v.vehicle||v.car);if(typeof v.location==='string')result.location=v.location;for(const key of ['comment','comments','notes'])if(typeof v[key]==='string')separateNotes.push(deduplicateImportedNotes?uniqueNoteLines(v[key] as string):v[key] as string);return true};
- const text=raw||'';try{if(object(JSON.parse(text))){result.text=separateNotes.join('\n');return result}}catch{/* mixed text import */}
+ const text=raw||'';try{if(object(JSON.parse(text))){result.text=separateNotes.map(n=>deduplicateImportedNotes?uniqueNoteLines(normalizeImportedNoteText(n)):n).join('\n');if(deduplicateImportedNotes)result.text=result.text.trim();return result}}catch{/* mixed text import */}
  const lines=text.split(/\r?\n/);
  for(let i=0;i<lines.length;i++){
   const line=lines[i];
@@ -30,5 +34,5 @@ export function displayComment(raw:string,deduplicateImportedNotes=false):Displa
   notes.push(line);
  }
  const human=notes.join('\n');
- result.text=[deduplicateImportedNotes&&result.imported?uniqueNoteLines(human):human,...separateNotes].filter(Boolean).join('\n').trim();return result;
+ result.text=[deduplicateImportedNotes&&result.imported?uniqueNoteLines(normalizeImportedNoteText(human)):human,...separateNotes.map(n=>deduplicateImportedNotes&&result.imported?uniqueNoteLines(normalizeImportedNoteText(n)):n)].filter(Boolean).join('\n').trim();return result;
 }

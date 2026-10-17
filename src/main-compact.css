@@ -53,3 +53,12 @@
 .app.fixed-top .date-strip button,.app.fixed-top .date-strip .today-btn,.app.fixed-top .date-pick,.app.fixed-top .date-pick input{min-height:44px}
 /* Owner override: only license-plate text is black; teal UI and icons stay unchanged. */
 .app.fixed-top .blr-plate{color:#111}
+
+/* Bound every metadata stack to the same pane; secondary text remains in detail. */
+.app.fixed-top .blr-main{height:85px;max-height:85px;overflow:hidden}
+.app.fixed-top .blr-body{min-height:0;max-height:85px;overflow:hidden}
+.app.fixed-top .blr-body>span{flex-shrink:0}
+.app.fixed-top .blr-comment{max-height:11px}
+.app.fixed-top .blr-calls{height:12px;max-height:12px;overflow:hidden;white-space:nowrap}
+.app.fixed-top .blr-calls .call-counter{flex-wrap:nowrap;white-space:nowrap;overflow:hidden;max-height:12px}
+.app.fixed-top .blr-calls .cc-date{flex-basis:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
