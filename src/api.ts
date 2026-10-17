@@ -1,6 +1,8 @@
-import {createClient} from '@supabase/supabase-js';import type {Booking,Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
+import {createRecoveringFetch,refreshSessionSafely} from './lib/auth-recovery';
+import {createClient,type SupabaseClient} from '@supabase/supabase-js';import type {Booking,Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
 const url=import.meta.env.VITE_SUPABASE_URL,key=import.meta.env.VITE_SUPABASE_ANON_KEY;
-export const db=url&&key?createClient(url,key,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}}):null;
+export const db:SupabaseClient|null=url&&key?createClient(url,key,{auth:{autoRefreshToken:true,persistSession:true,detectSessionInUrl:true},global:{fetch:createRecoveringFetch(url,()=>db?.auth??null)}}):null;
+export async function recoverSession(){if(!db)throw Error('Backend nicht eingerichtet');const {data}=await db.auth.getSession();if(!data.session)return '';return refreshSessionSafely(db.auth)}
 export async function load(){if(!db)throw Error('Backend nicht eingerichtet');const [b,e]=await Promise.all([db.from('bookings').select('*').order('arrival_at'),db.from('profiles').select('*')]);if(b.error)throw b.error;if(e.error)throw e.error;return{rows:b.data.map(x=>({...x,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,x[k]??'']))})) as Booking[],staff:e.data.filter(x=>x.active).map(x=>({id:x.id,full_name:x.full_name,role:x.role})) as Employee[]}}
 export async function saveBooking(b:Booking,admin:boolean){if(!db)return;if(admin){const{error}=await db.from('bookings').upsert(bookingWritePayload(b));if(error)throw error}else{const{error}=await db.rpc('update_booking_ops',{p_id:b.id,p_patch:{key_cash:b.key_cash,spot:b.spot,km:b.km,comment:b.comment,driver_id:b.driver_id}});if(error)throw error}}
 export async function checkBooking(id:string,action:'in'|'out'){if(!db)return;const{error}=await db.rpc('check_booking',{p_id:id,p_action:action});if(error)throw error}
