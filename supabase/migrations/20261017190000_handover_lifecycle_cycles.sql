@@ -7,14 +7,15 @@ language plpgsql set search_path = ''
 as $$
 begin
   if current_user in ('anon','authenticated')
-    and (new.checked_in_at is distinct from old.checked_in_at
-      or new.checked_out_at is distinct from old.checked_out_at) then
+    and ((TG_OP='INSERT' and (new.checked_in_at is not null or new.checked_out_at is not null))
+      or (TG_OP='UPDATE' and (new.checked_in_at is distinct from old.checked_in_at
+        or new.checked_out_at is distinct from old.checked_out_at))) then
     raise exception 'Lifecycle timestamps require a lifecycle RPC' using errcode='42501';
   end if;
   return new;
 end $$;
 revoke all on function private.guard_booking_lifecycle_update() from public,anon,authenticated;
-create trigger bookings_lifecycle_guard before update on public.bookings
+create trigger bookings_lifecycle_guard before insert or update on public.bookings
   for each row execute function private.guard_booking_lifecycle_update();
 
 -- Keep validated completion implementation inaccessible to API callers.
@@ -23,20 +24,21 @@ alter function private.complete_booking_handover(uuid,uuid,text,jsonb,jsonb) ren
 revoke all on function private.complete_booking_handover_core(uuid,uuid,text,jsonb,jsonb)
   from public,anon,authenticated,service_role;
 
--- Seven required parameters, including explicitly nullable expected timestamps.
+-- Eight required parameters, including explicitly nullable expected timestamps.
 -- No five-argument overload/default can silently bypass snapshot validation.
 create function public.complete_booking_handover(
   p_request_id uuid,p_booking_id uuid,p_action text,p_details jsonb,p_media jsonb,
-  p_expected_in timestamptz,p_expected_out timestamptz
+  p_expected_in timestamptz,p_expected_out timestamptz,p_expected_revision timestamptz
 ) returns public.bookings
 language plpgsql security definer set search_path = ''
 as $$
-declare v_booking public.bookings; v_receipt public.booking_handovers;
+declare v_booking public.bookings; v_receipt public.booking_handovers; v_revision timestamptz;
 begin
   if not private.is_staff() then raise exception 'Staff access required' using errcode='42501'; end if;
   if p_request_id is null or p_booking_id is null or p_action is null or p_action not in ('in','out')
     or (p_expected_in is not null and not isfinite(p_expected_in))
-    or (p_expected_out is not null and not isfinite(p_expected_out)) then
+    or (p_expected_out is not null and not isfinite(p_expected_out))
+    or (p_expected_revision is not null and not isfinite(p_expected_revision)) then
     raise exception 'Invalid handover identity, action or snapshot' using errcode='22023'; end if;
   perform pg_advisory_xact_lock(hashtextextended(p_request_id::text,170017));
   select * into v_booking from public.bookings where id=p_booking_id for update;
@@ -47,14 +49,17 @@ begin
     -- Legitimate completed-request retries ignore snapshots and mutable draft data.
     return private.complete_booking_handover_core(p_request_id,p_booking_id,p_action,p_details,p_media);
   end if;
+  select max(occurred_at) into v_revision from public.booking_handover_undos where booking_id=p_booking_id;
+  if v_revision is distinct from p_expected_revision then
+    raise exception 'Lifecycle revision changed; reopen handover' using errcode='40001'; end if;
   if v_booking.checked_in_at is distinct from p_expected_in
     or v_booking.checked_out_at is distinct from p_expected_out then
     raise exception 'Lifecycle changed; reopen handover' using errcode='40001'; end if;
   return private.complete_booking_handover_core(p_request_id,p_booking_id,p_action,p_details,p_media);
 end $$;
-revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz)
+revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,timestamptz)
   from public,anon,authenticated;
-grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz)
+grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,timestamptz)
   to authenticated;
 
 alter table public.booking_operation_events

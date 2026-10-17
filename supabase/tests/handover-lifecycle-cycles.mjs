@@ -30,8 +30,9 @@ const req=uuid(), mediaId=uuid(), path=b.id+'/'+req+'-'+mediaId+'.jpg';
 const media={id:mediaId,path,kind:'photo',mime_type:'image/jpeg',size_bytes:123,captured_at:new Date().toISOString()};
 const call=async(request=req,booking=b.id,action='in',details={},files=[],snapshot=undefined)=>{
  const current=snapshot ?? (await db.query('select checked_in_at,checked_out_at from public.bookings where id=$1',[booking])).rows[0] ?? {};
- return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz)',
- [request,booking,action,JSON.stringify(details),JSON.stringify(files),current.checked_in_at??null,current.checked_out_at??null]);
+ const revision=(await db.query('select max(occurred_at) as revision from public.booking_handover_undos where booking_id=$1',[booking])).rows[0].revision;
+ return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz,$8::timestamptz)',
+ [request,booking,action,JSON.stringify(details),JSON.stringify(files),current.checked_in_at??null,current.checked_out_at??null,snapshot && Object.hasOwn(snapshot,'revision')?snapshot.revision:revision]);
 };
 await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'IMAGE/JPEG; codecs=binary'}]);
 await user(actor);
@@ -232,12 +233,32 @@ await undo(uuid(),cycle.id,'in',ci2.checked_in_at);
 await failure(()=>db.query("insert into public.bookings(id,customer_name,arrival_at,departure_at,checked_in_at) values($1,'Stale',now(),now(),$2) on conflict(id) do update set checked_in_at=excluded.checked_in_at",[cycle.id,ci2.checked_in_at]),'42501');
 await call(uuid(),cycle.id,'in');checks++;
 await user('', 'anon');
-await failure(()=>db.query("select public.complete_booking_handover($1,$2,'in','{}','[]',null,null)",[uuid(),cycle.id]),'42501');
+await failure(()=>db.query("select public.complete_booking_handover($1,$2,'in','{}','[]',null,null,null)",[uuid(),cycle.id]),'42501');
 await user(outsider);
 await failure(()=>call(uuid(),cycle.id,'out',{},[],staleSnapshot),'40001');
 await db.exec('reset role');
 await db.query('update public.profiles set active=false where id=$1',[outsider]);
 await user(outsider);await failure(()=>call(uuid(),cycle.id,'out'),'42501');
 await db.exec('reset role');
+
+// ABA null/null draft must fail even when both lifecycle timestamps match again.
+await user(actor);
+const aba=await makeBooking();
+const beforeABA={checked_in_at:null,checked_out_at:null,revision:null};
+const abaIn=(await call(uuid(),aba.id,'in',{},[],beforeABA)).rows[0];
+await undo(uuid(),aba.id,'in',abaIn.checked_in_at);
+await failure(()=>call(uuid(),aba.id,'in',{},[],beforeABA),'40001');
+const latestRevision=(await db.query('select max(occurred_at) as revision from public.booking_handover_undos where booking_id=$1',[aba.id])).rows[0].revision;
+const abaRequest=uuid();
+const abaRecheck=(await call(abaRequest,aba.id,'in',{},[],{...beforeABA,revision:latestRevision})).rows[0];checks++;
+assert.deepEqual((await call(abaRequest,aba.id,'in',null,null,beforeABA)).rows[0],abaRecheck);checks++;
+await failure(()=>call(uuid(),aba.id,'out',{},[],{checked_in_at:abaRecheck.checked_in_at,revision:null}),'40001');
+await failure(()=>call(uuid(),aba.id,'out',{},[],{checked_in_at:abaRecheck.checked_in_at,revision:'infinity'}),'22023');
+await undo(uuid(),aba.id,'in',abaRecheck.checked_in_at);
+await failure(()=>call(abaRequest,aba.id,'in',{},[],beforeABA),'40001');
+await failure(()=>call(uuid(),aba.id,'in',{},[],{...beforeABA,revision:latestRevision}),'40001');
+await failure(()=>db.query("insert into public.bookings(customer_name,arrival_at,departure_at,checked_in_at) values('Spoofed',now(),now(),now())"),'42501');
+await db.query("insert into public.bookings(customer_name,arrival_at,departure_at) values('Ordinary insert',now(),now())");checks++;
+await failure(()=>db.query("select public.complete_booking_handover($1,$2,'in','{}','[]',null,null)",[uuid(),aba.id]),'42883');
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveBookingWrites:0}));
 await db.close();
