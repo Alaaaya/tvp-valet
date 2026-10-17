@@ -23,7 +23,7 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .export-btn{border:1px solid #2d6a6a;color:#2d6a6a;background:#fff;border-radius:999px;padding:2px 12px;font-weight:600;cursor:pointer}
 .filter-group input[type=number]{width:64px;text-align:center;border:1px solid #80bcb3;border-radius:8px;padding:6px;color:#469a84}
 
-.topbar{background:#0d6e66!important;height:56px!important}
+.topbar{background:#0f6b67!important;height:56px!important}
 .search-row{background:#0a5c55!important}
 .counter.incoming{background:#1da463!important}.counter.outgoing{background:#e83d36!important}
 .time-block{background:#9fecca!important;width:64px!important}.booking-row.out .time-block{background:#fdb9bc!important}
@@ -94,3 +94,17 @@ input[type=datetime-local]{width:100%;display:block;-webkit-appearance:none;appe
 .filter-screen>header{height:calc(62px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
 h1,h2,h3,p,small,strong,td{overflow-wrap:anywhere}
 }
+
+
+/* Opaque chrome extends behind the standalone iOS status bar. */
+html{background:#0f6b67}
+.topbar,.detail>header,.filter-screen>header{
+  background:#0f6b67!important;background-image:none!important;
+  opacity:1;backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.topbar{gap:4px}
+.topbar>strong{flex:1;min-width:0;line-height:1.2;font-size:clamp(14px,4vw,17px)}
+.header-actions{display:flex;align-items:center;gap:0;flex:none}
+.header-actions>button{width:44px;min-height:44px;flex:none;color:#fff;padding:0}
+.header-actions>.new-booking{background:transparent;border:0;border-radius:6px}
+.header-actions>button:hover{background:#ffffff18}
