@@ -1,6 +1,6 @@
 import React from 'react';
 import {PlaneLanding,PlaneTakeoff,Car,Users,Phone,KeyRound,Check,Banknote,MessageSquare} from 'lucide-react';
-import {money,type Booking} from '../model';
+import {money,clock,type Booking} from '../model';
 import {displayComment} from './comments';
 import '../booking-list-row.css';
 
@@ -38,15 +38,18 @@ export interface BookingListRowProps{
 export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
 export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=displayComment(b.comment,true).text.trim();
+ const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
+ const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?'Annahme ':'Rückgabe ')+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><Users size={18}/></span><strong>{time}</strong>{flight&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{flight}</span></span>}</span>
+   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><Users size={18}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
    <span className="blr-body">
-    <span className="blr-line blr-l2">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}<strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
-    <span className="blr-line blr-l3">{b.phone&&<Phone size={16} aria-label="Telefon"/>}<span className="blr-name">{b.customer_name}</span></span>
+    <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
+    <span className="blr-line blr-l2" title={[b.plate,key,b.code,b.external_id].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
+    <span className="blr-line blr-l3">{b.phone&&<Phone size={16} aria-label="Telefon"/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
     {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
-    {c&&<span className="blr-comment">{c}</span>}
+    {c&&<span className="blr-comment" title={c}>{c}</span>}
     {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
    <span className="blr-side">
