@@ -19,7 +19,7 @@ it('fixed-top shell: only booking-list scrolls, opaque',()=>{
  expect(c).toMatch(/\.fixed-top \.workspace\{height:100dvh;display:flex;flex-direction:column;min-height:0/);
  expect(c).toMatch(/\.fixed-top \.page>\.booking-list\{[^}]*flex:1 1 auto;min-height:0;overflow-y:auto/);
  expect(c).toContain('env(safe-area-inset-bottom)');
- const blk=c.slice(c.indexOf('/* Main list: header'));expect(blk).not.toMatch(/blur|backdrop|box-shadow|opacity/);
+ const blk=c.slice(c.indexOf('/* Main list: header')).replace(/\/\*[\s\S]*?\*\//g,'');expect(blk).not.toMatch(/blur|backdrop|box-shadow|opacity/);
  expect(s.indexOf('className="counters"')).toBeLessThan(s.indexOf('className="booking-list"'));
 });
 
