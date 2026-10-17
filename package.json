@@ -19,7 +19,8 @@
     "lucide-react": "^1.57.0",
     "papaparse": "^5.7.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "signature_pad": "^5.1.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
