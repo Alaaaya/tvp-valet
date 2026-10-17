@@ -15,6 +15,10 @@ export async function undoHandover({requestId,booking,action}:{requestId:string;
  });
  if(error)throw Error(error.code==='40001'?'Die Buchung wurde inzwischen geändert. Bitte schließen, neu laden und erneut prüfen.':error.message);
  if(!data)throw Error('Keine Bestätigung erhalten. Bitte mit derselben Rücknahme erneut versuchen.');
- const row=data as Booking;
+ const revision=await db.from('bookings').select('*,booking_handover_undos(count)').eq('id',booking.id).single();
+ if(revision.error)throw revision.error;
+ if(!revision.data)throw Error('Buchung nach Rücknahme bitte neu laden.');
+ const {booking_handover_undos,...current}=revision.data;
+ const row={...current,lifecycle_revision:booking_handover_undos?.[0]?.count??0} as Booking;
  return{...row,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,row[k as keyof Booking]??'']))};
 }
