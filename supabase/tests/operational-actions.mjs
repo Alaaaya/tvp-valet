@@ -13,6 +13,7 @@ await db.exec(`create role anon nologin; create role authenticated nologin; crea
  grant all on storage.objects to anon,authenticated,service_role;`);
 await db.exec(await readFile(new URL('../migrations/20261017090000_valet_backend.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../migrations/20261017100000_booking_operational_actions.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../migrations/20261017130000_retrieved_operation.sql',import.meta.url),'utf8'));
 const admin='00000000-0000-4000-8000-000000000001',driver='00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users(id) values($1),($2)',[admin,driver]);
 await db.query("insert into public.profiles(id,full_name,role) values($1,'Test Admin','admin'),($2,'Test Driver','driver')",[admin,driver]);
@@ -22,16 +23,16 @@ let checks=0;
 async function action(value){return db.query('select * from public.record_booking_operation($1,$2)',[booking.id,value]);}
 async function fail(value,code){checks++;await assert.rejects(action(value),e=>{assert.equal(e.code,code);return true;});}
 await user(driver);
-await fail('total','22023');await fail(null,'22023');await fail('taken_away','23514');await fail('ride_started','23514');
+await fail('total','22023');await fail(null,'22023');await fail('taken_away','23514');await fail('ride_started','23514');await fail('retrieved','23514');
 const baseline=(await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0];
 const called=(await action('customer_called')).rows[0];assert.ok(called.customer_called_at);checks++;
 const retry=(await action('customer_called')).rows[0];assert.deepEqual(retry,called);checks++;
 assert.deepEqual((await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0],baseline);checks++;
 await db.query("select public.check_booking($1,'in')",[booking.id]);
 const afterCheck=(await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0];
-for(const name of ['taken_away','ride_started']){const op=(await action(name)).rows[0];assert.ok(op[name+'_at']);checks++;}
+for(const name of ['taken_away','retrieved','ride_started']){const op=(await action(name)).rows[0];assert.ok(op[name+'_at']);checks++;}
 assert.deepEqual((await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0],afterCheck);checks++;
-assert.equal((await db.query('select * from public.booking_operation_events')).rows.length,3);checks++;
+assert.equal((await db.query('select * from public.booking_operation_events')).rows.length,4);checks++;
 for(const sql of ["update public.booking_operations set updated_at=now()","delete from public.booking_operation_events","insert into public.booking_operations(booking_id,performed_by) values($1,$2)"]){await assert.rejects(db.query(sql,sql.includes('$1')?[booking.id,driver]:[]),e=>e.code==='42501');checks++;}
 // A different staff member cannot claim an existing action by retrying it.
 await user(admin);
@@ -41,6 +42,7 @@ for(const sql of ["update public.booking_operations set performed_by=$1","update
 await user(driver);
 await db.query("select public.check_booking($1,'out')",[booking.id]);
 await action('taken_away');checks++;
+await action('retrieved');checks++;
 await user('', 'anon');await fail('customer_called','42501');
 await db.exec('reset role');
 await db.query('update public.profiles set active=false where id=$1',[driver]);
