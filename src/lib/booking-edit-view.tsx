@@ -36,6 +36,8 @@ export function validate(b:EditableBooking,x:EditDraft):string[]{
  if(!a||!r)e.push('Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)');
  else if(Date.parse(r)<Date.parse(a))e.push('Rückgabe muss nach der Annahme liegen');
  const o=toDraft(b);
+ if(x.first_name.length>120||x.last_name.length>120)e.push('Vor- und Nachname: maximal 120 Zeichen');
+ if(x.car_description.length>500)e.push('Fahrzeugbeschreibung: maximal 500 Zeichen');
  if(o.plate!==x.plate&&!x.plate.trim())e.push('Kennzeichen darf nicht leer sein');
  if(NAMES.some(k=>o[k]!==x[k])&&!x.first_name.trim()&&!x.last_name.trim())e.push('Name darf nicht leer sein');
  const legacyUntouched=b.persons===0&&x.persons===0;
@@ -79,7 +81,7 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
  const legacy=!x.first_name&&!x.last_name&&booking.customer_name.trim();
  const save=async()=>{if(!can||inflight.current)return;inflight.current=true;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{inflight.current=false;setBusy(false)}};
  const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
- const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><X size={14}/></button>}</span></label>};
+ const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} maxLength={k==='first_name'||k==='last_name'?120:k==='car_description'?500:undefined} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><X size={14}/></button>}</span></label>};
  const when=(kind:'in'|'out')=>{const p=kind==='in'?'arrival':'departure',f=kind==='in'?'flight_in':'flight_out',dis=!canEdit(role,(p+'_date') as keyof EditDraft),open=dateEdit[kind]&&!dis;
   return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?'Parking date':'Return date'}</h3><button type="button" aria-label={(kind==='in'?'Parking date':'Return date')+' bearbeiten'} disabled={dis} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
   <div className="be-row"><input type="date" aria-label="Datum" disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label="Uhrzeit" disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
