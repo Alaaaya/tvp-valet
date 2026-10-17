@@ -44,3 +44,10 @@ it('actual flight clock is rendered only from a valid stored directional timesta
  expect(r(<BookingListRow {...P({b:{...b,actual_flight_out:'not-time'}})}/>)).not.toContain('blr-actual-flight');
  expect(r(<BookingListRow {...P({kind:'in',b:{...b,actual_flight_out:'2026-10-17T10:33:00Z'}})}/>)).not.toContain('blr-actual-flight');
 });
+
+it('keeps secondary key and code metadata outside the plate line',()=>{
+ const h=r(<BookingListRow {...P()}/>);
+ expect(h).toMatch(/blr-plate[^]*?<\/strong><\/span>[^]*?blr-reference/);
+ const c=readFileSync('src/booking-list-row.css','utf8');
+ expect(c).toContain('.blr-l2 .blr-plate{flex:1 1 100%;width:100%}');
+});

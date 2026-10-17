@@ -43,3 +43,8 @@
 .blr-calls .cc-date{font-size:11px}
 .blr-flight{overflow:hidden;display:block;white-space:nowrap;text-overflow:ellipsis}
 .blr-flight .flight-status{font-size:11px;white-space:nowrap}
+
+/* The plate owns its line; secondary references must never shrink it. */
+.blr-l2 .blr-plate{flex:1 1 100%;width:100%}
+.blr-reference{overflow:hidden;white-space:nowrap;min-height:14px}
+.blr-reference .blr-code,.blr-reference .blr-key{flex:1 1 0;min-width:0}
