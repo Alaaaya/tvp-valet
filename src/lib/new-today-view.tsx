@@ -1,4 +1,5 @@
 import React from 'react';
+import {displayComment} from './comments';
 import {ChevronLeft,ChevronRight,Car,Users,MessageSquare} from 'lucide-react';
 import {clock,money,type Booking} from '../model';
 import {applyNewFilter,DEFAULT_FILTER,type NewFilter} from './new-filter';
@@ -12,7 +13,7 @@ export function NewToday({rows,date,setDate,open,filter=DEFAULT_FILTER}:{rows:re
       <span className="nt-time"><Car size={20}/><strong>{clock(b.created_at)}</strong></span>
       <span className="nt-body"><span className="nt-tags"><span className="prod">{b.product}{b.covered?' · Über':''}</span><span className="cov">{b.covered?'Über':'Frei'}</span></span>
         <span className="nt-plate"><strong>{b.plate||'–'}</strong><small>#{b.code}</small>{b.external_id&&b.external_id!==b.code&&<small>{b.external_id}</small>}</span>
-        <span className="nt-name"><span>{b.customer_name}</span><span className="nt-n">{b.comment&&<><MessageSquare size={13}/>1</>}<Users size={13}/>{b.persons}</span></span>
+        <span className="nt-name"><span>{b.customer_name}</span><span className="nt-n">{displayComment(b.comment).text&&<MessageSquare size={13} aria-label="Kommentar vorhanden"/>}<Users size={13}/>{b.persons}</span></span>
         <span className="nt-foot"><span>{b.platform}</span><span className="nt-pill">{b.platform} | {money(Math.max(0,b.total-b.paid))}</span></span></span></button>)}</div>
     {hidden>0&&<p className="nt-hidden" role="status">{hidden} Buchung(en) durch Filter ausgeblendet.</p>}{!s.list.length&&<p className="nt-empty">Keine Buchungen an diesem Tag erstellt.</p>}
     <p className="nt-note">{IMPORT_NOTE}</p>
