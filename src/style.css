@@ -68,3 +68,4 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .identity-grid button.pp-link{border:0;background:none;color:#1d6fd0;padding:0;min-height:0;width:auto;text-align:left;font-size:14px}
 .fp-head{gap:4px}.fp-head strong{font-size:12px}.fp-head svg{width:16px;height:16px}.fp-time{font-size:22px}
 .identity-grid .pp-link{border:0;background:none;justify-content:flex-start;text-align:left;padding:0;min-height:0;width:auto}
+.identity-grid .pp-link{min-height:24px}
