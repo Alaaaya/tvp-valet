@@ -1,11 +1,11 @@
 {
   "id": "./",
-  "name": "TVP Valet Leitstelle",
-  "short_name": "TVP Valet",
+  "name": "Travel Valet",
+  "short_name": "Travel Valet",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#2d696a",
+  "background_color": "#DAD8D9",
   "theme_color": "#2d696a",
   "lang": "de",
   "icons": [
