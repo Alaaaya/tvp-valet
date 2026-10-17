@@ -6,7 +6,7 @@ export type {FlightUpdate, FlightUpdatesResult, FlightStatus} from '../../supaba
 
 
 /** Read-only flight lookup. Session persistence/refresh is enabled in the shared client. */
-export async function fetchFlightUpdates(flightNumbers:string[], date:string, direction:'arrival'|'departure'='arrival'):Promise<FlightUpdatesResult> {
+export async function fetchFlightUpdates(flightNumbers:string[], date:string, direction:'arrival'|'departure'='arrival',signal?:AbortSignal):Promise<FlightUpdatesResult> {
   const validated=validateFlightRequest({flightNumbers,date,...(direction==='departure'?{direction}:{})});
   // Validation supplies the default arrival direction.
   const body={...validated,...(direction==='departure'?{direction}:{})};
@@ -14,8 +14,8 @@ export async function fetchFlightUpdates(flightNumbers:string[], date:string, di
   // Public read-only endpoint: anon key only, never the user's session token.
   let res:Response;
   try {
-    res=await fetch(supabaseUrl+'/functions/v1/dus-flights',{method:'POST',headers:{apikey:supabaseAnonKey,Authorization:'Bearer '+supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify(body)});
-  } catch { throw new Error('Flugzeiten konnten nicht geladen werden'); }
+    res=await fetch(supabaseUrl+'/functions/v1/dus-flights',{method:'POST',headers:{apikey:supabaseAnonKey,Authorization:'Bearer '+supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store',signal});
+  } catch (e) { if (signal?.aborted) throw e; throw new Error('Flugzeiten konnten nicht geladen werden'); }
   let data:any=null;
   try { data=await res.json(); } catch { /* non-JSON */ }
   if (!res.ok) throw new Error(typeof data?.error==='string'?data.error:'Flugzeiten konnten nicht geladen werden');

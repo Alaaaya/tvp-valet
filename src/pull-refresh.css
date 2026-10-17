@@ -1,0 +1,8 @@
+/* Pull-to-refresh gap lives INSIDE the list; solid colors only. */
+.app.fixed-top .page>.booking-list{padding-top:var(--pull-gap,0px);background:#fff}
+.app.fixed-top .page>.booking-list[data-pull=settle]{transition:padding-top .22s ease-out}
+.app.fixed-top .page>.booking-list[data-pull=drag],.app.fixed-top .page>.booking-list[data-pull=busy]{touch-action:pan-y}
+.app.fixed-top .page>.booking-list[data-pull]:not([data-pull=''])::before{content:'';position:absolute;left:50%;top:calc(var(--pull-gap,0px)/2 - 11px);width:22px;height:22px;margin-left:-11px;box-sizing:border-box;border:3px solid #b7d7cf;border-top-color:#2d696a;border-radius:50%}
+.app.fixed-top .page>.booking-list[data-pull=busy]::before{animation:pull-spin .8s linear infinite}
+@keyframes pull-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.app.fixed-top .page>.booking-list[data-pull=settle]{transition:none}}
