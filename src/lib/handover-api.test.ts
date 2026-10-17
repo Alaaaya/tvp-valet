@@ -35,7 +35,7 @@ describe('private atomic save and retries',()=>{
  it('uploads privately before final secure RPC and uses server timestamps',async()=>{
   const p=photo(),progress=vi.fn();const r=await saveHandover({requestId,booking,action:'in',details,media:[p],onProgress:progress});
   expect(mock.upload).toHaveBeenCalledWith(mediaPath(bid,requestId,p),p.blob,{contentType:'image/jpeg',upsert:false,cacheControl:'0'});
-  expect(mock.rpc).toHaveBeenCalledWith('complete_booking_handover',expect.objectContaining({p_request_id:requestId,p_details:details,p_media:[expect.objectContaining({id:p.id,captured_at:p.captured_at,size_bytes:5})]}));
+  expect(mock.rpc).toHaveBeenCalledWith('complete_booking_handover',expect.objectContaining({p_request_id:requestId,p_details:details,p_expected_in:booking.checked_in_at,p_expected_out:booking.checked_out_at,p_media:[expect.objectContaining({id:p.id,captured_at:p.captured_at,size_bytes:5})]}));
   expect(mock.upload.mock.invocationCallOrder[0]).toBeLessThan(mock.rpc.mock.invocationCallOrder[0]);
   expect(r.checked_in_at).toBe('2026-10-17T14:00:00Z');expect(progress).toHaveBeenLastCalledWith(1,1);
  });

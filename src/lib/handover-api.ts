@@ -90,7 +90,7 @@ export async function saveHandover(input:HandoverSave):Promise<Booking>{
    metadata.push({id:item.id,path,kind:item.kind,mime_type:item.mime_type,captured_at:item.captured_at,size_bytes:item.blob.size});completed++;onProgress?.(completed,media.length);
   }catch{throw Error(completed+' von '+media.length+' Medien gespeichert. Übergabe noch nicht abgeschlossen. Bitte erneut speichern; vorhandene Aufnahmen werden nicht dupliziert.')}
  }
- const result=await d.rpc('complete_booking_handover',{p_request_id:requestId,p_booking_id:booking.id,p_action:action,p_details:details,p_media:metadata});
+ const result=await d.rpc('complete_booking_handover',{p_request_id:requestId,p_booking_id:booking.id,p_action:action,p_details:details,p_media:metadata,p_expected_in:booking.checked_in_at,p_expected_out:booking.checked_out_at});
  if(result.error)throw Error('Medien gespeichert, Übergabe noch nicht bestätigt. Bitte erneut speichern. '+result.error.message);
  if(!result.data)throw Error('Keine Speicherbestätigung erhalten. Bitte erneut speichern.');
  return normalizeBooking(result.data as Booking);
