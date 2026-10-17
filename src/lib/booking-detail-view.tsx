@@ -50,7 +50,7 @@ export function serviceInfo(b:Pick<Booking,'product'|'covered'>,location:string)
 const dateLong=(v:string)=>new Date(v).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Berlin'}).replace(',','');
 
 export function BookingDetailView(p:BookingDetailViewProps){
-  const b=p.booking,o=p.ops,due=Math.max(0,b.total-b.paid),c=displayComment(b.comment),info=serviceInfo(b,c.location);
+  const b=p.booking,o=p.ops,due=Math.max(0,b.total-b.paid),c=displayComment(b.comment,true),info=serviceInfo(b,c.location);
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
     const key=b.id+':'+a;
     return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> {label} · {stamp(at)}</>:p.opsBusy===key?'Wird gespeichert …':label}</button>;

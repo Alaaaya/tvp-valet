@@ -1,10 +1,20 @@
 export interface DisplayComment {text:string;vehicle:string;location:string;imported:boolean}
+/** Deduplicate within one note only; retain the first line verbatim and compare case-sensitively. */
+export function uniqueNoteLines(note:string):string {
+ const seen=new Set<string>();
+ return note.split(/\r?\n/).filter(line=>{
+  const key=line.trim();
+  if(!key)return true;
+  if(seen.has(key))return false;
+  seen.add(key);return true;
+ }).join('\n');
+}
 /** Presentation only. Original import content remains unchanged in storage. */
-export function displayComment(raw:string):DisplayComment {
- const result:DisplayComment={text:'',vehicle:'',location:'',imported:false};const notes:string[]=[];
+export function displayComment(raw:string,deduplicateImportedNotes=false):DisplayComment {
+ const result:DisplayComment={text:'',vehicle:'',location:'',imported:false};const notes:string[]=[],separateNotes:string[]=[];
  const vehicle=(value:unknown)=>{if(value&&typeof value==='object'&&!Array.isArray(value)){const v=value as Record<string,unknown>;result.vehicle=['brand','type','color','description'].map(k=>v[k]).filter(v=>typeof v==='string'&&v.trim()).join(' · ')}};
- const object=(value:unknown):boolean=>{if(!value||typeof value!=='object'||Array.isArray(value))return false;const v=value as Record<string,unknown>;if(!Object.keys(v).some(k=>/^(source|source_id|sourceId|parkingpro|parkingpro_id|vehicle|car|imported_at|importedAt|provenance)$/i.test(k)))return false;result.imported=true;vehicle(v.vehicle||v.car);if(typeof v.location==='string')result.location=v.location;for(const key of ['comment','comments','notes'])if(typeof v[key]==='string')notes.push(v[key] as string);return true};
- const text=raw||'';try{if(object(JSON.parse(text))){result.text=notes.join('\n');return result}}catch{/* mixed text import */}
+ const object=(value:unknown):boolean=>{if(!value||typeof value!=='object'||Array.isArray(value))return false;const v=value as Record<string,unknown>;if(!Object.keys(v).some(k=>/^(source|source_id|sourceId|parkingpro|parkingpro_id|vehicle|car|imported_at|importedAt|provenance)$/i.test(k)))return false;result.imported=true;vehicle(v.vehicle||v.car);if(typeof v.location==='string')result.location=v.location;for(const key of ['comment','comments','notes'])if(typeof v[key]==='string')separateNotes.push(deduplicateImportedNotes?uniqueNoteLines(v[key] as string):v[key] as string);return true};
+ const text=raw||'';try{if(object(JSON.parse(text))){result.text=separateNotes.join('\n');return result}}catch{/* mixed text import */}
  const lines=text.split(/\r?\n/);
  for(let i=0;i<lines.length;i++){
   const line=lines[i];
@@ -19,5 +29,6 @@ export function displayComment(raw:string):DisplayComment {
   const tail=lines.slice(i).join('\n');try{if(object(JSON.parse(tail)))break}catch{/* ordinary comment */}
   notes.push(line);
  }
- result.text=notes.join('\n').trim();return result;
+ const human=notes.join('\n');
+ result.text=[deduplicateImportedNotes&&result.imported?uniqueNoteLines(human):human,...separateNotes].filter(Boolean).join('\n').trim();return result;
 }
