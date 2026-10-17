@@ -1,0 +1,13 @@
+# Audited customer calls
+
+Migration 20261017230000_booking_customer_calls.sql is additive. Do not apply without the owner's deployment approval. It depends on 210000 detail actions and the final main 190000 lifecycle hardening. No booking backfill, timestamp rewrites, old event deletion, or lifecycle RPC replacement.
+
+UI integration uses recordCustomerCall({booking,requestId,allowRepeat}). Booking must contain canonical booking_operations.customer_called_at (explicit null if absent) and authoritative undo-count lifecycle_revision. Do not supply a default revision for an unloaded booking. Generate one request UUID per user intent; keep both that UUID and original booking snapshot for network retries. A repeat must display an explicit confirmation before passing allowRepeat:true. A phone-link click does not count as a confirmed call. Reload booking/operations and history after success; response customer_called_at and lifecycle_revision reflect current server state, while occurred_at is the immutable timestamp of that request.
+
+RPC record_booking_customer_call takes p_request_id, p_booking_id, p_expected_called_at, p_expected_checked_out_at, p_expected_lifecycle_revision, p_allow_repeat. Server generates clock_timestamp and actor identity. Active staff required; confirmed, not checked out, no future operational timestamp. Booking row then operations row locks serialize calls with undo/checkout. Actor and every snapshot parameter are bound to immutable receipts. A replay returns without recording another call, even if later lifecycle changes happened. Changed context is rejected. A new repeat needs both a fresh snapshot and explicit repeat flag.
+
+The canonical customer_called_at column is retained. Legacy record_booking_operation is idempotent once that column is set, so cannot replace a call without the new repeat protection. New calls append only to the new immutable receipt ledger. booking_call_history unions legacy operation events and new receipts with no initial-call duplication. Existing positive bigint event IDs remain; new receipt IDs project as negative bigint identity values. The client loadBookingCallHistory contract needs no change.
+
+Inspected main 180000 and 190000: undo checkout does NOT clear customer_called_at, so no undo RPC replacement is necessary. Undo check-in intentionally resets operational cycle state while leaving both call histories intact. Calls carry undo-count revision to prevent ABA. Check-out/recheck-out never changes the last confirmed call.
+
+Isolated tests use PGlite, not live Supabase. The SQL fixture loads the actual final main 190000 migration from /home/kit/tvp-valet by default; TVP_LIFECYCLE_MIGRATION may point to an equivalent fixture.
