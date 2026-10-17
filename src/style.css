@@ -13,3 +13,5 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .detail,.filter-screen{overscroll-behavior:contain;scrollbar-width:none}
 .detail::-webkit-scrollbar,.filter-screen::-webkit-scrollbar{display:none}
 .booking-row{min-height:108px}
+
+.drawer-close{position:absolute;right:10px;top:14px;color:#64817a;width:35px;min-height:35px}.sidebar>.brand{padding-right:25px}
