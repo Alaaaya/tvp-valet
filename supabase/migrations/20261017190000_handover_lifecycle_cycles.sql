@@ -28,17 +28,17 @@ revoke all on function private.complete_booking_handover_core(uuid,uuid,text,jso
 -- No five-argument overload/default can silently bypass snapshot validation.
 create function public.complete_booking_handover(
   p_request_id uuid,p_booking_id uuid,p_action text,p_details jsonb,p_media jsonb,
-  p_expected_in timestamptz,p_expected_out timestamptz,p_expected_revision timestamptz
+  p_expected_in timestamptz,p_expected_out timestamptz,p_expected_revision integer
 ) returns public.bookings
 language plpgsql security definer set search_path = ''
 as $$
-declare v_booking public.bookings; v_receipt public.booking_handovers; v_revision timestamptz;
+declare v_booking public.bookings; v_receipt public.booking_handovers; v_revision bigint;
 begin
   if not private.is_staff() then raise exception 'Staff access required' using errcode='42501'; end if;
   if p_request_id is null or p_booking_id is null or p_action is null or p_action not in ('in','out')
     or (p_expected_in is not null and not isfinite(p_expected_in))
     or (p_expected_out is not null and not isfinite(p_expected_out))
-    or (p_expected_revision is not null and not isfinite(p_expected_revision)) then
+    or (p_expected_revision is null or p_expected_revision < 0) then
     raise exception 'Invalid handover identity, action or snapshot' using errcode='22023'; end if;
   perform pg_advisory_xact_lock(hashtextextended(p_request_id::text,170017));
   select * into v_booking from public.bookings where id=p_booking_id for update;
@@ -49,7 +49,7 @@ begin
     -- Legitimate completed-request retries ignore snapshots and mutable draft data.
     return private.complete_booking_handover_core(p_request_id,p_booking_id,p_action,p_details,p_media);
   end if;
-  select max(occurred_at) into v_revision from public.booking_handover_undos where booking_id=p_booking_id;
+  select count(*) into v_revision from public.booking_handover_undos where booking_id=p_booking_id;
   if v_revision is distinct from p_expected_revision then
     raise exception 'Lifecycle revision changed; reopen handover' using errcode='40001'; end if;
   if v_booking.checked_in_at is distinct from p_expected_in
@@ -57,9 +57,9 @@ begin
     raise exception 'Lifecycle changed; reopen handover' using errcode='40001'; end if;
   return private.complete_booking_handover_core(p_request_id,p_booking_id,p_action,p_details,p_media);
 end $$;
-revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,timestamptz)
+revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,integer)
   from public,anon,authenticated;
-grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,timestamptz)
+grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,integer)
   to authenticated;
 
 alter table public.booking_operation_events
