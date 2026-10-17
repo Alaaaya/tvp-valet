@@ -34,15 +34,17 @@ export interface BookingListRowProps{
  /** Compact call counter from the parent; omit when there are no calls. Freeze/unfreeze is the parent's job. */
  callCounterSlot?:React.ReactNode;
 }
+/** Counter helper: done/total for one direction over the (done-inclusive) population. */
+export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
 export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=displayComment(b.comment,true).text.trim();
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?'Annahme ':'Rückgabe ')+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time"><span className="blr-ico"><Car size={16}/><Users size={14}/></span><strong>{flight&&(kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>)}{time}</strong>{flight&&<span className="blr-tf">{flight}</span>}</span>
+   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={16} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={16}/><Users size={14}/></span><strong>{flight&&(kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>)}{time}</strong>{flight&&<span className="blr-tf">{flight}</span>}</span>
    <span className="blr-body">
     {badge&&<span className="blr-top"><em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>{badge.product&&<small className="blr-prov">{badge.label}</small>}</span>}
-    <span className="blr-line"><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}{done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={14}/></span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
+    <span className="blr-line"><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
     <span className="blr-line"><span className="blr-name">{b.customer_name}</span>{b.phone&&<Phone size={14} aria-label="Telefon"/>}</span>
     {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
     {c&&<span className="blr-comment">{c}</span>}

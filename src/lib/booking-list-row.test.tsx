@@ -2,7 +2,7 @@ import React from 'react';
 import {renderToStaticMarkup as r} from 'react-dom/server';
 import {readFileSync} from 'node:fs';
 import {describe,expect,it} from 'vitest';
-import {BookingListRow,partnerBadge,moneyState} from './booking-list-row';
+import {BookingListRow,partnerBadge,moneyState,directionCounts} from './booking-list-row';
 import {blank} from '../model';
 const b={...blank(),code:'AF-1',plate:'JNG35R',customer_name:'Latifa',product:'AG-V-F',total:60,paid:10,key_cash:'30€ Wael',persons:2};
 const P=(x:any={})=>({b,kind:'out' as const,time:'12:00',completed:false,onOpen:()=>{},...x});
@@ -17,4 +17,13 @@ describe('booking list row',()=>{
  it('flight only when known; live slot wins',()=>{expect(r(<BookingListRow {...P()}/>)).not.toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('BY123');expect(r(<BookingListRow {...P({live:<i id="lv"/>})}/>)).toContain('id="lv"')});
  it('call counter slot only when supplied, no start-ride hint',()=>{const h0=r(<BookingListRow {...P()}/>);expect(h0).not.toContain('blr-calls');const h=r(<BookingListRow {...P({callCounterSlot:<i id="cc"/>})}/>);expect(h).toContain('id="cc"');expect(h).toContain('blr-calls');expect(h0+h).not.toMatch(/start ride|fahrt starten/i)});
  it('css solid, readable',()=>{const c=readFileSync('src/booking-list-row.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/min-height:44px/)});
+});
+
+describe('completed rows and counters',()=>{
+ const inB={...b,checked_in_at:'2026-10-17T08:00:00Z'},outB={...b,checked_out_at:'2026-10-17T10:00:00Z'};
+ it('completed in: check inside timebox, none in plate line',()=>{const h=r(<BookingListRow {...P({kind:'in',b:inB,completed:true})}/>);expect(h).toContain('blr in done');expect(h).toMatch(/blr-time"><span class="blr-check"/);expect(h.match(/blr-check/g)?.length).toBe(1)});
+ it('completed out and open rows',()=>{expect(r(<BookingListRow {...P({b:outB,completed:true})}/>)).toMatch(/blr out done.*blr-time"><span class="blr-check"/);const o=r(<BookingListRow {...P()}/>);expect(o).not.toContain('blr-check');expect(o).not.toContain(' done')});
+ it('open in row with no check even if other direction stamp',()=>{expect(r(<BookingListRow {...P({kind:'in',b:outB,completed:false})}/>)).not.toContain('blr-check')});
+ it('directionCounts done/total',()=>{const ev=[{kind:'in' as const,completed:true},{kind:'in' as const},{kind:'out' as const,completed:true},{kind:'out' as const,completed:true},{kind:'out' as const}];expect(directionCounts(ev,'in')).toEqual({done:1,total:2});expect(directionCounts(ev,'out')).toEqual({done:2,total:3});expect(directionCounts([],'in')).toEqual({done:0,total:0})});
+ it('css: white completed box with colored stripe',()=>{const c=readFileSync('src/booking-list-row.css','utf8');expect(c).toContain('.blr.done .blr-time{background:#fff;border-left:5px solid #2e9e5b}');expect(c).toContain('.blr.out.done .blr-time{background:#fff;border-left-color:#d23b3b}')});
 });
