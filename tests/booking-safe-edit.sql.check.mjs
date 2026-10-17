@@ -36,7 +36,7 @@ test('safe edit exact migrations, roles, stale ABA, immutable replay and operati
  for(const patch of [{phone:'x'},{customer_name:'x'},{arrival_at:'2027-01-01Z'}])await fail(rpc(patch,e),'42501');
  for(const field of ['paid','total','status','spot','driver_id','checked_in_at','actual_flight_out','edit_revision','customer_called_at'])await fail(rpc({[field]:null},e),'22023');
  const id=rid();const statement=rpc({comment:'new note',km:321},e,id);
- await db.exec(statement);equal((await row()).customer_name,'Legacy Full Name');equal(Number((await row()).edit_revision),1);
+ const freshEdit=(await db.query(statement)).rows[0].apply_booking_safe_edit;equal(freshEdit.lifecycle_revision,0);equal((await row()).customer_name,'Legacy Full Name');equal(Number((await row()).edit_revision),1);
  await db.exec(statement);equal(Number((await row()).edit_revision),1);
  await fail(rpc({comment:'changed'},e,id),'23514');
  await role();await fail(statement,'23514');
@@ -74,7 +74,9 @@ test('safe edit exact migrations, roles, stale ABA, immutable replay and operati
  await db.exec('reset role');await db.exec(`update public.bookings set checked_in_at='2026-10-17T10:00Z'`);await role();
  await fail(rpc({comment:'lifecycle ABA'},e),'PT409');
  // Identical old retry after later operations returns current booking without reapplying note.
- await role(driver);await db.exec(statement);equal((await row()).comment,'numeric legacy retained');await role();
+ await role(driver);const replayed=(await db.query(statement)).rows[0].apply_booking_safe_edit;
+ equal(replayed.lifecycle_revision,1);equal(new Date(replayed.checked_in_at).toISOString(),'2026-10-17T10:00:00.000Z');
+ equal((await row()).comment,'numeric legacy retained');await role();
  equal((await db.query('select count(*)::int n from public.booking_edit_receipts')).rows[0].n,5);
  await fail(`update public.booking_edit_receipts set patch='{}'`,'42501');await fail('delete from public.booking_edit_receipts','42501');
  await db.exec('reset role');await fail('delete from public.booking_edit_receipts','42501');
