@@ -51,3 +51,5 @@
 .app.fixed-top .now-button{min-height:44px}
 .app.fixed-top .date-strip{height:44px}
 .app.fixed-top .date-strip button,.app.fixed-top .date-strip .today-btn,.app.fixed-top .date-pick,.app.fixed-top .date-pick input{min-height:44px}
+/* Owner override: only license-plate text is black; teal UI and icons stay unchanged. */
+.app.fixed-top .blr-plate{color:#111}
