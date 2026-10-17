@@ -14,7 +14,7 @@ describe('booking list row',()=>{
  it('phone icon only with phone',()=>{expect(r(<BookingListRow {...P()}/>)).not.toContain('Telefon');expect(r(<BookingListRow {...P({b:{...b,phone:'+49'}})}/>)).toContain('Telefon')});
  it('comment is human text, never raw json; count only when real',()=>{const raw='ParkingPro source abc\nFahrzeug: {"brand":"VW"}\nBitte anrufen';const h=r(<BookingListRow {...P({b:{...b,comment:raw}})}/>);expect(h).toContain('Bitte anrufen');expect(h).not.toContain('brand');expect(h).not.toContain('blr-cc');expect(r(<BookingListRow {...P({commentCount:3})}/>)).toContain('blr-cc')});
  it('real key and check only when done',()=>{expect(r(<BookingListRow {...P()}/>)).toContain('30€ Wael');expect(r(<BookingListRow {...P()}/>)).not.toContain('blr-check');expect(r(<BookingListRow {...P({b:{...b,checked_out_at:'2026-10-17T10:00:00Z'},completed:true})}/>)).toContain('blr-check')});
- it('flight only when known; live slot wins',()=>{expect(r(<BookingListRow {...P()}/>)).not.toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('BY123');expect(r(<BookingListRow {...P({live:<i id="lv"/>})}/>)).toContain('id="lv"')});
+ it('keeps known flight number in timebox but omits status slot',()=>{expect(r(<BookingListRow {...P()}/>)).not.toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('blr-tf');expect(r(<BookingListRow {...P({b:{...b,flight_out:'BY123'}})}/>)).toContain('BY123');expect(r(<BookingListRow {...P({live:<i id="lv"/>})}/>)).not.toContain('id="lv"')});
  it('call counter slot only when supplied, no start-ride hint',()=>{const h0=r(<BookingListRow {...P()}/>);expect(h0).not.toContain('blr-calls');const h=r(<BookingListRow {...P({callCounterSlot:<i id="cc"/>})}/>);expect(h).toContain('id="cc"');expect(h).toContain('blr-calls');expect(h0+h).not.toMatch(/start ride|fahrt starten/i)});
  it('css solid, readable',()=>{const c=readFileSync('src/booking-list-row.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/min-height:158px/)});
 });
@@ -63,4 +63,10 @@ it('omits external IDs from row text and tooltip while preserving booking code a
   expect(h).toContain('#AF-1');
   expect(JSON.stringify(row)).toBe(before);
  }
+});
+
+it('retains directional flight clock and number but no separate live status line',()=>{
+ const h=r(<BookingListRow {...P({b:{...b,flight_out:'NP855',actual_flight_out:'2026-10-17T10:33:00Z'},live:<small>landed +21′</small>})}/>);
+ expect(h).toContain('NP855');expect(h).toContain('12:33');expect(h).toContain('blr-tf');
+ expect(h).not.toContain('landed');expect(h).not.toContain('blr-flight');
 });
