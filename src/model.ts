@@ -37,9 +37,3 @@ export function occupancyDays(rows:Booking[],start=day(),count=7,capacity=350):{
   return{date,peak,capacity};
  });
 }
-
-// Runtime rows can include legacy columns. Booking writes never carry operational timestamps.
-export function bookingPayload(b:Booking):Booking {
- const keys: readonly (keyof Booking)[]=['id','code','external_id','platform','customer_name','phone','email','persons','plate','product','covered','arrival_at','departure_at','flight_in','flight_out','actual_flight_in','actual_flight_out','checked_in_at','checked_out_at','status','total','paid','key_cash','spot','km','comment','driver_id','created_at'];
- return Object.fromEntries(keys.map(k=>[k,b[k]])) as Booking;
-}

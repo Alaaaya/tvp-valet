@@ -1,4 +1,4 @@
-import {createClient} from '@supabase/supabase-js';import {bookingPayload,type Booking,type Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
+import {createClient} from '@supabase/supabase-js';import type {Booking,Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
 const url=import.meta.env.VITE_SUPABASE_URL,key=import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const db=url&&key?createClient(url,key):null;
 export async function load(){if(!db)throw Error('Backend nicht eingerichtet');const [b,e]=await Promise.all([db.from('bookings').select('*').order('arrival_at'),db.from('profiles').select('*')]);if(b.error)throw b.error;if(e.error)throw e.error;return{rows:b.data.map(x=>({...x,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,x[k]??'']))})) as Booking[],staff:e.data.filter(x=>x.active).map(x=>({id:x.id,full_name:x.full_name,role:x.role})) as Employee[]}}
