@@ -16,3 +16,5 @@ describe('retention',()=>{
  });
  it('marks stale on error',()=>{expect(markStale({'d|X':f('X')},{},'d','T')['d|X']).toBe('T')});
 });
+import {normalizeFlightNumber} from '../../supabase/functions/_shared/flights';
+describe('normalization',()=>{it('client and server key agree',()=>{expect(normalizeFlightNumber('A3 0540')).toBe('A3540');expect(normalizeFlightNumber('a30540')).toBe('A3540')})});
