@@ -27,7 +27,7 @@ const b=await makeBooking(), b2=await makeBooking(), cancelled=await makeBooking
 const req=uuid(), mediaId=uuid(), path=b.id+'/'+req+'-'+mediaId+'.jpg';
 const media={id:mediaId,path,kind:'photo',mime_type:'image/jpeg',size_bytes:123,captured_at:new Date().toISOString()};
 const call=(request=req,booking=b.id,action='in',details={},files=[])=>db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb)',[request,booking,action,JSON.stringify(details),JSON.stringify(files)]);
-await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'image/jpeg; charset=binary'}]);
+await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'IMAGE/JPEG; codecs=binary'}]);
 await user(actor);
 for(const details of [null,[],{total:0},{km:-1},{km:1.1},{km:2147483648},{km:'1'},{poor_visibility:null},{key_cash:null},{flight_number:'a'.repeat(41)},{comment:'a'.repeat(10001)},{key_cash:'a'.repeat(201)}]){
  await failure(()=>call(req,b.id,'in',details),'22023');
@@ -57,7 +57,7 @@ await failure(()=>call(req,b2.id,'in'),'23514');
 await failure(()=>call(req,b.id,'out'),'23514');
 await failure(()=>call(uuid(),b.id,'in'),'23514');
 for(const table of ['booking_media','booking_handovers']){
- for(const sql of [`delete from public.${table}`,`update public.${table} set booking_id=$1`,table==='booking_media'?"insert into public.booking_media(id) values($1)":"insert into public.booking_handovers(request_id) values($1)"])
+ for(const sql of [`delete from public.${table}`,`update public.${table} set booking_id=$1`,table==='booking_media'?"insert into public.booking_media(id) values($1)":"insert into public.booking_handovers(id) values($1)"])
   await failure(()=>db.query(sql,sql.includes('$1')?[uuid()]:[]),'42501');
  assert.equal((await db.query('select count(*)::int as n from public.'+table)).rows[0].n,1);checks++;
 }

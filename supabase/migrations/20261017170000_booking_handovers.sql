@@ -1,14 +1,14 @@
 -- Atomic handover completion. Uploads remain private; uncommitted drafts may be cleaned by service_role.
 begin;
 create table public.booking_handovers (
-  request_id uuid primary key,
+  id uuid primary key,
   booking_id uuid not null references public.bookings(id) on delete cascade,
   action text not null check (action in ('in','out')),
   details jsonb not null check (jsonb_typeof(details)='object'),
   performed_by uuid not null references public.profiles(id),
   completed_at timestamptz not null default clock_timestamp(),
   unique (booking_id,action),
-  unique (request_id,booking_id,action)
+  unique (id,booking_id,action)
 );
 create table public.booking_media (
   id uuid primary key,
@@ -22,7 +22,7 @@ create table public.booking_media (
   size_bytes bigint not null check (size_bytes > 0),
   created_at timestamptz not null default clock_timestamp(),
   foreign key (request_id,booking_id,action)
-    references public.booking_handovers(request_id,booking_id,action) on delete cascade
+    references public.booking_handovers(id,booking_id,action) on delete cascade
 );
 create index booking_media_booking_idx on public.booking_media(booking_id,created_at);
 alter table public.booking_handovers enable row level security;
@@ -34,21 +34,8 @@ create policy booking_handovers_staff_read on public.booking_handovers for selec
   using ((select private.is_staff()));
 create policy booking_media_staff_read on public.booking_media for select to authenticated
   using ((select private.is_staff()));
--- The shared audit trigger expects id/code, whereas this table is keyed by request_id.
-create function private.audit_handover() returns trigger
-language plpgsql security definer set search_path = ''
-as $$
-declare v_old jsonb; v_new jsonb;
-begin
-  if TG_OP <> 'INSERT' then v_old:=to_jsonb(old); end if;
-  if TG_OP <> 'DELETE' then v_new:=to_jsonb(new); end if;
-  insert into public.audit_log(actor_id,entity,entity_id,action,old_data,new_data)
-    values(auth.uid(),TG_TABLE_NAME,coalesce(v_new->>'request_id',v_old->>'request_id'),TG_OP,v_old,v_new);
-  if TG_OP='DELETE' then return old; else return new; end if;
-end $$;
-revoke all on function private.audit_handover() from public,anon,authenticated;
 create trigger booking_handovers_audit after insert or update or delete on public.booking_handovers
-  for each row execute function private.audit_handover();
+  for each row execute function private.audit_change();
 create trigger booking_media_audit after insert or update or delete on public.booking_media
   for each row execute function private.audit_change();
 
@@ -71,7 +58,7 @@ begin
   perform pg_advisory_xact_lock(hashtextextended(p_request_id::text,170017));
   select * into v_booking from public.bookings where id=p_booking_id for update;
   if not found then raise exception 'Booking not found' using errcode='P0002'; end if;
-  select * into v_existing from public.booking_handovers where request_id=p_request_id;
+  select * into v_existing from public.booking_handovers where id=p_request_id;
   if found then
     if v_existing.booking_id <> p_booking_id or v_existing.action <> p_action then
       raise exception 'Request already belongs to another handover' using errcode='23514'; end if;
@@ -109,7 +96,7 @@ begin
   if p_media is null or jsonb_typeof(p_media)<>'array' then
     raise exception 'Media must be an array' using errcode='22023'; end if;
   if jsonb_array_length(p_media)>41 then raise exception 'Too many media files' using errcode='22023'; end if;
-  insert into public.booking_handovers(request_id,booking_id,action,details,performed_by)
+  insert into public.booking_handovers(id,booking_id,action,details,performed_by)
     values(p_request_id,p_booking_id,p_action,p_details,auth.uid());
   for v_item in select value from jsonb_array_elements(p_media) loop
     if jsonb_typeof(v_item)<>'object' then raise exception 'Invalid media object' using errcode='22023'; end if;
