@@ -1,11 +1,11 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
-const mock=vi.hoisted(()=>({rpc:vi.fn()}));
-vi.mock('../api',()=>({db:{rpc:mock.rpc}}));
+const mock=vi.hoisted(()=>({rpc:vi.fn(),revision:vi.fn()}));
+vi.mock('../api',()=>({db:{rpc:mock.rpc,from:()=>({select:()=>({eq:()=>({single:mock.revision})})})}}));
 import {blank} from '../model';
 import {canUndoHandover,undoHandover} from './handover-undo';
 const requestId='22222222-2222-4222-8222-222222222222';
 const booking={...blank(),checked_in_at:'2026-10-17T12:00:00Z',checked_out_at:null};
-beforeEach(()=>{vi.clearAllMocks();mock.rpc.mockResolvedValue({data:{...booking,checked_in_at:null},error:null})});
+beforeEach(()=>{vi.clearAllMocks();mock.revision.mockResolvedValue({data:{...booking,checked_in_at:null,booking_handover_undos:[{count:1}]},error:null});mock.rpc.mockResolvedValue({data:{...booking,checked_in_at:null},error:null})});
 describe('undo lifecycle and server contract',()=>{
  it('only permits completed confirmed actions in valid order',()=>{
   expect(canUndoHandover(booking,'in')).toBe(true);
@@ -46,8 +46,9 @@ describe('undo lifecycle and server contract',()=>{
   await expect(undoHandover({requestId:'bad',booking,action:'in'})).rejects.toThrow('Ungültige');
   expect(mock.rpc).not.toHaveBeenCalled();
  });
+ it('returns the monotonic undo receipt revision',async()=>{mock.revision.mockResolvedValue({data:{...booking,booking_handover_undos:[{count:9}]},error:null});expect(await undoHandover({requestId,booking,action:'in'})).toHaveProperty('lifecycle_revision',9)});
  it('normalizes nullable booking fields',async()=>{
-  mock.rpc.mockResolvedValue({data:{...booking,phone:null,external_id:null,comment:null}});
+  mock.revision.mockResolvedValue({data:{...booking,phone:null,external_id:null,comment:null,booking_handover_undos:[{count:1}]}});
   expect(await undoHandover({requestId,booking,action:'in'})).toMatchObject({phone:'',external_id:'',comment:''});
  });
 });
