@@ -38,10 +38,23 @@ export function createPlateOcr(paths:OcrPaths=bundledPaths()):PlateOcr{
         if(signal?.aborted||disposed)throw new Error('abgebrochen');
         const wk=await start();
         if(signal?.aborted||disposed)throw new Error('abgebrochen');
-        const r=await wk.recognize(img);
+        // A surrounding plate frame/Euroband can make SINGLE_LINE segmentation
+        // classify the whole picture as a non-text region. Retry sparse text only
+        // when no usable candidate was found; never invent or substitute letters.
+        // Reset for every job, including jobs following an aborted fallback.
+        await wk.setParameters({tessedit_pageseg_mode:'7'});
+        let r=await wk.recognize(img);
         if(signal?.aborted||disposed)throw new Error('abgebrochen');
-        const text=r.data.text||'';
-        return{text,confidence:Math.round(r.data.confidence||0),candidates:extractPlateCandidates(text)};
+        let candidates=extractPlateCandidates(r.data.text||'');
+        if(!candidates.length){
+          await wk.setParameters({tessedit_pageseg_mode:'11'});
+          if(signal?.aborted||disposed)throw new Error('abgebrochen');
+          const sparse=await wk.recognize(img);
+          if(signal?.aborted||disposed)throw new Error('abgebrochen');
+          const found=extractPlateCandidates(sparse.data.text||'');
+          if(found.length){r=sparse;candidates=found}
+        }
+        return{text:r.data.text||'',confidence:Math.round(r.data.confidence||0),candidates};
       };
       let onAbort=()=>{};
       /* abort terminates the worker so the CPU stops immediately; the next job spawns a fresh one */
