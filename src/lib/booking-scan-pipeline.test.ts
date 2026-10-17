@@ -56,6 +56,16 @@ describe('plate OCR (real tesseract.js, on-device, generated plate photos)',()=>
     const r=await ocr.recognize(readFileSync(fx('plate-de.png')));
     expect(r.candidates.map(c=>c.key)).toContain('DAB1234');expect(r.confidence).toBeGreaterThan(40);
   },120000);
+  it('reads a framed German plate with Euroband using real sparse segmentation fallback',async()=>{
+    const r=await ocr.recognize(readFileSync(fx('plate-framed-de.png')));
+    expect(r.text).toContain('EN IF 306');
+    expect(r.candidates.map(c=>c.key)).toContain('ENIF306');
+    expect(r.confidence).toBeGreaterThan(40);
+    // A fallback must not leave subsequent jobs in sparse-text mode.
+    const next=await ocr.recognize(readFileSync(fx('plate-de.png')));
+    expect(next.candidates.map(c=>c.key)).toContain('DAB1234');
+    expect(next.confidence).toBeGreaterThan(40);
+  },120000);
   it('reads a foreign yellow plate',async()=>{
     const r=await ocr.recognize(readFileSync(fx('plate-nl.png')));
     expect(r.candidates.map(c=>c.key)).toContain('XK498D');
