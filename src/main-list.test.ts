@@ -28,3 +28,5 @@ it('scan wiring + footer hidden in fixed-top shell',()=>{expect(s).toContain('re
 it('booking-list is a positioned containing block so absolute children cannot extend the page',()=>{expect(readFileSync('src/main-list.css','utf8')).toContain('.booking-list{position:relative;')});
 
 it('scan focus fills search with code, scrolls row, never opens detail or touches filters',()=>{const m=readFileSync('src/main.tsx','utf8');expect(m).toContain('const focusBooking=(b:Booking)=>{setQuery(b.code);setFocusId(b.id)}');expect(m).toMatch(/if\(o\.status==='single'\)\{setScanOut\(null\);focusBooking\(o\.booking\)\}/);expect(m).not.toMatch(/focusBooking=[^;]*open\(/);expect(m).not.toMatch(/focusBooking=[^;]*setMf/);expect(m).toContain('return day(resolveEventTime(b,k,mf.flights')});
+
+it('direction chips persist through the user filter setter',()=>{expect(s).toContain("const setType=(t:MainBookingFilters['type'])=>changeMf({...mf,type:t})");expect(s).not.toContain('setType=(t:string)=>setMf')});
