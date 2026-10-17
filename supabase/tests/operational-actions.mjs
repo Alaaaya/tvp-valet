@@ -37,6 +37,15 @@ await db.query("select public.check_booking($1,'out')",[booking.id]);
 await action('taken_away');checks++;
 await user('', 'anon');await fail('customer_called','42501');
 await db.exec('reset role');
+await db.query('update public.profiles set active=false where id=$1',[driver]);
+await user(driver);await fail('customer_called','42501');
+await db.exec('reset role');
+await db.query('update public.profiles set active=true where id=$1',[driver]);
+const closed=(await db.query("insert into public.bookings(customer_name,arrival_at,departure_at,status) values('Cancelled','2026-10-17T07:00:00Z','2026-10-20T07:00:00Z','cancelled') returning id")).rows[0];
+await user(driver);await assert.rejects(db.query("select public.record_booking_operation($1,'customer_called')",[closed.id]),e=>e.code==='23514');checks++;
+await assert.rejects(db.query("select public.record_booking_operation($1,'customer_called')",['00000000-0000-4000-8000-000000000099']),e=>e.code==='P0002');checks++;
+
+await db.exec('reset role');
 assert.ok((await db.query("select * from public.audit_log where entity='booking_operation_events'")).rows.length>=3);checks++;
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveBookingWrites:0}));
 await db.close();
