@@ -87,6 +87,8 @@ b=await fresh();await user(driver);const initial=await call(b);
 await db.query("select public.check_booking($1,'in')",[b.id]);
 state=(await db.query('select * from public.bookings where id=$1',[b.id])).rows[0];
 await db.query("select public.undo_booking_handover($1,$2,'in',$3)",[randomUUID(),b.id,state.checked_in_at]);
+assert.equal((await db.query('select * from public.booking_operations where booking_id=$1',[b.id])).rows[0].customer_called_at,null);checks++;
+assert.equal((await db.query('select * from public.booking_call_history($1)',[b.id])).rows.length,1);checks++;
 await reject(()=>call(b),'40001');
 await call(b,{revision:1});
 assert.equal((await db.query('select * from public.booking_call_history($1)',[b.id])).rows.length,2);checks++;
