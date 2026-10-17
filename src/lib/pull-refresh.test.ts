@@ -33,6 +33,19 @@ describe('runner',()=>{
 describe('real refetch',()=>{
  it('flight lookup hits the network uncached and honors abort',async()=>{const calls:any[]=[];vi.stubGlobal('fetch',vi.fn((u:string,o:any)=>{calls.push([u,o]);return new Promise((_,rej)=>o.signal?.addEventListener('abort',()=>rej(new DOMException('a','AbortError'))))}));
   const c=new AbortController();const p=fetchFlightUpdates(['LH123'],'2026-10-17','arrival',c.signal).catch(e=>e);await Promise.resolve();c.abort();const e=await p;if(calls.length){expect(calls[0][1].cache).toBe('no-store');expect(calls[0][1].signal).toBe(c.signal);expect(e.name).toBe('AbortError')}else expect(e).toBeInstanceOf(Error)});
- it('main wires one pull task that refetches bookings and flights, list-only',()=>{const s=readFileSync('src/main.tsx','utf8');expect(s).toMatch(/pullTask=async\(signal[^]*?Promise\.all\(\[refresh\(\),loadFlightDays\(/);expect(s).toContain('usePullRefresh(listRef,pullTask');expect(s).toContain("view==='today'&&session");expect(s).toContain('aria-label="Aktualisieren"');
+ it('main wires one pull task that refetches bookings and flights, list-only',()=>{const s=readFileSync('src/main.tsx','utf8');expect(s).toMatch(/pullTask=async\(signal[^]*?Promise\.all\(\[refresh\(signal\),loadFlightDays\(/);expect(s).toContain('usePullRefresh(listRef,pullTask');expect(s).toContain('void refreshList()');expect(s).toContain('gen!==flightGeneration.current');expect(s).toContain('key!==contextRef.current');expect(s).toContain('if(!valid())return');expect(s).toContain("view==='today'&&session");expect(s).toContain('aria-label="Aktualisieren"');
   const css=readFileSync('src/pull-refresh.css','utf8');expect(css).toContain('padding-top:var(--pull-gap');expect(css).not.toMatch(/blur|backdrop/);expect(readFileSync('src/main-list.css','utf8')).toContain('overscroll-behavior:contain')});
+});
+
+describe('coordinator lifecycle races',()=>{
+ it('never starts another request after unmount',async()=>{const task=vi.fn(async()=>{});const r=createRefreshRunner(task);r.dispose();expect(await r.run()).toBe(false);expect(task).not.toHaveBeenCalled()});
+ it('context cancellation stops late apply and allows new date request',async()=>{let release!:()=>void;const applied:string[]=[];let date='old';
+ const r=createRefreshRunner(async s=>{const snapshot=date;await new Promise<void>(res=>{release=res});if(!s.aborted&&snapshot===date)applied.push(snapshot)});
+ const first=r.run();date='new';r.cancel();expect(await first).toBe(false);release();await Promise.resolve();expect(applied).toEqual([]);
+ const second=r.run();release();expect(await second).toBe(true);expect(applied).toEqual(['new'])});
+ it('timeout then late response cannot mutate and collapses gesture gap',async()=>{vi.useFakeTimers();let release!:()=>void;const applied=vi.fn();const e=el();
+ const r=createRefreshRunner(async s=>{await new Promise<void>(res=>{release=res});if(!s.aborted)applied()},{timeoutMs:20});
+ const off=attachPullRefresh(e,r);drag(e,[0,160]);e.fire('touchend');expect(e.dataset.pull).toBe('busy');await vi.advanceTimersByTimeAsync(25);expect(e.st['--pull-gap']).toBe('0px');release();await vi.advanceTimersByTimeAsync(300);expect(applied).not.toHaveBeenCalled();expect(e.st['--pull-gap']).toBeUndefined();off()});
+ it('unmount while gesture request hangs removes gap and aborts without later apply',async()=>{const e=el();let release!:()=>void;const apply=vi.fn();const r=createRefreshRunner(async s=>{await new Promise<void>(res=>release=res);if(!s.aborted)apply()});const off=attachPullRefresh(e,r);drag(e,[0,160]);e.fire('touchend');off();r.dispose();release();await Promise.resolve();expect(e.st['--pull-gap']).toBeUndefined();expect(apply).not.toHaveBeenCalled()});
+ it('manual and gesture invoke the identical single-flight runner',async()=>{let release!:()=>void;const task=vi.fn(()=>new Promise<void>(res=>release=res));const r=createRefreshRunner(task),e=el();attachPullRefresh(e,r);const manual=r.run();drag(e,[0,160]);e.fire('touchend');expect(task).toHaveBeenCalledTimes(1);release();expect(await manual).toBe(true)});
 });
