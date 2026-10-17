@@ -54,6 +54,12 @@ test('exact payment migration: permissions, atomicity, snapshots, immutable cont
   await fail(rpc(request,booking,'9001'),'23514');
   await fail(rpc(request,legacy,'1000','cash','0'),'23514');
   check((await db.query("update public.bookings set paid=20 where code='TEST1' returning id")).rows,[]);
+  // Ordinary staff and admin edits cannot erase legacy money and then collect it again.
+  await fail(`select public.update_booking_ops('${legacy}','{"key_cash":""}')`,'23514');
+  await fail(`select public.update_booking_ops('${legacy}','{"key_cash":null}')`,'23514');
+  await fail(`select public.update_booking_ops('${legacy}','{"key_cash":"Schlüssel"}')`,'23514');
+  await fail(`select public.update_booking_ops('${legacy}','{"key_cash":"40€ Wael"}')`,'23514');
+  await db.exec(`select public.update_booking_ops('${legacy}','{"key_cash":"30€ Wael","spot":"A1"}')`);
   const first=(await db.query(rpc())).rows[0];
   check(first.actor_id,driver);check(first.actor_name,'Employee Server Name');
   check(Number(first.amount_cents),2000);check(Number(first.paid_after_cents),3000);
@@ -75,6 +81,8 @@ test('exact payment migration: permissions, atomicity, snapshots, immutable cont
   await fail(rpc('ffffffff-ffff-4fff-8fff-ffffffffffff',booking,'1','cash','10000'),'23514');
   await db.exec(`reset role; set request.jwt.claim.sub='${admin}'; set role authenticated`);
   await fail(rpc(),'23514');
+  await fail(`update public.bookings set key_cash=null where id='${legacy}'`,'23514');
+  await fail(`update public.bookings set key_cash='key12' where id='${legacy}'`,'23514');
   await fail(`update public.bookings set paid=0 where id='${booking}'`,'42501');
   await fail(`delete from public.bookings where id='${booking}'`,'23001');
   check((await db.query("select count(*)::int as n from public.audit_log where entity='booking_payments'")).rows[0].n,2);

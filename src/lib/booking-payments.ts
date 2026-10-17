@@ -13,8 +13,10 @@ const maxCents=999999999999;
 function validId(id:string){if(!uuid.test(id))throw new Error('Ungültige Anfrage-ID');}
 function cents(value:number):number {
  if(!Number.isFinite(value)||value<0)throw new Error('Ungültiger Geldbetrag');
- const rounded=Math.round(value*100);
- if(!Number.isSafeInteger(rounded)||rounded>maxCents||Math.abs(value*100-rounded)>0.0001)
+ const decimal=value.toFixed(2);
+ const [whole,fraction]=decimal.split('.');
+ const rounded=Number(whole)*100+Number(fraction);
+ if(Number(decimal)!==value||!Number.isSafeInteger(rounded)||rounded>maxCents)
   throw new Error('Geldbeträge benötigen volle Cent');
  return rounded;
 }
@@ -49,6 +51,7 @@ export async function recordBookingPayment({booking,requestId,amountCents,method
   throw new Error('Keine gültige Zahlungsbestätigung vom Server');
  return data as BookingPayment;
 }
+/** Non-snapshot paginated history preview. Never use it as an authoritative cash total. */
 export async function loadBookingPayments(bookingId?:string):Promise<BookingPayment[]> {
  if(bookingId!==undefined)validId(bookingId);
  if(!db)throw new Error('Backend nicht eingerichtet');
@@ -69,10 +72,14 @@ export type EmployeeCashTotal={
 };
 export type EmployeeCashReport={
  totals:EmployeeCashTotal[];conflictBookingIds:string[];unparsedBookingIds:string[];
- /** Null means reconciliation is required; never display an uncertain sum as truth. */
- totalCents:number|null;
+ /** Always null: separate client reads are not a consistent financial snapshot. */
+ totalCents:null;
+ previewTotalCents:number|null;
+ snapshotConsistent:false;
+ label:string;
 };
 /**
+ * NON-SNAPSHOT PREVIEW ONLY. Both employee rows and previewTotalCents need a preview label.
  * Cash only. Legacy notes are a separate, explicitly historical identity namespace.
  * No provider, paid amount, driver assignment or booking price is treated as cash.
  */
@@ -112,5 +119,6 @@ export function employeeCashTotals(bookings:readonly Booking[],payments:readonly
  const total=list.reduce((sum,row)=>sum+row.cashCents,0);
  if(!Number.isSafeInteger(total))throw new Error('Bargeldsumme ist zu groß');
  return {totals:list,conflictBookingIds,unparsedBookingIds,
-  totalCents:conflictBookingIds.length||unparsedBookingIds.length?null:total};
+  totalCents:null,previewTotalCents:conflictBookingIds.length||unparsedBookingIds.length?null:total,
+  snapshotConsistent:false,label:'Vorschau, kein konsistenter Buchungs-/Zahlungsstand'};
 }
