@@ -10,3 +10,4 @@ it('main list is compact and ParkingPro-like',()=>{
  expect(s.indexOf('className="counters"')).toBeLessThan(s.indexOf('className="search-row"'));
  expect(s.indexOf('className="search-row"')).toBeLessThan(s.indexOf('className="date-strip"'));
 });
+it('main-list.css loads after style.css, today button 44px',()=>{expect(s.indexOf("import './main-list.css'")).toBeGreaterThan(s.indexOf("import'./style.css'"));const c=readFileSync('src/main-list.css','utf8');expect(c).toMatch(/today-btn\{[^}]*min-height:44px/);expect(c).not.toMatch(/min-height:36px/)});
