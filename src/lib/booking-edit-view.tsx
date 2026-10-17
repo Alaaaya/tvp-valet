@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
+import '../booking-edit.css';
 import {ArrowLeft,CalendarDays,Car,MessageSquare,Pencil,Save,User,X,Minus,Plus} from 'lucide-react';
 import {formatInTimeZone,fromZonedTime} from 'date-fns-tz';
 import type {Booking} from '../model';

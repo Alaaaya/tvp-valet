@@ -17,4 +17,4 @@ describe('booking edit',()=>{
  it('field validation',()=>{const x=toDraft(b);expect(validate(b,{...x,km:'Infinity'}).length).toBe(1);expect(validate(b,{...x,km:'-1'}).length).toBe(1);expect(validate(b,{...x,km:'1e999'}).length).toBe(1);expect(validate(b,{...x,km:'120'})).toEqual([]);expect(validate(b,{...x,plate:'  '}).length).toBe(1);expect(validate(b,{...x,first_name:'',last_name:'',namesTouched:true}).length).toBe(0);const n={...b,first_name:'A',last_name:'B'};expect(validate(n,{...toDraft(n),first_name:'',last_name:''}).length).toBe(1)});
  it('limits',()=>{const x=toDraft(b);expect(validate(b,{...x,first_name:'a'.repeat(121)}).length).toBeGreaterThan(0);expect(validate(b,{...x,car_description:'a'.repeat(501)}).length).toBe(1)});
  it('css solid 16px',()=>{const c=readFileSync('src/booking-edit.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/font-size:16px/)});
-});
+ it('component imports its stylesheet',()=>{expect(readFileSync('src/lib/booking-edit-view.tsx','utf8')).toContain("booking-edit.css")});});
