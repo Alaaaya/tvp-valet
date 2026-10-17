@@ -16,6 +16,7 @@ await db.exec(await readFile(new URL('../migrations/20261017100000_booking_opera
 await db.exec(await readFile(new URL('../migrations/20261017130000_retrieved_operation.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../migrations/20261017170000_booking_handovers.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../migrations/20261017180000_booking_handover_undo.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../migrations/20261017190000_handover_lifecycle_cycles.sql',import.meta.url),'utf8'));
 const actor='00000000-0000-4000-8000-000000000001', outsider='00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users(id) values($1),($2)',[actor,outsider]);
 await db.query("insert into public.profiles(id,full_name,role) values($1,'Driver','driver')",[actor]);
@@ -27,7 +28,11 @@ async function failure(fn,code){await assert.rejects(fn,e=>{if(code)assert.equal
 const b=await makeBooking(), b2=await makeBooking(), cancelled=await makeBooking('cancelled');
 const req=uuid(), mediaId=uuid(), path=b.id+'/'+req+'-'+mediaId+'.jpg';
 const media={id:mediaId,path,kind:'photo',mime_type:'image/jpeg',size_bytes:123,captured_at:new Date().toISOString()};
-const call=(request=req,booking=b.id,action='in',details={},files=[])=>db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb)',[request,booking,action,JSON.stringify(details),JSON.stringify(files)]);
+const call=async(request=req,booking=b.id,action='in',details={},files=[],snapshot=undefined)=>{
+ const current=snapshot ?? (await db.query('select checked_in_at,checked_out_at from public.bookings where id=$1',[booking])).rows[0] ?? {};
+ return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz)',
+ [request,booking,action,JSON.stringify(details),JSON.stringify(files),current.checked_in_at??null,current.checked_out_at??null]);
+};
 await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'IMAGE/JPEG; codecs=binary'}]);
 await user(actor);
 for(const details of [null,[],{total:0},{km:-1},{km:1.1},{km:2147483648},{km:'1'},{poor_visibility:null},{key_cash:null},{flight_number:'a'.repeat(41)},{comment:'a'.repeat(10001)},{key_cash:'a'.repeat(201)}]){
@@ -180,5 +185,59 @@ assert.equal(udf.prosecdef,true);assert.deepEqual(udf.proconfig,['search_path=""
 await db.exec('reset role');
 await failure(()=>db.query('delete from public.booking_handover_undos'),'42501');
 await failure(()=>db.query('update public.booking_handover_undos set actor_id=$1',[outsider]),'42501');
+
+// New snapshot-bound completion rejects obsolete checkout drafts after undo/recheck.
+await user(actor);
+const cycle=await makeBooking();
+// makeBooking above is admin-authorized because actor is now admin.
+const ci=(await call(uuid(),cycle.id,'in')).rows[0];
+const staleSnapshot={checked_in_at:ci.checked_in_at,checked_out_at:null};
+const op=async(action)=>(await db.query('select * from public.record_booking_operation($1,$2)',[cycle.id,action])).rows[0];
+for(const action of ['taken_away','retrieved','customer_called','ride_started']) await op(action);
+const opsBefore=(await db.query('select * from public.booking_operations where booking_id=$1',[cycle.id])).rows[0];
+const co=(await call(uuid(),cycle.id,'out')).rows[0];
+await undo(uuid(),cycle.id,'out',co.checked_out_at);
+assert.deepEqual((await db.query('select * from public.booking_operations where booking_id=$1',[cycle.id])).rows[0],opsBefore);checks++;
+await undo(uuid(),cycle.id,'in',ci.checked_in_at);
+const reset=(await db.query('select * from public.booking_operations where booking_id=$1',[cycle.id])).rows[0];
+for(const key of ['taken_away_at','retrieved_at','customer_called_at','ride_started_at']) {assert.equal(reset[key],null);checks++;}
+const oldEvents=(await db.query('select * from public.booking_operation_events where booking_id=$1',[cycle.id])).rows;
+assert.equal(oldEvents.length,4);assert.ok(oldEvents.every(e=>e.undone_at&&e.undone_by===actor));checks+=2;
+await failure(()=>op('taken_away'),'23514');
+const ci2=(await call(uuid(),cycle.id,'in')).rows[0];
+const rejectedRequest=uuid();
+await failure(()=>call(rejectedRequest,cycle.id,'out',{comment:'STALE DRAFT'},[],staleSnapshot),'40001');
+assert.equal((await db.query('select * from public.booking_handovers where id=$1',[rejectedRequest])).rows.length,0);checks++;
+assert.ok(!(await db.query('select comment from public.bookings where id=$1',[cycle.id])).rows[0].comment.includes('STALE DRAFT'));checks++;
+await failure(()=>call(uuid(),cycle.id,'out',{},[],{checked_in_at:null,checked_out_at:null}),'40001');
+await failure(()=>call(uuid(),cycle.id,'out',{},[],{checked_in_at:ci2.checked_in_at,checked_out_at:ci2.checked_in_at}),'40001');
+await failure(()=>call(uuid(),cycle.id,'out',{},[],{checked_in_at:'infinity'}),'22023');
+for(const action of ['taken_away','retrieved','customer_called','ride_started']) await op(action);
+const events=(await db.query('select * from public.booking_operation_events where booking_id=$1',[cycle.id])).rows;
+assert.equal(events.length,8);assert.equal(events.filter(e=>e.undone_at===null).length,4);checks+=2;
+const co2Req=uuid();
+const co2=(await call(co2Req,cycle.id,'out',{},[],{checked_in_at:ci2.checked_in_at,checked_out_at:null})).rows[0];
+// Active receipt retries may carry stale snapshots, but never reapply mutable details.
+assert.deepEqual((await call(co2Req,cycle.id,'out',null,null,staleSnapshot)).rows[0],co2);checks++;
+await failure(()=>db.query("select public.complete_booking_handover($1,$2,'in','{}','[]')",[uuid(),cycle.id]),'42883');
+await failure(()=>db.query("select private.complete_booking_handover_core($1,$2,'in','{}','[]')",[uuid(),cycle.id]),'42501');
+await db.query("select set_config('tvp.trusted_lifecycle','true',false)");
+await failure(()=>db.query('update public.bookings set checked_out_at=null where id=$1',[cycle.id]),'42501');
+assert.ok((await db.query("select * from public.audit_log where entity='booking_operations' and entity_id=$1 and old_data->>'taken_away_at' is not null and new_data->>'taken_away_at' is null and actor_id=$2",[opsBefore.id,actor])).rows.length>=1);checks++;
+await failure(()=>db.query('update public.bookings set checked_in_at=$2 where id=$1',[cycle.id,ci.checked_in_at]),'42501');
+await db.query("update public.bookings set comment='Ordinary admin edit' where id=$1",[cycle.id]);checks++;
+// Direct admin upsert cannot resurrect undo timestamps; RPCs still succeed.
+await undo(uuid(),cycle.id,'out',co2.checked_out_at);
+await undo(uuid(),cycle.id,'in',ci2.checked_in_at);
+await failure(()=>db.query("insert into public.bookings(id,customer_name,arrival_at,departure_at,checked_in_at) values($1,'Stale',now(),now(),$2) on conflict(id) do update set checked_in_at=excluded.checked_in_at",[cycle.id,ci2.checked_in_at]),'42501');
+await call(uuid(),cycle.id,'in');checks++;
+await user('', 'anon');
+await failure(()=>db.query("select public.complete_booking_handover($1,$2,'in','{}','[]',null,null)",[uuid(),cycle.id]),'42501');
+await user(outsider);
+await failure(()=>call(uuid(),cycle.id,'out',{},[],staleSnapshot),'40001');
+await db.exec('reset role');
+await db.query('update public.profiles set active=false where id=$1',[outsider]);
+await user(outsider);await failure(()=>call(uuid(),cycle.id,'out'),'42501');
+await db.exec('reset role');
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveBookingWrites:0}));
 await db.close();
