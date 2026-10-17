@@ -26,7 +26,7 @@ export function mainBookingEvents(rows:readonly Booking[],date:string,input:Main
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00Z'))||new Date(date+'T12:00:00Z').toISOString().slice(0,10)!==date)return result;
  for(const b of rows){
   if(seen.has(b.id))continue;seen.add(b.id);
-  const noShow=b.status==='no_show'||sameMinuteNoShow(b);
+  const noShow=b.status==='no_show'||(b.status==='confirmed'&&sameMinuteNoShow(b));
   if(noShow?!f.noshow:b.status==='cancelled'?!f.cancelled:b.status!=='confirmed')continue;
   if(f.assigned&&(!userId||b.driver_id!==userId))continue;
   if(f.products.length&&!f.products.includes(b.product))continue;
