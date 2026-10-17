@@ -4,22 +4,41 @@ import type {FlightUpdatesResult} from '../../supabase/functions/_shared/flights
 export {normalizeFlightNumber} from '../../supabase/functions/_shared/flights';
 export type {FlightUpdate, FlightUpdatesResult, FlightStatus} from '../../supabase/functions/_shared/flights';
 
-/** Arrival flights at DUS, keyed by scheduled Europe/Berlin date. Never writes booking dates. */
-export async function fetchFlightUpdates(flightNumbers:string[], date:string):Promise<FlightUpdatesResult> {
-  const body = validateFlightRequest({flightNumbers,date});
+let refreshing:Promise<string>|null=null;
+/** One refresh for concurrent day/direction lookups, without rotating the refresh token twice. */
+async function refreshToken(failedToken:string):Promise<string> {
+  if(refreshing)return refreshing;
+  refreshing=(async()=>{
+    const current=await db!.auth.getSession();
+    if(!current.error&&current.data.session&&current.data.session.access_token!==failedToken)
+      return current.data.session.access_token;
+    const result=await db!.auth.refreshSession();
+    if(result.error||!result.data.session)throw new Error('Sitzung abgelaufen. Bitte erneut anmelden.');
+    return result.data.session.access_token;
+  })();
+  try{return await refreshing}finally{refreshing=null}
+}
+
+/** Read-only flight lookup. Session persistence/refresh is enabled in the shared client. */
+export async function fetchFlightUpdates(flightNumbers:string[], date:string, direction:'arrival'|'departure'='arrival'):Promise<FlightUpdatesResult> {
+  const validated=validateFlightRequest({flightNumbers,date,...(direction==='departure'?{direction}:{})});
+  // Validation supplies the default arrival direction.
+  const body={...validated,...(direction==='departure'?{direction}:{})};
   if (!db) throw new Error('Backend nicht eingerichtet');
-  let auth=await db.auth.getSession();
-  if(auth.error||!auth.data.session)throw new Error('Bitte erneut anmelden, um Live-Flugzeiten zu laden');
-  const request=(token:string)=>db!.functions.invoke('dus-flights',{body,headers:{Authorization:'Bearer '+token}});
-  let {data,error}=await request(auth.data.session.access_token);
-  // One safe refresh/retry only. This is a read-only call, never an operation replay.
+  const auth=await db.auth.getSession();
+  if(auth.error||!auth.data.session)throw new Error('Bitte erneut anmelden, um Flugzeiten zu laden');
+  let token=auth.data.session.access_token;
+  const expiresAt=auth.data.session.expires_at;
+  if(expiresAt&&expiresAt*1000<Date.now()+60000)token=await refreshToken(token);
+  const request=(accessToken:string)=>db!.functions.invoke('dus-flights',{body,headers:{Authorization:'Bearer '+accessToken}});
+  let {data,error}=await request(token);
+  // Retry only reads, once, and only on an authentication rejection.
   if(error?.context instanceof Response&&error.context.status===401){
-    const refreshed=await db.auth.refreshSession();
-    if(refreshed.error||!refreshed.data.session)throw new Error('Sitzung abgelaufen. Bitte erneut anmelden.');
-    ({data,error}=await request(refreshed.data.session.access_token));
+    token=await refreshToken(token);
+    ({data,error}=await request(token));
   }
   if (error) {
-    let message = 'Live-Flugzeiten konnten nicht geladen werden';
+    let message = 'Flugzeiten konnten nicht geladen werden';
     if (error.context instanceof Response) {
       try { const detail = await error.context.clone().json(); if (typeof detail.error === 'string') message=detail.error; } catch { /* network/non-JSON error */ }
     }

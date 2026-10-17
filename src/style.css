@@ -45,3 +45,10 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .op-btn:disabled{opacity:.7}
 .op-btn[aria-busy=true]{opacity:.6;cursor:progress}
 .filter-chips button[aria-pressed=true]{outline:2px solid currentColor}
+
+/* Flight facts are neutral, separate from green/red vehicle handover blocks. */
+.flight-panel{background:#edf2f4;color:#344954;min-height:190px;height:auto;gap:16px}
+.flight-panel>span{display:block;min-width:0;overflow-wrap:anywhere;line-height:1.45}
+.flight-panel>span>svg{vertical-align:middle;margin-right:6px}
+.flight-panel small{color:#526773!important;opacity:1;margin-top:7px;line-height:1.5}
+.flight-panel>button{flex-shrink:0}
