@@ -27,7 +27,8 @@ const migrationNames=[
  '20261017210000_booking_detail_actions.sql',
  '20261017210100_booking_optional_details.sql',
  '20261017220000_booking_payments.sql',
- '20261017230000_booking_customer_calls.sql'
+ '20261017230000_booking_customer_calls.sql',
+ '20261017240000_booking_safe_edit.sql'
 ];
 await db.exec("alter table storage.objects add column metadata jsonb");
 for(const name of migrationNames){
@@ -232,6 +233,69 @@ const beforeHistorical=await sqlRow(historical.id);
 await db.query("select public.undo_booking_handover($1,$2,'in',$3)",[randomUUID(),historical.id,beforeHistorical.checked_in_at]);
 eq((await sqlRow(historical.id)).key_cash,'10€ Wael');
 eq((await sqlRow(historical.id)).paid,'10.00');
+// Safe-edit integration: narrow patches coexist with payment/call changes,
+// but spot/lifecycle/edit changes invalidate the captured optimistic snapshot.
+async function editSnapshot(id){
+ const row=await sqlRow(id);
+ return {edit_revision:Number(row.edit_revision),detail_revision:Number(row.detail_revision),
+ lifecycle_revision:await revision(id),status:row.status,checked_in_at:row.checked_in_at,
+ checked_out_at:row.checked_out_at,spot:row.spot||''};
+}
+async function edit(id,patch,expected,request=randomUUID()){
+ return (await db.query('select public.apply_booking_safe_edit($1,$2,$3::jsonb,$4::jsonb) as result',
+ [request,id,JSON.stringify(patch),JSON.stringify(expected)])).rows[0].result;
+}
+const editable=await fresh();
+await db.query('update public.bookings set total=100 where id=$1',[editable.id]);
+await user(admin);
+let editExpected=await editSnapshot(editable.id);
+await edit(editable.id,{first_name:'Combined',car_description:'Fixture car'},editExpected);
+eq((await sqlRow(editable.id)).first_name,'Combined');
+await reject(async()=>edit(editable.id,{comment:'stale own edit'},editExpected),'PT409');
+editExpected=await editSnapshot(editable.id);
+// Payment and calls change no editable fields: a narrow edit must preserve both.
+await payment(editable.id,1000,'card');
+const editCall=await call(editable);
+await edit(editable.id,{comment:'After payment and call'},editExpected);
+eq((await sqlRow(editable.id)).paid,'10.00');
+eq(new Date((await sqlOps(editable.id)).customer_called_at).toISOString(),new Date(editCall.customer_called_at).toISOString());
+eq((await sqlRow(editable.id)).status,'confirmed');
+for(const patch of [{paid:0},{total:0},{status:'cancelled'},{checked_in_at:null},{spot:'illegal'}])
+ await reject(async()=>edit(editable.id,patch,await editSnapshot(editable.id)),'22023');
+editExpected=await editSnapshot(editable.id);
+await detail(editable.id,'spot','EDIT-1');
+await reject(async()=>edit(editable.id,{phone:'stale spot'},editExpected),'PT409');
+await edit(editable.id,{phone:'+49 fixture'},await editSnapshot(editable.id));
+eq((await sqlRow(editable.id)).spot,'EDIT-1');
+editExpected=await editSnapshot(editable.id);
+await complete(editable.id,'in',{comment:'Handover revision'});
+await reject(async()=>edit(editable.id,{email:'stale lifecycle'},editExpected),'PT409');
+await edit(editable.id,{email:'fixture@example.invalid'},await editSnapshot(editable.id));
+let editRow=await sqlRow(editable.id);
+editExpected=await editSnapshot(editable.id);
+await db.query("select public.undo_booking_handover($1,$2,'in',$3)",[randomUUID(),editable.id,editRow.checked_in_at]);
+await reject(async()=>edit(editable.id,{comment:'stale undo'},editExpected),'PT409');
+eq((await sqlOps(editable.id)).customer_called_at,null);
+eq((await sqlRow(editable.id)).paid,'10.00');
+const postUndoExpected=await editSnapshot(editable.id),editRequest=randomUUID(),editPatch={comment:'After undo'};
+await edit(editable.id,editPatch,postUndoExpected,editRequest);
+await payment(editable.id,2000,'cash');
+await detail(editable.id,'status','cancelled');
+await reject(async()=>edit(editable.id,{phone:'stale status'},postUndoExpected),'PT409');
+// Exact replay after later payment/status returns current state, never replays stale fields.
+const replayEdit=await edit(editable.id,editPatch,postUndoExpected,editRequest);
+eq(replayEdit.paid,30);eq(replayEdit.lifecycle_revision,1);eq(replayEdit.status,'cancelled');
+await reject(async()=>edit(editable.id,{comment:'changed request'},postUndoExpected,editRequest),'23514');
+await edit(editable.id,{car_description:'After cancellation'},await editSnapshot(editable.id));
+eq((await sqlRow(editable.id)).paid,'30.00');eq((await sqlRow(editable.id)).status,'cancelled');
+// Legacy-key protection remains enforced through the new security-definer edit RPC.
+await reject(async()=>edit(historical.id,{key_cash:''},await editSnapshot(historical.id)),'23514');
+eq((await sqlRow(historical.id)).key_cash,'10€ Wael');
+await user(driver);
+await reject(async()=>edit(editable.id,{phone:'forbidden driver'},await editSnapshot(editable.id)),'42501');
+await edit(editable.id,{comment:'Driver permitted note'},await editSnapshot(editable.id));
+eq((await sqlRow(editable.id)).paid,'30.00');
+eq((await sqlRow(editable.id)).status,'cancelled');
 console.log(JSON.stringify({status:'passed',checks,migrations:migrationNames.length,isolated:true,liveWrites:0,
  note:'PGlite single-session transaction semantics, not a multi-connection lock test'}));
 await db.close();
