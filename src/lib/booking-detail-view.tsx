@@ -30,6 +30,8 @@ export interface BookingDetailViewProps{
   mediaGallery?:React.ReactNode;
   /** fallback only when no gallery element is given */
   mediaAdd?:React.ReactNode;
+  /** Has called button + live counter supplied by the caller (audited customer_called_at; repeat needs confirmation). Rendered full width under the columns. */
+  calledSlot?:React.ReactNode;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -75,10 +77,9 @@ export function BookingDetailView(p:BookingDetailViewProps){
         <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={15}/> {k==='in'?'Checked-in:':'Checked-out:'} {clock(at)}</>:k==='in'?'Check-in':'Check-out'}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         {k==='in'?act('taken_away','Mark as taken away',o?.taken_away_at,'fp-act'):act('retrieved','Mark as retrieved',o?.retrieved_at,'fp-act')}
-        {k==='in'?<button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||'Not assigned to driver'}</button>:act('customer_called','Has called',o?.customer_called_at,'fp-act')}</div>
+        <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||'Not assigned to driver'}</button></div>
     </section>})}</div>
-    <section className="pp-ride" aria-label="Ablauf">{act('ride_started','Start ride',o?.ride_started_at,'ride')}
-      {!b.checked_in_at&&b.status==='confirmed'&&<small>Abholen und Fahrt starten erst nach dem Check-in.</small>}
+    <section className="pp-called" aria-label="Kundenanruf">{p.calledSlot}
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}
       {p.opsLoadErr&&!p.demo&&<small role="status">Ablauf konnte nicht geladen werden: {p.opsLoadErr}</small>}
       {p.demo&&<small>Demo, nur lokal</small>}</section>
