@@ -1,0 +1,16 @@
+import {describe,it,expect} from 'vitest';
+import {blank} from '../model';
+import {bookingWritePayload} from './booking-payload';
+describe('booking write boundary',()=>{
+ it('never spreads unused nullable columns or merged operation metadata into booking upserts',()=>{
+  const original=blank();
+  const payload=bookingWritePayload({...original,taken_away_at:null,customer_called_at:null,ride_started_at:null,performed_by:'spoof',updated_at:'yesterday',booking_id:'other',operation_events:[]} as typeof original);
+  expect(Object.keys(payload).sort()).toEqual(Object.keys(original).sort());
+  for(const field of ['taken_away_at','customer_called_at','ride_started_at','performed_by','updated_at','booking_id','operation_events'])expect(payload).not.toHaveProperty(field);
+  expect(payload.id).toBe(original.id);
+ });
+ it('preserves original fields and nullable reference normalization',()=>{
+  const original=blank();original.customer_name='Disposable';original.external_id='';original.product='';
+  expect(bookingWritePayload(original)).toEqual({...original,external_id:null,product:null});
+ });
+});
