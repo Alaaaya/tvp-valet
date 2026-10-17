@@ -6,13 +6,17 @@ export type AnalyticsDay={date:string;arriving:number;departing:number;maximum:n
 export type AnalyticsData={days:AnalyticsDay[];parkedNow:number;overdueNow:number};
 export const LIMIT_NOTE='Nur importierte Buchungen enthalten; zukünftige Auslastung möglicherweise unvollständig.';
 
+/** Turnover can exceed peak occupancy, so all displayed series determine the axis. */
+export function chartMaximum(days:AnalyticsDay[]):number{return Math.max(1,...days.flatMap(d=>[d.arriving,d.departing,d.maximum]))}
+export function chartTicks(top:number):number[]{return [...new Set([0,1,2,3,4].map(i=>Math.round(top*i/4)))]}
+
 export function peakDay(days:AnalyticsDay[]):AnalyticsDay|undefined{return days.reduce<AnalyticsDay|undefined>((a,b)=>!a||b.maximum>a.maximum?b:a,undefined)}
 export function dm(date:string){const[,m,d]=date.split('-');return Number(d)+'/'+Number(m)}
 export function dmy(date:string){return date.split('-').reverse().join('-')}
 export function peakText(days:AnalyticsDay[]){const p=peakDay(days);return p?'Max occupancy: '+p.maximum+' on '+dmy(p.date):'Max occupancy: –'}
 
 export function DrawerSummary({data,onOpen}:{data:AnalyticsData;onOpen:()=>void}){
-  const days=data.days.slice(0,30);const top=Math.max(1,...days.map(d=>d.maximum));
+  const days=data.days.slice(0,30);const top=chartMaximum(days);
   return <button type="button" className="an-card-btn" onClick={onOpen} aria-label={peakText(days)+'. Analyse öffnen'}>
     <svg className="an-mini" viewBox="0 0 120 40" aria-hidden="true" preserveAspectRatio="none">
       {days.map((d,i)=>{const w=120/Math.max(days.length,1);return <g key={d.date}><rect x={i*w+.3} width={w*.38} y={40-d.arriving/top*40} height={d.arriving/top*40} fill="#259968"/><rect x={i*w+w*.45} width={w*.38} y={40-d.departing/top*40} height={d.departing/top*40} fill="#e4433c"/></g>})}
@@ -24,7 +28,7 @@ export function DrawerSummary({data,onOpen}:{data:AnalyticsData;onOpen:()=>void}
 
 export default function AnalyticsScreen({data,onBack}:{data:AnalyticsData;onBack:()=>void}){
   const[mode,setMode]=useState<'chart'|'table'>('chart');
-  const days=data.days;const top=Math.max(1,...days.map(d=>d.maximum));const ticks=[0,1,2,3,4].map(i=>Math.round(top*i/4));
+  const days=data.days;const top=chartMaximum(days);const ticks=chartTicks(top);
   const chartData=days.map(d=>({...d,label:dm(d.date)}));
   return <div className="an-screen"><header className="an-head"><button type="button" aria-label="Zurück" onClick={onBack}><ChevronLeft size={24}/></button><strong>Analytics</strong><span/></header>
     <div className="an-switch" role="tablist" aria-label="Ansicht"><button role="tab" aria-selected={mode==='chart'} className={mode==='chart'?'on':''} onClick={()=>setMode('chart')}>Chart</button><button role="tab" aria-selected={mode==='table'} className={mode==='table'?'on':''} onClick={()=>setMode('table')}>Table</button></div>
