@@ -1,0 +1,20 @@
+import React from 'react';
+import {renderToStaticMarkup as r} from 'react-dom/server';
+import {readFileSync} from 'node:fs';
+import {describe,expect,it,vi} from 'vitest';
+import {BookingActionsSheet,bookingDetailsText,copyText,callEntries} from './booking-actions-sheet';
+import {blank} from '../model';
+const b={...blank(),code:'AF-1',plate:'JNG35R',customer_name:'Latifa',spot:'12',total:60,paid:10};
+const P=(x:any={})=>({booking:b,onClose:()=>{},onEditBooking:()=>{},...x});
+describe('actions sheet',()=>{
+  it('renders reference structure',()=>{const h=r(<BookingActionsSheet {...P()}/>);for(const t of ['Edit','MODIFY','Edit booking','Change location','TOOLS','Copy booking details','Location history','Calllist history','STATUS','No show','Reset check-in/out'])expect(h).toContain(t);expect(h).toContain('aria-modal="true"')});
+  it('absent actions are disabled, not fake',()=>{const h=r(<BookingActionsSheet {...P()}/>);expect(h).toMatch(/disabled=""[^>]*><span>No show/);expect(h).toMatch(/disabled=""[^>]*><span>Change location/);expect(h).toContain('Nicht verfügbar')});
+  it('enabled when handlers given and booking active',()=>{const h=r(<BookingActionsSheet {...P({onNoShow:async()=>{},onChangeLocation:async()=>{}})}/>);expect(h).not.toMatch(/disabled=""[^>]*><span>No show/);expect(h).not.toMatch(/disabled=""[^>]*><span>Change location/)});
+  it('no show disabled when checked in or busy',()=>{expect(r(<BookingActionsSheet {...P({onNoShow:async()=>{},booking:{...b,checked_in_at:'2026-10-09T10:00:00Z'}})}/>)).toMatch(/disabled=""[^>]*><span>No show/);expect(r(<BookingActionsSheet {...P({onNoShow:async()=>{},busy:true})}/>)).toMatch(/disabled=""[^>]*><span>No show/)});
+  it('undo slot reused',()=>{expect(r(<BookingActionsSheet {...P({undoSlot:<i id="u"/>})}/>)).toContain('id="u"')});
+  it('call history honest',()=>{expect(callEntries(null)).toBeNull();expect(callEntries([])).toEqual([]);const ev=[{id:2,booking_id:'x',action:'customer_called' as const,occurred_at:'2026-10-09T10:00:00Z',actor_id:'a'},{id:1,booking_id:'x',action:'ride_started' as const,occurred_at:'2026-10-09T09:00:00Z',actor_id:'a'}];expect(callEntries(ev)!.length).toBe(1)});
+  it('details text uses real data',()=>{const t=bookingDetailsText(b);expect(t).toContain('Booking #AF-1');expect(t).toContain('Spot: 12');expect(t).toMatch(/Due: .*50/)});
+  it('copy uses clipboard',async()=>{const w=vi.fn().mockResolvedValue(undefined);await copyText('x',{} as any,{clipboard:{writeText:w}} as any);expect(w).toHaveBeenCalledWith('x')});
+  it('copy errors when no fallback',async()=>{const doc:any={createElement:()=>({setAttribute(){},style:{},select(){},remove(){}}),body:{appendChild(){}},execCommand:()=>false};await expect(copyText('x',doc,{} as any)).rejects.toThrow(/nicht unterstützt/)});
+  it('css solid, 44px touch',()=>{const c=readFileSync('src/booking-actions-sheet.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/min-height:48px/);expect(c).toMatch(/\.bas-x\{width:44px;height:44px/)});
+});
