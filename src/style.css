@@ -35,3 +35,4 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .list-heading .export-btn{position:static!important;width:auto!important;height:auto!important;flex:none;margin-left:auto;border-radius:999px;font-size:12px}
 .flight-panel small{color:#fff!important}
 .list-heading{height:auto!important;min-height:28px}.list-heading .export-btn{min-height:26px!important;height:26px!important;padding:0 12px}
+.flight-status{display:inline-block;margin-top:2px;padding:1px 5px;border-radius:6px;background:#fff;font-weight:700}.st-delayed{color:#b45309}.st-landed{color:#15803d}.st-approaching{color:#1d4ed8}.st-cancelled{color:#b91c1c}.st-diverted{color:#b91c1c}.st-scheduled,.st-unknown,.st-none{color:#475569}
