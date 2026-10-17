@@ -6,8 +6,10 @@ import {BookingPayment,parseEuroToCents,validateAmount,dueCents,fmtEur} from './
 import {blank} from '../model';
 const b:any={...blank(),id:'1',total:83,paid:10.1};
 const P=(x:any={})=>({booking:b,onPaid:()=>{},recordPayment:async()=>b,...x});
-import {adaptReceipt,cashBlocked} from './booking-payment-view';
+import {adaptReceipt,cashBlocked,uuid} from './booking-payment-view';
 describe('booking payment',()=>{
+ it('uuid v4 or null, no fallback',()=>{expect(uuid()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);const c=globalThis.crypto;Object.defineProperty(globalThis,'crypto',{value:undefined,configurable:true});try{expect(uuid()).toBeNull()}finally{Object.defineProperty(globalThis,'crypto',{value:c,configurable:true})}});
+ it('dialog semantics + hideSummary',()=>{const h=r(<BookingPayment {...P({initialOpen:true,hideSummary:true})}/>);expect(h).toContain('role="dialog"');expect(h).toContain('aria-labelledby="bpay-title"');expect(h).toContain('id="bpay-title"');expect(h).not.toContain('Kostenübersicht');expect(r(<BookingPayment {...P()}/>)).toContain('Kostenübersicht')});
  it('adapter returns booking with authoritative paid',async()=>{const x=await adaptReceipt(async()=>({paid_after_cents:5000}))({booking:b,requestId:'x',amountCents:1,method:'card'});expect(x.paid).toBe(50);expect(x.total).toBe(83)});
  it('legacy note blocks cash only, card default',()=>{const k={...b,key_cash:'30€ Wael'};expect(cashBlocked(k)).toBe(true);const h=r(<BookingPayment {...P({booking:k,initialOpen:true})}/>);expect(h).toContain('Barzahlung gesperrt');expect(h).toMatch(/aria-checked="false"[^>]*disabled=""[^>]*>Bargeld/);expect(h).toMatch(/aria-checked="true"[^>]*>Karte/)});
  it('unconfirmed booking cannot pay',()=>{expect(r(<BookingPayment {...P({booking:{...b,status:'cancelled'}})}/>)).toMatch(/bpay-main"[^>]*disabled/)});
