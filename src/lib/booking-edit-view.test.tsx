@@ -2,7 +2,7 @@ import React from 'react';
 import {renderToStaticMarkup as r} from 'react-dom/server';
 import {readFileSync} from 'node:fs';
 import {describe,expect,it} from 'vitest';
-import {BookingEditView,toDraft,isDirty,buildPatch,validate,appendComment,canEdit} from './booking-edit-view';
+import {toBerlinIso,BookingEditView,toDraft,isDirty,buildPatch,validate,appendComment,canEdit} from './booking-edit-view';
 import {blank} from '../model';
 const b:any={...blank(),customer_name:'Pim Mulder',phone:'+31',email:'a@b.c',persons:4,plate:'K775RL',key_cash:'10€',external_id:'267462468',arrival_at:'2026-10-17T03:15:00Z',departure_at:'2026-10-22T13:20:00Z',comment:'Hallo\nParkingPro source X\n{"source":"pp"}'};
 describe('booking edit',()=>{
@@ -13,5 +13,7 @@ describe('booking edit',()=>{
  it('validation',()=>{const x=toDraft(b);expect(validate(b,{...x,departure_date:'2026-10-01'}).length).toBe(1);expect(validate(b,{...x,persons:0}).length).toBe(1);expect(validate({...b,persons:0},{...x,persons:0})).toEqual([])});
  it('berlin time',()=>{const x=toDraft(b);expect(x.arrival_time).toBe('05:15');expect(buildPatch(b,{...x,arrival_time:'06:00'},'admin').arrival_at).toBe('2026-10-17T04:00:00.000Z')});
  it('comment keeps provenance',()=>{const c=appendComment(b.comment,'neu');expect(c).toContain('{"source":"pp"}');expect(c.indexOf('neu')).toBeLessThan(c.indexOf('ParkingPro source'));expect(c.startsWith('Hallo')).toBe(true)});
+ it('safe dates',()=>{expect(toBerlinIso('2026-10-17','')).toBeNull();expect(toBerlinIso('','05:00')).toBeNull();expect(toBerlinIso('2026-03-29','02:30')).toBeNull();expect(toBerlinIso('2026-03-29','03:30')).toBeTruthy();expect(validate(b,{...toDraft(b),arrival_time:''}).length).toBe(1)});
+ it('field validation',()=>{const x=toDraft(b);expect(validate(b,{...x,km:'Infinity'}).length).toBe(1);expect(validate(b,{...x,km:'-1'}).length).toBe(1);expect(validate(b,{...x,km:'1e999'}).length).toBe(1);expect(validate(b,{...x,km:'120'})).toEqual([]);expect(validate(b,{...x,plate:'  '}).length).toBe(1);expect(validate(b,{...x,first_name:'',last_name:'',namesTouched:true}).length).toBe(0);const n={...b,first_name:'A',last_name:'B'};expect(validate(n,{...toDraft(n),first_name:'',last_name:''}).length).toBe(1)});
  it('css solid 16px',()=>{const c=readFileSync('src/booking-edit.css','utf8');expect(c).not.toMatch(/gradient|backdrop-filter|blur/);expect(c).toMatch(/font-size:16px/)});
 });

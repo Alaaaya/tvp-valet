@@ -13,7 +13,12 @@ export interface EditDraft{first_name:string;last_name:string;phone:string;email
 export interface EditPatch{patch:Partial<EditableBooking>}
 
 const d=(v:string)=>formatInTimeZone(v,TZ,'yyyy-MM-dd'),t=(v:string)=>formatInTimeZone(v,TZ,'HH:mm');
-export const toBerlinIso=(date:string,time:string)=>fromZonedTime(date+'T'+time,TZ).toISOString();
+/** null for partial, invalid or nonexistent (DST gap) local times; verified by round trip. */
+export function toBerlinIso(date:string,time:string):string|null{
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^\d{2}:\d{2}$/.test(time))return null;
+ try{const z=fromZonedTime(date+'T'+time,TZ);if(Number.isNaN(z.getTime()))return null;
+  return formatInTimeZone(z,TZ,"yyyy-MM-dd'T'HH:mm")===date+'T'+time?z.toISOString():null}catch{return null}
+}
 
 /** Legacy customer_name is never split: first/last start empty unless explicit fields exist. */
 export function toDraft(b:EditableBooking):EditDraft{
@@ -27,11 +32,15 @@ export function isDirty(b:EditableBooking,x:EditDraft):boolean{
 }
 export function validate(b:EditableBooking,x:EditDraft):string[]{
  const e:string[]=[];
- if(!x.arrival_date||!x.arrival_time||!x.departure_date||!x.departure_time)e.push('Datum und Uhrzeit erforderlich');
- else if(Date.parse(toBerlinIso(x.departure_date,x.departure_time))<Date.parse(toBerlinIso(x.arrival_date,x.arrival_time)))e.push('Rückgabe muss nach der Annahme liegen');
+ const a=toBerlinIso(x.arrival_date,x.arrival_time),r=toBerlinIso(x.departure_date,x.departure_time);
+ if(!a||!r)e.push('Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)');
+ else if(Date.parse(r)<Date.parse(a))e.push('Rückgabe muss nach der Annahme liegen');
+ const o=toDraft(b);
+ if(o.plate!==x.plate&&!x.plate.trim())e.push('Kennzeichen darf nicht leer sein');
+ if(NAMES.some(k=>o[k]!==x[k])&&!x.first_name.trim()&&!x.last_name.trim())e.push('Name darf nicht leer sein');
  const legacyUntouched=b.persons===0&&x.persons===0;
  if(!legacyUntouched&&(!Number.isInteger(x.persons)||x.persons<1))e.push('Personen: mindestens 1');
- if(x.km!==''&&!(Number(x.km)>=0))e.push('Kilometerstand ungültig');
+ if(x.km!==''&&!(/^\d+$/.test(x.km.trim())&&Number.isSafeInteger(Number(x.km))))e.push('Kilometerstand ungültig');
  return e;
 }
 /** Human note goes before any import provenance block so displayComment keeps both. */
@@ -51,28 +60,31 @@ export function buildPatch(b:EditableBooking,x:EditDraft,role:EditRole):Partial<
  if(NAMES.some(ch)){p.first_name=x.first_name.trim();p.last_name=x.last_name.trim();p.customer_name=[p.first_name,p.last_name].filter(Boolean).join(' ')}
  for(const k of ['phone','email','plate','car_description','flight_in','flight_out','key_cash','spot'] as const)if(ch(k))(p as any)[k]=x[k].trim();
  if(ch('persons'))p.persons=x.persons;
- if(ch('km'))p.km=x.km===''?null:Number(x.km);
- if(ch('arrival_date')||ch('arrival_time'))p.arrival_at=toBerlinIso(x.arrival_date,x.arrival_time);
- if(ch('departure_date')||ch('departure_time'))p.departure_at=toBerlinIso(x.departure_date,x.departure_time);
+ if(ch('km'))p.km=x.km.trim()===''?null:Number(x.km);
+ if(ch('arrival_date')||ch('arrival_time'))p.arrival_at=toBerlinIso(x.arrival_date,x.arrival_time)||undefined;
+ if(ch('departure_date')||ch('departure_time'))p.departure_at=toBerlinIso(x.departure_date,x.departure_time)||undefined;
  if(x.new_comment.trim())p.comment=appendComment(b.comment,x.new_comment);
  return p;
 }
 
-export interface BookingEditViewProps{booking:EditableBooking;role:EditRole;onBack:()=>void;onSave:(patch:Partial<EditableBooking>)=>Promise<void>|void}
-export function BookingEditView({booking,role,onBack,onSave}:BookingEditViewProps){
+export interface BookingEditViewProps{booking:EditableBooking;role:EditRole;onBack:()=>void;onSave:(patch:Partial<EditableBooking>)=>Promise<void>|void;/** parent must block backdrop/outside dismissal while true */onDirtyChange?:(dirty:boolean)=>void}
+export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:BookingEditViewProps){
  const [x,setX]=useState(()=>toDraft(booking));const [err,setErr]=useState('');const [busy,setBusy]=useState(false);const [ask,setAsk]=useState(false);const [dateEdit,setDateEdit]=useState({in:false,out:false});
  const dirty=useMemo(()=>isDirty(booking,x),[booking,x]);const problems=validate(booking,x);const can=dirty&&!problems.length&&!busy;
  const set=(k:keyof EditDraft,v:string|number)=>setX(s=>({...s,[k]:v}));
- const dlg=useRef<HTMLDivElement>(null);useEffect(()=>{if(ask)dlg.current?.querySelector('button')?.focus()},[ask]);
+ const dlg=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null),inflight=useRef(false);
+ useEffect(()=>{onDirtyChange?.(dirty)},[dirty]);useEffect(()=>()=>onDirtyChange?.(false),[]);
+ useEffect(()=>{if(ask){opener.current=document.activeElement as HTMLElement|null;dlg.current?.querySelector('button')?.focus()}else opener.current?.focus?.()},[ask]);
+ const trap=(e:React.KeyboardEvent)=>{if(e.key==='Escape'){e.stopPropagation();setAsk(false);return}if(e.key!=='Tab')return;const bs=Array.from(dlg.current?.querySelectorAll('button')||[]) as HTMLElement[];if(!bs.length)return;const f=bs[0],l=bs[bs.length-1];if(e.shiftKey&&document.activeElement===f){e.preventDefault();l.focus()}else if(!e.shiftKey&&document.activeElement===l){e.preventDefault();f.focus()}else if(!dlg.current?.contains(document.activeElement)){e.preventDefault();f.focus()}};
  const legacy=!x.first_name&&!x.last_name&&booking.customer_name.trim();
- const save=async()=>{if(!can)return;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{setBusy(false)}};
- const back=()=>dirty?setAsk(true):onBack();
+ const save=async()=>{if(!can||inflight.current)return;inflight.current=true;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{inflight.current=false;setBusy(false)}};
+ const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
  const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><X size={14}/></button>}</span></label>};
  const when=(kind:'in'|'out')=>{const p=kind==='in'?'arrival':'departure',f=kind==='in'?'flight_in':'flight_out',dis=!canEdit(role,(p+'_date') as keyof EditDraft),open=dateEdit[kind]&&!dis;
   return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?'Parking date':'Return date'}</h3><button type="button" aria-label={(kind==='in'?'Parking date':'Return date')+' bearbeiten'} disabled={dis} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
   <div className="be-row"><input type="date" aria-label="Datum" disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label="Uhrzeit" disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
   {inp(f,'Flight number')}</section>};
- return <div className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label="Zurück" onClick={back}><ArrowLeft size={20}/></button><h2>Edit</h2><button type="button" className="be-save" disabled={!can} onClick={save}>Save</button></header>
+ return <div className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label="Zurück" disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>Edit</h2><button type="button" className="be-save" disabled={!can} onClick={save}>Save</button></header>
  <div className="be-ext">Extern ID: {booking.external_id||booking.code}</div>
  {err&&<div className="be-err" role="alert">{err}</div>}
  <div className="be-body">
@@ -87,6 +99,6 @@ export function BookingEditView({booking,role,onBack,onSave}:BookingEditViewProp
  {dirty&&problems.map(p=><p key={p} className="be-err" role="alert">{p}</p>)}
  </div>
  <footer className="be-foot"><button type="button" className="be-update" disabled={!can} onClick={save}><Save size={18}/>{busy?'Wird gespeichert …':'Update booking'}</button></footer>
- {ask&&<div className="be-dialog" role="alertdialog" aria-modal="true" aria-label="Ungespeicherte Änderungen" ref={dlg} onKeyDown={e=>{if(e.key==='Escape')setAsk(false)}}><div><p>Ungespeicherte Änderungen verwerfen?</p><button type="button" onClick={()=>setAsk(false)}>Weiter bearbeiten</button><button type="button" className="danger" onClick={onBack}>Verwerfen</button></div></div>}
+ {ask&&<div className="be-dialog" role="alertdialog" aria-modal="true" aria-label="Ungespeicherte Änderungen" ref={dlg} onKeyDown={trap}><div><p>Ungespeicherte Änderungen verwerfen?</p><button type="button" onClick={()=>setAsk(false)}>Weiter bearbeiten</button><button type="button" className="danger" disabled={busy} onClick={onBack}>Verwerfen</button></div></div>}
  </div>;
 }
