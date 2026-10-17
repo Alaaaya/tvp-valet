@@ -1,0 +1,22 @@
+.blr{background:#fff;border-bottom:1px solid #d5dcdc}
+.blr-main{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;width:100%;min-height:44px;padding:10px 12px 10px 0;border:0;background:none;text-align:left;font:inherit;color:#17302f;cursor:pointer}
+.blr-time{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:15px;padding:6px 0;border-radius:0 8px 8px 0;background:#2e9e5b}
+.blr.out .blr-time{background:#d23b3b}
+.blr-time b{font-size:12px;letter-spacing:.06em}.blr-time strong{font-size:18px}
+.blr.done .blr-time{opacity:.55}
+.blr-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.blr-top,.blr-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.blr-badge{font-style:normal;font-size:12px;font-weight:700;color:#fff;padding:2px 8px;border-radius:10px;background:#566}
+.blr-badge.ag{background:#d9467f}.blr-badge.ap{background:#2f6fd0}.blr-badge.fsp{background:#2c5f62}.blr-badge.pl{background:#7a4ad0}.blr-badge.pr{background:#c9781f}.blr-badge.f2m{background:#1d8a8a}
+.blr-code{font-size:13px;color:#51666a;overflow-wrap:anywhere}
+.blr-plate{font-size:18px;letter-spacing:.03em}
+.blr-key{display:inline-flex;align-items:center;gap:3px;font-size:14px}
+.blr-check{color:#2e9e5b}
+.blr-name{font-size:15px;overflow-wrap:anywhere}.blr-n{font-size:14px;color:#51666a}
+.blr-flight{font-size:15px}
+.blr-comment{font-size:14px;color:#51666a;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.blr-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:13px;max-width:110px}
+.blr-cover{padding:2px 8px;border-radius:10px;font-weight:700;color:#fff;background:#6b7c7e}.blr-cover.cov{background:#2c5f62}
+.blr-cc{display:inline-flex;gap:3px;align-items:center}
+.blr-pay{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-weight:600;background:#e6efef;color:#17302f}
+.blr-pay.due{background:#fde3e3;color:#a02525}.blr-pay.paid{background:#dff3e6;color:#1f6b3d}
