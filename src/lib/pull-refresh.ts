@@ -1,4 +1,4 @@
-import {useEffect,useRef} from 'react';
+import {useEffect,useRef,useState} from 'react';
 /** List-only pull-down-to-refresh. Touch gesture at scrollTop 0 opens a solid gap inside the list (padding-top, spinner in ::before),
  *  runs one real refresh, then snaps back. No document bounce: the list uses overscroll-behavior:contain. */
 export const PULL={threshold:64,max:96,hold:52,resistance:.5,timeoutMs:20000,slop:8} as const;
@@ -13,16 +13,17 @@ export function abortable<T>(p:Promise<T>,s:AbortSignal):Promise<T>{
   p.then(v=>{s.removeEventListener('abort',f);res(v)},e=>{s.removeEventListener('abort',f);rej(e)})});
 }
 /** Single in-flight runner: ignores triggers while busy, aborts on timeout/dispose, always settles. */
-export function createRefreshRunner(task:(s:AbortSignal)=>Promise<unknown>,o:{timeoutMs?:number;onError?:(e:unknown)=>void}={}){
+export function createRefreshRunner(task:(s:AbortSignal)=>Promise<unknown>,o:{timeoutMs?:number;onError?:(e:unknown)=>void;onBusy?:(b:boolean)=>void}={}){
  let ctl:AbortController|null=null,disposed=false;
  return{
   get busy(){return !!ctl},
   async run():Promise<boolean>{
-   if(ctl)return false;const c=ctl=new AbortController();const t=setTimeout(()=>c.abort(),o.timeoutMs??PULL.timeoutMs);
+   if(disposed||ctl)return false;disposed=false;const c=ctl=new AbortController();o.onBusy?.(true);const t=setTimeout(()=>c.abort('timeout'),o.timeoutMs??PULL.timeoutMs);
    try{await abortable(task(c.signal),c.signal);return true}
-   catch(e){if(!(e instanceof RefreshAbort&&c.signal.aborted&&disposed))o.onError?.(e);return false}
-   finally{clearTimeout(t);if(ctl===c)ctl=null}
+   catch(e){if(!(e instanceof RefreshAbort&&c.signal.aborted&&(disposed||c.signal.reason!=='timeout')))o.onError?.(e);return false}
+   finally{clearTimeout(t);if(ctl===c){ctl=null;o.onBusy?.(false)}}
   },
+  cancel(){ctl?.abort()},
   dispose(){disposed=true;ctl?.abort()}
  };
 }
@@ -44,8 +45,10 @@ export function attachPullRefresh(el:PullEl,runner:{run():Promise<boolean>;reado
  el.addEventListener('touchstart',start,{passive:true});el.addEventListener('touchmove',move,{passive:false});el.addEventListener('touchend',end);el.addEventListener('touchcancel',cancel);
  return()=>{gone=true;el.removeEventListener('touchstart',start);el.removeEventListener('touchmove',move);el.removeEventListener('touchend',end);el.removeEventListener('touchcancel',cancel);el.style.removeProperty('--pull-gap');el.dataset.pull=''};
 }
-/** Hook: always calls the latest task; runner persists across renders; aborts on unmount. */
-export function usePullRefresh(listRef:{current:PullEl|null},task:(s:AbortSignal)=>Promise<unknown>,onError:(e:unknown)=>void,enabled=true){
- const t=useRef(task),er=useRef(onError);t.current=task;er.current=onError;
- useEffect(()=>{const el=listRef.current;if(!el||!enabled)return;const runner=createRefreshRunner(s=>t.current(s),{onError:e=>er.current(e)});const off=attachPullRefresh(el,runner);return()=>{off();runner.dispose()}},[enabled]);
+/** Hook: ONE runner shared by the pull gesture and the manual refresh button. Always runs the latest task; aborts on unmount. */
+export function usePullRefresh(listRef:{current:PullEl|null},task:(s:AbortSignal)=>Promise<unknown>,onError:(e:unknown)=>void,enabled=true,context=''){
+ const[busy,setBusy]=useState(false);const t=useRef(task),er=useRef(onError),r=useRef<ReturnType<typeof createRefreshRunner>|null>(null);t.current=task;er.current=onError;
+ useEffect(()=>{const el=listRef.current;if(!el||!enabled)return;const base=createRefreshRunner(s=>t.current(s),{onError:e=>er.current(e)});const runner={...base,get busy(){return base.busy},async run(){if(base.busy)return false;setBusy(true);try{return await base.run()}finally{if(r.current===runner)setBusy(false)}}};r.current=runner;setBusy(false);const off=attachPullRefresh(el,runner);return()=>{off();runner.dispose();if(r.current===runner)r.current=null}},[enabled]);
+ useEffect(()=>{r.current?.cancel()},[context]);
+ return {busy,run:()=>r.current?.run()??Promise.resolve(false)};
 }
