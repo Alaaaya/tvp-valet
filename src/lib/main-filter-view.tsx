@@ -71,3 +71,4 @@ export function MainFilterView({filter:raw,onChange,date,onDate,onClose,rows,use
       <small className="mf-hint">Ausgegraute Optionen gibt es in den Buchungsdaten nicht. Nur Valet lässt sich aus den Produktcodes ableiten.</small>
       <button type="button" className="mf-reset" onClick={()=>{const d=defaultMainFilters();setProdOpen(false);setPlaceOpen(false);onChange(d)}}><RotateCcw size={18}/> Reset filters</button>
     </div></div>}
+export const MainFilterScreen=MainFilterView;
