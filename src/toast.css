@@ -1,0 +1,2 @@
+.toast{position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top));z-index:50;max-width:366px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 4px 0 14px;min-height:44px;border-radius:10px;background:#d9f0dc;color:#1f5a33;border:1px solid #9fcfa9;font-size:15px;font-weight:600;pointer-events:none}
+.toast button{pointer-events:auto;width:44px;min-width:44px;min-height:44px;display:grid;place-items:center;color:inherit;background:none;border:0}
