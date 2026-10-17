@@ -28,7 +28,7 @@ create trigger booking_edit_audit after insert on public.booking_edit_receipts
 for each row execute function private.audit_change();
 
 create function public.apply_booking_safe_edit(p_request_id uuid,p_booking_id uuid,p_patch jsonb,p_expected jsonb)
-returns public.bookings language plpgsql security definer set search_path='' as $$
+returns jsonb language plpgsql security definer set search_path='' as $$
 declare b public.bookings;n public.bookings;r public.booking_edit_receipts;k text;v jsonb;rev bigint;before_snapshot jsonb;
 begin
  if not private.is_staff() then raise exception 'Staff access required' using errcode='42501'; end if;
@@ -60,7 +60,8 @@ begin
   if r.actor_id<>auth.uid() or r.booking_id<>p_booking_id or r.patch<>p_patch or r.expected<>p_expected then
    raise exception 'Request context mismatch' using errcode='23514'; end if;
   -- Return current server row; original immutable before/after snapshots remain in receipt.
-  return b;
+  return to_jsonb(b)||jsonb_build_object('lifecycle_revision',
+   (select count(*) from public.booking_handover_undos where booking_id=p_booking_id));
  end if;
  select count(*) into rev from public.booking_handover_undos where booking_id=p_booking_id;
  if (p_expected->>'edit_revision')::bigint is distinct from b.edit_revision
@@ -81,7 +82,8 @@ begin
  update public.bookings set customer_name=n.customer_name,first_name=n.first_name,last_name=n.last_name,car_description=n.car_description,phone=n.phone,email=n.email,persons=n.persons,plate=n.plate,km=n.km,key_cash=n.key_cash,comment=n.comment,arrival_at=n.arrival_at,departure_at=n.departure_at,flight_in=n.flight_in,flight_out=n.flight_out where id=p_booking_id returning * into b;
  insert into public.booking_edit_receipts(id,booking_id,actor_id,patch,expected,before_data,after_data)
  values(p_request_id,p_booking_id,auth.uid(),p_patch,p_expected,before_snapshot,to_jsonb(b));
- return b;
+ return to_jsonb(b)||jsonb_build_object('lifecycle_revision',
+   (select count(*) from public.booking_handover_undos where booking_id=p_booking_id));
 end $$;
 revoke all on function public.apply_booking_safe_edit(uuid,uuid,jsonb,jsonb) from public,anon,authenticated;
 grant execute on function public.apply_booking_safe_edit(uuid,uuid,jsonb,jsonb) to authenticated;

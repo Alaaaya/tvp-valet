@@ -42,6 +42,6 @@ export async function saveEditedBooking(original:Booking,edited:Booking,requestI
   if(error.code==='42501')throw new Error('Keine Berechtigung für diese Änderung.');
   throw new Error(error.message||'Speichern fehlgeschlagen');
  }
- if(!data||data.id!==o.id||!Number.isSafeInteger(data.edit_revision)||data.edit_revision<0)throw new Error('Keine Bestätigung vom Server');
- return {...data,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,data[k]??''])),lifecycle_revision:o.lifecycle_revision} as EditBooking;
+ if(!data||data.id!==o.id||!Number.isSafeInteger(data.edit_revision)||data.edit_revision<0||!Number.isSafeInteger(data.lifecycle_revision)||data.lifecycle_revision<0||!Number.isSafeInteger(data.detail_revision)||data.detail_revision<0)throw new Error('Keine Bestätigung vom Server');
+ return {...data,...Object.fromEntries(['external_id','phone','email','plate','product','flight_in','flight_out','key_cash','spot','comment'].map(k=>[k,data[k]??'']))} as EditBooking;
 }
