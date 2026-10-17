@@ -58,6 +58,11 @@ describe('private atomic save and retries',()=>{
   mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in'},error:null});mock.booking.mockResolvedValue({data:booking,error:null});
   await expect(saveHandover({requestId,booking,action:'in',details,media:[photo()]})).resolves.toHaveProperty('id',bid);expect(mock.upload).not.toHaveBeenCalled();expect(mock.rpc).not.toHaveBeenCalled();
  });
+ it('rejects stale receipt after undo instead of treating it as completion',async()=>{
+  mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in',undone_at:'2026-10-17T15:00:00Z'}});
+  await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('rückgängig');
+  expect(mock.upload).not.toHaveBeenCalled();expect(mock.rpc).not.toHaveBeenCalled();
+ });
  it('rejects receipt reused for other booking/action',async()=>{mock.receipt.mockResolvedValue({data:{booking_id:bid,action:'out'}});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('bereits verwendet');expect(mock.rpc).not.toHaveBeenCalled()});
  it('does not silently treat receipt lookup failure as absence',async()=>{mock.receipt.mockResolvedValue({error:Error('Auth unavailable')});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow();expect(mock.upload).not.toHaveBeenCalled()});
 });
@@ -65,5 +70,13 @@ describe('gallery private access',()=>{
  it('short lived URLs only',async()=>{const item={id:'id',path:bid+'/x.jpg',kind:'photo' as const,mime_type:'image/jpeg',captured_at:'',size_bytes:3};mock.signed.mockResolvedValue({data:{signedUrl:'signed'}});expect(await signedMediaUrl(item)).toBe('signed');expect(mock.signed).toHaveBeenCalledWith(item.path,300)});
  it('download authenticated blob not public URL',async()=>{const blob=new Blob(['x']);mock.download.mockResolvedValue({data:blob});expect(await mediaBlob({id:'id',path:bid+'/x.jpg',kind:'photo',mime_type:'image/jpeg',captured_at:'',size_bytes:1})).toBe(blob)});
  it('preserves legacy photos, hides abandoned draft objects',async()=>{const p=photo();mock.list.mockResolvedValue({data:[{id:'legacy',name:'old.jpg',created_at:'2026-01-01T00:00:00Z',metadata:{mimetype:'image/jpeg',size:5}},{id:p.id,name:mediaPath(bid,requestId,p).split('/')[1],metadata:{mimetype:'image/jpeg',size:5}}]});const r=await listBookingMedia(bid);expect(r).toHaveLength(1);expect(r[0].id).toBe('legacy')});
+ it('keeps undone evidence and maps history marker without broadening storage access',async()=>{
+  mock.metadata.mockResolvedValue({data:[{id:'id',path:bid+'/x.png',kind:'signature',mime_type:'image/png',captured_at:'2026-10-17T12:00:00Z',size_bytes:3,booking_handovers:{undone_at:'2026-10-17T13:00:00Z',undone_by:requestId}}]});
+  expect(await listBookingMedia(bid)).toEqual([expect.objectContaining({id:'id',undone_at:'2026-10-17T13:00:00Z',undone_by:requestId})]);
+ });
+ it('handles array-shaped join and active handover',async()=>{
+  mock.metadata.mockResolvedValue({data:[{id:'id',path:bid+'/x.png',kind:'signature',mime_type:'image/png',captured_at:'2026-10-17T12:00:00Z',size_bytes:3,booking_handovers:[{undone_at:null,undone_by:null}]}]});
+  expect((await listBookingMedia(bid))[0].undone_at).toBeNull();
+ });
  it('metadata errors do not silently show empty gallery',async()=>{mock.metadata.mockResolvedValue({error:Error('Forbidden')});await expect(listBookingMedia(bid)).rejects.toThrow('Forbidden')});
 });

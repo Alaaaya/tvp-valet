@@ -2,7 +2,7 @@ import {db} from '../api';
 import type {Booking} from '../model';
 export type MediaKind='photo'|'video'|'signature';
 export type PendingMedia={id:string;blob:Blob;kind:MediaKind;mime_type:string;captured_at:string;name:string};
-export type MediaItem={id:string;path:string;kind:MediaKind;mime_type:string;captured_at:string;size_bytes:number;action?:'in'|'out'};
+export type MediaItem={id:string;path:string;kind:MediaKind;mime_type:string;captured_at:string;size_bytes:number;action?:'in'|'out';undone_at?:string|null;undone_by?:string|null};
 export type HandoverDetails={km:number|null;key_cash:string;flight_number:string;comment:string;poor_visibility:boolean};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const imageTypes=new Set(['image/jpeg','image/png','image/webp']),videoTypes=new Set(['video/mp4','video/webm','video/quicktime']);
@@ -34,9 +34,9 @@ export function validateHandover(details:HandoverDetails,media:PendingMedia[]){
 }
 export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  if(!uuid.test(bookingId))throw Error('Ungültige Buchung.');
- const d=client(),result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action').eq('booking_id',bookingId).order('captured_at');
+ const d=client(),result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action,booking_handovers!inner(undone_at,undone_by)').eq('booking_id',bookingId).order('captured_at');
  if(result.error)throw result.error;
- const items:MediaItem[]=result.data||[];
+ const items:MediaItem[]=(result.data||[]).map((row:MediaItem&{booking_handovers?:{undone_at:string|null;undone_by:string|null}|{undone_at:string|null;undone_by:string|null}[]})=>{const {booking_handovers,...item}=row;const history=Array.isArray(booking_handovers)?booking_handovers[0]:booking_handovers;return{...item,undone_at:history?.undone_at||null,undone_by:history?.undone_by||null}});
  // Preserve pre-existing photos, but do not publish abandoned partial uploads as completed evidence.
  for(let offset=0;;offset+=100){
   const r=await d.storage.from('booking-media').list(bookingId,{limit:100,offset,sortBy:{column:'created_at',order:'asc'}});
@@ -67,9 +67,10 @@ export async function saveHandover(input:HandoverSave):Promise<Booking>{
  validateHandover(details,media);
  const d=client(),bucket=d.storage.from('booking-media');
  // Recover a lost success response before uploading anything again.
- const receipt=await d.from('booking_handovers').select('id,booking_id,action').eq('id',requestId).maybeSingle();
+ const receipt=await d.from('booking_handovers').select('id,booking_id,action,undone_at').eq('id',requestId).maybeSingle();
  if(receipt.error)throw receipt.error;
  if(receipt.data){
+  if(receipt.data.undone_at)throw Error('Diese Übergabe wurde rückgängig gemacht. Bitte eine neue Übergabe beginnen.');
   if(receipt.data.booking_id!==booking.id||receipt.data.action!==action)throw Error('Diese Übergabe-ID wurde bereits verwendet.');
   const saved=await d.from('bookings').select('*').eq('id',booking.id).single();
   if(saved.error)throw saved.error;
