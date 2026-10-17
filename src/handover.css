@@ -98,3 +98,14 @@
 @media(min-width:800px){.gv-stage{max-width:720px;margin:12px auto;width:calc(100% - 24px)}}
 .mg-retry,.gv-retry{border:1px solid currentColor;border-radius:8px;padding:0 12px;min-height:44px;margin-left:6px;font-size:13px}
 .gv-load.err{text-align:center;padding:16px;color:#ffb4a8}.gv-load.err p{margin:0 0 10px}
+
+.undo{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.undo-btn{min-height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:700;border:2px solid #c0392b;color:#c0392b;background:#fff;border-radius:10px}
+.undo-scrim{position:fixed;inset:0;background:#000;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.undo-dlg{background:#fff;color:#1c3a36;width:100%;max-width:480px;max-height:100%;overflow:auto;padding:22px 16px max(18px,env(safe-area-inset-bottom));border-radius:18px 18px 0 0;display:flex;flex-direction:column;gap:10px}
+.undo-dlg h3{margin:0;font-size:18px}.undo-dlg p{margin:0;font-size:16px;line-height:1.4}
+.undo-err{background:#fdecea;color:#8a1f14;border-radius:8px;padding:10px;font-size:16px}
+.undo-cancel,.undo-ok{min-height:48px;width:100%;font-size:16px;font-weight:700;border-radius:10px}
+.undo-cancel{background:#fff;border:2px solid #9fcfc7;color:#1c3a36}.undo-ok{background:#c0392b;color:#fff}.undo-ok:disabled,.undo-cancel:disabled{opacity:.7}
+.mg-undone{position:absolute;left:0;right:0;bottom:0;background:#000;color:#fff;font-size:10px;line-height:1.2;padding:2px 3px;text-align:center}
+.mg-tile.undone img,.mg-tile.undone .mg-ico{opacity:.55}
