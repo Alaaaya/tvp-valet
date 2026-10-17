@@ -1,6 +1,6 @@
 import {describe,expect,it} from 'vitest';
 import html from '../index.html?raw';
-import css from './style.css?raw';
+import {readFileSync} from 'node:fs';const css=readFileSync('src/style.css','utf8');
 import main from './main.tsx?raw';
 describe('mobile and demo',()=>{
  it('viewport',()=>{expect(html).toContain('maximum-scale=1');expect(html).toContain('viewport-fit=cover')});
