@@ -64,3 +64,19 @@ describe('counter population',()=>{
   expect(pop({cancelled:true,noshow:true}).map(e=>e.b.id).sort()).toEqual(['a','b','c']);
  });
 });
+
+import {blockingMainFilters as _bmf,relaxMainFilters as _rmf,defaultMainFilters as _dmf,mainBookingEvents as _mbe} from './booking-filters';
+describe('blocking filters',()=>{
+ const b:any={id:'x',code:'C1',plate:'AB1',customer_name:'n',external_id:'',product:'P',platform:'pl',status:'no_show',covered:false,driver_id:'u2',checked_in_at:null,checked_out_at:null,planned_in:'2026-10-17T10:00:00Z',planned_out:'2026-10-17T10:00:00Z'};
+ it('names only the specific blocking filters',()=>{
+  const f={..._dmf(),assigned:true,platform:'other'};
+  expect(_bmf(b,f,'u1')).toEqual(['noshow','assigned','platform']);
+  expect(_bmf(b,{..._dmf(),noshow:true},'u1')).toEqual([]);
+ });
+ it('relax changes only the named filters',()=>{
+  const f={..._dmf(),assigned:true,platform:'other',products:['Z'],cancelled:false};
+  const n=_rmf(f,['noshow','assigned']);
+  expect(n).toEqual({...f,noshow:true,assigned:false});
+  expect(f.noshow).toBe(false);
+ });
+});

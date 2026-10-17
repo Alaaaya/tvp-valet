@@ -44,7 +44,7 @@
 .blr-flight{overflow:hidden;display:block;white-space:nowrap;text-overflow:ellipsis}
 .blr-flight .flight-status{font-size:11px;white-space:nowrap}
 
-/* The plate owns its line; secondary references must never shrink it. */
-.blr-l2 .blr-plate{flex:1 1 100%;width:100%}
-.blr-reference{overflow:hidden;white-space:nowrap;min-height:14px}
-.blr-reference .blr-code,.blr-reference .blr-key{flex:1 1 0;min-width:0}
+/* One line: plate keeps its intrinsic full text; key and codes shrink with ellipsis. */
+.blr-l2 .blr-plate{flex:0 0 auto;max-width:none;overflow:visible;text-overflow:clip;white-space:nowrap}
+.blr-l2 .blr-key,.blr-l2 .blr-code{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.blr-l2 .blr-key{flex-shrink:2}

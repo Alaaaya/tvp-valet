@@ -13,5 +13,10 @@ it('renders each outcome; jump only as explicit button',()=>{
 
 it('explains remaining filter exclusion after an explicit jump without offering an automatic reset',()=>{
  const html=r(<ScanResult outcome={{status:'outside',bookings:[b],jumpDate:null,filteredAfterJump:true}} onPick={n} onJump={n} onClose={n}/>);
- expect(html).toContain('Datum gewechselt');expect(html).toContain('aktiven Filter');expect(html).toContain('kein Filter geändert');expect(html).not.toContain('springen');
+ expect(html).toContain('Datum gewechselt');expect(html).toContain('aktiven Filter');expect(html).toContain('kein Filter automatisch geändert');expect(html).not.toContain('Filter ausschalten');expect(html).not.toContain('springen');
+});
+
+it('offers an explicit action naming only the blocking filters',()=>{
+ const html=r(<ScanResult outcome={{status:'outside',bookings:[b],jumpDate:null,filteredAfterJump:true,blocking:['noshow','assigned']}} onPick={n} onJump={n} onRelax={n} onClose={n}/>);
+ expect(html).toContain('Filter ausschalten: No-Shows, Nur meine');
 });

@@ -46,3 +46,24 @@ export function mainBookingEvents(rows:readonly Booking[],date:string,input:Main
  }
  return result.sort((a,b)=>Date.parse(a.time)-Date.parse(b.time)||a.b.id.localeCompare(b.b.id)||a.kind.localeCompare(b.kind));
 }
+
+export type BlockingKey='noshow'|'cancelled'|'status'|'assigned'|'products'|'placements'|'services'|'platform'|'done'|'type';
+export const BLOCKING_LABELS:Record<BlockingKey,string>={noshow:'No-Shows',cancelled:'Stornierte',status:'Status',assigned:'Nur meine',products:'Produkt',placements:'Platzart',services:'Service',platform:'Plattform',done:'Erledigte',type:'Richtung'};
+/** Names the specific active filters that hide a booking. Date window is not a filter here. */
+export function blockingMainFilters(b:Booking,f:MainBookingFilters,userId:string):BlockingKey[]{
+ const k:BlockingKey[]=[],ns=b.status==='no_show'||(b.status==='confirmed'&&sameMinuteNoShow(b));
+ if(ns){if(!f.noshow)k.push('noshow')}else if(b.status==='cancelled'){if(!f.cancelled)k.push('cancelled')}else if(b.status!=='confirmed')k.push('status');
+ if(f.assigned&&(!userId||b.driver_id!==userId))k.push('assigned');
+ if(f.products.length&&!f.products.includes(b.product))k.push('products');
+ if(f.placements.length&&!f.placements.includes(b.covered?'covered':'open'))k.push('placements');
+ if(f.services.length&&!f.services.includes(bookingService(b) as ServiceType))k.push('services');
+ if(f.platform&&b.platform!==f.platform)k.push('platform');
+ if(!ns&&b.status==='confirmed'&&!f.done&&(b.checked_in_at||b.checked_out_at)&&(f.type==='all'?!!(b.checked_in_at&&b.checked_out_at):f.type==='in'?!!b.checked_in_at:!!b.checked_out_at))k.push('done');
+ return k;
+}
+/** Change only the named filters so the booking is no longer blocked by them. */
+export function relaxMainFilters(f:MainBookingFilters,keys:readonly BlockingKey[]):MainBookingFilters{
+ const n={...f};
+ for(const k of keys){if(k==='noshow')n.noshow=true;else if(k==='cancelled')n.cancelled=true;else if(k==='assigned')n.assigned=false;else if(k==='products')n.products=[];else if(k==='placements')n.placements=[];else if(k==='services')n.services=[];else if(k==='platform')n.platform='';else if(k==='done')n.done=true}
+ return n;
+}

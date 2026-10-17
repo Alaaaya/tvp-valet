@@ -19,5 +19,10 @@ import {scanAfterJump} from './scan-lookup';
 it('post-jump visibility distinguishes a visible row from a still-filtered booking',()=>{
  const booking={...blank(),id:'jump-target',code:'TARGET'};
  expect(scanAfterJump(booking,[booking])).toBeNull();
- expect(scanAfterJump(booking,[])).toEqual({status:'outside',bookings:[booking],jumpDate:null,filteredAfterJump:true});
+ expect(scanAfterJump(booking,[])).toEqual({status:'outside',bookings:[booking],jumpDate:null,filteredAfterJump:true,blocking:[]});
+});
+
+it('scanAfterJump carries named blocking filters',()=>{
+ const booking={...blank(),id:'jump-target',code:'TARGET'};
+ expect(scanAfterJump(booking,[],['noshow'])).toEqual({status:'outside',bookings:[booking],jumpDate:null,filteredAfterJump:true,blocking:['noshow']});
 });
