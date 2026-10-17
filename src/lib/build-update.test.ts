@@ -101,6 +101,31 @@ describe('deployment update coordinator', () => {
     const coordinator = s.start(); await settle(); await coordinator.check(); s.blocked(false); coordinator.flush();
     expect(s.replace).not.toHaveBeenCalled(); coordinator.dispose();
   });
+  it('never applies a late timeout response even if fetch ignores abort', async () => {
+    const s = setup(); let release!: (response: Pick<Response, 'ok' | 'text'>) => void;
+    s.fetch.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    const coordinator = s.start(); await vi.advanceTimersByTimeAsync(10_000);
+    expect(s.fetch.mock.calls[0][1].signal?.aborted).toBe(true);
+    await coordinator.check();
+    release({ok: true, text: async () => JSON.stringify({hash: NEW})}); await settle();
+    coordinator.flush(); expect(s.replace).not.toHaveBeenCalled(); coordinator.dispose();
+  });
+  it.each(['malformed', 'failed'])('retains a validated pending version after a %s response', async failure => {
+    const s = setup(); s.blocked(true);
+    s.fetch.mockResolvedValueOnce({ok: true, text: async () => JSON.stringify({hash: NEW})});
+    const coordinator = s.start(); await settle();
+    if (failure === 'failed') s.fetch.mockRejectedValueOnce(new Error('offline'));
+    else s.fetch.mockResolvedValueOnce({ok: true, text: async () => '{'});
+    await coordinator.check(); s.blocked(false); coordinator.flush();
+    expect(s.replace).toHaveBeenCalledTimes(1);
+    expect(new URL(s.replace.mock.calls[0][0]).searchParams.get('v')).toBe(NEW); coordinator.dispose();
+  });
+  it('uses the Vite injected hash by default in tests too', async () => {
+    const s = setup();
+    s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: __BUILD_HASH__})});
+    const coordinator = startBuildUpdates({env: s.env, baseUrl: '/tvp-valet/', isBlocked: () => false});
+    await settle(); expect(s.replace).not.toHaveBeenCalled(); coordinator.dispose();
+  });
   it('does not poll hidden startup, then checks when visible', async () => {
     const s = setup(); s.visible(false); const coordinator = s.start(); await settle(); expect(s.fetch).not.toHaveBeenCalled();
     s.visible(true); s.documentEvents.dispatchEvent(new Event('visibilitychange')); await settle(); expect(s.fetch).toHaveBeenCalledTimes(1); coordinator.dispose();
