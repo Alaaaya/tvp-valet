@@ -1,0 +1,35 @@
+/* Compact main list at 390 CSS px: row 85, time pane 55, stripe 4. Main list only; detail untouched. */
+.app.fixed-top .topbar{height:calc(44px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
+.app.fixed-top .topbar>button,.app.fixed-top .header-actions>button{min-height:44px}
+.app.fixed-top .counters{gap:6px;margin:0;padding:4px 8px;background:#0f6b67}
+.app.fixed-top .counter{height:44px;padding:2px 8px;border-radius:8px}
+.app.fixed-top .counter>div>span{font-size:12px}
+.app.fixed-top .counter>div svg{width:16px;height:16px}
+.app.fixed-top .counter strong,.app.fixed-top .counter strong small{font-size:18px;line-height:1.1}
+.app.fixed-top .search-row{height:44px;padding:0 8px 4px;gap:6px}
+.app.fixed-top .search,.app.fixed-top .search input{height:40px;min-height:40px}
+.app.fixed-top .search input{font-size:16px}
+.workspace .app.fixed-top .date-strip,.app.fixed-top .date-strip{height:38px;padding:0 6px}
+.app.fixed-top .date-strip .today-btn{min-height:32px;font-size:12px;padding:0 10px}
+.app.fixed-top .date-strip button{min-height:38px}
+.app.fixed-top .date-pick,.app.fixed-top .date-pick input{min-height:38px;font-size:16px}
+.app.fixed-top .cam-search{width:40px;min-width:40px;min-height:40px}
+.app.fixed-top .blr-main{grid-template-columns:55px minmax(0,1fr) auto;gap:4px;min-height:85px;padding:0 6px 0 0}
+.app.fixed-top .blr-time,.app.fixed-top .blr.done .blr-time{gap:3px;padding:4px 1px;border-left-width:4px}
+.app.fixed-top .blr-time strong{font-size:13px;font-weight:400}
+.app.fixed-top .blr-tf{font-size:10px;max-width:50px;gap:2px}
+.app.fixed-top .blr-ico svg{width:14px;height:14px}
+.app.fixed-top .blr-body{gap:2px;padding:4px 0}
+.app.fixed-top .blr-line{gap:4px}
+.app.fixed-top .blr-l1{min-height:16px}
+.app.fixed-top .blr-badge{font-size:10px;padding:0 6px;border-width:1px}
+.app.fixed-top .blr-plate{font-size:13px;font-weight:700}
+.app.fixed-top .blr-code,.app.fixed-top .blr-keycode{font-size:11px}
+.app.fixed-top .blr-name{font-size:12px}
+.app.fixed-top .blr-flight,.app.fixed-top .blr-actual-flight,.app.fixed-top .blr-comment,.app.fixed-top .blr-calls,.app.fixed-top .blr .call-counter,.app.fixed-top .blr .call-counter *{font-size:11px}
+.app.fixed-top .blr-calls{min-height:14px;gap:4px}
+.app.fixed-top .blr-l3 svg,.app.fixed-top .blr-key svg,.app.fixed-top .blr-cc svg,.app.fixed-top .blr-pn svg{width:12px;height:12px}
+.app.fixed-top .blr-side{gap:3px;font-size:11px;max-width:90px;padding:4px 0}
+.app.fixed-top .blr-cover{font-size:11px;padding:0 6px;border-width:1px}
+.app.fixed-top .blr-pay{font-size:11px;padding:0 7px;border-width:1px}
+.app.fixed-top .blr-check{top:2px;left:3px}.app.fixed-top .blr-check svg{width:14px;height:14px}

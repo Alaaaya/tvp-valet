@@ -32,3 +32,5 @@ it('scan focus fills search with code, scrolls row, never opens detail or touche
 it('direction chips persist through the user filter setter',()=>{expect(s).toContain("const setType=(t:MainBookingFilters['type'])=>changeMf({...mf,type:t})");expect(s).not.toContain('setType=(t:string)=>setMf')});
 
 it('choosing a hidden ambiguous match asks for its explicit date jump before touching search',()=>{expect(s).toContain("if(visible.some(e=>e.b.id===b.id)){setScanOut(null);focusBooking(b)}else setScanOut({status:'outside',bookings:[b],jumpDate:scanBookingDay(b)})");expect(s).toContain('rows,scanBookingDay')});
+
+it('main-compact.css loads last and sets 85/55/4 row',()=>{const s=readFileSync('src/main.tsx','utf8');expect(s.indexOf("main-compact.css")).toBeGreaterThan(s.indexOf("main-list.css"));const c=readFileSync('src/main-compact.css','utf8');expect(c).toContain('grid-template-columns:55px');expect(c).toContain('min-height:85px');expect(c).toContain('border-left-width:4px');expect(c).toMatch(/\.blr-search|search input\{font-size:16px/)});
