@@ -1,7 +1,7 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
 import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} from './booking-scan-parse';
-import {createQrDecoder,decodeQrFromFile,type QrDecoder} from './booking-scan-qr';
+import {createQrDecoder,decodeQrFromFile,validateImageFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
 import '../booking-scan.css';
 
@@ -50,11 +50,12 @@ export function BookingScanSheet(p:BookingScanSheetProps){
 
 function Confirm({f,onLookup,onRetry}:{f:Found;onLookup:(r:ScanLookup)=>void;onRetry:()=>void}){
   const[v,setV]=useState(f.value);const ok=f.kind==='qr'?isValidBookingCode(v.trim()):normalizePlate(v).length>=2;
-  const go=()=>{if(!ok)return;onLookup({kind:f.kind,value:v.trim()})};
+  const go=()=>{if(!ok)return;onLookup({kind:f.kind,value:f.kind==='qr'?v.trim().replace(/^#/,'').toUpperCase():v.trim()})};
   return <form className="bsc-body" onSubmit={e=>{e.preventDefault();go()}}>
     <label className="bsc-lab">{f.kind==='qr'?'Buchungscode':'Kennzeichen'}
       <input data-first value={v} onChange={e=>setV(f.kind==='qr'?e.target.value.slice(0,40):e.target.value.slice(0,16))} autoCapitalize="characters" autoCorrect="off" spellCheck={false} inputMode="text" maxLength={f.kind==='qr'?40:16}/>
     </label>
+    {f.kind==='qr'&&!ok&&<p className="bsc-err" role="alert">Ungültiger Buchungscode. Erlaubt sind Buchstaben, Ziffern und Bindestriche (3-40 Zeichen).</p>}
     {f.note&&<p className="bsc-hint">{f.note}</p>}
     {f.confidence!==undefined&&<p className={'bsc-hint'+(f.confidence<60?' warn':'')}>Erkennungssicherheit {f.confidence}%{f.confidence<60?' - bitte genau prüfen':''}</p>}
     {f.alts&&f.alts.length>0&&<div className="bsc-alts">{f.alts.map(a=><button type="button" key={a.key} className="bsc-chip" onClick={()=>setV(a.display)}>{a.display}</button>)}</div>}
@@ -134,7 +135,9 @@ function PlatePane({onFound}:{onFound:(f:Found)=>void}){
   const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];e.target.value='';if(!f)return;
     if(f.size>15*1024*1024||!f.type.startsWith('image/')){setErr('Bitte ein Foto bis 15 MB auswählen.');return}
-    ctl.current?.abort();const c=ctl.current=new AbortController();const my=++job.current;setErr('');setBusy(true);setPreview(URL.createObjectURL(f));
+    ctl.current?.abort();const c=ctl.current=new AbortController();const my=++job.current;setErr('');
+    try{validateImageFile(f)}catch(x){setPreview('');setErr(x instanceof Error?x.message:'Ungültiges Foto.');return}
+    setBusy(true);setPreview(URL.createObjectURL(f));
     try{
       const m=await import('./booking-scan-ocr');
       if(!mounted.current||my!==job.current)return;
