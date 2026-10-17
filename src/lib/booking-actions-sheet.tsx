@@ -2,11 +2,10 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {X} from 'lucide-react';
 import {stamp,money,type Booking} from '../model';
 import {trapTab} from './undo-controls';
-import type {BookingOperationEvent} from './operations';
+import type {BookingLocationHistory,BookingCallHistory} from './booking-actions';
 import '../booking-actions-sheet.css';
 
-export interface LocationPatch{spot:string;product:string;covered:boolean}
-export interface LocationEntry{at:string;spot?:string;product?:string;covered?:boolean;by?:string}
+export interface LocationPatch{spot:string}
 export interface BookingActionsSheetProps{
   booking:Booking;
   onClose:()=>void;
@@ -20,10 +19,10 @@ export interface BookingActionsSheetProps{
   onCancelBooking?:()=>Promise<void>;
   /** existing secure UndoControls element (reset check-in/out); never manual timestamp clearing */
   undoSlot?:React.ReactNode;
-  /** real operation events; null/undefined = unavailable, [] = none */
-  operationEvents?:BookingOperationEvent[]|null;
-  /** real location history; null/undefined = unavailable */
-  locationHistory?:LocationEntry[]|null;
+  /** rows from loadBookingCallHistory; null/undefined = unavailable, [] = none */
+  callHistory?:BookingCallHistory[]|null;
+  /** rows from loadBookingLocationHistory; null/undefined = unavailable, [] = none */
+  locationHistory?:BookingLocationHistory[]|null;
   busy?:boolean;
 }
 type View='menu'|'location'|'locHistory'|'callHistory'|'noshow'|'cancel';
@@ -38,11 +37,10 @@ export async function copyText(text:string,doc:Document=document,nav:Navigator|u
   const ta=doc.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;left:0;opacity:0';doc.body.appendChild(ta);ta.select();let ok=false;try{ok=doc.execCommand('copy')}catch{ok=false}ta.remove();
   if(!ok)throw new Error('Kopieren wird von diesem Gerät nicht unterstützt.');
 }
-export function callEntries(ev?:BookingOperationEvent[]|null){return ev?ev.filter(e=>e.action==='customer_called').sort((a,b)=>a.occurred_at.localeCompare(b.occurred_at)):null}
 
 export function BookingActionsSheet(p:BookingActionsSheetProps){
   const b=p.booking;const[view,setView]=useState<View>('menu'),[msg,setMsg]=useState(''),[err,setErr]=useState(''),[work,setWork]=useState(false);
-  const[spot,setSpot]=useState(''),[prod,setProd]=useState(b.product),[cov,setCov]=useState(b.covered);
+  const[spot,setSpot]=useState('');
   const box=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null),saving=useRef(false);
   useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;const first=box.current?.querySelector<HTMLElement>('button:not(:disabled),input');first?.focus();return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
   useEffect(()=>{setErr('');setMsg('');const first=box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input');first?.focus()},[view]);
@@ -55,10 +53,10 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
     const i=f.indexOf(document.activeElement as HTMLElement);e.preventDefault();f[trapTab(i,f.length,e.shiftKey)].focus();
   };
   async function run(fn:()=>Promise<void>,done:()=>void){if(saving.current)return;saving.current=true;setWork(true);setErr('');try{await fn();done()}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{saving.current=false;setWork(false)}}
-  const locChanged=(spot.trim()!==''||prod.trim()!==b.product||cov!==b.covered)&&prod.trim()!=='';
+  const locChanged=spot.trim()!==''&&spot.trim()!==b.spot&&spot.trim().length<=100;
   const noshowOk=!!p.onNoShow&&!p.busy&&b.status==='confirmed'&&!b.checked_in_at&&!b.checked_out_at;
   const cancelOk=!!p.onCancelBooking&&!p.busy&&b.status==='confirmed'&&!b.checked_in_at&&!b.checked_out_at;
-  const calls=useMemo(()=>callEntries(p.operationEvents),[p.operationEvents]);
+  const calls=p.callHistory;
   const title=view==='menu'?'Edit':view==='location'?'Change location':view==='locHistory'?'Location history':view==='callHistory'?'Calllist history':view==='cancel'?'Cancel booking':'No show';
   const item=(label:string,onClick:()=>void,o:{disabled?:boolean;danger?:boolean;note?:string}={})=><button type="button" role="menuitem" className={'bas-item'+(o.danger?' danger':'')} disabled={o.disabled} onClick={onClick}><span>{label}</span>{o.note&&<small>{o.note}</small>}</button>;
   return <div className="bas-scrim" onClick={back}>
@@ -69,27 +67,24 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
       {view==='menu'&&<div role="menu">
         <h3 className="bas-sec">MODIFY</h3>
         {item('Edit booking',()=>{p.onClose();p.onEditBooking()})}
-        {item('Change location',()=>{setSpot('');setProd(b.product);setCov(b.covered);setView('location')},{disabled:!p.onChangeLocation,note:p.onChangeLocation?undefined:'Nicht verfügbar'})}
+        {item('Change location',()=>{setSpot('');setView('location')},{disabled:!p.onChangeLocation,note:p.onChangeLocation?undefined:'Nicht verfügbar'})}
         <h3 className="bas-sec">TOOLS</h3>
         {item('Copy booking details',()=>{void copyText(bookingDetailsText(b)).then(()=>{setErr('');setMsg('Buchungsdetails kopiert')}).catch(e=>{setMsg('');setErr(e instanceof Error?e.message:String(e))})})}
         {item('Location history',()=>setView('locHistory'))}
         {item('Calllist history',()=>setView('callHistory'))}
         <h3 className="bas-sec">STATUS</h3>
         {item('No show',()=>setView('noshow'),{danger:true,disabled:!noshowOk,note:!p.onNoShow?'Nicht verfügbar':b.status!=='confirmed'?'Buchung ist nicht aktiv':b.checked_in_at?'Bereits eingecheckt':undefined})}
-        {!b.checked_in_at&&!b.checked_out_at&&item('Reset check-in',()=>{},{disabled:true,danger:true,note:'Nicht eingecheckt'})}
         {b.checked_out_at&&item('Reset check-in',()=>{},{disabled:true,danger:true,note:'Bitte zuerst den Check-out rückgängig machen.'})}
         {(b.checked_in_at||b.checked_out_at)&&<div className="bas-undo">{p.undoSlot}</div>}
         {item('Cancel booking',()=>setView('cancel'),{danger:true,disabled:!cancelOk,note:!p.onCancelBooking?'Nicht verfügbar':b.status!=='confirmed'?'Buchung ist nicht aktiv':b.checked_in_at?'Bereits eingecheckt':undefined})}
         {item('Close',p.onClose)}
       </div>}
-      {view==='location'&&<form className="bas-form" onSubmit={e=>{e.preventDefault();if(!locChanged||!p.onChangeLocation)return;void run(()=>p.onChangeLocation!({spot:spot.trim()||b.spot,product:prod.trim(),covered:cov}),()=>{p.onClose()})}}>
-        <p className="bas-hint">Aktuell: Platz {b.spot||'–'} · {b.product} · {b.covered?'überdacht':'Freifläche'}</p>
-        <label>Neuer Stellplatz<input data-first value={spot} placeholder={b.spot||'z. B. 12'} onChange={e=>setSpot(e.target.value)} autoComplete="off"/></label>
-        <label>Produkt-Code<input value={prod} onChange={e=>setProd(e.target.value)} autoComplete="off"/></label>
-        <label className="bas-check"><input type="checkbox" checked={cov} onChange={e=>setCov(e.target.checked)}/>Überdacht</label>
+      {view==='location'&&<form className="bas-form" onSubmit={e=>{e.preventDefault();if(!locChanged||!p.onChangeLocation)return;void run(()=>p.onChangeLocation!({spot:spot.trim()}),()=>{p.onClose()})}}>
+        <p className="bas-hint">Aktuell: Platz {b.spot||'–'}</p>
+        <label>Neuer Stellplatz<input data-first maxLength={100} value={spot} placeholder={b.spot||'z. B. 12'} onChange={e=>setSpot(e.target.value)} autoComplete="off"/></label>
         <div className="bas-row"><button type="button" className="bas-btn" onClick={()=>setView('menu')} disabled={work}>Abbrechen</button><button className="bas-btn primary" disabled={!locChanged||work} aria-busy={work}>{work?'Wird gespeichert …':'Speichern'}</button></div></form>}
-      {view==='locHistory'&&<div className="bas-list">{!p.locationHistory?<p className="bas-hint">{UNAVAILABLE}</p>:!p.locationHistory.length?<p className="bas-hint">{NO_LOCATIONS}</p>:p.locationHistory.map((l,i)=><p key={i}><strong>{stamp(l.at)}</strong><span>{[l.spot&&'Platz '+l.spot,l.product,l.covered===undefined?'':l.covered?'überdacht':'Freifläche'].filter(Boolean).join(' · ')}</span></p>)}</div>}
-      {view==='callHistory'&&<div className="bas-list">{!calls?<p className="bas-hint">{UNAVAILABLE}</p>:!calls.length?<p className="bas-hint">{NO_CALLS}</p>:calls.map(c=><p key={c.id}><strong>{stamp(c.occurred_at)}</strong><span>Kunde angerufen</span></p>)}</div>}
+      {view==='locHistory'&&<div className="bas-list">{!p.locationHistory?<p className="bas-hint">{UNAVAILABLE}</p>:!p.locationHistory.length?<p className="bas-hint">{NO_LOCATIONS}</p>:p.locationHistory.map(l=><p key={l.id}><strong>{stamp(l.occurred_at)}</strong><span>{(l.old_spot||'–')+' → '+(l.new_spot||'–')}{l.actor_name?' · '+l.actor_name:''}</span></p>)}</div>}
+      {view==='callHistory'&&<div className="bas-list">{!calls?<p className="bas-hint">{UNAVAILABLE}</p>:!calls.length?<p className="bas-hint">{NO_CALLS}</p>:calls.map(c=><p key={c.id}><strong>{stamp(c.occurred_at)}</strong><span>Kunde angerufen{c.actor_name?' · '+c.actor_name:''}</span></p>)}</div>}
       {view==='cancel'&&<div className="bas-form"><p className="bas-hint">{b.plate} · #{b.code} wird storniert. Das wird protokolliert.</p>
         <div className="bas-row"><button type="button" className="bas-btn" data-first onClick={()=>setView('menu')} disabled={work}>Abbrechen</button><button type="button" className="bas-btn danger" disabled={work||!cancelOk} aria-busy={work} onClick={()=>void run(()=>p.onCancelBooking!(),()=>p.onClose())}>{work?'Wird gespeichert …':err?'Erneut versuchen':'Buchung stornieren'}</button></div></div>}
       {view==='noshow'&&<div className="bas-form"><p className="bas-hint">{b.plate} · #{b.code} wird als No-Show markiert. Das wird protokolliert.</p>
