@@ -43,8 +43,8 @@ describe('callCounter',()=>{
   it('component renders compact and full',()=>{
     const h=r(<CallCounter calledAt={C} now={t(C)+120000}/>);
     expect(h).toContain('Angerufen 17:21');expect(h).toContain('seit 2 Min');expect(h).toContain('17.10.2026');
-    const c=r(<CallCounter compact calledAt={C} checkedOutAt={t(C)+300000}/>);
-    expect(c).toContain('call-counter--compact');expect(c).toContain('Anruf→Übergabe 5 Min');expect(c).not.toContain('cc-date');
+    const c=r(<CallCounter compact calledAt={C} now={t(C)+300000}/>);
+    expect(c).toContain('call-counter--compact');expect(c).toContain('seit 5 Min');expect(c).not.toContain('cc-date');
   });
 });
 describe('startMinuteTicker',()=>{

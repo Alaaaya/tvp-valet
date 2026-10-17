@@ -36,16 +36,18 @@ export function startMinuteTicker(update:()=>void,doc?:{addEventListener:Functio
   return ()=>{clearI(id);doc?.removeEventListener('visibilitychange',vis);};
 }
 
-export function CallCounter({calledAt,checkedOutAt,compact,now}:{calledAt:Ts;checkedOutAt?:Ts;compact?:boolean;now?:number}){
+export function CallCounter({calledAt,checkedInAt,checkedOutAt,compact,now}:{calledAt:Ts;checkedInAt?:Ts;checkedOutAt?:Ts;compact?:boolean;now?:number}){
   const [tick,setTick]=useState(()=>now??Date.now());
-  const live=now===undefined&&toEpoch(calledAt)!==null&&toEpoch(checkedOutAt)===null;
+  // Current authoritative handover stamps control display, never call history.
+  const handedOver=toEpoch(checkedInAt)!==null||toEpoch(checkedOutAt)!==null;
+  const live=now===undefined&&toEpoch(calledAt)!==null&&!handedOver;
   useEffect(()=>{
     if(!live)return;
     setTick(Date.now());
     return startMinuteTicker(()=>setTick(Date.now()),typeof document!=='undefined'?document:undefined);
   },[live]);
   const r=callCounter({calledAt,checkedOutAt,now:now??tick});
-  if(r.state==='none')return null;
+  if(handedOver||r.state==='none')return null;
   const cls='call-counter'+(compact?' call-counter--compact':'')+(r.state==='frozen'?' is-frozen':'');
   return <div className={cls} title={r.title} data-state={r.state}>
     <span className="cc-main">Angerufen {r.time}</span>
