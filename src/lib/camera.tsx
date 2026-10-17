@@ -22,14 +22,21 @@ export function useObjectUrls(media:PendingMedia[]){
 }
 
 export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
-  const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0);
-  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false);
+  const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
+  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false);
   const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;if(stream.current&&v&&v.videoWidth>0)setReady(true)};
   const full=media.length>=MAX_MEDIA;
   const canRecord=typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
   const stopStream=useCallback(()=>{stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(videoEl.current)videoEl.current.srcObject=null;setReady(false)},[]);
-  const stopRecorder=useCallback((drop:boolean)=>{window.clearInterval(timer.current);const r=rec.current;if(r&&r.state!=='inactive'){discard.current=drop;try{r.stop()}catch{}}else if(drop){chunks.current=[]}setRecording(false)},[]);
+  const stopRecorder=useCallback((drop:boolean)=>{
+    window.clearInterval(timer.current);const r=rec.current;
+    if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}
+    if(r&&r.state!=='inactive'){
+      if(!drop){finalizingRef.current=true;if(mounted.current)setFinalizing(true)}
+      try{r.stop()}catch{rec.current=null;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false);setNote('Videoaufnahme konnte nicht abgeschlossen werden.')}}
+    }
+  },[]);
 
   const start=useCallback(async(wantAudio:boolean)=>{
     const my=++gen.current;
@@ -69,6 +76,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   }
 
   async function toggleRecord(){
+    if(finalizingRef.current)return;
     if(recording){stopRecorder(false);return}
     if(full){setNote('Maximal '+MAX_MEDIA+' Medien.');return}
     if(!canRecord){setNote('Videoaufnahme wird in diesem Browser nicht unterstützt.');return}
@@ -76,17 +84,19 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     const mime=pickVideoMime(MediaRecorder)!;chunks.current=[];bytes.current=0;discard.current=false;
     let r:MediaRecorder;try{r=new MediaRecorder(stream.current,{mimeType:mime})}catch{try{r=new MediaRecorder(stream.current)}catch{setNote('Videoaufnahme konnte nicht gestartet werden.');return}}
     rec.current=r;
-    r.onerror=ev=>{window.clearInterval(timer.current);setRecording(false);discard.current=true;try{if(r.state!=='inactive')r.stop()}catch{}chunks.current=[];if(mounted.current)setNote('Videoaufnahme fehlgeschlagen'+((ev as any)?.error?.message?': '+(ev as any).error.message:'')+'.')};
-    r.ondataavailable=e=>{if(e.data&&e.data.size){chunks.current.push(e.data);bytes.current+=e.data.size;if(bytes.current>=MAX_VIDEO_BYTES&&r.state==='recording'){setNote('Video auf 45 MB begrenzt.');r.stop()}}};
-    r.onstop=()=>{window.clearInterval(timer.current);setRecording(false);const drop=discard.current;const type=(r.mimeType||mime||'video/webm').split(';')[0];const parts=chunks.current;chunks.current=[];if(drop||!parts.length)return;
-      const blob=new Blob(parts,{type});if(!mounted.current)return;try{validateVideoSize(blob.size);onAdd(createPendingMedia(blob,'video','video-'+stamp()+'.'+(type.includes('mp4')?'mp4':'webm')))}catch(e){setNote(e instanceof Error?e.message:String(e))}};
+    r.onerror=ev=>{window.clearInterval(timer.current);discard.current=true;r.ondataavailable=null;r.onstop=null;try{if(r.state!=='inactive')r.stop()}catch{}rec.current=null;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false);setNote('Videoaufnahme fehlgeschlagen'+((ev as any)?.error?.message?': '+(ev as any).error.message:'')+'.')}};
+    r.ondataavailable=e=>{if(e.data&&e.data.size){chunks.current.push(e.data);bytes.current+=e.data.size;if(bytes.current>=MAX_VIDEO_BYTES&&r.state==='recording'){setNote('Video auf 45 MB begrenzt.');stopRecorder(false)}}};
+    r.onstop=()=>{window.clearInterval(timer.current);const drop=discard.current;const type=(r.mimeType||mime||'video/webm').split(';')[0];const parts=chunks.current;chunks.current=[];
+      try{if(drop||!parts.length||!mounted.current)return;const blob=new Blob(parts,{type});validateVideoSize(blob.size);onAdd(createPendingMedia(blob,'video','video-'+stamp()+'.'+(type.includes('mp4')?'mp4':'webm')))}
+      catch(e){if(mounted.current)setNote(e instanceof Error?e.message:String(e))}
+      finally{rec.current=null;finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}};
     try{r.start(1000)}catch(e){rec.current=null;setNote('Videoaufnahme konnte nicht gestartet werden'+(e instanceof Error&&e.message?': '+e.message:'')+'.');return}
     setRecording(true);setSecs(0);const t0=Date.now();
-    timer.current=window.setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);setSecs(s);if(s>=MAX_VIDEO_SECONDS&&r.state==='recording'){setNote('Video auf 120 Sekunden begrenzt.');r.stop()}},500);
+    timer.current=window.setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);setSecs(s);if(s>=MAX_VIDEO_SECONDS&&r.state==='recording'){setNote('Video auf 120 Sekunden begrenzt.');stopRecorder(false)}},500);
   }
 
   async function chooseMode(m:'photo'|'video'){
-    if(recording||m===mode)return;setMode(m);setNote('');
+    if(recording||finalizingRef.current||m===mode)return;setMode(m);setNote('');
     if(fallback)return;
     if(m==='video'&&!canRecord){setNote('Videoaufnahme wird in diesem Browser nicht unterstützt.');return}
     await start(m==='video');
@@ -103,7 +113,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     <video ref={videoEl} className="cam-video" playsInline muted autoPlay onLoadedMetadata={markReady} onPlaying={markReady}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>Foto / Video aufnehmen</button></div>}
     <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label="Aufnahme über Kamera-App"/>
-    <div className="cam-top"><button type="button" className="cam-round" aria-label="Zurück" onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
+    <div className="cam-top"><button type="button" className="cam-round" aria-label="Zurück" disabled={recording||finalizing} onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
       <button type="button" className="cam-round" aria-label={caps.torch?(torch?'Blitz aus':'Blitz an'):'Blitz nicht verfügbar'} aria-pressed={torch} disabled={!caps.torch} onClick={toggleTorch}>{caps.torch&&torch?<Zap size={20}/>:<ZapOff size={20}/>}</button></div>
     {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}:{String(secs%60).padStart(2,'0')}</div>}
     <div className="cam-bottom">
@@ -114,10 +124,10 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
         {!zs&&<small>{fallback?'Zoom in der Kamera-App':'Zoom nicht verfügbar'}</small>}</div>
       {media.length>0&&<div className="cam-strip" aria-label="Aufgenommene Medien">{media.map((m,i)=><div key={m.id} className="cam-thumb">{m.kind==='video'?<video src={urls.get(m.id)} muted playsInline/>:<img src={urls.get(m.id)} alt={'Aufnahme '+(i+1)}/>}{m.kind==='video'&&<VideoIcon size={13}/>}<button type="button" aria-label={'Aufnahme '+(i+1)+' entfernen'} onClick={()=>onRemove(m.id)}>×</button></div>)}</div>}
       <div className="cam-row">
-        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={recording} onClick={()=>chooseMode('photo')}>Photo</button><button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={recording||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>Video</button></div>
+        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={recording||finalizing} onClick={()=>chooseMode('photo')}>Photo</button><button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={recording||finalizing||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>Video</button></div>
         {fallback?<button type="button" className="cam-shutter" aria-label="Kamera-App öffnen" onClick={()=>fileEl.current?.click()}><i/></button>
-        :<button type="button" className={'cam-shutter'+(mode==='video'?' video':'')+(recording?' rec':'')} aria-label={mode==='photo'?'Foto aufnehmen':recording?'Aufnahme stoppen':'Aufnahme starten'} disabled={!ready} onClick={mode==='photo'?take:toggleRecord}><i/></button>}
-        <button type="button" className="cam-pill blue" disabled={recording} onClick={onDone}>Done</button></div>
+        :<button type="button" className={'cam-shutter'+(mode==='video'?' video':'')+(recording?' rec':'')} aria-label={mode==='photo'?'Foto aufnehmen':recording?'Aufnahme stoppen':'Aufnahme starten'} disabled={!ready||finalizing} onClick={mode==='photo'?take:toggleRecord}><i/></button>}
+        <button type="button" className="cam-pill blue" disabled={recording||finalizing} onClick={onDone}>Done</button></div>
       <p className="cam-status" role="status">{note||(err&&!fallback?err:media.length?media.length+' / '+MAX_MEDIA+' Medien aufgenommen'+(mode==='video'&&ready&&!hasAudio?' · ohne Ton':''):'No media captured yet')}</p>
     </div></div>;
 }
