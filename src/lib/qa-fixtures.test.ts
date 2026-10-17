@@ -17,3 +17,14 @@ describe('QA fixtures excluded from metrics',()=>{
   expect(withoutQaFixtures([b('x')]).length).toBe(1);
  });
 });
+import {readFileSync} from 'node:fs';
+describe('app-level exclusion wiring',()=>{
+ const m=readFileSync(new URL('../main.tsx',import.meta.url),'utf8');
+ it('filters every API load and import before setRows',()=>{
+  expect(m).toContain('setRows(withoutQaFixtures(d.rows))');
+  expect(m).toContain('setRows(withoutQaFixtures(next))');
+ });
+ it('labels analytics',()=>{
+  expect(readFileSync(new URL('./analytics-view.tsx',import.meta.url),'utf8')).toContain('QA-Testbuchungen sind ausgeschlossen');
+ });
+});
