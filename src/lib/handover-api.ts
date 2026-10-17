@@ -91,7 +91,7 @@ export async function saveHandover(input:HandoverSave):Promise<Booking>{
   }catch{throw Error(completed+' von '+media.length+' Medien gespeichert. Übergabe noch nicht abgeschlossen. Bitte erneut speichern; vorhandene Aufnahmen werden nicht dupliziert.')}
  }
  const result=await d.rpc('complete_booking_handover',{p_request_id:requestId,p_booking_id:booking.id,p_action:action,p_details:details,p_media:metadata,p_expected_in:booking.checked_in_at,p_expected_out:booking.checked_out_at,p_expected_revision:booking.lifecycle_revision??0});
- if(result.error){if(result.error.code==='40001')throw Error('Die Übergabe wurde inzwischen geändert oder rückgängig gemacht. Bitte schließen, die Buchung neu öffnen und die Übergabe erneut beginnen. Bereits hochgeladene Entwürfe gelten nicht als bestätigte Übergabe.');throw Error('Medien gespeichert, Übergabe noch nicht bestätigt. Bitte erneut speichern. '+result.error.message);}
+ if(result.error){if(['PT409','40001'].includes(result.error.code))throw Error('Die Übergabe wurde inzwischen geändert oder rückgängig gemacht. Bitte schließen, die Buchung neu öffnen und die Übergabe erneut beginnen. Bereits hochgeladene Entwürfe gelten nicht als bestätigte Übergabe.');throw Error('Medien gespeichert, Übergabe noch nicht bestätigt. Bitte erneut speichern. '+result.error.message);}
  if(!result.data)throw Error('Keine Speicherbestätigung erhalten. Bitte erneut speichern.');
  return normalizeBooking({...result.data,lifecycle_revision:booking.lifecycle_revision??0} as Booking);
 }

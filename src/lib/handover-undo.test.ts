@@ -35,7 +35,7 @@ describe('undo lifecycle and server contract',()=>{
   await expect(undoHandover({requestId,booking,action:'in'})).rejects.toThrow('Keine Bestätigung');
  });
  it('surfaces concurrent changes without overwriting',async()=>{
-  mock.rpc.mockResolvedValue({error:{code:'40001',message:'stale'}});
+  mock.rpc.mockResolvedValue({error:{code:'PT409',message:'stale'}});
   await expect(undoHandover({requestId,booking,action:'in'})).rejects.toThrow('inzwischen geändert');
  });
  it('refuses undo checkin while checkout exists',async()=>{

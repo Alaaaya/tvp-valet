@@ -54,7 +54,7 @@ describe('private atomic save and retries',()=>{
   await expect(saveHandover({requestId,booking,action:'in',details,media:[p]})).rejects.toThrow('noch nicht abgeschlossen');expect(mock.rpc).not.toHaveBeenCalled();
  });
  it('RPC failure preserves truthful partial state',async()=>{mock.rpc.mockResolvedValue({error:{message:'Check failed'}});await expect(saveHandover({requestId,booking,action:'out',details,media:[photo()]})).rejects.toThrow('noch nicht bestätigt')});
- it('stale lifecycle is not presented as a save-retry success',async()=>{mock.rpc.mockResolvedValue({error:{code:'40001',message:'changed'}});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('neu öffnen')});
+ it('stale lifecycle is not presented as a save-retry success',async()=>{mock.rpc.mockResolvedValue({error:{code:'PT409',message:'changed'}});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('neu öffnen')});
  it('lost successful response recovers receipt via locked RPC without reupload',async()=>{
   mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in'},error:null});mock.booking.mockResolvedValue({data:booking,error:null});
   await expect(saveHandover({requestId,booking,action:'in',details,media:[photo()]})).resolves.toHaveProperty('id',bid);expect(mock.upload).not.toHaveBeenCalled();expect(mock.rpc).toHaveBeenCalledOnce();
