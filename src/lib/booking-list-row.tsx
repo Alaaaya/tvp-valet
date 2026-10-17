@@ -48,7 +48,6 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
     <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
     <span className="blr-line blr-l3">{b.phone&&<Phone size={16} aria-label="Telefon"/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
-    {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
     {c&&<span className="blr-comment" title={c}>{c}</span>}
     {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
