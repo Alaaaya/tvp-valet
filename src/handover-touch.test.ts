@@ -9,6 +9,8 @@ it('thumb delete hitbox is not clipped and does not reach neighbors',()=>{
 it('handover controls are 44px',()=>{
  for(const s of['.cam-zoom button','.cam-modes button','.cam-thumb button','.ho-back','.gv-head .gv-round','.mg-retry,.gv-retry','.ho-scan','.cam-round','.gv-round','.gv-nav','.gv-fs'])expect(rule(s)).toMatch(/(min-)?(height|width):44px/);
  expect(rule('.cam-zoom')).toContain('flex-wrap:wrap');
+ expect(rule('.cam-strip')).toContain('padding:18px 18px 4px 2px');
+ expect(rule('.cam-strip')).toContain('gap:20px');
  expect(css).toContain('.cam-zoom.off input[type=range]{display:none}');
  expect(css).not.toMatch(/blur\(|gradient|shadow|rgba\(|#[0-9a-fA-F]{4}\b|#[0-9a-fA-F]{8}\b/);
 });
