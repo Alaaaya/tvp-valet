@@ -4,6 +4,10 @@ const bookingFields = ['id','code','external_id','platform','customer_name','pho
 export function bookingWritePayload(booking:Booking):Record<string,unknown> {
  const payload:Record<string,unknown>={};
  for(const field of bookingFields)payload[field]=booking[field];
+ // Missing fields on legacy records must not clear newer data during an unrelated edit.
+ for(const field of ['first_name','last_name','car_description'] as const){
+  if(Object.prototype.hasOwnProperty.call(booking,field)&&booking[field]!==undefined)payload[field]=booking[field];
+ }
  payload.external_id=booking.external_id||null;
  payload.product=booking.product||null;
  return payload;
