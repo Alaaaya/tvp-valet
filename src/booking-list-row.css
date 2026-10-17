@@ -20,3 +20,6 @@
 .blr-cc{display:inline-flex;gap:3px;align-items:center}
 .blr-pay{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-weight:600;background:#e6efef;color:#17302f}
 .blr-pay.due{background:#fde3e3;color:#a02525}.blr-pay.paid{background:#dff3e6;color:#1f6b3d}
+.blr-badge.web{background:#4a5a5c}.blr-badge small{font-weight:500;font-size:11px}
+.blr-ico{display:flex;align-items:center;gap:3px;font-size:12px;margin-top:2px}.blr-ico i{font-style:normal}
+.blr-tf{display:flex;align-items:center;gap:2px;font-size:11px;max-width:60px;overflow:hidden}
