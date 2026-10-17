@@ -5,7 +5,6 @@ import type {FlightUpdate} from '../_shared/flights.ts';
 const allowedOrigins = new Set(['https://alaaaya.github.io', 'http://localhost:5173']);
 const days = new Map<string, {flights:FlightUpdate[]; fetchedAt:number; updatedAt:string}>();
 const pending = new Map<string, Promise<{flights:FlightUpdate[]; fetchedAt:number; updatedAt:string}>>();
-const rates = new Map<string, {count:number; since:number}>();
 const CACHE_MS = 60000;
 
 Deno.serve(async request => {
@@ -22,26 +21,33 @@ Deno.serve(async request => {
   if (request.method !== 'POST') return reply({error:'POST erforderlich'},405);
   if (Number(request.headers.get('content-length')) > 8192) return reply({error:'Anfrage zu groß'},413);
   try {
-    const authorization = request.headers.get('authorization') || '';
-    if (!authorization.startsWith('Bearer ')) return reply({error:'Anmeldung erforderlich'},401);
-    const db = createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_ANON_KEY')!,{
-      global:{headers:{Authorization:authorization}}, auth:{persistSession:false,autoRefreshToken:false},
+    // Public flight data only. Never inspect a user session or use service_role.
+    const anon = Deno.env.get('TVP_FLIGHTS_PUBLIC_KEY') || Deno.env.get('SUPABASE_ANON_KEY')!;
+    if (request.headers.get('apikey') !== anon ||
+        request.headers.get('authorization') !== 'Bearer ' + anon)
+      return reply({error:'Öffentlicher API-Schlüssel erforderlich'},401);
+    const budget = createClient(Deno.env.get('SUPABASE_URL')!, anon, {
+      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},
     });
-    // Validate JWT server-side. The gateway is disabled for publishable-key compatibility.
-    const {data:{user},error:authError} = await db.auth.getUser(authorization.slice(7));
-    if (authError || !user) return reply({error:'Anmeldung erforderlich'},401);
-    const {data:profile,error:profileError} = await db.from('profiles').select('active').eq('id',user.id).single();
-    if (profileError || !profile?.active) return reply({error:'Kein aktiver Mitarbeiter'},403);
+    // Atomic Postgres budget shared across ALL Edge isolates/restarts. Fail closed.
+    const {data:allowed,error:budgetError} = await budget.rpc('consume_dus_flight_budget');
+    if (budgetError || typeof allowed !== 'boolean')
+      return reply({error:'Flugabfrage momentan nicht verfügbar. Bitte später erneut versuchen.'},503);
+    if (!allowed) {
+      headers['Retry-After'] = '60';
+      return reply({error:'Zu viele Anfragen. Bitte später erneut versuchen.'},429);
+    }
     const now = Date.now();
-    // Best-effort per-isolate limit, not a replacement for gateway/global rate limiting.
-    for (const [key,value] of rates) if (now-value.since > 60000) rates.delete(key);
-    const rate = rates.get(user.id) || {count:0,since:now};
-    if (++rate.count > 30) return reply({error:'Zu viele Anfragen. Bitte später erneut versuchen.'},429);
-    rates.set(user.id,rate);
     const raw = await request.text();
     if (raw.length > 8192) return reply({error:'Anfrage zu groß'},413);
     let input:ReturnType<typeof validateFlightRequest>;
-    try {input = validateFlightRequest(JSON.parse(raw));} catch(error) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) ||
+          Object.keys(parsed).some(key => !['date','flightNumbers','direction'].includes(key)))
+        throw new Error('Ungültige Anfrage');
+      input = validateFlightRequest(parsed);
+    } catch(error) {
       return reply({error:error instanceof Error ? error.message : 'Ungültige Anfrage'},400);
     }
     const {date,flightNumbers,direction} = input;

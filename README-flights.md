@@ -14,7 +14,7 @@ Live test on 17 October 2026 returned 243 arrivals. EW9751 reported scheduled 10
 
 ## Client contract
 
-`src/lib/flights.ts` exports `fetchFlightUpdates(flightNumbers: string[], date: string, direction?: 'arrival' | 'departure'): Promise<FlightUpdatesResult>`, `normalizeFlightNumber`, and the `FlightUpdate`, `FlightUpdatesResult`, `FlightStatus` types. It uses the existing signed-in Supabase client.
+`src/lib/flights.ts` exports `fetchFlightUpdates(flightNumbers: string[], date: string, direction?: 'arrival' | 'departure'): Promise<FlightUpdatesResult>`, `normalizeFlightNumber`, and the `FlightUpdate`, `FlightUpdatesResult`, `FlightStatus` types. It uses raw fetch with the configured public anon key, independently of any user session or auth refresh. No service-role credential is used in the client or flight handler.
 
 Result fields are `flights`, `missing`, `source`, `updatedAt`, `cached`, optional `availability` (`live`, `schedule`, `unavailable`) and optional German `note`. The deployed backend always sends availability/note; optional typing preserves older fixtures and clients. Each flight also has optional `dataKind` (`live` or `schedule`). Each flight has `flightNumber`, nullable ISO UTC `scheduled`, `estimated`, `actual`, `status`, nullable `statusText`, nullable `delayMinutes`, `source`, `updatedAt`. Status values are scheduled, delayed, approaching, landed, departed, cancelled, diverted, unknown. The raw public status text is kept when available. Delay is actual minus scheduled when actual exists, otherwise estimated minus scheduled. Negative delay means early arrival.
 
@@ -59,3 +59,16 @@ The different winter time confirms why copying today's flight schedule would be 
 Primary research sources are https://www.dus.com/en/flights/arrivals and https://www.dus.com/en/flights/departures with their public `SearchFlightsWithOutParams` endpoint. Secondary cross-check only, not used by the application, https://flyteam.jp/en/airline_route/mad_dus/flight_schedule and https://flyteam.jp/en/airline_route/dus_mad/flight_schedule listed IB1325 daily 19:50 MAD / 22:20 DUS and IB1326 daily 06:20 DUS / 09:00 MAD for 1–24 October 2026, as of 5 October 2026. Their later winter rows differ. Official per-date DUS records remain the runtime authority.
 
 Backend regression tests live in `supabase/tests/flights-backend.test.ts`; run them together with the original adapter suite using `npx vitest run supabase/tests/flights-backend.test.ts src/lib/flights.test.ts`. Validate the edge runtime with `deno check supabase/functions/dus-flights/index.ts`.
+
+
+## Public lookup and terminal auth recovery (17 October 2026)
+
+Only `dus-flights` has `verify_jwt=false` in `supabase/config.toml`. The handler requires the app's public anon key in both `apikey` and Bearer headers, restricts CORS/method/body size/allowed JSON fields/flight numbers/dates, and only returns selected public DUS flight facts. It never reads profiles, bookings or customer data.
+
+Set Edge secret `TVP_FLIGHTS_PUBLIC_KEY` to the same PUBLIC anon key as `VITE_SUPABASE_ANON_KEY` before deploying. The platform-provided Edge `SUPABASE_ANON_KEY` can differ from the dashboard legacy anon key; the explicit public key avoids an erroneous 401. This value is public, not a service-role credential.
+
+Apply migration `20261017150000_public_flight_budget.sql`. Its atomic PostgreSQL RPC consumes a global budget of 120 requests/minute and 2400/hour across all isolates and restarts, including cached and invalid-body requests. Anonymous callers can consume the same budget but cannot read, reset, or change limits. A public endpoint cannot treat an anon key or CORS as secret authentication. A distributed denial-of-service can exhaust this shared cap, but cannot cause unbounded upstream traffic. The handler fails closed with 503 if the budget database is unavailable and returns 429 with Retry-After when capped. Counter-only internal writes contain no customer data.
+
+Auth recovery remains required for protected bookings. Invalid/revoked refresh tokens clear the local session and show login; transient network/5xx errors retain it for focus/visibility/online retries. Supabase local-scope signout may contact Auth to revoke only that session, never all user sessions. Public flight fetch does not invoke any Auth method.
+
+Verification includes handler security tests, isolated SQL budget/permission tests, real anonymous A3540 lookup and invalid-refresh browser login recovery. No booking or operation writes.

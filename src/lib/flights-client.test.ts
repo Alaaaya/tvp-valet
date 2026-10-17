@@ -1,57 +1,44 @@
-import {beforeEach,describe,it,expect,vi} from 'vitest';
-const {invoke,getSession,refreshSession}=vi.hoisted(()=>({invoke:vi.fn(),getSession:vi.fn(),refreshSession:vi.fn()}));
-vi.mock('../api',()=>({db:{functions:{invoke},auth:{getSession,refreshSession}}}));
+import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
+vi.mock('../api',()=>({supabaseUrl:'https://p.supabase.co',supabaseAnonKey:'anon-key',db:{auth:{getSession:()=>{throw Error('flights must not touch auth')}}}}));
 import {fetchFlightUpdates} from './flights';
-describe('flight client',()=>{
-  beforeEach(()=>{vi.resetAllMocks();getSession.mockResolvedValue({data:{session:{access_token:'current-token'}},error:null});refreshSession.mockResolvedValue({data:{session:{access_token:'fresh-token'}},error:null})});
-  it('invokes only the secure function with normalized input',async()=>{
-    const data={flights:[],missing:['EW1'],source:'https://www.dus.com/en/flights/arrivals',updatedAt:'2026-10-17T09:00:00Z',cached:false};
-    invoke.mockResolvedValue({data,error:null});
+const data={flights:[],missing:['EW1'],source:'https://www.dus.com/en/flights/arrivals',updatedAt:'2026-10-17T09:00:00Z',cached:false};
+const json=(b:unknown,status=200)=>new Response(JSON.stringify(b),{status});
+let f:ReturnType<typeof vi.fn>;
+beforeEach(()=>{f=vi.fn();vi.stubGlobal('fetch',f)});
+afterEach(()=>vi.unstubAllGlobals());
+describe('public flight client',()=>{
+  it('posts with anon key only, no session token',async()=>{
+    f.mockResolvedValue(json(data));
     expect(await fetchFlightUpdates(['EW 001'],'2026-10-17')).toEqual(data);
-    expect(invoke).toHaveBeenCalledWith('dus-flights',{body:{flightNumbers:['EW1'],date:'2026-10-17',direction:'arrival'},headers:{Authorization:'Bearer current-token'}});
+    const [url,init]=f.mock.calls[0];
+    expect(url).toBe('https://p.supabase.co/functions/v1/dus-flights');
+    expect(init.headers).toEqual({apikey:'anon-key',Authorization:'Bearer anon-key','Content-Type':'application/json'});
+    expect(JSON.parse(init.body)).toEqual({flightNumbers:['EW1'],date:'2026-10-17',direction:'arrival'});
   });
-  it('surfaces explicit server failure rather than stale/made-up flight times',async()=>{
-    invoke.mockResolvedValue({data:null,error:{context:new Response(JSON.stringify({error:'DUS-Livequelle momentan nicht erreichbar'}),{status:502})}});
+  it('sends departure direction',async()=>{
+    f.mockResolvedValue(json(data));await fetchFlightUpdates(['IB 1326'],'2026-10-24','departure');
+    expect(JSON.parse(f.mock.calls[0][1].body)).toMatchObject({flightNumbers:['IB1326'],direction:'departure'});
+  });
+  it('surfaces server error message',async()=>{
+    f.mockResolvedValue(json({error:'DUS-Livequelle momentan nicht erreichbar'},502));
     await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow('DUS-Livequelle');
+    expect(f).toHaveBeenCalledTimes(1);
   });
-  it('rejects malformed successful payload',async()=>{
-    invoke.mockResolvedValue({data:{flights:[]},error:null});
+  it('does not retry or refresh on 401',async()=>{
+    f.mockResolvedValue(json({},401));
+    await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow('Flugzeiten');
+    expect(f).toHaveBeenCalledTimes(1);
+  });
+  it('maps network failure',async()=>{
+    f.mockRejectedValue(new TypeError('offline'));
+    await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow('Flugzeiten');
+  });
+  it('rejects malformed success payload',async()=>{
+    f.mockResolvedValue(json({flights:[]}));
     await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow('Ungültige Antwort');
   });
-  it('rejects invalid requests before invoking anything',async()=>{
+  it('rejects invalid requests before fetching',async()=>{
     await expect(fetchFlightUpdates(['http://evil'],'2026-10-17')).rejects.toThrow();
-    expect(invoke).not.toHaveBeenCalled();
+    expect(f).not.toHaveBeenCalled();
   });
-});
-
-// Authentication rejection replay is owned and tested at the shared HTTP transport.
-// These client-level tests intentionally mock functions.invoke above that boundary.
-describe('flight session checks',()=>{
- beforeEach(()=>{vi.resetAllMocks();getSession.mockResolvedValue({data:{session:{access_token:'old'}},error:null});refreshSession.mockResolvedValue({data:{session:{access_token:'new'}},error:null})});
- const data={flights:[],missing:[],updatedAt:'2026-10-17T09:00:00Z'};
- it('does not add another retry after shared transport exhausts401 recovery',async()=>{
-  invoke.mockResolvedValue({data:null,error:{context:new Response('{}',{status:401})}});
-  await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow();
-  expect(invoke).toHaveBeenCalledTimes(1);expect(refreshSession).not.toHaveBeenCalled();
- });
- it('does not refresh or retry upstream502',async()=>{
-  invoke.mockResolvedValue({data:null,error:{context:new Response('{}',{status:502})}});
-  await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow();
-  expect(invoke).toHaveBeenCalledTimes(1);expect(refreshSession).not.toHaveBeenCalled();
- });
- it('stops before request with absent session',async()=>{
-  getSession.mockResolvedValue({data:{session:null},error:null});
-  await expect(fetchFlightUpdates(['EW1'],'2026-10-17')).rejects.toThrow('anmelden');
-  expect(invoke).not.toHaveBeenCalled();
- });
- it('renews a nearly expired persisted session before the request',async()=>{
-  getSession.mockResolvedValue({data:{session:{access_token:'old',expires_at:Math.floor(Date.now()/1000)+20}},error:null});
-  invoke.mockResolvedValue({data,error:null});
-  await fetchFlightUpdates(['EW1'],'2026-10-17');
-  expect(refreshSession).toHaveBeenCalledTimes(1);expect(invoke.mock.calls[0][1].headers.Authorization).toBe('Bearer new');
- });
- it('sends departure direction explicitly',async()=>{
-  invoke.mockResolvedValue({data,error:null});await fetchFlightUpdates(['IB 1326'],'2026-10-24','departure');
-  expect(invoke.mock.calls[0][1].body).toMatchObject({flightNumbers:['IB1326'],date:'2026-10-24',direction:'departure'});
- });
 });

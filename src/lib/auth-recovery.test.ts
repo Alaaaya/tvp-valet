@@ -15,7 +15,7 @@ describe('shared auth recovery',()=>{
  });
  it('will not replay a rejected token when refresh and fallback fail',async()=>{
   const auth=makeAuth();auth.refreshSession.mockRejectedValue(Error());auth.getSession.mockResolvedValue(session('expired'));
-  await expect(refreshSessionSafely(auth,'expired')).rejects.toThrow('abgelaufen');
+  await expect(refreshSessionSafely(auth,'expired')).rejects.toThrow('Sitzung');
  });
  it('shares refresh among concurrency and delayed failures of the same JWT',async()=>{
   const auth=makeAuth();let finish!:(value:ReturnType<typeof session>)=>void;
