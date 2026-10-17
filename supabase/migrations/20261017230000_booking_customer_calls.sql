@@ -59,7 +59,7 @@ begin
  if v_ops.customer_called_at is distinct from p_expected_called_at
   or v_booking.checked_out_at is distinct from p_expected_checked_out_at
   or v_revision<>p_expected_lifecycle_revision
- then raise exception 'Booking changed; reload' using errcode='40001'; end if;
+ then raise exception 'Booking changed; reload' using errcode='PT409'; end if;
  if v_booking.status<>'confirmed' or v_booking.checked_out_at is not null then
   raise exception 'Call requires an open confirmed booking' using errcode='23514'; end if;
  if v_ops.customer_called_at is not null and not p_allow_repeat then

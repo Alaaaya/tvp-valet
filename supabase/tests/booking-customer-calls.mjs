@@ -45,7 +45,7 @@ const first=await call(b,{request});
 assert.ok(new Date(first.occurred_at)>=before);checks++;
 assert.deepEqual(await call(b,{request}),first);checks++;
 await reject(()=>call(b,{request,repeat:true}),'23514');
-await reject(()=>call(b),'40001');
+await reject(()=>call(b),'PT409');
 await reject(()=>call(b,{called:first.customer_called_at}),'23514');
 await reject(()=>call(b,{called:first.customer_called_at,revision:-1,repeat:true}),'22023');
 const second=await call(b,{called:first.customer_called_at,repeat:true});
@@ -77,11 +77,11 @@ let ops=(await db.query('select * from public.booking_operations where booking_i
 await reject(()=>call(b,{called:ops.customer_called_at,out:state.checked_out_at,repeat:true}),'23514');
 await db.query("select public.undo_booking_handover($1,$2,'out',$3)",[randomUUID(),b.id,state.checked_out_at]);
 assert.equal((await db.query('select * from public.booking_operations where booking_id=$1',[b.id])).rows[0].customer_called_at.toISOString(),ops.customer_called_at.toISOString());checks++;
-await reject(()=>call(b,{called:ops.customer_called_at,repeat:true}),'40001');
+await reject(()=>call(b,{called:ops.customer_called_at,repeat:true}),'PT409');
 await call(b,{called:ops.customer_called_at,revision:1,repeat:true});
 await db.query("select public.check_booking($1,'out')",[b.id]);
 const frozen=(await db.query('select * from public.booking_operations where booking_id=$1',[b.id])).rows[0].customer_called_at;
-await reject(()=>call(b,{called:frozen,revision:1,repeat:true}),'40001');
+await reject(()=>call(b,{called:frozen,revision:1,repeat:true}),'PT409');
 // Undo check-in clears operational timestamp but history survives and revision stops ABA.
 b=await fresh();await user(driver);const initial=await call(b);
 await db.query("select public.check_booking($1,'in')",[b.id]);
@@ -89,14 +89,14 @@ state=(await db.query('select * from public.bookings where id=$1',[b.id])).rows[
 await db.query("select public.undo_booking_handover($1,$2,'in',$3)",[randomUUID(),b.id,state.checked_in_at]);
 assert.equal((await db.query('select * from public.booking_operations where booking_id=$1',[b.id])).rows[0].customer_called_at,null);checks++;
 assert.equal((await db.query('select * from public.booking_call_history($1)',[b.id])).rows.length,1);checks++;
-await reject(()=>call(b),'40001');
+await reject(()=>call(b),'PT409');
 await call(b,{revision:1});
 assert.equal((await db.query('select * from public.booking_call_history($1)',[b.id])).rows.length,2);checks++;
 // Competing calls on the same snapshot yield exactly one receipt, not two overwrites.
 const raceBooking=await fresh();await user(driver);
 const race=await Promise.allSettled([call(raceBooking),call(raceBooking)]);
 assert.equal(race.filter(x=>x.status==='fulfilled').length,1);
-assert.equal(race.filter(x=>x.status==='rejected'&&x.reason.code==='40001').length,1);checks+=2;
+assert.equal(race.filter(x=>x.status==='rejected'&&x.reason.code==='PT409').length,1);checks+=2;
 assert.equal((await db.query('select * from public.booking_call_history($1)',[raceBooking.id])).rows.length,1);checks++;
 // A future stored timestamp cannot be overwritten by a nominally confirmed repeat.
 await db.exec('reset role');

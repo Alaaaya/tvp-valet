@@ -43,10 +43,10 @@ const req=randomUUID();
 let moved=await action(b,'spot','B2',req);assert.equal(moved.spot,'B2');checks++;
 assert.deepEqual(await action(b,'spot','B2',req),moved);checks++;
 await reject(()=>action(b,'spot','C3',req),'23514');
-await reject(()=>action(b,'spot','C3'),'40001');
+await reject(()=>action(b,'spot','C3'),'PT409');
 // Spot ABA must not accept the original snapshot, even after returning to A1.
 const back=await action(moved,'spot','A1');
-await reject(()=>action(b,'spot','D4'),'40001');
+await reject(()=>action(b,'spot','D4'),'PT409');
 moved=await action(back,'spot','B2');
 await reject(()=>action(moved,'spot',''),'22023');
 await reject(()=>action(moved,'spot','x'.repeat(101)),'22023');
@@ -74,7 +74,7 @@ await db.query("update public.bookings set spot='A2',detail_revision=9999 where 
 await db.query(`select public.update_booking_ops($1,'{"spot":"A1"}')`,[b.id]);
 const afterABA=(await db.query('select * from public.bookings where id=$1',[b.id])).rows[0];
 assert.equal(Number(afterABA.detail_revision),2);checks++;
-await reject(()=>action(b,'spot','D4'),'40001');
+await reject(()=>action(b,'spot','D4'),'PT409');
 // Preserve historical timestamps and reject both no_show and cancel after check-in/out.
 for(const complete of [false,true]){
  b=await fresh();await user(admin);
@@ -90,7 +90,7 @@ b=await fresh();await user(admin);
 await db.query("select public.check_booking($1,'in')",[b.id]);
 const checked=(await db.query('select * from public.bookings where id=$1',[b.id])).rows[0];
 await db.query("select public.undo_booking_handover($1,$2,'in',$3)",[randomUUID(),b.id,checked.checked_in_at]);
-await reject(()=>action(b,'status','no_show'),'40001');
+await reject(()=>action(b,'status','no_show'),'PT409');
 const ns=await action(b,'status','no_show',randomUUID(),snapshot(b,1));assert.equal(ns.status,'no_show');checks++;
 await reject(()=>db.query("delete from public.booking_detail_action_receipts"),'42501');
 await db.exec('reset role');

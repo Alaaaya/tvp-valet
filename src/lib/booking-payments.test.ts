@@ -44,9 +44,9 @@ describe('atomic payments client',()=>{
   mock.rpc.mockResolvedValue({data:{...receipt,method:'card'},error:null});
   await recordBookingPayment({booking:legacy,requestId,amountCents:1000,method:'card'});
  });
- it('retains exact request context on retry and reports stale state',async()=>{
+ it.each(['PT409','40001'])('retains exact request context on retry and reports stale state %s',async code=>{
   const input={booking,requestId,amountCents:1000,method:'cash' as const};
-  mock.rpc.mockResolvedValueOnce({error:{code:'40001'}});
+  mock.rpc.mockResolvedValueOnce({error:{code}});
   await expect(recordBookingPayment(input)).rejects.toThrow('neu laden');
   await recordBookingPayment(input);
   expect(mock.rpc.mock.calls[0]).toEqual(mock.rpc.mock.calls[1]);

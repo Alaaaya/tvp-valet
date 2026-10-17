@@ -86,7 +86,7 @@ begin
  end if;
  if v_booking.paid*100 is distinct from p_expected_paid_cents
   or v_booking.total*100 is distinct from p_expected_total_cents
- then raise exception 'Booking changed; reload before payment' using errcode='40001'; end if;
+ then raise exception 'Booking changed; reload before payment' using errcode='PT409'; end if;
  if v_booking.status<>'confirmed' then raise exception 'Booking is not confirmed' using errcode='23514'; end if;
  if p_amount_cents > p_expected_total_cents-p_expected_paid_cents then
   raise exception 'Payment exceeds outstanding balance' using errcode='23514'; end if;

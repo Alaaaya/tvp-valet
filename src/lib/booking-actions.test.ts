@@ -54,7 +54,8 @@ describe('audited booking detail actions',()=>{
   expect(mock.rpc.mock.calls[0]).toEqual(mock.rpc.mock.calls[1]);
  });
  it('reports concurrency and forbidden actions without false success',async()=>{
-  mock.rpc.mockResolvedValueOnce({error:{code:'40001'}}).mockResolvedValueOnce({error:{code:'42501'}});
+  mock.rpc.mockResolvedValueOnce({error:{code:'PT409'}}).mockResolvedValueOnce({error:{code:'40001'}}).mockResolvedValueOnce({error:{code:'42501'}});
+  await expect(changeBookingSpot({booking,requestId,spot:'A2'})).rejects.toThrow('inzwischen');
   await expect(changeBookingSpot({booking,requestId,spot:'A2'})).rejects.toThrow('inzwischen');
   await expect(changeBookingSpot({booking,requestId,spot:'A2'})).rejects.toThrow('Berechtigung');
  });

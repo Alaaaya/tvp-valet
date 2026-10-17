@@ -41,9 +41,9 @@ it('retries with identical actor-free request context',async()=>{
  await recordCustomerCall({booking,requestId});
  expect(mock.rpc.mock.calls[0]).toEqual(mock.rpc.mock.calls[1]);
 });
-it.each(['40001','42501'])('shows actionable server rejection %s',async code=>{
+it.each(['PT409','40001','42501'])('shows actionable server rejection %s',async code=>{
  mock.rpc.mockResolvedValue({error:{code}});
- await expect(recordCustomerCall({booking,requestId})).rejects.toThrow(code==='40001'?'neu laden':'Berechtigung');
+ await expect(recordCustomerCall({booking,requestId})).rejects.toThrow(code==='42501'?'Berechtigung':'neu laden');
 });
 it('rejects malformed server confirmation',async()=>{
  for(const data of [null,{...receipt,receipt_id:'other'},{...receipt,lifecycle_revision:-1},{...receipt,occurred_at:'bad'}]){
