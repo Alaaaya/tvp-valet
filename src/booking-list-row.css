@@ -11,7 +11,7 @@
 .blr-top,.blr-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
 .blr-badge{font-style:normal;font-size:12px;font-weight:700;padding:1px 9px;border-radius:12px;background:#fff;border:1.5px solid #566;color:#566}
 .blr-badge.ag{border-color:#d9467f;color:#d9467f;background:#fff0f5}.blr-badge.ap{border-color:#2f6fd0;color:#2f6fd0;background:#eaf2ff}.blr-badge.fsp{border-color:#2e9e5b;color:#1f6b3d;background:#e6f7ee}.blr-badge.pl{border-color:#7a4ad0;color:#7a4ad0}.blr-badge.pr{border-color:#c9781f;color:#c9781f}.blr-badge.f2m{border-color:#1d8a8a;color:#1d8a8a}.blr-badge.web{border-color:#4a5a5c;color:#4a5a5c}
-.blr-prov{font-size:11px;color:#51666a}
+.blr-prov{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .blr-plate{font-size:16px;font-weight:800;letter-spacing:.02em}
 .blr-code{font-size:12px;color:#6b7c7e;overflow-wrap:anywhere}
 .blr-key{display:inline-flex;align-items:center;gap:3px;font-size:13px}
