@@ -1,3 +1,4 @@
+import {withoutQaFixtures} from './qa-fixtures';
 import {fromZonedTime} from 'date-fns-tz';
 import {day,TZ,type Booking} from '../model';
 
@@ -13,7 +14,8 @@ function calendarDate(start:string,offset:number):string {
 }
 
 /** Read-only imported-data projection, not a physical inventory or capacity guarantee. */
-export function occupancyAnalytics(rows:readonly Booking[],start=day(),count=30,now=new Date()):OccupancyAnalytics {
+export function occupancyAnalytics(allRows:readonly Booking[],start=day(),count=30,now=new Date()):OccupancyAnalytics {
+ const rows=withoutQaFixtures(allRows);
  if(!/^\d{4}-\d{2}-\d{2}$/.test(start)||!Number.isFinite(Date.parse(start+'T12:00:00Z'))||calendarDate(start,0)!==start)
   throw new RangeError('Invalid start date');
  if(!Number.isSafeInteger(count)||count<0)throw new RangeError('Invalid day count');

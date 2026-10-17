@@ -1,3 +1,4 @@
+import {withoutQaFixtures,isQaFixtureId} from './qa-fixtures';
 import {db} from '../api';
 import type {Booking} from '../model';
 
@@ -83,7 +84,8 @@ export type EmployeeCashReport={
  * Cash only. Legacy notes are a separate, explicitly historical identity namespace.
  * No provider, paid amount, driver assignment or booking price is treated as cash.
  */
-export function employeeCashTotals(bookings:readonly Booking[],payments:readonly BookingPayment[]):EmployeeCashReport {
+export function employeeCashTotals(allBookings:readonly Booking[],allPayments:readonly BookingPayment[]):EmployeeCashReport {
+ const bookings=withoutQaFixtures(allBookings),payments=allPayments.filter(p=>!isQaFixtureId(p.booking_id));
  const totals=new Map<string,EmployeeCashTotal>(),cashBookings=new Set<string>(),seenPayments=new Set<string>();
  const conflictBookingIds:string[]=[],unparsedBookingIds:string[]=[];
  const selected=new Set(bookings.map(b=>b.id));
