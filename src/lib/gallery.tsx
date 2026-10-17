@@ -25,18 +25,18 @@ export function useSignedUrls(){
 }
 
 type Undo={undone_at?:string|null;undone_by?:string|null};const undone=(m:MediaItem)=>(m as MediaItem&Undo).undone_at||null;
-export function MediaGallery({bookingId,demo,refreshKey,local}:{bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[]}){
+export function MediaGallery({bookingId,demo,refreshKey,local,addTile}:{bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];addTile?:React.ReactNode}){
   const[items,setItems]=useState<MediaItem[]>([]),[err,setErr]=useState(''),[open,setOpen]=useState<number|null>(null),[loading,setLoading]=useState(false);
   const{map,errs,ensure,bad,good,retry}=useSignedUrls();const[reload,setReload]=useState(0);
   useEffect(()=>{if(demo)return;let dead=false;setLoading(true);setErr('');
     listBookingMedia(bookingId).then(l=>{if(dead)return;const s=[...l].sort((a,b)=>a.captured_at.localeCompare(b.captured_at));setItems(s);s.filter(i=>i.kind!=='video').forEach(i=>ensure(i))}).catch(e=>{if(!dead)setErr(e instanceof Error?e.message:String(e))}).finally(()=>{if(!dead)setLoading(false)});
     return()=>{dead=true}},[bookingId,refreshKey,reload,demo,ensure]);
-  if(demo)return <div className="mg-grid">{local.map(p=><a key={p.name} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="Fahrzeugdokumentation"/></a>)}</div>;
+  if(demo)return <div className="mg-grid">{addTile}{local.map(p=><a key={p.name} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt="Fahrzeugdokumentation"/></a>)}</div>;
   return <div className="mg">
     {err&&<p className="mg-err" role="alert">Medien konnten nicht geladen werden: {err} <button type="button" className="mg-retry" onClick={()=>setReload(x=>x+1)}>Erneut versuchen</button></p>}
     {loading&&!items.length&&<p className="mg-note" role="status">Medien werden geladen …</p>}
     {!loading&&!err&&!items.length&&<p className="mg-note">Noch keine Medien.</p>}
-    <div className="mg-grid">{items.map((m,i)=><button type="button" key={m.id} className={'mg-tile'+(undone(m)?' undone':'')} aria-label={'Medium '+(i+1)+' öffnen, '+kindLabel(m.kind)+(undone(m)?', rückgängig gemacht':'')} onClick={()=>setOpen(i)}>
+    <div className="mg-grid">{addTile}{items.map((m,i)=><button type="button" key={m.id} className={'mg-tile'+(undone(m)?' undone':'')} aria-label={'Medium '+(i+1)+' öffnen, '+kindLabel(m.kind)+(undone(m)?', rückgängig gemacht':'')} onClick={()=>setOpen(i)}>
       {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b>{undone(m)&&<span className="mg-undone">Rückgängig gemacht</span>}</button>)}</div>
     {open!==null&&items[open]&&<Viewer items={items} index={open} setIndex={setOpen} onClose={()=>setOpen(null)} map={map} errs={errs} ensure={ensure} bad={bad} good={good} retry={retry}/>}
   </div>;
