@@ -30,6 +30,8 @@ export interface BookingDetailViewProps{
   mediaGallery?:React.ReactNode;
   /** fallback only when no gallery element is given */
   mediaAdd?:React.ReactNode;
+  /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
+  paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
   admin?:boolean;
 }
@@ -54,7 +56,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
   return <div className="bd">
     <header className="bd-head"><button type="button" aria-label="Schließen" className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>Booking #{b.code}</h2><button type="button" aria-label="Bearbeiten" className="bd-round" onClick={p.onEdit}><Settings size={21}/></button></header>
     <div className="pp-strip ext">External ID: {b.external_id||b.code}</div>
-    {due>0&&<div className="pp-strip due"><Banknote size={16}/> Outstanding amount: {money(due)}</div>}
+    {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> Outstanding amount: {money(due)}</div>}
     <section className="bd-identity">
       <div><span className="bd-label">Name</span><strong>{b.customer_name}</strong>
         {b.phone&&<a href={'tel:'+b.phone}>{b.phone}</a>}
@@ -85,7 +87,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <p><span>Parking ({b.product||b.platform})<small className="bd-days">{parkingDays(b)} days</small></span><span>{money(b.total)}</span></p>
       <p><span>Total amount</span><span>{money(b.total)}</span></p>
       <p><span>Paid</span><span>{money(b.paid)}</span></p>
-      <p><strong>Total due payable</strong><strong>{money(due)}</strong></p></section>
+      <p><strong>Total due payable</strong><strong>{money(due)}</strong></p>{p.paymentSlot}</section>
     <div className="summary-location bd-service"><Car size={18}/><span>{info.service&&<b>{info.service}</b>}<small>{info.physical}</small></span><span className="bd-product">{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
     <section className="summary-media"><h3><Camera size={18}/> Media</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
     <section className="summary-media bd-comments"><h3><MessageSquare size={18}/> Comments</h3>

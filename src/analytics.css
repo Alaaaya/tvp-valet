@@ -24,3 +24,4 @@
 .nt-name{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:#555}.nt-n{display:inline-flex;gap:4px;align-items:center;color:#248675}
 .nt-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#888;gap:8px}.nt-pill{border:1px solid #3d987e;border-radius:5px;color:#276e58;padding:2px 6px;font-size:12px}
 .nt-empty{text-align:center;color:#527;padding:40px 16px}.nt-note{font-size:12px;color:#4b5a57;padding:14px 16px;line-height:1.5;margin:0;background:#eff7f4}
+.nf{z-index:35}.nf-why{display:block;font-size:11px;color:#7a8a86;font-weight:400}.nf-select select{font-size:16px;min-height:44px}.nf-chips{flex-wrap:wrap}.nf-chips button{min-height:44px;gap:6px}.nf-chips button:disabled{opacity:.45}.nf-hint{display:block;padding:10px 0}.nf .filter-group>label{min-height:53px}.nf .switch:disabled{opacity:.5}

@@ -1,5 +1,20 @@
 -- Additive, no booking backfill. All action state comes from a locked row.
 begin;
+-- Server-maintained revision also covers existing direct admin and ops writes.
+alter table public.bookings add column detail_revision bigint not null default 0 check (detail_revision>=0);
+create function private.advance_booking_detail_revision() returns trigger
+language plpgsql set search_path='' as $$
+begin
+ if TG_OP='INSERT' then new.detail_revision:=0;
+ else
+  new.detail_revision:=old.detail_revision+
+   case when new.spot is distinct from old.spot or new.status is distinct from old.status then 1 else 0 end;
+ end if;
+ return new;
+end $$;
+revoke all on function private.advance_booking_detail_revision() from public,anon,authenticated;
+create trigger bookings_detail_revision before insert or update on public.bookings
+ for each row execute function private.advance_booking_detail_revision();
 create table public.booking_detail_action_receipts (
  id uuid primary key,
  booking_id uuid not null references public.bookings(id) on delete restrict,
@@ -33,8 +48,8 @@ begin
  if p_action='status' and not private.is_admin() then raise exception 'Admin access required' using errcode='42501'; end if;
  if p_request_id is null or p_booking_id is null or p_action is null or p_action not in ('status','spot')
   or p_target is null or p_expected is null or jsonb_typeof(p_expected)<>'object'
-  or not (p_expected ?& array['status','checked_in_at','checked_out_at','spot','lifecycle_revision'])
-  or exists(select 1 from jsonb_object_keys(p_expected) k where k not in ('status','checked_in_at','checked_out_at','spot','lifecycle_revision'))
+  or not (p_expected ?& array['status','checked_in_at','checked_out_at','spot','lifecycle_revision','detail_revision'])
+  or exists(select 1 from jsonb_object_keys(p_expected) k where k not in ('status','checked_in_at','checked_out_at','spot','lifecycle_revision','detail_revision'))
  then raise exception 'Invalid action context' using errcode='22023'; end if;
  if (p_action='status' and p_target not in ('no_show','cancelled'))
   or (p_action='spot' and (length(trim(p_target)) not between 1 and 100 or p_target<>trim(p_target)))
@@ -55,6 +70,7 @@ begin
   or (p_expected->>'checked_out_at')::timestamptz is distinct from v_booking.checked_out_at
   or coalesce(p_expected->>'spot','') is distinct from coalesce(v_booking.spot,'')
   or (p_expected->>'lifecycle_revision')::bigint is distinct from v_revision
+  or (p_expected->>'detail_revision')::bigint is distinct from v_booking.detail_revision
  then raise exception 'Booking changed; reload' using errcode='40001'; end if;
  if v_booking.status<>'confirmed' then raise exception 'Booking is not confirmed' using errcode='23514'; end if;
  if p_action='status' then
