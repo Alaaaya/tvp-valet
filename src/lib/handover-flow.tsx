@@ -8,7 +8,7 @@ import {SignatureField,renderSignature,type Stroke} from './signature';
 export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;action:'in'|'out';onClose:()=>void;onDone:(b:Booking)=>void}){
   const[requestId]=useState(()=>crypto.randomUUID());
   const[step,setStep]=useState<'camera'|'details'>('camera'),[media,setMedia]=useState<PendingMedia[]>([]),[askLeave,setAskLeave]=useState(false);
-  const[km,setKm]=useState(booking.km?String(booking.km):''),[key,setKey]=useState(booking.key_cash||''),[flight,setFlight]=useState((action==='in'?booking.flight_in:booking.flight_out)||''),[poor,setPoor]=useState(false),[comment,setComment]=useState('');
+  const[km,setKm]=useState(booking.km==null?'':String(booking.km)),[key,setKey]=useState(booking.key_cash||''),[flight,setFlight]=useState((action==='in'?booking.flight_in:booking.flight_out)||''),[poor,setPoor]=useState(false),[comment,setComment]=useState('');
   const[strokes,setStrokes]=useState<Stroke[]>([]),[busy,setBusy]=useState(false),[progress,setProgress]=useState(''),[err,setErr]=useState('');
   const sig=useRef<{n:number;item:PendingMedia}|null>(null),saving=useRef(false),alive=useRef(true);
   useEffect(()=>{alive.current=true;const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{alive.current=false;document.body.style.overflow=o}},[]);
