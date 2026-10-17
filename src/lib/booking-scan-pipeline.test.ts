@@ -2,7 +2,7 @@ import {describe,expect,it,afterAll} from 'vitest';
 import {readFileSync,existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import QRCode from 'qrcode';
-import {decodeImageDataQr} from './booking-scan-qr';
+import {decodeImageDataQr,validateImageFile} from './booking-scan-qr';
 import {parseQrPayload} from './booking-scan-parse';
 import {createPlateOcr} from './booking-scan-ocr';
 
@@ -18,6 +18,15 @@ function render(text:string,scale=6,noise=0){
   }
   return{data:d,width:W,height:W};
 }
+describe('image validation before preview/decode',()=>{
+  it('rejects oversize, empty and non-image files',()=>{
+    expect(()=>validateImageFile(new Blob([new Uint8Array(15*1024*1024+1)],{type:'image/png'}))).toThrow('zu groß');
+    expect(()=>validateImageFile(new Blob([],{type:'image/png'}))).toThrow('leer');
+    expect(()=>validateImageFile(new Blob(['x'],{type:'text/html'}))).toThrow('Foto');
+    expect(()=>validateImageFile(new Blob(['x']))).toThrow('Foto');
+    expect(()=>validateImageFile(new Blob(['x'],{type:'image/jpeg'}))).not.toThrow();
+  });
+});
 describe('QR pipeline (real generated QR -> jsQR -> parse)',()=>{
   it('decodes a plain booking code',()=>{
     const r=parseQrPayload(decodeImageDataQr(render('AF-YA4TQSG'))!);expect(r).toMatchObject({ok:true,code:'AF-YA4TQSG'});

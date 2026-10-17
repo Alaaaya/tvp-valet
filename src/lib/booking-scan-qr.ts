@@ -4,11 +4,17 @@ export const MAX_PHOTO_BYTES=15*1024*1024;
 export const MAX_SIDE=1280;
 export const MAX_PIXELS=64_000_000;
 
+/** Cheap size/type check, run before any decode or preview URL is created. */
+export function validateImageFile(file:Blob):void{
+  if(file.size>MAX_PHOTO_BYTES)throw new Error('Das Foto ist zu groß (max. 15 MB).');
+  if(file.size===0)throw new Error('Das Foto ist leer.');
+  if(!file.type||!file.type.startsWith('image/'))throw new Error('Bitte ein Foto auswählen.');
+}
+
 export interface LoadedImage{source:CanvasImageSource;width:number;height:number;release():void}
 /** createImageBitmap when available, else HTMLImageElement + object URL (older iOS). Rejects oversize pixel counts. */
 export async function loadImageFile(file:Blob):Promise<LoadedImage>{
-  if(file.size>MAX_PHOTO_BYTES)throw new Error('Das Foto ist zu groß (max. 15 MB).');
-  if(file.type&&!file.type.startsWith('image/'))throw new Error('Bitte ein Foto auswählen.');
+  validateImageFile(file);
   const guard=(w:number,h:number)=>{if(!w||!h)throw new Error('Das Foto konnte nicht gelesen werden.');if(w*h>MAX_PIXELS)throw new Error('Das Foto hat zu viele Pixel. Bitte mit niedrigerer Auflösung aufnehmen.')};
   if(typeof createImageBitmap==='function'){
     try{const b=await createImageBitmap(file,{imageOrientation:'from-image'} as never);if(b.width*b.height>MAX_PIXELS){b.close?.();guard(b.width,b.height)}guard(b.width,b.height);return{source:b,width:b.width,height:b.height,release:()=>b.close?.()}}

@@ -23,5 +23,12 @@ describe('BookingScanSheet',()=>{
     expect(src.match(/onLookup\(/g)?.length).toBe(1);expect(src).toMatch(/onSubmit=\{e=>\{e\.preventDefault\(\);go\(\)\}\}/);
   });
   it('image loader falls back to HTMLImageElement and guards pixels',()=>{const q=readFileSync(new URL('./booking-scan-qr.ts',import.meta.url),'utf8');expect(q).toMatch(/typeof createImageBitmap==='function'/);expect(q).toContain('new Image()');expect(q).toContain('URL.revokeObjectURL(url)');expect(q).toContain('MAX_PIXELS')});
+  it('photo decode race: per-file token, bumped by handle()->stop(), manual result and unmount',()=>{
+    expect(src).toContain('const job=++fileJob.current');expect(src).toMatch(/job!==fileJob\.current\)return/);expect(src).toMatch(/gen\.current\+\+;fileJob\.current\+\+/);expect(src).toMatch(/stop\(\);onFound\(\{kind:'qr'/);
+  });
+  it('QR confirmation uses full code validation; plate preview only after file validation',()=>{
+    expect(src).toContain("isValidBookingCode(v.trim())");
+    expect(src.indexOf('validateImageFile(f)}catch')).toBeGreaterThan(0);expect(src.indexOf('validateImageFile(f)}catch')).toBeLessThan(src.indexOf('URL.createObjectURL(f)'));
+  });
   it('file input uses environment capture',()=>{expect(src.match(/capture="environment"/g)?.length).toBe(2)});
 });
