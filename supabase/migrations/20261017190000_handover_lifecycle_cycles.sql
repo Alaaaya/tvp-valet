@@ -28,7 +28,7 @@ revoke all on function private.complete_booking_handover_core(uuid,uuid,text,jso
 -- No five-argument overload/default can silently bypass snapshot validation.
 create function public.complete_booking_handover(
   p_request_id uuid,p_booking_id uuid,p_action text,p_details jsonb,p_media jsonb,
-  p_expected_in timestamptz,p_expected_out timestamptz,p_expected_revision integer
+  p_expected_in timestamptz,p_expected_out timestamptz,p_expected_revision bigint
 ) returns public.bookings
 language plpgsql security definer set search_path = ''
 as $$
@@ -57,9 +57,9 @@ begin
     raise exception 'Lifecycle changed; reopen handover' using errcode='40001'; end if;
   return private.complete_booking_handover_core(p_request_id,p_booking_id,p_action,p_details,p_media);
 end $$;
-revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,integer)
+revoke all on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,bigint)
   from public,anon,authenticated;
-grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,integer)
+grant execute on function public.complete_booking_handover(uuid,uuid,text,jsonb,jsonb,timestamptz,timestamptz,bigint)
   to authenticated;
 
 alter table public.booking_operation_events

@@ -31,7 +31,7 @@ const media={id:mediaId,path,kind:'photo',mime_type:'image/jpeg',size_bytes:123,
 const call=async(request=req,booking=b.id,action='in',details={},files=[],snapshot=undefined)=>{
  const current=snapshot ?? (await db.query('select checked_in_at,checked_out_at from public.bookings where id=$1',[booking])).rows[0] ?? {};
  const revision=(await db.query('select count(*)::int as revision from public.booking_handover_undos where booking_id=$1',[booking])).rows[0].revision;
- return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz,$8::integer)',
+ return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz,$8::bigint)',
  [request,booking,action,JSON.stringify(details),JSON.stringify(files),current.checked_in_at??null,current.checked_out_at??null,snapshot && Object.hasOwn(snapshot,'revision')?snapshot.revision:revision]);
 };
 await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'IMAGE/JPEG; codecs=binary'}]);
