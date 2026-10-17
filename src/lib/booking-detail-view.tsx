@@ -26,9 +26,9 @@ export interface BookingDetailViewProps{
   onAction:(a:BookingOperationAction)=>void;
   /** existing secure UndoControls element, rendered unchanged */
   undoSlot?:React.ReactNode;
-  /** existing MediaGallery element (gallery) */
+  /** MediaGallery element; caller passes the upload label as its addTile prop so + is the FIRST tile in the grid */
   mediaGallery?:React.ReactNode;
-  /** existing upload control, rendered as the first tile */
+  /** fallback only when no gallery element is given */
   mediaAdd?:React.ReactNode;
   /** show raw import provenance (admins) */
   admin?:boolean;
@@ -87,7 +87,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <p><span>Paid</span><span>{money(b.paid)}</span></p>
       <p><strong>Total due payable</strong><strong>{money(due)}</strong></p></section>
     <div className="summary-location bd-service"><Car size={18}/><span>{info.service&&<b>{info.service}</b>}<small>{info.physical}</small></span><span className="bd-product">{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
-    <section className="summary-media"><h3><Camera size={18}/> Media</h3><div className="bd-media">{p.mediaAdd}{p.mediaGallery}</div></section>
+    <section className="summary-media"><h3><Camera size={18}/> Media</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
     <section className="summary-media bd-comments"><h3><MessageSquare size={18}/> Comments</h3>
       <button type="button" className="add-comment" aria-label="Kommentar hinzufügen" onClick={p.onEdit}><Plus/></button>
       <p>{c.text||NO_COMMENTS}</p>
