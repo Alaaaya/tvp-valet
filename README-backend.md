@@ -1,4 +1,4 @@
-No real TVP Supabase project has been created. The backend is prepared locally but not provisioned. No live Supabase changes, users, bookings or emails were created. Use a new dedicated TVP Supabase project, not the existing IPTV panel project. Deployment requires an authorized operator with project access.
+A dedicated live TVP project has been provisioned in EU Frankfurt, separate from the IPTV project. The migration is applied, the initial administrator exists, public and anonymous signup are disabled, and authenticated booking/check-in/check-out and private media upload/download were verified. Verification test booking and media were removed. Credentials are held outside the repository. Public Pages frontend uses only the public anon key. E-mail ingestion and partner connectors remain phase 2.
 
 Run these commands from the repository after installing dependencies. The CLI prompts for credentials when necessary. Do not put database passwords or service keys in committed files, browser environment variables, terminal recordings or shell history.
 
@@ -77,3 +77,6 @@ node --check supabase/scripts/create-auth-user.mjs
 ```
 
 Before production use, run a fresh-project Supabase migration and verify real authenticated uploads, downloads, anonymous rejection, disabled employee rejection, admin/driver role separation and backups. Provisioning and these hosted service checks are blocked until an authorized operator logs in. No email ingestion, platform scraping, flight integration or outbound messaging is included in this schema.
+
+
+For GitHub Pages builds, export VITE_BASE_PATH=/tvp-valet/ in the build command itself. Vite configuration reads process.env before .env.production.local is loaded. Deploy dist contents with .nojekyll to gh-pages.
