@@ -15,8 +15,6 @@ await db.exec(await readFile(new URL('../migrations/20261017090000_valet_backend
 await db.exec(await readFile(new URL('../migrations/20261017100000_booking_operational_actions.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../migrations/20261017130000_retrieved_operation.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../migrations/20261017170000_booking_handovers.sql',import.meta.url),'utf8'));
-await db.exec(await readFile(new URL('../migrations/20261017180000_booking_handover_undo.sql',import.meta.url),'utf8'));
-await db.exec(await readFile(new URL('../migrations/20261017190000_handover_lifecycle_cycles.sql',import.meta.url),'utf8'));
 const actor='00000000-0000-4000-8000-000000000001', outsider='00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users(id) values($1),($2)',[actor,outsider]);
 await db.query("insert into public.profiles(id,full_name,role) values($1,'Driver','driver')",[actor]);
@@ -28,11 +26,7 @@ async function failure(fn,code){await assert.rejects(fn,e=>{if(code)assert.equal
 const b=await makeBooking(), b2=await makeBooking(), cancelled=await makeBooking('cancelled');
 const req=uuid(), mediaId=uuid(), path=b.id+'/'+req+'-'+mediaId+'.jpg';
 const media={id:mediaId,path,kind:'photo',mime_type:'image/jpeg',size_bytes:123,captured_at:new Date().toISOString()};
-const call=async(request=req,booking=b.id,action='in',details={},files=[],snapshot=undefined)=>{
- const current=snapshot ?? (await db.query('select checked_in_at,checked_out_at from public.bookings where id=$1',[booking])).rows[0] ?? {};
- return db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb,$6::timestamptz,$7::timestamptz)',
- [request,booking,action,JSON.stringify(details),JSON.stringify(files),current.checked_in_at??null,current.checked_out_at??null]);
-};
+const call=(request=req,booking=b.id,action='in',details={},files=[])=>db.query('select * from public.complete_booking_handover($1,$2,$3,$4::jsonb,$5::jsonb)',[request,booking,action,JSON.stringify(details),JSON.stringify(files)]);
 await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2)",[path,{size:123,mimetype:'IMAGE/JPEG; codecs=binary'}]);
 await user(actor);
 for(const details of [null,[],{total:0},{km:-1},{km:1.1},{km:2147483648},{km:'1'},{poor_visibility:null},{key_cash:null},{flight_number:'a'.repeat(41)},{comment:'a'.repeat(10001)},{key_cash:'a'.repeat(201)}]){
