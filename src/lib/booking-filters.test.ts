@@ -21,6 +21,13 @@ describe('main booking filters',()=>{
   mainBookingEvents([b],'2026-10-17',{...defaultMainFilters(),flOutOn:false},'u','',live);expect(calls).toBe(0);
   mainBookingEvents([b],'2026-10-17',defaultMainFilters(),'u','',live);expect(calls).toBe(1);
  });
+ it('enabled live return crosses Berlin date boundary without moving incoming event',()=>{
+  const b=row({arrival_at:utc('2026-10-16T08:00'),departure_at:utc('2026-10-17T23:50'),flight_out:'EW1'});
+  const live={flightNumber:'EW1',scheduled:b.departure_at,estimated:utc('2026-10-18T00:15'),actual:null,status:'delayed' as const,statusText:null,delayMinutes:25,source:'fixture',updatedAt:utc('2026-10-17T20:00')};
+  expect(mainBookingEvents([b],'2026-10-17',defaultMainFilters(),'u','',()=>live)).toEqual([]);
+  expect(mainBookingEvents([b],'2026-10-18',defaultMainFilters(),'u','',()=>live).map(e=>[e.kind,e.time])).toEqual([['out',live.estimated]]);
+  expect(mainBookingEvents([b],'2026-10-17',{...defaultMainFilters(),flights:false},'u','',()=>live).map(e=>e.kind)).toEqual(['out']);
+ });
  it('uses explicit canceled/no-show toggles including same-minute implicit no-shows',()=>{
   const c=row({status:'cancelled'}),n=row({status:'no_show'}),implicit=row({checked_in_at:utc('2026-10-17T10:00'),checked_out_at:utc('2026-10-17T10:00')});
   expect(events([c,n,implicit])).toHaveLength(0);expect(events([c],{cancelled:true})).toHaveLength(1);expect(events([n,implicit],{noshow:true})).toHaveLength(3);
