@@ -121,3 +121,5 @@ html:root{background:#0f6b67}
 .filter-group input[type=number]{min-height:44px}
 .filter-chips button{min-height:44px}
 .list-heading .export-btn{min-height:44px!important;height:44px!important}
+.topbar>button{width:44px;min-width:44px;min-height:44px}
+.filter-screen>header>button{width:44px;min-width:44px;min-height:44px}
