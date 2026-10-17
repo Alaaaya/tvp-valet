@@ -1,0 +1,10 @@
+
+/* compact main list */
+.date-strip{background:#fff;color:#17302f;height:44px;padding:0 8px;border-bottom:1px solid #d5dcdc}
+.date-strip button{color:#0f6b67}.date-strip .today-btn{background:#0f6b67;color:#fff;border-radius:8px;min-height:36px;font-weight:700}
+.date-pick{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:112px;min-height:44px;font-size:16px;font-weight:700}
+.date-pick input{position:absolute;inset:0;width:100%!important;min-height:44px;opacity:0;cursor:pointer}
+.search-row{height:56px;padding:0 12px 10px}
+.cam-search{flex:none;width:44px;min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:50%;background:#0f6b67;color:#fff;border:0}
+.drawer-action{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;background:none;border:0;color:inherit;text-align:left;font-size:16px}
+.drawer-action:disabled{opacity:.45}

@@ -16,13 +16,12 @@ describe('solid standalone header',()=>{
   expect(css).toContain('opacity:1;backdrop-filter:none;-webkit-backdrop-filter:none;');
   expect(css).toContain('height:calc(56px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)');
  });
- it('puts a named plus button inside the header, not a light strip',()=>{
+ it('plus moved from header to drawer; header keeps one filter button',()=>{
   const header=main.slice(main.indexOf('<header className="topbar">'),main.indexOf('</header><section className="page">'));
   expect(header).toContain('className="header-actions"');
-  expect(header).toContain('aria-label="Buchung erstellen"');
-  expect(header).toContain('setSelected(blank());setEditing(true);setPhotos([])');
-  expect(header).toContain('<Plus size={24}/>');
-  expect(main).not.toContain('<Plus size={18}/> Buchung');
+  expect(header).not.toContain('Buchung erstellen');
+  expect((header.match(/aria-label="Filter"/g)||[]).length).toBe(1);
+  expect(main).toMatch(/className="drawer-action"[^]*?setSelected\(blank\(\)\);setEditing\(true\);setPhotos\(\[\]\)[^]*?Buchung erstellen/);
   expect(css).toContain('.header-actions>button{width:44px;min-height:44px;');
  });
 });
