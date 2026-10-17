@@ -31,8 +31,10 @@ export interface BookingListRowProps{
  live?:React.ReactNode;
  /** Optional real count of structured comments; omitted means no indicator. */
  commentCount?:number;
+ /** Compact call counter from the parent; omit when there are no calls. Freeze/unfreeze is the parent's job. */
+ callCounterSlot?:React.ReactNode;
 }
-export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount}:BookingListRowProps){
+export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=displayComment(b.comment).text.trim();
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')}>
@@ -43,7 +45,7 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount}:
     <span className="blr-line"><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}{done&&<Check size={16} className="blr-check" aria-label="erledigt"/>}</span>
     <span className="blr-line"><span className="blr-name">{b.customer_name}</span>{b.phone&&<Phone size={14} aria-label="Telefon"/>}</span>
     {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
-    {c&&<span className="blr-comment">{c}</span>}
+    {c&&<span className="blr-comment">{c}</span>}{callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
    <span className="blr-side">
     <span className={'blr-cover '+(b.covered?'cov':'free')}>{b.covered?'Über':'Frei'}</span>

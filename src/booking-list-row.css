@@ -23,3 +23,4 @@
 .blr-badge.web{background:#4a5a5c}.blr-badge small{font-weight:500;font-size:11px}
 .blr-ico{display:flex;align-items:center;gap:3px;font-size:12px;margin-top:2px}.blr-ico i{font-style:normal}
 .blr-tf{display:flex;align-items:center;gap:2px;font-size:11px;max-width:60px;overflow:hidden}
+.blr-calls{display:flex;align-items:center;gap:6px;font-size:13px;min-height:20px}
