@@ -1,0 +1,27 @@
+/* scan bottom sheet: opaque dim only */
+.bsc-scrim{position:fixed;inset:0;z-index:70;background:rgba(20,40,38,.55);display:flex;align-items:flex-end;justify-content:center}
+.bsc{width:100%;max-width:700px;max-height:90dvh;overflow-y:auto;overflow-x:hidden;background:#fff;border-radius:18px 18px 0 0;padding:8px 0 max(12px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+.bsc-handle{width:56px;height:6px;border-radius:3px;background:#b9e6d6;margin:4px auto 6px}
+.bsc-head{display:flex;align-items:center;gap:8px;padding:4px 16px 8px}
+.bsc-head h2{margin:0;font-size:18px;flex:1}
+.bsc-x{width:44px;height:44px;border-radius:50%;background:#e3efec;color:#1d3a35;display:grid;place-items:center}
+.bsc-item{display:flex;align-items:center;gap:14px;width:100%;min-height:56px;padding:8px 16px;border-top:1px solid #edf1ef;font-size:17px;color:#222;text-align:left;border-radius:0}
+.bsc-item svg{color:#2d696a;flex:none}
+.bsc-body{display:grid;gap:12px;padding:8px 16px 12px}
+.bsc-view{position:relative;aspect-ratio:4/3;background:#10201e;border-radius:12px;overflow:hidden;display:grid;place-items:center}
+.bsc-view video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.bsc-view.live video{display:block}
+.bsc-frame{position:absolute;inset:18% 18%;border:3px solid #7be0b8;border-radius:14px;pointer-events:none}
+.bsc-view-msg{color:#cfe9e1;font-size:14px;margin:0;padding:0 16px;text-align:center}
+.bsc-preview{width:100%;max-height:220px;object-fit:contain;background:#10201e;border-radius:12px}
+.bsc-lab{display:grid;gap:6px;font-size:13px;font-weight:700;color:#2d696a}
+.bsc-lab input{font-size:16px;min-height:48px;font-weight:400;color:#222}
+.bsc-manual{display:grid;gap:10px}
+.bsc-hint{margin:0;font-size:14px;color:#555}.bsc-hint.warn{color:#a15c00}
+.bsc-err{margin:0;padding:10px 12px;border-radius:8px;font-size:14px;background:#fbe0de;color:#a63732}
+.bsc-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bsc-btn{min-height:48px;border:1px solid #9bbab2;border-radius:10px;background:#fff;color:#1d3a35;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.bsc-btn.primary{background:#2d696a;color:#fff;border-color:#2d696a}
+.bsc-btn:disabled{opacity:.5}
+.bsc-alts{display:flex;flex-wrap:wrap;gap:8px}
+.bsc-chip{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid #9bbab2;background:#eef6f3;font-size:16px;color:#1d3a35}
