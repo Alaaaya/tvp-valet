@@ -26,3 +26,13 @@ describe('solid standalone header',()=>{
   expect(css).toContain('.header-actions>button{width:44px;min-height:44px;');
  });
 });
+
+describe('no fog anywhere',()=>{
+ it('has no blur, gradients, shadows or translucent colors',()=>{
+  expect(css).not.toMatch(/blur\(|gradient|shadow|rgba\(|hsla\(/i);
+  expect(css).not.toMatch(/#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{4}\b/);
+  expect(css).not.toMatch(/backdrop-filter:(?!none)/);
+  expect(html).toContain('status-bar-style" content="default"');
+  expect(html).toContain('name="theme-color" content="#0f6b67"');
+ });
+});
