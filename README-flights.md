@@ -33,3 +33,9 @@ Only POST is accepted; CORS permits `https://alaaaya.github.io` and `http://loca
 Successful full-day snapshots are cached for 60 seconds in isolate memory and concurrent requests in that isolate share an in-flight fetch. There is no shared persistent cache or global rate limiter; parallel/cold isolates may fetch independently. The per-user 30 requests/minute limit is likewise best-effort per isolate. For larger-scale use add durable caching and gateway throttling before increasing traffic. Failed source refreshes return an explicit 502, not silently stale data.
 
 Deployment endpoint and final smoke-test evidence are recorded below after deployment. Deployment does not publish the frontend; the UI owner must build/publish it separately.
+
+## Deployment verification, 17 October 2026
+
+Deployed ACTIVE v1 at https://xblgioeurvzqeaitumdq.supabase.co/functions/v1/dus-flights with gateway JWT verification false and the application-level Auth/profile checks above. Independent authenticated live smoke tests returned HTTP 200 and matched a separately fetched official DUS source. EW9463 was scheduled/estimated 09:10 UTC, actual 09:04:20 UTC, landed, delay -6 minutes. EW9751 was scheduled 08:45 UTC, estimated 09:38:58 UTC, actual null, delay +54. ZZ9999 was explicitly missing. Anonymous and invalid token returned 401, malformed/hostile input 400, outside-window date 422, foreign Origin 403. Production CORS header matched the GitHub Pages origin.
+
+Sequential deployed requests both reported cached=false, consistent with fresh isolates; cache reuse is NOT proven and must not be assumed. The implementation's 60-second memory cache is only best-effort. Add a shared durable cache for reliable request reduction at scale.
