@@ -26,3 +26,5 @@ it('fixed-top shell: only booking-list scrolls, opaque',()=>{
 it('scan wiring + footer hidden in fixed-top shell',()=>{expect(s).toContain('resolveScan(q,visible.map(e=>e.b),rows');expect(s).toContain('<ScanResult outcome={scanOut}');expect(readFileSync('src/main-list.css','utf8')).toContain('.app.fixed-top .page>footer{display:none}')});
 
 it('booking-list is a positioned containing block so absolute children cannot extend the page',()=>{expect(readFileSync('src/main-list.css','utf8')).toContain('.booking-list{position:relative;')});
+
+it('scan focus fills search with code, scrolls row, never opens detail or touches filters',()=>{const m=readFileSync('src/main.tsx','utf8');expect(m).toContain('const focusBooking=(b:Booking)=>{setQuery(b.code);setFocusId(b.id)}');expect(m).toMatch(/if\(o\.status==='single'\)\{setScanOut\(null\);focusBooking\(o\.booking\)\}/);expect(m).not.toMatch(/focusBooking=[^;]*open\(/);expect(m).not.toMatch(/focusBooking=[^;]*setMf/);expect(m).toContain('return day(resolveEventTime(b,k,mf.flights')});
