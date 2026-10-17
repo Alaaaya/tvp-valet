@@ -8,7 +8,7 @@ describe('solid standalone header',()=>{
  it('matches browser and installed theme colors',()=>{
   expect(html).toContain('name="theme-color" content="#0f6b67"');
   expect(JSON.parse(manifestRaw).theme_color).toBe('#0f6b67');
-  expect(css).toContain('html{background:#0f6b67}');
+  expect(css).toContain('html:root{background:#0f6b67}');
  });
  it('paints the safe area with opaque chrome without blur',()=>{
   expect(css).toContain('.topbar,.detail>header,.filter-screen>header{');
