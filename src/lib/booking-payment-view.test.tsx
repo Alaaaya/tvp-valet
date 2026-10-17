@@ -6,7 +6,11 @@ import {BookingPayment,parseEuroToCents,validateAmount,dueCents,fmtEur} from './
 import {blank} from '../model';
 const b:any={...blank(),id:'1',total:83,paid:10.1};
 const P=(x:any={})=>({booking:b,onPaid:()=>{},recordPayment:async()=>b,...x});
+import {adaptReceipt,cashBlocked} from './booking-payment-view';
 describe('booking payment',()=>{
+ it('adapter returns booking with authoritative paid',async()=>{const x=await adaptReceipt(async()=>({paid_after_cents:5000}))({booking:b,requestId:'x',amountCents:1,method:'card'});expect(x.paid).toBe(50);expect(x.total).toBe(83)});
+ it('legacy note blocks cash only, card default',()=>{const k={...b,key_cash:'30€ Wael'};expect(cashBlocked(k)).toBe(true);const h=r(<BookingPayment {...P({booking:k,initialOpen:true})}/>);expect(h).toContain('Barzahlung gesperrt');expect(h).toMatch(/aria-checked="false"[^>]*disabled=""[^>]*>Bargeld/);expect(h).toMatch(/aria-checked="true"[^>]*>Karte/)});
+ it('unconfirmed booking cannot pay',()=>{expect(r(<BookingPayment {...P({booking:{...b,status:'cancelled'}})}/>)).toMatch(/bpay-main"[^>]*disabled/)});
  it('parses cents exactly',()=>{expect(parseEuroToCents('25,50')).toBe(2550);expect(parseEuroToCents('0.1')).toBe(10);expect(parseEuroToCents('19.99')).toBe(1999);expect(parseEuroToCents('1,005')).toBeNull();expect(parseEuroToCents('-5')).toBeNull();expect(parseEuroToCents('')).toBeNull();expect(parseEuroToCents('abc')).toBeNull()});
  it('due without float drift',()=>{expect(dueCents(b)).toBe(7290);expect(dueCents({total:0.3,paid:0.1})).toBe(20);expect(dueCents({total:5,paid:9})).toBe(0);expect(fmtEur(7290)).toBe('72,90 €')});
  it('rejects zero, negative, overpay; allows partial and full',()=>{expect(validateAmount('0',100).error).toBeTruthy();expect(validateAmount('-1',100).error).toBeTruthy();expect(validateAmount('1,01',100).error).toContain('höher');expect(validateAmount('1',100).cents).toBe(100);expect(validateAmount('0,50',100).cents).toBe(50)});

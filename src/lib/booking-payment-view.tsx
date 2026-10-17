@@ -27,12 +27,18 @@ export function validateAmount(s:string,due:number):{cents:number|null;error:str
 }
 const uuid=()=>globalThis.crypto?.randomUUID?globalThis.crypto.randomUUID():'r-'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);
 
+export type Receipt={paid_after_cents:number};
+/** Adapter: pass backend recordBookingPayment; result is the booking with authoritative paid (other fields stale, parent should refresh). */
+export const adaptReceipt=(record:(i:{booking:Booking;requestId:string;amountCents:number;method:PayMethod})=>Promise<Receipt>):RecordPayment=>async input=>{const rc=await record(input);return{...input.booking,paid:rc.paid_after_cents/100};};
+export const cashBlocked=(b:{key_cash?:string|null})=>/[0-9]/.test(b.key_cash??'');
+export const CASH_BLOCK_TEXT='Barzahlung gesperrt: Es gibt bereits einen Bargeld-/Schlüsselvermerk, der erst geklärt werden muss. Karte oder Überweisung sind möglich.';
+
 type Props={booking:Booking;onPaid:(b:Booking)=>void;disabled?:boolean;recordPayment?:RecordPayment;initialOpen?:boolean};
 
 export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpen}:Props){
  const due=dueCents(booking);
  const [open,setOpen]=useState(!!initialOpen);
- const [method,setMethod]=useState<PayMethod>('cash');
+ const [method,setMethod]=useState<PayMethod>(cashBlocked(booking)?'card':'cash');
  const [amount,setAmount]=useState(centsToInput(due));
  const [confirm,setConfirm]=useState(false);
  const [busy,setBusy]=useState(false);
@@ -40,13 +46,15 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
  const busyRef=useRef(false);
  const req=useRef({key:'',id:''});
  const v=validateAmount(amount,due);
- const canPay=!disabled&&!!recordPayment;
+ const blocked=cashBlocked(booking);
+ const canPay=!disabled&&!!recordPayment&&booking.status==='confirmed';
  useEffect(()=>{if(!open){setAmount(centsToInput(due));setConfirm(false);setErr('');}},[open,due]);
- const requestId=()=>{const k=[booking.id,v.cents,method].join('|');if(req.current.key!==k)req.current={key:k,id:uuid()};return req.current.id;};
+ const requestId=()=>{const k=[booking.id,toCents(booking.paid),toCents(booking.total),booking.status,v.cents,method].join('|');if(req.current.key!==k)req.current={key:k,id:uuid()};return req.current.id;};
  const submit=async()=>{
-  if(busyRef.current||!recordPayment||v.cents===null)return;
+  if(busyRef.current||!recordPayment||v.cents===null||(method==='cash'&&blocked))return;
+  const snap=booking;
   busyRef.current=true;setBusy(true);setErr('');
-  try{const updated=await recordPayment({booking,requestId:requestId(),amountCents:v.cents,method});
+  try{const updated=await recordPayment({booking:snap,requestId:requestId(),amountCents:v.cents,method});
    req.current={key:'',id:''};setOpen(false);onPaid(updated);}
   catch(e:any){setErr(e?.message||'Zahlung konnte nicht gespeichert werden.');}
   finally{busyRef.current=false;setBusy(false);}
@@ -55,12 +63,13 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
   <h3 className="bpay-h">Kostenübersicht</h3>
   <dl className="bpay-sum"><div><dt>Gesamt</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>Bezahlt</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':'ok'}><dt>Offen</dt><dd>{fmtEur(due)}</dd></div></dl>
   {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={()=>setOpen(true)}>Als bezahlt markieren</button>}
-  {due>0&&!canPay&&<p className="bpay-note">Zahlung nur für Admin/Mitarbeiter verfügbar.</p>}
+  {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?'Zahlung nur für bestätigte Buchungen.':'Zahlung nur für Admin/Mitarbeiter verfügbar.'}</p>}
   <div className="bpay-soon">{['Zahlungslink per E-Mail','Rechnung per E-Mail','QR-Zahlung'].map(t=><button key={t} type="button" disabled aria-disabled="true">{t} <em>bald</em></button>)}</div>
   {open&&<div className="bpay-sheet" role="dialog" aria-modal="true" aria-label="Zahlung erfassen">
    <div className="bpay-card">
     <h4>Zahlungsart</h4>
-    <div className="bpay-methods" role="radiogroup">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
+    <div className="bpay-methods" role="radiogroup">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
+    {blocked&&<p className="bpay-note" role="note">{CASH_BLOCK_TEXT}</p>}
     <label className="bpay-l" htmlFor="bpay-amt">Betrag (€), offen {fmtEur(due)}</label>
     <input id="bpay-amt" className="bpay-in" inputMode="decimal" autoComplete="off" value={amount} disabled={busy} onChange={e=>{setAmount(e.target.value);setConfirm(false);}} aria-invalid={!!v.error}/>
     {v.error&&<p className="bpay-err" role="alert">{v.error}</p>}
@@ -69,7 +78,7 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
     <div className="bpay-act">
      <button type="button" className="bpay-cancel" disabled={busy} onClick={()=>setOpen(false)}>Abbrechen</button>
      {!confirm?<button type="button" className="bpay-ok" disabled={v.cents===null} onClick={()=>setConfirm(true)}>Weiter</button>
-      :<button type="button" className="bpay-ok" disabled={busy||v.cents===null} onClick={submit}>{busy?'Speichern…':'Bestätigen'}</button>}
+      :<button type="button" className="bpay-ok" disabled={busy||v.cents===null||(method==='cash'&&blocked)} onClick={submit}>{busy?'Speichern…':'Bestätigen'}</button>}
     </div>
    </div></div>}
  </section>;
