@@ -16,3 +16,11 @@ npm test -- src/lib/booking-actions.test.ts
 npm run build
 
 SQL test uses the established local PGlite package at /tmp/tvp-dbtest unless TVP_PGLITE_MODULE is supplied. Tests cover access checks, no-show/cancel rejection after check-in/out, spot bounds, stale snapshots, ABA undo revision, receipts and retries, cross-actor request reuse, immutable receipt guard, limited history projections and truthful empty histories.
+
+Native optional edit fields
+
+Separate additive migration 20261017210100_booking_optional_details.sql adds nullable first_name and last_name (120 characters each), and car_description (500 characters). There is no UPDATE/backfill/default, no splitting of customer_name, and no staff RPC permission expansion. Existing rows read null for the new columns; when validating original imported records compare the original column set rather than full SELECT-star shape. The migration tolerates columns and its constraint already existing. A database constraint validates lengths.
+
+Booking models permit those three fields optionally as string|null. Admin bookingWritePayload only emits them when present as an own property and not undefined. Explicit null clears a value; omitted fields never erase it. Legacy full name remains independently preserved. Staff saveBooking continues using only the pre-existing operational patch allowlist. The editor should expose native names, never derive them from a legacy full name without a deliberate user change.
+
+node supabase/tests/booking-optional-details.mjs validates schema idempotency, exact original-column preservation, null defaults, length boundaries, and staff denial in an isolated database.
