@@ -4,16 +4,19 @@ import {money,type Booking} from '../model';
 import {displayComment} from './comments';
 import '../booking-list-row.css';
 
-export interface PartnerBadge{label:string;cls:'ag'|'ap'|'fsp'|'pl'|'pr'|'f2m'}
-/** Only real product/platform mappings; unknown sources get no badge. */
-export function partnerBadge(b:Pick<Booking,'product'|'platform'>):PartnerBadge|null{
- const p=(b.product||'').trim().toUpperCase(),pl=(b.platform||'').trim().toLowerCase();
- if(p.startsWith('AG-'))return{label:'AvioGo',cls:'ag'};
- if(p.startsWith('AP-'))return{label:'Allopark',cls:'ap'};
- if(p.startsWith('FSP-'))return{label:'Flughafenstellplatz',cls:'fsp'};
- if(/^pl-/i.test(p)||pl==='parkinglist')return{label:'ParkingList',cls:'pl'};
- if(pl==='parkradar24')return{label:'ParkRadar24',cls:'pr'};
- if(pl==='free2move'||pl==='travelcar')return{label:'Free2Move',cls:'f2m'};
+export interface PartnerBadge{label:string;product:string;cls:'ag'|'ap'|'fsp'|'pl'|'pr'|'f2m'|'web'}
+/** Shows the actual stored product code plus a provider label. Only real mappings; unknown sources get no badge. */
+export function partnerBadge(b:{product?:string|null;platform?:string|null}):PartnerBadge|null{
+ const product=(b.product||'').trim(),p=product.toUpperCase(),pl=(b.platform||'').trim().toLowerCase().replace(/[\s_-]+/g,'');
+ const mk=(label:string,cls:PartnerBadge['cls']):PartnerBadge=>({label,product,cls});
+ if(p.startsWith('AG-'))return mk('AvioGo','ag');
+ if(p.startsWith('AP-'))return mk('Allopark','ap');
+ if(p.startsWith('FSP-'))return mk('Flughafenstellplatz','fsp');
+ if(p.startsWith('F2M-'))return mk('Free2Move','f2m');
+ if(p.startsWith('PL-')||pl==='parkinglist')return mk('ParkingList','pl');
+ if(pl==='parkradar24'||pl==='parkradar')return mk('ParkRadar24','pr');
+ if(pl==='free2move'||pl==='travelcar'||pl==='f2m')return mk('Free2Move','f2m');
+ if(p.startsWith('WEB-')||p.startsWith('WEB ')||['website','web','direct','direkt','homepage'].includes(pl))return mk('Direkt Web','web');
  return null;
 }
 /** Neutral money state from stored totals; no processor is invented. */
@@ -34,12 +37,12 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount}:
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?'Annahme ':'Rückgabe ')+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time"><b>{kind==='in'?'IN':'OUT'}</b><strong>{time}</strong></span>
+   <span className="blr-time"><b>{kind==='in'?'IN':'OUT'}</b><strong>{time}</strong><span className="blr-ico"><Car size={14}/>{b.persons>0&&<><Users size={14}/><i>{b.persons}</i></>}</span>{flight&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={13}/>:<PlaneTakeoff size={13}/>}{flight}</span>}</span>
    <span className="blr-body">
-    <span className="blr-top">{badge&&<em className={'blr-badge '+badge.cls}>{badge.label}</em>}<span className="blr-code">{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
-    <span className="blr-line"><Car size={15}/><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}{done&&<Check size={16} className="blr-check" aria-label="erledigt"/>}</span>
-    <span className="blr-line"><Users size={15}/><span className="blr-name">{b.customer_name}</span>{b.persons>0&&<span className="blr-n">{b.persons}</span>}{b.phone&&<Phone size={14} aria-label="Telefon"/>}</span>
-    {(live||flight)&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live||<span>{flight}</span>}</span>}
+    <span className="blr-top">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}<small>{badge.product?' · '+badge.label:''}</small></em>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
+    <span className="blr-line"><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}{done&&<Check size={16} className="blr-check" aria-label="erledigt"/>}</span>
+    <span className="blr-line"><span className="blr-name">{b.customer_name}</span>{b.phone&&<Phone size={14} aria-label="Telefon"/>}</span>
+    {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
     {c&&<span className="blr-comment">{c}</span>}
    </span>
    <span className="blr-side">
