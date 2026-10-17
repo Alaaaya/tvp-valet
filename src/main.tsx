@@ -48,7 +48,7 @@ if(flights&&flOutOn&&view==='today')for(const b of rows)if(b.status==='confirmed
 if(selected){if(selected.flight_out)addNeed(selected);}
 const needKey=Array.from(needs).sort().join(',');const contextKey=JSON.stringify([date,mf,query,view,session,demo,selected?.id]);const contextRef=useRef(contextKey);contextRef.current=contextKey;const mounted=useRef(true),bookingGeneration=useRef(0),flightGeneration=useRef(0),bookingCtl=useRef<AbortController|null>(null),flightCtl=useRef<AbortController|null>(null);
 useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;bookingGeneration.current++;flightGeneration.current++;bookingCtl.current?.abort();flightCtl.current?.abort()}},[]);
-useEffect(()=>{bookingCtl.current?.abort();flightCtl.current?.abort()},[contextKey]);
+useEffect(()=>{const pending=bookingCtl.current;pending?.abort();flightCtl.current?.abort();if(pending&&session&&!demo)void refresh().catch(e=>{if(mounted.current)setError(e.message)})},[contextKey]);
 const needsDate=new Set(Array.from(needs).map(k=>k.split('|')[0]));
 useEffect(()=>{const wake=()=>{if(document.visibilityState==='visible')setTick(t=>t+1)};const off=installSessionWake(document,window,db?recoverSession:null,wake);const id=setInterval(wake,300000);return()=>{clearInterval(id);off()}},[]);
 useEffect(()=>{if(!session){liveRef.current={};staleRef.current={};setLive({});setStale({});setLiveMeta({})}},[session,demo]);
