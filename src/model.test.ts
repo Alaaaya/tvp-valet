@@ -18,3 +18,6 @@ describe('occupancy from imported booking intervals',()=>{
  it('counts cars already inside at midnight and honors DST',()=>{expect(occupancyDays([at('2026-10-24T10:00','2026-10-26T00:00')],'2026-10-25',2).map(x=>x.peak)).toEqual([1,0])});
  it('does not clamp or hide over-capacity',()=>{expect(occupancyDays([at('2026-10-17T08:00','2026-10-17T09:00'),at('2026-10-17T08:00','2026-10-17T09:00')],'2026-10-17',1,1)[0].peak).toBe(2)});
 });
+
+import {bookingPayload} from './model';
+describe('strict booking write payload',()=>{it('never writes separate or legacy operation timestamps from runtime rows',()=>{const b={...blank(),taken_away_at:'spoof',customer_called_at:'spoof',ride_started_at:'spoof',performed_by:'spoof',booking_id:'spoof',updated_at:'spoof'};const payload=bookingPayload(b);expect(payload).toEqual(blankWithId(b));expect(Object.keys(payload)).not.toContain('taken_away_at');function blankWithId(x:typeof b){const {taken_away_at,customer_called_at,ride_started_at,performed_by,booking_id,updated_at,...rest}=x;return rest}})});
