@@ -79,7 +79,6 @@ html,body{max-width:100%;overflow-x:hidden}
 .cash-row,.staff-row{flex-wrap:wrap;gap:6px 12px;min-width:0}
 .cash-row>*,.staff-row>*{overflow-wrap:anywhere}
 .identity-grid,.split-handover,.ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.admin-grid{grid-template-columns:minmax(0,1fr)}
 .sidebar{padding-top:calc(26px + env(safe-area-inset-top))!important;padding-bottom:calc(26px + env(safe-area-inset-bottom))!important}
 @media(max-width:650px){
 input,select,textarea,.date-strip input,.filter-group input[type=date],.filter-group input[type=number],.form-grid input{font-size:16px!important;min-width:0;max-width:100%}
@@ -89,7 +88,7 @@ input[type=datetime-local]{width:100%;display:block;-webkit-appearance:none;appe
 .login{grid-template-columns:minmax(0,1fr)}
 .login-art{padding:calc(28px + env(safe-area-inset-top)) 20px 28px}
 .login-panel{padding:24px 16px calc(24px + env(safe-area-inset-bottom))}
-.form-grid{grid-template-columns:minmax(0,1fr)}
+.form-grid,.admin-grid{grid-template-columns:minmax(0,1fr)}
 .topbar{height:calc(56px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
 .detail>header{padding-top:env(safe-area-inset-top);min-height:calc(62px + env(safe-area-inset-top))}
 .filter-screen>header{height:calc(62px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)}
