@@ -41,20 +41,18 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?'Annahme ':'Rückgabe ')+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={16} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={16}/><Users size={14}/></span><strong>{flight&&(kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>)}{time}</strong>{flight&&<span className="blr-tf">{flight}</span>}</span>
+   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><Users size={18}/></span><strong>{time}</strong>{flight&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{flight}</span></span>}</span>
    <span className="blr-body">
-    {badge&&<span className="blr-top"><em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>{badge.product&&<small className="blr-prov">{badge.label}</small>}</span>}
-    <span className="blr-line"><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={14}/>{key}</span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
-    <span className="blr-line"><span className="blr-name">{b.customer_name}</span>{b.phone&&<Phone size={14} aria-label="Telefon"/>}</span>
+    <span className="blr-line blr-l2">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}<strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span>{b.external_id&&b.external_id!==b.code&&<span className="blr-code">{b.external_id}</span>}</span>
+    <span className="blr-line blr-l3">{b.phone&&<Phone size={16} aria-label="Telefon"/>}<span className="blr-name">{b.customer_name}</span></span>
     {live&&<span className="blr-line blr-flight">{kind==='in'?<PlaneLanding size={15}/>:<PlaneTakeoff size={15}/>}{live}</span>}
     {c&&<span className="blr-comment">{c}</span>}
     {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
    <span className="blr-side">
     <span className={'blr-cover '+(b.covered?'cov':'free')}>{b.covered?'Über':'Frei'}</span>
-    {typeof commentCount==='number'&&commentCount>0&&<span className="blr-cc"><MessageSquare size={14}/>{commentCount}</span>}
-    {b.persons>0&&<span className="blr-pn"><Users size={14}/>{b.persons}</span>}
-    {m.kind!=='none'&&<span className={'blr-pay '+m.kind}>{m.text}</span>}
+    <span className="blr-meta">{typeof commentCount==='number'&&commentCount>0&&<span className="blr-cc"><MessageSquare size={16}/>{commentCount}</span>}{b.persons>0&&<span className="blr-pn">{b.persons}<Users size={16}/></span>}</span>
+    {m.kind!=='none'&&<span className={'blr-pay '+m.kind} aria-label={m.text} title={m.text}>{money(m.kind==='due'?Math.max(0,(b.total||0)-(b.paid||0)):(b.paid||0))}</span>}
    </span>
   </button>
  </article>;
