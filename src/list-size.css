@@ -42,5 +42,5 @@
 .list-size-options input{width:20px;height:20px;min-height:20px;padding:0;accent-color:#0f6b67}
 .list-size-options label:has(input:checked){background:#e1f0eb}
 .list-size-value{display:block;font-size:13px;margin:12px 0}
-.app.fixed-top.list-size-preview{height:auto;min-height:0;overflow:hidden;width:100%;border:1px solid #aad3cb;margin-top:16px}
+.app.fixed-top.list-size-preview{--list-scale:inherit;height:auto;min-height:0;overflow:hidden;width:100%;border:1px solid #aad3cb;margin-top:16px}
 .list-size-preview .topbar{position:static;justify-content:center;padding:0 4px}
