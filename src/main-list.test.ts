@@ -24,3 +24,5 @@ it('fixed-top shell: only booking-list scrolls, opaque',()=>{
 });
 
 it('scan wiring + footer hidden in fixed-top shell',()=>{expect(s).toContain('resolveScan(q,visible.map(e=>e.b),rows');expect(s).toContain('<ScanResult outcome={scanOut}');expect(readFileSync('src/main-list.css','utf8')).toContain('.app.fixed-top .page>footer{display:none}')});
+
+it('booking-list is a positioned containing block so absolute children cannot extend the page',()=>{expect(readFileSync('src/main-list.css','utf8')).toContain('.booking-list{position:relative;')});
