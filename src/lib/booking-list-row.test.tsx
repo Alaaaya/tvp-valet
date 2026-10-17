@@ -70,3 +70,13 @@ it('retains directional flight clock and number but no separate live status line
  expect(h).toContain('NP855');expect(h).toContain('12:33');expect(h).toContain('blr-tf');
  expect(h).not.toContain('landed');expect(h).not.toContain('blr-flight');
 });
+
+it('hides an exact external-ID provenance token in list comments and tooltip only',()=>{
+ const row=Object.freeze({...b,external_id:'DP-YWJ4U9G',comment:'Flughafenstellplatz | DP-YWJ4U9G | Travel Valet Parking | Online vorausbezahlt, keine Barzahlung vor Ort.'}),before=JSON.stringify(row);
+ const h=r(<BookingListRow {...P({b:row})}/>);
+ expect(h).not.toContain('DP-YWJ4U9G');
+ expect(h).toContain('Online vorausbezahlt, keine Barzahlung vor Ort.');
+ expect(h).toContain('Travel Valet Parking');
+ expect(h).toContain('#AF-1');
+ expect(JSON.stringify(row)).toBe(before);
+});
