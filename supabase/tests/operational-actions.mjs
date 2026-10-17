@@ -33,6 +33,12 @@ for(const name of ['taken_away','ride_started']){const op=(await action(name)).r
 assert.deepEqual((await db.query('select * from public.bookings where id=$1',[booking.id])).rows[0],afterCheck);checks++;
 assert.equal((await db.query('select * from public.booking_operation_events')).rows.length,3);checks++;
 for(const sql of ["update public.booking_operations set updated_at=now()","delete from public.booking_operation_events","insert into public.booking_operations(booking_id,performed_by) values($1,$2)"]){await assert.rejects(db.query(sql,sql.includes('$1')?[booking.id,driver]:[]),e=>e.code==='42501');checks++;}
+// A different staff member cannot claim an existing action by retrying it.
+await user(admin);
+const actorRetry=(await action('customer_called')).rows[0];assert.equal(actorRetry.performed_by,driver);checks++;
+const originalEvent=(await db.query("select * from public.booking_operation_events where action='customer_called'")).rows[0];assert.equal(originalEvent.actor_id,driver);checks++;
+for(const sql of ["update public.booking_operations set performed_by=$1","update public.booking_operation_events set actor_id=$1","insert into public.booking_operation_events(booking_id,action,occurred_at,actor_id) values($1,'customer_called',now(),$2)"]){await assert.rejects(db.query(sql,sql.includes('$2')?[booking.id,admin]:[admin]),e=>e.code==='42501');checks++;}
+await user(driver);
 await db.query("select public.check_booking($1,'out')",[booking.id]);
 await action('taken_away');checks++;
 await user('', 'anon');await fail('customer_called','42501');
