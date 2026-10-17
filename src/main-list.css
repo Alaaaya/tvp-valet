@@ -17,3 +17,4 @@
 .app.fixed-top .page>*{flex:none}
 .app.fixed-top .page>.booking-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom);background:#fff}
 .app.fixed-top .page>.empty{flex:1 1 auto;overflow-y:auto}
+.app.fixed-top .page>footer{display:none}
