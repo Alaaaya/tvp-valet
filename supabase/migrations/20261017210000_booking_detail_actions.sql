@@ -71,7 +71,7 @@ begin
   or coalesce(p_expected->>'spot','') is distinct from coalesce(v_booking.spot,'')
   or (p_expected->>'lifecycle_revision')::bigint is distinct from v_revision
   or (p_expected->>'detail_revision')::bigint is distinct from v_booking.detail_revision
- then raise exception 'Booking changed; reload' using errcode='40001'; end if;
+ then raise exception 'Booking changed; reload' using errcode='PT409'; end if;
  if v_booking.status<>'confirmed' then raise exception 'Booking is not confirmed' using errcode='23514'; end if;
  if p_action='status' then
   if v_booking.checked_in_at is not null or v_booking.checked_out_at is not null then

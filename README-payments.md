@@ -12,8 +12,10 @@ Pass the displayed booking total/paid snapshot as integer cents and one UUID per
 payment intent. Keep the exact input and UUID after a timeout. The server serializes
 the UUID globally and locks the booking row. A retry with identical actor, booking,
 method, amount and original paid/total returns the ORIGINAL immutable receipt.
-A changed context fails. Different requests with stale snapshots fail with 40001;
-reload before creating another intent. Never silently retry using a fresh UUID.
+A changed context fails. Different requests with stale snapshots fail with PT409 (HTTP 409);
+reload before creating another intent. Business-stale errors deliberately avoid SQLSTATE
+40001, which PostgREST can retry and surface as HTTP 503. The client accepts
+PT409 and legacy 40001 for compatibility. Never silently retry using a fresh UUID.
 Receipt paid_after_cents is historical, not necessarily the current paid balance.
 Refresh the booking after success. No actor or timestamp is accepted from a client.
 

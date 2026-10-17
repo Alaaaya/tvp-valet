@@ -26,7 +26,7 @@ export function hasLegacyCashConflict(booking:Pick<Booking,'key_cash'>):boolean 
  return /[0-9]/.test(booking.key_cash??'');
 }
 function failure(error:{code?:string;message?:string}):Error {
- if(error.code==='40001')return new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
+ if(error.code==='PT409'||error.code==='40001')return new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
  if(error.code==='42501')return new Error('Keine Berechtigung für diese Zahlung.');
  return new Error(error.message||'Zahlung fehlgeschlagen');
 }

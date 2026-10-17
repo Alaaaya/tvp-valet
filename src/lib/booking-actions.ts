@@ -8,7 +8,7 @@ export type BookingCallHistory={id:number;occurred_at:string;actor_id:string;act
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function validId(id:string){if(!uuid.test(id))throw new Error('Ungültige Anfrage-ID');}
 function failure(error:{code?:string;message?:string}):Error{
- if(error.code==='40001')return new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
+ if((error.code==='PT409'||error.code==='40001'))return new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
  if(error.code==='42501')return new Error('Keine Berechtigung für diese Aktion.');
  return new Error(error.message||'Aktion fehlgeschlagen');
 }

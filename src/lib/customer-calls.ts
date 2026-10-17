@@ -25,7 +25,7 @@ export async function recordCustomerCall({booking,requestId,allowRepeat=false}:{
   p_expected_lifecycle_revision:booking.lifecycle_revision,p_allow_repeat:allowRepeat
  });
  if(error){
-  if(error.code==='40001')throw new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
+  if((error.code==='PT409'||error.code==='40001'))throw new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
   if(error.code==='42501')throw new Error('Keine Berechtigung für diese Aktion.');
   throw new Error(error.message||'Anruf konnte nicht gespeichert werden');
  }

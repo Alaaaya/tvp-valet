@@ -50,7 +50,7 @@ test('exact payment migration: permissions, atomicity, snapshots, immutable cont
   await db.exec(`reset role; set request.jwt.claim.sub='${driver}'; set role authenticated`);
   for(const bad of ['0','-1','1.1',"'NaN'::numeric","'Infinity'::numeric","'-Infinity'::numeric",'1000000000000'])
    await fail(rpc(request,booking,bad),'22023');
-  await fail(rpc(request,booking,'2000','cash','999'),'40001');
+  await fail(rpc(request,booking,'2000','cash','999'),'PT409');
   await fail(rpc(request,booking,'9001'),'23514');
   await fail(rpc(request,legacy,'1000','cash','0'),'23514');
   check((await db.query("update public.bookings set paid=20 where code='TEST1' returning id")).rows,[]);
@@ -63,7 +63,7 @@ test('exact payment migration: permissions, atomicity, snapshots, immutable cont
   await fail(rpc(request,booking,'2000','card'),'23514');
   await fail(rpc(request,other),'23514');
   await fail(rpc(request,booking,'2000','cash','3000'),'23514');
-  await fail(rpc(request2,booking,'2000'),'40001');
+  await fail(rpc(request2,booking,'2000'),'PT409');
   await fail(`update public.booking_payments set amount_cents=1 where id='${request}'`,'42501');
   await fail(`delete from public.booking_payments where id='${request}'`,'42501');
   await fail(`insert into public.booking_payments select * from public.booking_payments`,'42501');
