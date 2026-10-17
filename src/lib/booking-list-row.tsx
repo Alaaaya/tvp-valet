@@ -27,7 +27,7 @@ export function moneyState(b:Pick<Booking,'total'|'paid'>):{kind:'paid'|'due'|'n
 }
 export interface BookingListRowProps{
  b:Booking;kind:'in'|'out';time:string;completed:boolean;onOpen:(b:Booking)=>void;
- /** Live flight/status JSX supplied by the list, shown in place of the plain flight number. */
+ /** Compatibility slot retained for callers; separate status is deliberately not rendered. */
  live?:React.ReactNode;
  /** Optional real count of structured comments; omitted means no indicator. */
  commentCount?:number;
@@ -36,8 +36,15 @@ export interface BookingListRowProps{
 }
 /** Counter helper: done/total for one direction over the (done-inclusive) population. */
 export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
+/** Imported provenance sometimes repeats the external reference as a pipe token.
+ * Omit only that exact token in this row's display, never edit stored comments. */
+export function rowComment(b:Pick<Booking,'comment'|'external_id'|'code'>){
+ const text=displayComment(b.comment,true).text.trim(),id=b.external_id?.trim();
+ if(!id||id===b.code)return text;
+ return text.split('\n').map(line=>line.split('|').filter(part=>part.trim()!==id).join('|')).join('\n').trim();
+}
 export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
- const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=displayComment(b.comment,true).text.trim();
+ const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b);
  const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
  const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
