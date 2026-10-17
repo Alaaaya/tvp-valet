@@ -1,0 +1,163 @@
+import React,{useCallback,useEffect,useRef,useState} from 'react';
+import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
+import {parseQrPayload,normalizePlate,type PlateCandidate} from './booking-scan-parse';
+import {createQrDecoder,decodeQrFromFile,type QrDecoder} from './booking-scan-qr';
+import {trapTab} from './undo-controls';
+import '../booking-scan.css';
+
+export interface ScanLookup{kind:'qr'|'plate';value:string}
+export interface BookingScanSheetProps{
+  /** Parent performs the lookup (filter/focus/jump). The sheet never selects a booking itself. */
+  onLookup:(r:ScanLookup)=>void;
+  onClose:()=>void;
+  /** optional hosts accepted for QR links; default accepts any host but only extracts a code */
+  expectedHosts?:string[];
+}
+type View='menu'|'qr'|'plate';
+type Found={kind:'qr'|'plate';value:string;note?:string;confidence?:number;alts?:PlateCandidate[]};
+
+export function BookingScanSheet(p:BookingScanSheetProps){
+  const[view,setView]=useState<View>('menu');const[found,setFound]=useState<Found|null>(null);
+  const box=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null);
+  useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
+  useEffect(()=>{box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input')?.focus()},[view,found]);
+  const back=()=>{if(found){setFound(null);return}view==='menu'?p.onClose():setView('menu')};
+  const keys=(e:React.KeyboardEvent)=>{
+    if(e.key==='Escape'){e.stopPropagation();back();return}
+    if(e.key!=='Tab')return;
+    const f=Array.from(box.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled)')||[]);
+    if(!f.length)return;const i=f.indexOf(document.activeElement as HTMLElement);e.preventDefault();f[trapTab(i,f.length,e.shiftKey)].focus();
+  };
+  const title=found?'Bestätigen':view==='menu'?'Scan':view==='qr'?'QR code':'License plate';
+  return <div className="bsc-scrim" onClick={p.onClose}>
+    <div ref={box} className="bsc" role="dialog" aria-modal="true" aria-labelledby="bsc-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
+      <div className="bsc-handle" aria-hidden="true"/>
+      <header className="bsc-head">
+        {view!=='menu'&&<button type="button" className="bsc-x" aria-label="Zurück" onClick={back}><ChevronLeft size={20}/></button>}
+        <h2 id="bsc-t">{title}</h2>
+        <button type="button" className="bsc-x" aria-label="Schließen" onClick={p.onClose}><X size={20}/></button>
+      </header>
+      {found?<Confirm key={found.kind+found.value} f={found} onLookup={p.onLookup} onRetry={()=>setFound(null)}/>
+        :view==='menu'?<div role="menu">
+          <button type="button" role="menuitem" className="bsc-item" data-first onClick={()=>setView('qr')}><QrCode size={22}/><span>QR code</span></button>
+          <button type="button" role="menuitem" className="bsc-item" onClick={()=>setView('plate')}><Car size={22}/><span>License plate</span></button>
+        </div>
+        :view==='qr'?<QrPane hosts={p.expectedHosts} onFound={setFound}/>
+        :<PlatePane onFound={setFound}/>}
+    </div>
+  </div>;
+}
+
+function Confirm({f,onLookup,onRetry}:{f:Found;onLookup:(r:ScanLookup)=>void;onRetry:()=>void}){
+  const[v,setV]=useState(f.value);const ok=f.kind==='qr'?v.trim().length>=3:normalizePlate(v).length>=2;
+  const go=()=>{if(!ok)return;onLookup({kind:f.kind,value:v.trim()})};
+  return <form className="bsc-body" onSubmit={e=>{e.preventDefault();go()}}>
+    <label className="bsc-lab">{f.kind==='qr'?'Buchungscode':'Kennzeichen'}
+      <input data-first value={v} onChange={e=>setV(f.kind==='qr'?e.target.value.slice(0,40):e.target.value.slice(0,16))} autoCapitalize="characters" autoCorrect="off" spellCheck={false} inputMode="text" maxLength={f.kind==='qr'?40:16}/>
+    </label>
+    {f.note&&<p className="bsc-hint">{f.note}</p>}
+    {f.confidence!==undefined&&<p className={'bsc-hint'+(f.confidence<60?' warn':'')}>Erkennungssicherheit {f.confidence}%{f.confidence<60?' - bitte genau prüfen':''}</p>}
+    {f.alts&&f.alts.length>0&&<div className="bsc-alts">{f.alts.map(a=><button type="button" key={a.key} className="bsc-chip" onClick={()=>setV(a.display)}>{a.display}</button>)}</div>}
+    <div className="bsc-row"><button type="button" className="bsc-btn" onClick={onRetry}>Erneut scannen</button><button type="submit" className="bsc-btn primary" disabled={!ok}><Search size={16}/> Suchen</button></div>
+  </form>;
+}
+
+function useMounted(){const m=useRef(true);useEffect(()=>{m.current=true;return()=>{m.current=false}},[]);return m}
+
+function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
+  const video=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),gen=useRef(0),mounted=useMounted(),file=useRef<HTMLInputElement>(null),dec=useRef<QrDecoder|null>(null);
+  const[state,setState]=useState<'starting'|'live'|'nocam'>('starting');const[err,setErr]=useState('');const[manual,setManual]=useState('');
+  const stop=useCallback(()=>{gen.current++;stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(video.current)video.current.srcObject=null},[]);
+  const handle=useCallback((raw:string):boolean=>{
+    const r=parseQrPayload(raw,{expectedHosts:hosts});
+    if(!r.ok){setErr(r.reason);return false}
+    stop();onFound({kind:'qr',value:r.code,note:r.source==='plain'?undefined:'Code aus QR-Link gelesen. Es wird kein Link geöffnet.'});return true;
+  },[hosts,onFound,stop]);
+  useEffect(()=>{
+    const my=++gen.current;let raf=0,timer=0,last='';
+    (async()=>{
+      if(!navigator.mediaDevices?.getUserMedia){setState('nocam');return}
+      let s:MediaStream;
+      try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false})}
+      catch(e){if(my!==gen.current||!mounted.current)return;setState('nocam');setErr((e as DOMException)?.name==='NotAllowedError'?'Kamerazugriff wurde nicht erlaubt. Foto oder manuelle Eingabe nutzen.':'Keine Kamera verfügbar. Foto oder manuelle Eingabe nutzen.');return}
+      if(my!==gen.current||!mounted.current){s.getTracks().forEach(t=>t.stop());return}
+      stream.current=s;const v=video.current;if(!v){s.getTracks().forEach(t=>t.stop());return}
+      v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;
+      try{await v.play()}catch{/* autoplay quirks; frames still decode once playing */}
+      if(my!==gen.current||!mounted.current)return;
+      setState('live');dec.current=await createQrDecoder();
+      let busy=false;
+      const tick=async()=>{
+        if(my!==gen.current||!mounted.current)return;
+        if(!busy&&v.videoWidth>0&&v.readyState>=2&&dec.current){
+          busy=true;
+          try{const raw=await dec.current.decode(v,v.videoWidth,v.videoHeight);
+            if(my===gen.current&&mounted.current&&raw&&raw!==last){last=raw;if(handle(raw))return}}catch{/* next frame */}
+          busy=false;
+        }
+        timer=window.setTimeout(()=>{raf=requestAnimationFrame(tick)},150);
+      };
+      raf=requestAnimationFrame(tick);
+    })();
+    const vis=()=>{if(document.visibilityState==='hidden'){stop();setState('nocam');setErr('Kamera pausiert. Zurück und erneut öffnen.')}};
+    document.addEventListener('visibilitychange',vis);
+    return()=>{document.removeEventListener('visibilitychange',vis);cancelAnimationFrame(raf);clearTimeout(timer);stop()};
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+  const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];e.target.value='';if(!f)return;setErr('');
+    try{const raw=await decodeQrFromFile(f,dec.current||undefined);if(!mounted.current)return;if(!raw)setErr('Kein QR-Code im Foto erkannt.');else handle(raw)}
+    catch(x){if(mounted.current)setErr(x instanceof Error?x.message:'Foto konnte nicht gelesen werden.')}
+  };
+  return <div className="bsc-body">
+    <div className={'bsc-view'+(state==='live'?' live':'')}>
+      <video ref={video} playsInline muted aria-label="Kamera"/>
+      {state==='live'&&<div className="bsc-frame" aria-hidden="true"/>}
+      {state==='starting'&&<p className="bsc-view-msg">Kamera wird gestartet…</p>}
+      {state==='nocam'&&<p className="bsc-view-msg">Keine Live-Kamera</p>}
+    </div>
+    {err&&<p className="bsc-err" role="alert">{err}</p>}
+    <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={onFile}/>
+    <button type="button" className="bsc-btn" onClick={()=>file.current?.click()}><Camera size={16}/> Foto aufnehmen</button>
+    <form className="bsc-manual" onSubmit={e=>{e.preventDefault();if(manual.trim())handle(manual)}}>
+      <label className="bsc-lab">Code manuell eingeben<input value={manual} onChange={e=>setManual(e.target.value.slice(0,2048))} autoCapitalize="characters" autoCorrect="off" spellCheck={false} placeholder="z. B. AF-YA4TQSG"/></label>
+      <button type="submit" className="bsc-btn primary" disabled={!manual.trim()}>Weiter</button>
+    </form>
+  </div>;
+}
+
+function PlatePane({onFound}:{onFound:(f:Found)=>void}){
+  const file=useRef<HTMLInputElement>(null),mounted=useMounted(),ocr=useRef<import('./booking-scan-ocr').PlateOcr|null>(null),ctl=useRef<AbortController|null>(null),job=useRef(0);
+  const[busy,setBusy]=useState(false);const[err,setErr]=useState('');const[manual,setManual]=useState('');const[preview,setPreview]=useState('');
+  useEffect(()=>()=>{ctl.current?.abort();void ocr.current?.dispose();ocr.current=null},[]);
+  useEffect(()=>()=>{if(preview)URL.revokeObjectURL(preview)},[preview]);
+  const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const f=e.target.files?.[0];e.target.value='';if(!f)return;
+    ctl.current?.abort();const c=ctl.current=new AbortController();const my=++job.current;setErr('');setBusy(true);setPreview(URL.createObjectURL(f));
+    try{
+      const m=await import('./booking-scan-ocr');
+      if(!mounted.current||my!==job.current)return;
+      ocr.current=ocr.current||m.createPlateOcr();
+      const img=await m.preparePlatePhoto(f);
+      const r=await ocr.current.recognize(img,c.signal);
+      if(!mounted.current||my!==job.current)return;
+      const best=r.candidates[0];
+      if(!best){setErr('Kein Kennzeichen erkannt. Foto näher aufnehmen oder manuell eingeben.');return}
+      onFound({kind:'plate',value:best.display,confidence:r.confidence,alts:r.candidates.slice(1,4),note:'Bitte mit dem Fahrzeug vergleichen. Das Foto bleibt auf diesem Gerät.'});
+    }catch(x){if(mounted.current&&my===job.current&&!c.signal.aborted)setErr(x instanceof Error&&x.message!=='abgebrochen'?'Texterkennung fehlgeschlagen: '+x.message+'. Bitte manuell eingeben.':'Texterkennung abgebrochen.')}
+    finally{if(mounted.current&&my===job.current)setBusy(false)}
+  };
+  const cancel=()=>{ctl.current?.abort();job.current++;setBusy(false);void ocr.current?.dispose();ocr.current=null};
+  return <div className="bsc-body">
+    {preview&&<img className="bsc-preview" src={preview} alt="Foto des Kennzeichens"/>}
+    {err&&<p className="bsc-err" role="alert">{err}</p>}
+    {busy&&<p className="bsc-hint" role="status">Kennzeichen wird auf dem Gerät gelesen…</p>}
+    <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={onFile}/>
+    {busy?<button type="button" className="bsc-btn" onClick={cancel}>Abbrechen</button>
+      :<button type="button" className="bsc-btn primary" data-first onClick={()=>file.current?.click()}><Camera size={16}/> Kennzeichen fotografieren</button>}
+    <form className="bsc-manual" onSubmit={e=>{e.preventDefault();if(normalizePlate(manual).length>=2)onFound({kind:'plate',value:manual.trim()})}}>
+      <label className="bsc-lab">Kennzeichen manuell<input value={manual} onChange={e=>setManual(e.target.value.slice(0,16))} autoCapitalize="characters" autoCorrect="off" spellCheck={false} placeholder="z. B. D AB 1234"/></label>
+      <button type="submit" className="bsc-btn" disabled={normalizePlate(manual).length<2}>Weiter</button>
+    </form>
+  </div>;
+}
