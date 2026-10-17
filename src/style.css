@@ -70,3 +70,20 @@ h1,h2,h3,.plate,.counter strong,.counter strong small{font-family:inherit}
 .identity-grid .pp-link{border:0;background:none;justify-content:flex-start;text-align:left;padding:0;min-height:0;width:auto}
 .identity-grid .pp-link{min-height:24px}
 .fp-hint{margin-left:8px;font-size:11px;opacity:.75}
+
+/* mobile bounds */
+*,*::before,*::after{box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
+#root,main,section,form,label,.login,.login-panel,.login-art{min-width:0;max-width:100%}
+@media(max-width:650px){
+input,select,textarea{font-size:16px!important;min-width:0;max-width:100%}
+input[type=datetime-local],input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;width:100%;max-width:100%;display:block}
+.login{grid-template-columns:minmax(0,1fr)}
+.login-art{padding:calc(28px + env(safe-area-inset-top)) 20px 28px}
+.login-panel{padding:24px 16px calc(24px + env(safe-area-inset-bottom))}
+form,.grid,[class*=grid]{grid-template-columns:minmax(0,1fr)!important}
+.filters,.chips,[class*=filter],[class*=chip]{flex-wrap:wrap;min-width:0}
+h1,h2,h3,p,small,strong,span,td,a{overflow-wrap:anywhere}
+body{padding-bottom:env(safe-area-inset-bottom)}
+header,.topbar,.top{padding-top:max(env(safe-area-inset-top),0px)}
+}
