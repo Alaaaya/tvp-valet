@@ -35,7 +35,7 @@ describe('private atomic save and retries',()=>{
  it('uploads privately before final secure RPC and uses server timestamps',async()=>{
   const p=photo(),progress=vi.fn();const r=await saveHandover({requestId,booking,action:'in',details,media:[p],onProgress:progress});
   expect(mock.upload).toHaveBeenCalledWith(mediaPath(bid,requestId,p),p.blob,{contentType:'image/jpeg',upsert:false,cacheControl:'0'});
-  expect(mock.rpc).toHaveBeenCalledWith('complete_booking_handover',expect.objectContaining({p_request_id:requestId,p_details:details,p_media:[expect.objectContaining({id:p.id,captured_at:p.captured_at,size_bytes:5})]}));
+  expect(mock.rpc).toHaveBeenCalledWith('complete_booking_handover',expect.objectContaining({p_request_id:requestId,p_details:details,p_expected_in:booking.checked_in_at,p_expected_out:booking.checked_out_at,p_expected_revision:0,p_media:[expect.objectContaining({id:p.id,captured_at:p.captured_at,size_bytes:5})]}));
   expect(mock.upload.mock.invocationCallOrder[0]).toBeLessThan(mock.rpc.mock.invocationCallOrder[0]);
   expect(r.checked_in_at).toBe('2026-10-17T14:00:00Z');expect(progress).toHaveBeenLastCalledWith(1,1);
  });
@@ -54,10 +54,13 @@ describe('private atomic save and retries',()=>{
   await expect(saveHandover({requestId,booking,action:'in',details,media:[p]})).rejects.toThrow('noch nicht abgeschlossen');expect(mock.rpc).not.toHaveBeenCalled();
  });
  it('RPC failure preserves truthful partial state',async()=>{mock.rpc.mockResolvedValue({error:{message:'Check failed'}});await expect(saveHandover({requestId,booking,action:'out',details,media:[photo()]})).rejects.toThrow('noch nicht bestätigt')});
- it('lost successful response recovers receipt without reupload or second RPC',async()=>{
+ it('stale lifecycle is not presented as a save-retry success',async()=>{mock.rpc.mockResolvedValue({error:{code:'PT409',message:'changed'}});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('neu öffnen')});
+ it('lost successful response recovers receipt via locked RPC without reupload',async()=>{
   mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in'},error:null});mock.booking.mockResolvedValue({data:booking,error:null});
-  await expect(saveHandover({requestId,booking,action:'in',details,media:[photo()]})).resolves.toHaveProperty('id',bid);expect(mock.upload).not.toHaveBeenCalled();expect(mock.rpc).not.toHaveBeenCalled();
+  await expect(saveHandover({requestId,booking,action:'in',details,media:[photo()]})).resolves.toHaveProperty('id',bid);expect(mock.upload).not.toHaveBeenCalled();expect(mock.rpc).toHaveBeenCalledOnce();
  });
+ it('receipt recovery racing an undo trusts the locked server rejection',async()=>{mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in'}});mock.rpc.mockResolvedValue({error:Error('already undone')});await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('already undone');expect(mock.booking).not.toHaveBeenCalled()});
+ it('binds draft revision even when both timestamps return to null',async()=>{await saveHandover({requestId,booking:{...booking,lifecycle_revision:7},action:'in',details,media:[]});expect(mock.rpc.mock.calls[0][1].p_expected_revision).toBe(7)});
  it('rejects stale receipt after undo instead of treating it as completion',async()=>{
   mock.receipt.mockResolvedValue({data:{id:requestId,booking_id:bid,action:'in',undone_at:'2026-10-17T15:00:00Z'}});
   await expect(saveHandover({requestId,booking,action:'in',details,media:[]})).rejects.toThrow('rückgängig');
