@@ -54,3 +54,13 @@ it('keeps plate, key and codes on one line with the plate never shrinking',()=>{
  expect(c).toContain('.blr-l2 .blr-plate{flex:0 0 auto');
  expect(c).toContain('.blr-l2 .blr-code{flex:0 1 auto');
 });
+
+it('omits external IDs from row text and tooltip while preserving booking code and input data',()=>{
+ for(const external_id of ['198183538','AL-750762123']){
+  const row=Object.freeze({...b,external_id}),before=JSON.stringify(row);
+  const h=r(<BookingListRow {...P({b:row})}/>);
+  expect(h).not.toContain(external_id);
+  expect(h).toContain('#AF-1');
+  expect(JSON.stringify(row)).toBe(before);
+ }
+});
