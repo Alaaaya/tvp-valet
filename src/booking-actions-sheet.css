@@ -1,0 +1,25 @@
+/* booking actions bottom sheet */
+.bas-scrim{position:fixed;inset:0;z-index:60;background:rgba(20,40,38,.55);display:flex;align-items:flex-end;justify-content:center}
+.bas{width:100%;max-width:700px;max-height:85dvh;overflow-y:auto;overflow-x:hidden;background:#fff;border-radius:18px 18px 0 0;padding:8px 0 max(12px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+.bas-handle{width:56px;height:6px;border-radius:3px;background:#b9e6d6;margin:4px auto 6px}
+.bas-head{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 8px}
+.bas-head h2{margin:0;font-size:18px}
+.bas-x{width:44px;height:44px;border-radius:50%;background:#e3efec;color:#1d3a35}
+.bas-sec{margin:10px 16px 2px;font-size:12px;letter-spacing:.8px;color:#2d696a;font-weight:800}
+.bas-item{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;width:100%;min-height:48px;padding:8px 16px;border-top:1px solid #edf1ef;text-align:left;font-size:16px;color:#222;border-radius:0}
+.bas-item.danger{color:#c0392b}
+.bas-item:disabled{color:#b9a7a5}
+.bas-item small{color:#888;font-size:12px}
+.bas-undo .undo{margin:0;padding:0}
+.bas-undo .undo-btn{width:100%;min-height:48px;justify-content:flex-start;border-radius:0;border-top:1px solid #edf1ef}
+.bas-err,.bas-msg{margin:4px 16px;padding:10px 12px;border-radius:8px;font-size:14px}
+.bas-err{background:#fbe0de;color:#a63732}.bas-msg{background:#e0f2ea;color:#1f5d49}
+.bas-form{display:grid;gap:12px;padding:8px 16px 12px}
+.bas-form input{font-size:16px;min-height:44px}
+.bas-check{flex-direction:row;align-items:center;gap:10px;min-height:44px}.bas-check input{width:22px;min-height:22px}
+.bas-hint{margin:0;font-size:14px;color:#555}
+.bas-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bas-btn{min-height:48px;border:1px solid #9bbab2;border-radius:10px;background:#fff;color:#1d3a35;font-size:16px}
+.bas-btn.primary{background:#2d696a;color:#fff;border-color:#2d696a}
+.bas-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b}
+.bas-list{padding:4px 16px 12px}.bas-list p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:12px 0;border-bottom:1px solid #edf1ef;font-size:14px}
