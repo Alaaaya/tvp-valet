@@ -1,8 +1,8 @@
 import {db} from '../api';
-export type BookingOperationAction='taken_away'|'customer_called'|'ride_started';
+export type BookingOperationAction='taken_away'|'retrieved'|'customer_called'|'ride_started';
 // performed_by is the latest newly recorded action actor, not every action actor.
 // Repeated actions never change it. Per-action attribution lives in BookingOperationEvent.
-export interface BookingOperations {booking_id:string;taken_away_at:string|null;customer_called_at:string|null;ride_started_at:string|null;performed_by:string;updated_at:string}
+export interface BookingOperations {booking_id:string;taken_away_at:string|null;retrieved_at:string|null;customer_called_at:string|null;ride_started_at:string|null;performed_by:string;updated_at:string}
 export async function loadBookingOperations():Promise<BookingOperations[]> {
   if(!db) throw new Error('Backend nicht eingerichtet');
   const {data,error}=await db.from('booking_operations').select('*');
