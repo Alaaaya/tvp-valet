@@ -203,7 +203,7 @@ export function createController(o: ControllerOpts) {
     /** returns true when the event should be preventDefault-ed */
     move(pid: unknown, x: number, y: number): boolean {
       if (pid !== id) return false;
-      if (phase === 'dragging' && (boundRoot !== o.root() || o.entry()?.enabled === false || o.entry()?.blocked || o.externalBlocked?.())) { self.cancel(); return false; }
+      if (phase === 'dragging' && (boundRoot !== o.root() || o.entry()?.enabled === false || o.entry()?.blocked || registry.active() !== o.entry() || o.externalBlocked?.())) { self.cancel(); return false; }
       if (phase === 'pending') {
         const intent = decideIntent(x - sx, y - sy);
         if (intent === 'vertical') { cleanup(); return false; }
@@ -233,7 +233,7 @@ export function createController(o: ControllerOpts) {
       settle(width, () => {
         if (my !== epoch) return;
         const e = o.entry();
-        if (!e || !e.enabled || e.blocked || registry.active() !== e) { settle(0, cleanup); return; }
+        if (!e || !e.enabled || e.blocked || registry.active() !== e || boundRoot !== o.root() || o.externalBlocked?.()) { settle(0, cleanup); return; }
         let res: BackResult;
         try { res = o.onBack(); } catch { res = false; }
         const fin = (ok: void | boolean) => {
