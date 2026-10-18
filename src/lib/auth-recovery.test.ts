@@ -72,3 +72,19 @@ describe('shared auth recovery',()=>{
   expect(response.status).toBe(401);expect(fetcher).toHaveBeenCalledTimes(1);
  });
 });
+
+describe('cached recovery isolation',()=>{
+ it.each([null,'another-account-token'])('does not reuse a recovered bearer after session changes to %s',async token=>{
+  const auth=makeAuth();
+  expect(await refreshSessionSafely(auth,'expired')).toBe('fresh');
+  auth.getSession.mockResolvedValue(session(token));
+  await expect(refreshSessionSafely(auth,'expired')).rejects.toThrow('Sitzung');
+  expect(auth.refreshSession).toHaveBeenCalledTimes(1);
+ });
+ it('does not reuse cached credentials if session storage fails',async()=>{
+  const auth=makeAuth();
+  await refreshSessionSafely(auth,'expired');
+  auth.getSession.mockResolvedValue({data:{session:null},error:Error('storage unavailable')} as any);
+  await expect(refreshSessionSafely(auth,'expired')).rejects.toThrow('Sitzung');
+ });
+});
