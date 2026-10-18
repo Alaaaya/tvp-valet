@@ -45,8 +45,8 @@ export function shouldUseCustomGesture(env: {
   return !!(env.standalone || env.displayModeStandalone);
 }
 
-const EXCLUDE_SELECTOR =
-  'input,select,textarea,button,a,[contenteditable]:not([contenteditable="false"]),canvas,video,audio,[role="slider"],[data-edge-back-exclude]';
+export const EXCLUDE_SELECTOR =
+  'input,select,textarea,[contenteditable]:not([contenteditable="false"]),canvas,video,audio,[role="slider"],[data-edge-back-exclude]';
 
 export interface ElementLike {
   closest?(sel: string): ElementLike | null;
@@ -74,6 +74,21 @@ export function isExcludedTarget(
     if (el === root) break;
   }
   return false;
+}
+
+/** After a horizontal edge-back drag started on a button/link, swallow only the ensuing click. */
+export function createClickSuppressor(now: () => number, ttlMs = 600) {
+  let until = 0;
+  return {
+    arm() { until = now() + ttlMs; },
+    clear() { until = 0; },
+    /** true = swallow this click (one-shot) */
+    consume(): boolean {
+      if (until && now() <= until) { until = 0; return true; }
+      until = 0;
+      return false;
+    },
+  };
 }
 
 /* ---------- registry ---------- */
