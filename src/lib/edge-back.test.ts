@@ -103,6 +103,13 @@ describe('controller', () => {
     expect(dialogsBlock([other], root, contains, () => true)).toBe(true);
     expect(dialogsBlock([other], root, contains, () => false)).toBe(false);
   });
+  it('a dialog opening during completion animation refuses back', () => {
+    let blocked=false,n=0;const timers: (()=>void)[]=[];
+    const root=mkRoot();const entry=registry.add({root,priority:1,enabled:true,blocked:false});
+    const c=createController({root:()=>root as any,entry:()=>entry,onBack:()=>{n++},externalBlocked:()=>blocked,reducedMotion:()=>false,viewportWidth:()=>400,now:()=>1,schedule:fn=>{timers.push(fn);return 1},clearSchedule:()=>{}});
+    c.start(1,5,0,null);c.move(1,300,0);c.end(1);blocked=true;timers.shift()!();timers.shift()!();
+    expect(n).toBe(0);expect(c.phase).toBe('idle');registry.remove(entry);
+  });
   it('registry blocked at release cancels', () => {
     let n = 0; const s = setup(() => { n++; }); s.c.start(1, 5, 0, null); s.c.move(1, 30, 0); s.c.move(1, 300, 0);
     const top = registry.add({ root: 9, priority: 9, enabled: true, blocked: false }); s.c.end(1);

@@ -47,7 +47,7 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
   useEffect(()=>{setErr('');setMsg('');const first=box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input');first?.focus()},[view]);
   const back=()=>{if(saving.current)return;view==='menu'?p.onClose():setView('menu')};
   const scrim=useRef<HTMLDivElement>(null);
-  useEdgeBack(scrim,{enabled:true,priority:40,blocked:work,onBack:()=>{if(saving.current)return false;if(view==='location'&&spot.trim()!==''&&spot.trim()!==b.spot&&!window.confirm('Ungespeicherten Standort verwerfen?'))return false;back()}});
+  useEdgeBack(box,{enabled:true,priority:40,blocked:work,onBack:()=>{if(saving.current)return false;if(view==='location'&&spot.trim()!==''&&spot.trim()!==b.spot&&!window.confirm('Ungespeicherten Standort verwerfen?'))return false;back()}});
   const keys=(e:React.KeyboardEvent)=>{
     if(e.key==='Escape'){e.stopPropagation();back();return}
     if(e.key!=='Tab')return;
