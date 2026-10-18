@@ -109,3 +109,4 @@
 .undo-cancel{background:#fff;border:2px solid #9fcfc7;color:#1c3a36}.undo-ok{background:#c0392b;color:#fff}.undo-ok:disabled,.undo-cancel:disabled{opacity:.7}
 .mg-undone{position:absolute;left:0;right:0;bottom:0;background:#000;color:#fff;font-size:10px;line-height:1.2;padding:2px 3px;text-align:center}
 .mg-tile.undone img,.mg-tile.undone .mg-ico{opacity:.55}
+.ho button:focus-visible,.ho input:focus-visible{outline:3px solid #7cc8f5;outline-offset:2px}

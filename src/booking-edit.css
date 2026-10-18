@@ -28,7 +28,8 @@
 .be-err{background:#fde7e7;color:#8a1c1c;border-radius:10px;padding:10px;margin:8px 12px 0;font-size:14px}
 .be-foot{padding:12px;position:sticky;bottom:0;background:#d4ece7}
 .be-update{width:100%;min-height:48px;border:0;border-radius:12px;background:#255c5a;color:#fff;font-size:16px;font-weight:700;display:flex;gap:8px;align-items:center;justify-content:center}
-.be-dialog{position:absolute;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:5}
+.be-dialog{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:5}
 .be-dialog>div{background:#fff;border-radius:14px;padding:16px;display:grid;gap:8px;width:min(320px,90%)}
+.be-screen button:focus-visible,.be-screen input:focus-visible,.be-screen textarea:focus-visible{outline:3px solid #255c5a;outline-offset:2px}
 .be-dialog button{min-height:44px;border-radius:10px;border:1.5px solid #255c5a;background:#fff;font-size:16px}
 .be-dialog .danger{background:#8a1c1c;color:#fff;border-color:#8a1c1c}

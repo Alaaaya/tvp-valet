@@ -50,7 +50,7 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
   useEffect(()=>{ensure(m);const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=o}},[]);
   useEffect(()=>{ensure(m);const t=window.setInterval(()=>ensure(m),30000);return()=>clearInterval(t)},[m,ensure]);
   useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const el=strip.current?.children[index] as HTMLElement|undefined;el?.scrollIntoView?.({inline:'center',block:'nearest'})},[index]);
-  useEffect(()=>{const k=(e:KeyboardEvent)=>{if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1);else if(e.key==='Escape')onClose()};window.addEventListener('keydown',k);return()=>window.removeEventListener('keydown',k)});
+  useEffect(()=>{const k=(e:KeyboardEvent)=>{const t=e.target as HTMLElement|null;if(t&&(t.tagName==='VIDEO'||t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1);else if(e.key==='Escape'){if(document.fullscreenElement)return;if(full){setFull(false);return}onClose()}};window.addEventListener('keydown',k);return()=>window.removeEventListener('keydown',k)});
   useEffect(()=>{const f=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',f);return()=>document.removeEventListener('fullscreenchange',f)},[]);
   function go(d:number){setMsg('');setIndex((index+d+items.length)%items.length)}
   async function toggleFull(){try{if(document.fullscreenElement)await document.exitFullscreen();else if(box.current?.requestFullscreen)await box.current.requestFullscreen();else setFull(f=>!f)}catch{setFull(f=>!f)}}

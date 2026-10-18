@@ -97,11 +97,11 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
   {open&&<div className="bpay-sheet" onClick={e=>{e.stopPropagation();if(e.target===e.currentTarget)close();}} onPointerDown={e=>e.stopPropagation()}>
    <div className="bpay-card" data-edge-back-modal ref={cardRef} role="dialog" aria-modal="true" aria-labelledby="bpay-title" tabIndex={-1} onClick={e=>e.stopPropagation()}>
     <h4 id="bpay-title">Zahlungsart</h4>
-    <div className="bpay-methods" role="radiogroup">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
+    <div className="bpay-methods" role="radiogroup" aria-label="Zahlungsart">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
     {blocked&&<p className="bpay-note" role="note">{CASH_BLOCK_TEXT}</p>}
     <label className="bpay-l" htmlFor="bpay-amt">Betrag (€), offen {fmtEur(due)}</label>
-    <input id="bpay-amt" className="bpay-in" inputMode="decimal" autoComplete="off" value={amount} disabled={busy} onChange={e=>{setAmount(e.target.value);setConfirm(false);}} aria-invalid={!!v.error}/>
-    {v.error&&<p className="bpay-err" role="alert">{v.error}</p>}
+    <input id="bpay-amt" className="bpay-in" inputMode="decimal" autoComplete="off" value={amount} disabled={busy} onChange={e=>{setAmount(e.target.value);setConfirm(false);}} aria-invalid={!!v.error} aria-describedby={v.error?'bpay-amt-err':undefined}/>
+    {v.error&&<p id="bpay-amt-err" className="bpay-err" role="alert">{v.error}</p>}
     {confirm&&canPay&&v.cents!==null&&<p className="bpay-conf">{fmtEur(v.cents)} per {METHODS.find(m=>m.id===method)!.label} buchen? Verbucht wird mit deinem Namen und Zeitstempel.</p>}
     {err&&<p className="bpay-err" role="alert">{err}</p>}
     <div className="bpay-act">

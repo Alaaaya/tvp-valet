@@ -31,7 +31,7 @@ export const UNAVAILABLE='Verlauf ist noch nicht verfügbar.';
 export const NO_CALLS='Keine Anrufe erfasst.';
 export const NO_LOCATIONS='Keine Standortänderungen erfasst.';
 export function bookingDetailsText(b:Booking){
-  return ['Booking #'+b.code,b.external_id&&'External ID: '+b.external_id,'Platform: '+b.platform,'Name: '+b.customer_name,b.phone&&'Phone: '+b.phone,b.email&&'Email: '+b.email,'Persons: '+b.persons,'Car: '+b.plate,'Product: '+b.product+' ('+(b.covered?'covered':'open')+')',b.spot&&'Spot: '+b.spot,'Parking: '+stamp(b.arrival_at),'Return: '+stamp(b.departure_at),b.flight_in&&'Flight in: '+b.flight_in,b.flight_out&&'Flight out: '+b.flight_out,'Total: '+money(b.total),'Paid: '+money(b.paid),'Due: '+money(Math.max(0,b.total-b.paid))].filter(Boolean).join('\n');
+  return ['Booking #'+b.code,b.external_id&&'External ID: '+b.external_id,'Platform: '+b.platform,'Name: '+b.customer_name,b.phone&&'Phone: '+b.phone,b.email&&'Email: '+b.email,'Persons: '+b.persons,'Car: '+b.plate,'Product: '+b.product+' ('+(b.covered?'covered':'open')+')',b.spot&&'Spot: '+b.spot,'Parking: '+stamp(b.arrival_at),'Return: '+stamp(b.departure_at),b.flight_in&&'Flight in: '+b.flight_in,b.flight_out&&'Flight out: '+b.flight_out,'Total: '+money(b.total),'Paid: '+money(b.paid),'Due: '+money(Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100)].filter(Boolean).join('\n');
 }
 export async function copyText(text:string,doc:Document=document,nav:Navigator|undefined=typeof navigator!=='undefined'?navigator:undefined){
   try{if(nav?.clipboard?.writeText){await nav.clipboard.writeText(text);return}}catch{/* fall back */}
