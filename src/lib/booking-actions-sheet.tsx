@@ -45,11 +45,13 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
   const box=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null),saving=useRef(false);
   useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;const first=box.current?.querySelector<HTMLElement>('button:not(:disabled),input');first?.focus();return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
   useEffect(()=>{setErr('');setMsg('');const first=box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input');first?.focus()},[view]);
-  const back=()=>{if(saving.current)return;view==='menu'?p.onClose():setView('menu')};
+  const draftDirty=()=>view==='location'&&spot.trim()!==''&&spot.trim()!==b.spot;
+  /** every dismissal path (X, backdrop, Escape, edge swipe, Abbrechen) goes through here; returns false when blocked/declined */
+  const back=():boolean=>{if(saving.current||work)return false;if(draftDirty()&&!window.confirm('Ungespeicherten Standort verwerfen?'))return false;view==='menu'?p.onClose():setView('menu');return true};
   const scrim=useRef<HTMLDivElement>(null);
-  useEdgeBack(box,{enabled:true,priority:40,blocked:work,onBack:()=>{if(saving.current)return false;if(view==='location'&&spot.trim()!==''&&spot.trim()!==b.spot&&!window.confirm('Ungespeicherten Standort verwerfen?'))return false;back()}});
+  useEdgeBack(box,{enabled:true,priority:40,blocked:work,onBack:()=>{if(!back())return false}});
   const keys=(e:React.KeyboardEvent)=>{
-    if(e.key==='Escape'){e.stopPropagation();back();return}
+    if(e.key==='Escape'){e.stopPropagation();e.preventDefault();back();return}
     if(e.key!=='Tab')return;
     const f=Array.from(box.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),a[href]')||[]).filter(x=>!x.closest('.undo-scrim'));
     if(!f.length||document.querySelector('.undo-scrim'))return;
@@ -62,10 +64,10 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
   const calls=p.callHistory;
   const title=view==='menu'?'Edit':view==='location'?'Change location':view==='locHistory'?'Location history':view==='callHistory'?'Calllist history':view==='cancel'?'Cancel booking':'No show';
   const item=(label:string,onClick:()=>void,o:{disabled?:boolean;danger?:boolean;note?:string}={})=><button type="button" role="menuitem" className={'bas-item'+(o.danger?' danger':'')} disabled={o.disabled} onClick={onClick}><span>{label}</span>{o.note&&<small>{o.note}</small>}</button>;
-  return <div ref={scrim} className="bas-scrim" onClick={back}>
+  return <div ref={scrim} className="bas-scrim" onClick={()=>{back()}}>
     <div ref={box} className="bas" role="dialog" aria-modal="true" aria-labelledby="bas-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
       <div className="bas-handle" aria-hidden="true"/>
-      <header className="bas-head"><h2 id="bas-t">{title}</h2><button type="button" className="bas-x" aria-label={view==='menu'?'Schließen':'Zurück'} onClick={back}><X size={20}/></button></header>
+      <header className="bas-head"><h2 id="bas-t">{title}</h2><button type="button" className="bas-x" aria-label={view==='menu'?'Schließen':'Zurück'} onClick={()=>{back()}} disabled={work}><X size={20}/></button></header>
       {err&&<p className="bas-err" role="alert">{err}</p>}{msg&&<p className="bas-msg" role="status">{msg}</p>}
       {view==='menu'&&<div role="menu">
         <h3 className="bas-sec">MODIFY</h3>
@@ -85,7 +87,7 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
       {view==='location'&&<form className="bas-form" onSubmit={e=>{e.preventDefault();if(!locChanged||!p.onChangeLocation)return;void run(()=>p.onChangeLocation!({spot:spot.trim()}),()=>{p.onClose()})}}>
         <p className="bas-hint">Aktuell: Platz {b.spot||'–'}</p>
         <label>Neuer Stellplatz<input data-first maxLength={100} value={spot} placeholder={b.spot||'z. B. 12'} onChange={e=>setSpot(e.target.value)} autoComplete="off"/></label>
-        <div className="bas-row"><button type="button" className="bas-btn" onClick={()=>setView('menu')} disabled={work}>Abbrechen</button><button className="bas-btn primary" disabled={!locChanged||work} aria-busy={work}>{work?'Wird gespeichert …':'Speichern'}</button></div></form>}
+        <div className="bas-row"><button type="button" className="bas-btn" onClick={()=>{back()}} disabled={work}>Abbrechen</button><button className="bas-btn primary" disabled={!locChanged||work} aria-busy={work}>{work?'Wird gespeichert …':'Speichern'}</button></div></form>}
       {view==='locHistory'&&<div className="bas-list">{!p.locationHistory?<p className="bas-hint">{UNAVAILABLE}</p>:!p.locationHistory.length?<p className="bas-hint">{NO_LOCATIONS}</p>:p.locationHistory.map(l=><p key={l.id}><strong>{stamp(l.occurred_at)}</strong><span>{(l.old_spot||'–')+' → '+(l.new_spot||'–')}{l.actor_name?' · '+l.actor_name:''}</span></p>)}</div>}
       {view==='callHistory'&&<div className="bas-list">{!calls?<p className="bas-hint">{UNAVAILABLE}</p>:!calls.length?<p className="bas-hint">{NO_CALLS}</p>:calls.map(c=><p key={c.id}><strong>{stamp(c.occurred_at)}</strong><span>Kunde angerufen{c.actor_name?' · '+c.actor_name:''}</span></p>)}</div>}
       {view==='cancel'&&<div className="bas-form"><p className="bas-hint">{b.plate} · #{b.code} wird storniert. Das wird protokolliert.</p>
