@@ -18,4 +18,8 @@ describe('pwa assets',()=>{
     expect(html).toContain('apple-mobile-web-app-capable');
     expect(html).toContain('<meta charset="utf-8">');
   });
+  it('viewport allows pinch zoom and keeps cover',()=>{
+    const v=html.match(/<meta name="viewport" content="([^"]*)"/)![1];
+    expect(v).not.toMatch(/maximum-scale|user-scalable/);expect(v).toContain('viewport-fit=cover');expect(v).toContain('initial-scale=1');
+  });
 });
