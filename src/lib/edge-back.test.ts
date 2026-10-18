@@ -79,6 +79,22 @@ describe('controller', () => {
     const c = createController({ root: () => root as any, entry: () => entry, onBack: () => {}, reducedMotion: () => true, viewportWidth: () => 400, now: () => 1, externalBlocked: () => b });
     expect(c.start(1, 5, 5, null)).toBe(false); b = false; expect(c.start(1, 5, 5, null)).toBe(true); c.cancel(); registry.remove(entry);
   });
+  it('stale velocity after hold is not a flick', () => {
+    let n = 0; let now = 0; const root = mkRoot(); const entry = registry.add({ root, priority: 1, enabled: true, blocked: false });
+    const c = createController({ root: () => root as any, entry: () => entry, onBack: () => { n++; }, reducedMotion: () => true, viewportWidth: () => 400, now: () => now });
+    c.start(1, 5, 0, null); now = 10; c.move(1, 25, 0); now = 20; c.move(1, 60, 0); now = 400; c.end(1);
+    expect(n).toBe(0); registry.remove(entry);
+  });
+  it('root change mid-drag cancels', () => {
+    let cur: any = mkRoot(); const entry = registry.add({ root: cur, priority: 1, enabled: true, blocked: false });
+    const c = createController({ root: () => cur, entry: () => entry, onBack: () => {}, reducedMotion: () => true, viewportWidth: () => 400, now: () => 1 });
+    c.start(1, 5, 0, null); c.move(1, 30, 0); cur = mkRoot(); c.move(1, 60, 0);
+    expect(c.phase).toBe('idle'); registry.remove(entry);
+  });
+  it('disabled mid-drag cancels', () => {
+    const s = setup(); s.c.start(1, 5, 0, null); s.c.move(1, 30, 0); s.entry.enabled = false; s.c.move(1, 60, 0);
+    expect(s.c.phase).toBe('idle'); expect(s.root.style.transform).toBe('x'); registry.remove(s.entry);
+  });
   it('disabled / blocked / lower priority cannot start; cancel cleans', () => {
     const s = setup(); const top = registry.add({ root: 9, priority: 9, enabled: true, blocked: false });
     expect(s.c.start(1, 5, 5, null)).toBe(false);

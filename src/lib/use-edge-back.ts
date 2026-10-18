@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import {
   createController,
   registry,
@@ -23,9 +23,9 @@ const getOx = (el: ElementLike) =>
 /** a visible modal/alert dialog outside the root blocks swiping the page underneath */
 function hasForeignDialog(root: HTMLElement | null): boolean {
   if (typeof document === 'undefined') return false;
-  const ds = document.querySelectorAll('[role="alertdialog"],[role="dialog"][aria-modal="true"],dialog[open]');
+  const ds = document.querySelectorAll('[role="alertdialog"],[role="dialog"],dialog[open],[aria-modal="true"],[data-edge-back-modal]');
   for (const d of Array.from(ds)) {
-    if (root && (root.contains(d) || d.contains(root))) continue;
+    if (d === root || (root && d.contains(root))) continue; // own dialog-root / ancestor allowed; nested dialogs inside root block
     const el = d as HTMLElement;
     if (el.hidden || el.getAttribute('aria-hidden') === 'true') continue;
     if (el.getClientRects().length > 0) return true;
@@ -49,14 +49,15 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
   const cancelRef = useRef<(() => void) | null>(null);
 
   // keep registry entry in sync; cancel a running drag when scope changes
-  useEffect(() => {
+  useLayoutEffect(() => {
     const e = entryRef.current;
+    if (e) e.root = ref.current;
     if (e) {
       e.enabled = opts.enabled;
       e.blocked = !!opts.blocked;
       e.priority = opts.priority;
     }
-    if (!opts.enabled || opts.blocked) cancelRef.current?.();
+    cancelRef.current?.(); // enabled/blocked/priority changed: never keep a stale drag
   }, [opts.enabled, opts.blocked, opts.priority]);
   useEffect(() => () => cancelRef.current?.(), [opts.key]);
 

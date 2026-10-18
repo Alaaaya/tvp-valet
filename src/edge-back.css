@@ -1,9 +1,9 @@
-/* scoped to the one page root that opts in via useEdgeBack; never on app shell */
+/* scoped to the one page root that opts in via useEdgeBack; never on app shell. no shadow, no blur */
 .edge-back-dragging,
 .edge-back-settling {
   will-change: transform;
-  touch-action: pan-y;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+  outline: 1px solid var(--edge-back-border, #3a3a3a);
+  outline-offset: 0;
 }
 .edge-back-dragging { transition: none !important; }
 .edge-back-settling { pointer-events: none; }

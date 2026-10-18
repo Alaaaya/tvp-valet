@@ -203,6 +203,7 @@ export function createController(o: ControllerOpts) {
     /** returns true when the event should be preventDefault-ed */
     move(pid: unknown, x: number, y: number): boolean {
       if (pid !== id) return false;
+      if (phase === 'dragging' && (boundRoot !== o.root() || o.entry()?.enabled === false || o.entry()?.blocked || o.externalBlocked?.())) { self.cancel(); return false; }
       if (phase === 'pending') {
         const intent = decideIntent(x - sx, y - sy);
         if (intent === 'vertical') { cleanup(); return false; }
@@ -224,6 +225,8 @@ export function createController(o: ControllerOpts) {
       if (pid !== id) return;
       if (phase === 'pending') { cleanup(); return; }
       if (phase !== 'dragging') return;
+      if (boundRoot !== o.root()) { self.cancel(); return; }
+      if (o.now() - lastT > 100) vel = 0; // held still before release: not a flick
       const go = shouldComplete(dx, width, vel);
       const my = epoch;
       if (!go) { settle(0, cleanup); return; }
