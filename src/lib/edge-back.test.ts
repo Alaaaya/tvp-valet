@@ -74,6 +74,11 @@ describe('controller', () => {
     s.c.start(1, 5, 100, null); s.c.move(1, 20, 100); s.c.move(1, 300, 100); s.c.end(1);
     expect(s.c.phase).toBe('idle'); expect(s.root.style.transform).toBe('x'); registry.remove(s.entry);
   });
+  it('external dialog blocks start', () => {
+    let b = true; const root = mkRoot(); const entry = registry.add({ root, priority: 1, enabled: true, blocked: false });
+    const c = createController({ root: () => root as any, entry: () => entry, onBack: () => {}, reducedMotion: () => true, viewportWidth: () => 400, now: () => 1, externalBlocked: () => b });
+    expect(c.start(1, 5, 5, null)).toBe(false); b = false; expect(c.start(1, 5, 5, null)).toBe(true); c.cancel(); registry.remove(entry);
+  });
   it('disabled / blocked / lower priority cannot start; cancel cleans', () => {
     const s = setup(); const top = registry.add({ root: 9, priority: 9, enabled: true, blocked: false });
     expect(s.c.start(1, 5, 5, null)).toBe(false);

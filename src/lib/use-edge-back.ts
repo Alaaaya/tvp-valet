@@ -13,17 +13,42 @@ export interface EdgeBackOptions {
   onBack: () => BackResult; // return false (or reject) to refuse; void = allowed
   priority: number;
   blocked?: boolean;
+  /** change (e.g. selected booking id) cancels the current gesture even if the DOM root is reused */
+  key?: unknown;
 }
 
 const getOx = (el: ElementLike) =>
   typeof getComputedStyle === 'function' ? getComputedStyle(el as Element).overflowX : 'visible';
 
+/** a visible modal/alert dialog outside the root blocks swiping the page underneath */
+function hasForeignDialog(root: HTMLElement | null): boolean {
+  if (typeof document === 'undefined') return false;
+  const ds = document.querySelectorAll('[role="alertdialog"],[role="dialog"][aria-modal="true"],dialog[open]');
+  for (const d of Array.from(ds)) {
+    if (root && (root.contains(d) || d.contains(root))) continue;
+    const el = d as HTMLElement;
+    if (el.hidden || el.getAttribute('aria-hidden') === 'true') continue;
+    if (el.getClientRects().length > 0) return true;
+  }
+  return false;
+}
+
+/** register a blocker (e.g. a custom payment confirm) that stops lower back gestures while active */
+export function useEdgeBackBlock(active: boolean, priority = 1000): void {
+  useEffect(() => {
+    if (!active) return;
+    const e = registry.add({ root: null, priority, enabled: true, blocked: true });
+    return () => registry.remove(e);
+  }, [active, priority]);
+}
+
 export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOptions): void {
   const optsRef = useRef(opts);
   optsRef.current = opts;
   const entryRef = useRef<RegEntry | null>(null);
+  const cancelRef = useRef<(() => void) | null>(null);
 
-  // keep registry entry in sync
+  // keep registry entry in sync; cancel a running drag when scope changes
   useEffect(() => {
     const e = entryRef.current;
     if (e) {
@@ -31,7 +56,9 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       e.blocked = !!opts.blocked;
       e.priority = opts.priority;
     }
-  });
+    if (!opts.enabled || opts.blocked) cancelRef.current?.();
+  }, [opts.enabled, opts.blocked, opts.priority]);
+  useEffect(() => () => cancelRef.current?.(), [opts.key]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -55,7 +82,11 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
         entry.root = r;
         return r as never;
       },
-      entry: () => (entry.root === ref.current ? entry : null),
+      entry: () => {
+        entry.root = ref.current; // root may mount after the hook (login -> app)
+        return ref.current ? entry : null;
+      },
+      externalBlocked: () => hasForeignDialog(ref.current),
       onBack: () => optsRef.current.onBack(),
       reducedMotion: () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
       viewportWidth: () => window.innerWidth,
@@ -65,6 +96,7 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
         restore: () => { html.style.overflowX = prevOx; },
       },
     });
+    cancelRef.current = () => ctl.cancel();
     const inRoot = (t: EventTarget | null) => !!(t && ref.current && ref.current.contains(t as Node));
     const onTouchStart = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
@@ -104,6 +136,7 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       window.removeEventListener('blur', onCancel);
       document.removeEventListener('visibilitychange', onVis);
       ctl.destroy();
+      cancelRef.current = null;
       registry.remove(entry);
       entryRef.current = null;
     };

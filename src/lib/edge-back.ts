@@ -125,6 +125,7 @@ export interface ControllerOpts {
   onBack: () => BackResult;
   reducedMotion: () => boolean;
   clip?: { set(): void; restore(): void }; // document overflow clip
+  externalBlocked?: () => boolean;
   viewportWidth: () => number;
   now: () => number;
   settleMs?: number;
@@ -191,6 +192,7 @@ export function createController(o: ControllerOpts) {
       if (!e || !e.enabled || e.blocked || top !== e) return false;
       const r = o.root();
       if (!r) return false;
+      if (o.externalBlocked?.()) return false;
       return !isExcludedTarget(target, r as unknown as ElementLike, getOx);
     },
     start(pid: unknown, x: number, y: number, target: ElementLike | null, getOx?: (el: ElementLike) => string): boolean {
@@ -206,7 +208,7 @@ export function createController(o: ControllerOpts) {
         if (intent === 'vertical') { cleanup(); return false; }
         if (intent === 'pending') return false;
         const r = o.root(), e = o.entry();
-        if (!r || !e || registry.active() !== e) { cleanup(); return false; }
+        if (!r || !e || registry.active() !== e || o.externalBlocked?.()) { cleanup(); return false; }
         width = Math.max(1, r.offsetWidth || r.clientWidth || o.viewportWidth());
         begin(r);
         phase = 'dragging';
