@@ -46,7 +46,7 @@ export function MediaGallery({bookingId,demo,refreshKey,local,addTile}:{bookingI
 function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
   const m=items[index],box=useRef<HTMLDivElement>(null),[full,setFull]=useState(false),[msg,setMsg]=useState(''),[busy,setBusy]=useState('');
   const strip=useRef<HTMLDivElement>(null),root=useRef<HTMLDivElement>(null);
-  useEdgeBack(root,{enabled:true,priority:60,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
+  useEdgeBack(root,{enabled:true,priority:60,blocked:!!busy,key:m.id,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
   useEffect(()=>{ensure(m);const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=o}},[]);
   useEffect(()=>{ensure(m);const t=window.setInterval(()=>ensure(m),30000);return()=>clearInterval(t)},[m,ensure]);
   useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const el=strip.current?.children[index] as HTMLElement|undefined;el?.scrollIntoView?.({inline:'center',block:'nearest'})},[index]);
