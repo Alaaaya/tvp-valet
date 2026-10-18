@@ -2,6 +2,7 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {X} from 'lucide-react';
 import {stamp,money,type Booking} from '../model';
 import {trapTab} from './undo-controls';
+import {useEdgeBack} from './use-edge-back';
 import type {BookingLocationHistory,BookingCallHistory} from './booking-actions';
 import '../booking-actions-sheet.css';
 
@@ -45,6 +46,8 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
   useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;const first=box.current?.querySelector<HTMLElement>('button:not(:disabled),input');first?.focus();return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
   useEffect(()=>{setErr('');setMsg('');const first=box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input');first?.focus()},[view]);
   const back=()=>{if(saving.current)return;view==='menu'?p.onClose():setView('menu')};
+  const scrim=useRef<HTMLDivElement>(null);
+  useEdgeBack(scrim,{enabled:true,priority:40,blocked:work,onBack:()=>{if(saving.current)return false;if(view==='location'&&spot.trim()!==''&&spot.trim()!==b.spot&&!window.confirm('Ungespeicherten Standort verwerfen?'))return false;back()}});
   const keys=(e:React.KeyboardEvent)=>{
     if(e.key==='Escape'){e.stopPropagation();back();return}
     if(e.key!=='Tab')return;
@@ -59,7 +62,7 @@ export function BookingActionsSheet(p:BookingActionsSheetProps){
   const calls=p.callHistory;
   const title=view==='menu'?'Edit':view==='location'?'Change location':view==='locHistory'?'Location history':view==='callHistory'?'Calllist history':view==='cancel'?'Cancel booking':'No show';
   const item=(label:string,onClick:()=>void,o:{disabled?:boolean;danger?:boolean;note?:string}={})=><button type="button" role="menuitem" className={'bas-item'+(o.danger?' danger':'')} disabled={o.disabled} onClick={onClick}><span>{label}</span>{o.note&&<small>{o.note}</small>}</button>;
-  return <div className="bas-scrim" onClick={back}>
+  return <div ref={scrim} className="bas-scrim" onClick={back}>
     <div ref={box} className="bas" role="dialog" aria-modal="true" aria-labelledby="bas-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
       <div className="bas-handle" aria-hidden="true"/>
       <header className="bas-head"><h2 id="bas-t">{title}</h2><button type="button" className="bas-x" aria-label={view==='menu'?'Schließen':'Zurück'} onClick={back}><X size={20}/></button></header>

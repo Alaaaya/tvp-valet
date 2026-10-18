@@ -3,6 +3,7 @@ import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
 import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} from './booking-scan-parse';
 import {createQrDecoder,decodeQrFromFile,validateImageFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
+import {useEdgeBack} from './use-edge-back';
 import '../booking-scan.css';
 
 export interface ScanLookup{kind:'qr'|'plate';value:string}
@@ -21,6 +22,8 @@ export function BookingScanSheet(p:BookingScanSheetProps){
   const box=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null);
   useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
   useEffect(()=>{box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input')?.focus()},[view,found]);
+  const scrim=useRef<HTMLDivElement>(null);
+  useEdgeBack(scrim,{enabled:true,blocked:true,priority:80,onBack:()=>{}});
   const back=()=>{if(found){setFound(null);return}view==='menu'?p.onClose():setView('menu')};
   const keys=(e:React.KeyboardEvent)=>{
     if(e.key==='Escape'){e.stopPropagation();back();return}
@@ -29,7 +32,7 @@ export function BookingScanSheet(p:BookingScanSheetProps){
     if(!f.length)return;const i=f.indexOf(document.activeElement as HTMLElement);e.preventDefault();f[trapTab(i,f.length,e.shiftKey)].focus();
   };
   const title=found?'Bestätigen':view==='menu'?'Scan':view==='qr'?'QR code':'License plate';
-  return <div className="bsc-scrim" onClick={p.onClose}>
+  return <div ref={scrim} className="bsc-scrim" onClick={p.onClose}>
     <div ref={box} className="bsc" role="dialog" aria-modal="true" aria-labelledby="bsc-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
       <div className="bsc-handle" aria-hidden="true"/>
       <header className="bsc-head">
