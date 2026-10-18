@@ -25,7 +25,17 @@ export function refreshSessionSafely(auth:RecoveryAuth, failedToken?:string):Pro
   const active=pending.get(auth);
   if(active)return active;
   const prior=recovered.get(auth);
-  if(failedToken&&prior?.failed===failedToken&&Date.now()-prior.at<10000)return Promise.resolve(prior.token);
+  if(failedToken&&prior?.failed===failedToken&&Date.now()-prior.at<10000){
+    // Delayed failures must not resurrect a bearer after logout/account switch.
+    return auth.getSession().then(current=>{
+      if(current.error)throw new TransientSessionError();
+      if(current.data.session?.access_token!==prior.token){
+        recovered.delete(auth);
+        throw new TransientSessionError();
+      }
+      return prior.token;
+    });
+  }
   const promise=(async()=>{
     let token:string|undefined,terminal=false,transient=false;
     try {
