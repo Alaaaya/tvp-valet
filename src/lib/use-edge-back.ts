@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import {
+  createClickSuppressor,
   createController,
   dialogsBlock,
   registry,
@@ -96,26 +97,35 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       },
     });
     cancelRef.current = () => ctl.cancel();
+    const sup = createClickSuppressor(() => performance.now());
+    let locked = false;
+    const lockMove = (v: boolean) => { if (v) { locked = true; sup.arm(); } return v; };
+    const onClick = (ev: MouseEvent) => {
+      if (sup.consume()) { ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); }
+    };
+    const resetLock = () => { locked = false; sup.clear(); };
     const inRoot = (t: EventTarget | null) => !!(t && ref.current && ref.current.contains(t as Node));
     const onTouchStart = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
       if (!inRoot(ev.target)) return;
+      resetLock();
       ctl.start(t.identifier, t.clientX, t.clientY, ev.target as unknown as ElementLike, getOx);
     };
     const onTouchMove = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
-      if (ctl.move(t.identifier, t.clientX, t.clientY) && ev.cancelable) ev.preventDefault();
+      if (lockMove(ctl.move(t.identifier, t.clientX, t.clientY)) && ev.cancelable) ev.preventDefault();
     };
     const onTouchEnd = (ev: TouchEvent) => { const t = ev.changedTouches[0]; if (t) ctl.end(t.identifier); };
     const onCancel = () => ctl.cancel();
     const onVis = () => { if (document.visibilityState !== 'visible') ctl.cancel(); };
     const onPtrDown = (ev: PointerEvent) => {
       if (ev.pointerType === 'touch' || !ev.isPrimary || !inRoot(ev.target)) return;
+      resetLock();
       ctl.start('p' + ev.pointerId, ev.clientX, ev.clientY, ev.target as unknown as ElementLike, getOx);
     };
-    const onPtrMove = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') ctl.move('p' + ev.pointerId, ev.clientX, ev.clientY); };
+    const onPtrMove = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') lockMove(ctl.move('p' + ev.pointerId, ev.clientX, ev.clientY)); };
     const onPtrUp = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') ctl.end('p' + ev.pointerId); };
     const on = [
       ['touchstart', onTouchStart, { passive: true }],
@@ -128,10 +138,12 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       ['pointercancel', onCancel, { passive: true }],
     ] as const;
     for (const [n, f, p] of on) window.addEventListener(n, f as EventListener, p);
+    window.addEventListener('click', onClick, true);
     window.addEventListener('blur', onCancel);
     document.addEventListener('visibilitychange', onVis);
     return () => {
       for (const [n, f] of on) window.removeEventListener(n, f as EventListener);
+      window.removeEventListener('click', onClick, true);
       window.removeEventListener('blur', onCancel);
       document.removeEventListener('visibilitychange', onVis);
       ctl.destroy();

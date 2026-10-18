@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dialogsBlock, decideIntent, shouldComplete, isEdgeStart, shouldUseCustomGesture, isExcludedTarget, createRegistry, createController, registry } from './edge-back';
+import { EXCLUDE_SELECTOR, createClickSuppressor, dialogsBlock, decideIntent, shouldComplete, isEdgeStart, shouldUseCustomGesture, isExcludedTarget, createRegistry, createController, registry } from './edge-back';
 
 const mkRoot = () => { const cls = new Set<string>(); return { style: { transform: 'x' } as any, offsetWidth: 400, classList: { add: (c: string) => cls.add(c), remove: (c: string) => cls.delete(c) }, cls }; };
 function setup(onBack: () => any = () => {}, over: any = {}) {
@@ -37,6 +37,20 @@ describe('edge helpers', () => {
     const sc: any = { closest: () => null, parentElement: root, scrollWidth: 900, clientWidth: 300, __overflowX: 'auto' };
     const kid: any = { closest: () => null, parentElement: sc };
     expect(isExcludedTarget(kid, root)).toBe(true);
+  });
+  it('buttons and links no longer excluded, inputs/canvas still are', () => {
+    const parts = EXCLUDE_SELECTOR.split(',');
+    expect(parts).not.toContain('button');
+    expect(parts).not.toContain('a');
+    for (const s of ['input', 'textarea', 'select', 'canvas', 'video']) expect(parts).toContain(s);
+  });
+  it('click suppressor is one-shot, expires, clearable', () => {
+    let t = 0;
+    const s = createClickSuppressor(() => t, 600);
+    expect(s.consume()).toBe(false); // plain tap untouched
+    s.arm(); expect(s.consume()).toBe(true); expect(s.consume()).toBe(false);
+    s.arm(); t = 1000; expect(s.consume()).toBe(false);
+    s.arm(); s.clear(); expect(s.consume()).toBe(false);
   });
   it('registry nested priority + blocked', () => {
     const r = createRegistry();
