@@ -4,6 +4,7 @@ import type {Booking} from '../model';
 import {createPendingMedia,saveHandover,type HandoverDetails,type PendingMedia} from './handover-api';
 import {CameraScreen} from './camera';
 import {SignatureField,renderSignature,type Stroke} from './signature';
+import {useEdgeBack} from './use-edge-back';
 
 export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;action:'in'|'out';onClose:()=>void;onDone:(b:Booking)=>void}){
   const[requestId]=useState(()=>crypto.randomUUID());
@@ -12,6 +13,8 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
   const[strokes,setStrokes]=useState<Stroke[]>([]),[busy,setBusy]=useState(false),[progress,setProgress]=useState(''),[err,setErr]=useState('');
   const sig=useRef<{n:number;item:PendingMedia}|null>(null),saving=useRef(false),alive=useRef(true);
   useEffect(()=>{alive.current=true;const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{alive.current=false;document.body.style.overflow=o}},[]);
+  const root=useRef<HTMLDivElement>(null);
+  useEdgeBack(root,{enabled:step==='details',priority:70,blocked:step==='camera'||askLeave||busy,onBack:()=>{setStep('camera')}});
   const label=action==='in'?'Check-in':'Check-out';
   const leave=()=>{if(busy)return;if(media.length||strokes.length||km||comment)setAskLeave(true);else onClose()};
 
@@ -35,7 +38,7 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
   // strokes signature key: count is enough because strokes only append or reset; reset+redraw with same count must regenerate
   const setS=(s:Stroke[])=>{sig.current=null;setStrokes(s)};
 
-  return <div className="ho">
+  return <div ref={root} className="ho">
     {step==='camera'&&<CameraScreen title={label+' · '+booking.plate} media={media} onAdd={m=>setMedia(x=>[...x,m])} onRemove={id=>setMedia(x=>x.filter(m=>m.id!==id))} onBack={leave} onDone={()=>setStep('details')}/>}
     {step==='details'&&<form className="ho-form" onSubmit={save} noValidate>
       <header><button type="button" className="ho-back" aria-label="Zurück zur Kamera" disabled={busy} onClick={()=>setStep('camera')}><ChevronLeft size={22}/></button><h2>Booking</h2><span/></header>

@@ -4,6 +4,7 @@ import {ArrowLeft,CalendarDays,Car,MessageSquare,Pencil,Save,User,X,Minus,Plus} 
 import {formatInTimeZone,fromZonedTime} from 'date-fns-tz';
 import type {Booking} from '../model';
 import {displayComment} from './comments';
+import {useEdgeBack} from './use-edge-back';
 
 const TZ='Europe/Berlin';
 /** Optional fields parent/backend will persist; extension until model.ts is updated. */
@@ -75,10 +76,11 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
  const [x,setX]=useState(()=>toDraft(booking));const [err,setErr]=useState('');const [busy,setBusy]=useState(false);const [ask,setAsk]=useState(false);const [dateEdit,setDateEdit]=useState({in:false,out:false});
  const dirty=useMemo(()=>isDirty(booking,x),[booking,x]);const problems=validate(booking,x);const can=dirty&&!problems.length&&!busy;
  const set=(k:keyof EditDraft,v:string|number)=>setX(s=>({...s,[k]:v}));
- const dlg=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null),inflight=useRef(false);
+ const root=useRef<HTMLDivElement>(null),dlg=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null),inflight=useRef(false);
  useEffect(()=>{onDirtyChange?.(dirty)},[dirty]);useEffect(()=>()=>onDirtyChange?.(false),[]);
  useEffect(()=>{if(ask){opener.current=document.activeElement as HTMLElement|null;dlg.current?.querySelector('button')?.focus()}else opener.current?.focus?.()},[ask]);
  const trap=(e:React.KeyboardEvent)=>{if(e.key==='Escape'){e.stopPropagation();setAsk(false);return}if(e.key!=='Tab')return;const bs=Array.from(dlg.current?.querySelectorAll('button')||[]) as HTMLElement[];if(!bs.length)return;const f=bs[0],l=bs[bs.length-1];if(e.shiftKey&&document.activeElement===f){e.preventDefault();l.focus()}else if(!e.shiftKey&&document.activeElement===l){e.preventDefault();f.focus()}else if(!dlg.current?.contains(document.activeElement)){e.preventDefault();f.focus()}};
+ useEdgeBack(root,{enabled:true,priority:30,blocked:ask||busy,onBack:()=>{back()}});
  const legacy=!x.first_name&&!x.last_name&&booking.customer_name.trim();
  const save=async()=>{if(!can||inflight.current)return;inflight.current=true;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{inflight.current=false;setBusy(false)}};
  const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
@@ -87,7 +89,7 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
   return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?'Parking date':'Return date'}</h3><button type="button" aria-label={(kind==='in'?'Parking date':'Return date')+' bearbeiten'} disabled={dis} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
   <div className="be-row"><input type="date" aria-label="Datum" disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label="Uhrzeit" disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
   {inp(f,'Flight number')}</section>};
- return <div className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label="Zurück" disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>Edit</h2><button type="button" className="be-save" disabled={!can} onClick={save}>Save</button></header>
+ return <div ref={root} className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label="Zurück" disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>Edit</h2><button type="button" className="be-save" disabled={!can} onClick={save}>Save</button></header>
  <div className="be-ext">Extern ID: {booking.external_id||booking.code}</div>
  {err&&<div className="be-err" role="alert">{err}</div>}
  <div className="be-body">

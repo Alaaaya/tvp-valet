@@ -1,6 +1,7 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {ChevronLeft,ChevronRight,Maximize2,Minimize2,Download,Share2,Camera,Video as VideoIcon,PenLine,Calendar,AlertTriangle} from 'lucide-react';
 import {listBookingMedia,signedMediaUrl,mediaBlob,type MediaItem} from './handover-api';
+import {useEdgeBack} from './use-edge-back';
 
 const RENEW_MS=240000;
 type U={url:string;at:number};
@@ -44,7 +45,8 @@ export function MediaGallery({bookingId,demo,refreshKey,local,addTile}:{bookingI
 
 function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
   const m=items[index],box=useRef<HTMLDivElement>(null),[full,setFull]=useState(false),[msg,setMsg]=useState(''),[busy,setBusy]=useState('');
-  const strip=useRef<HTMLDivElement>(null);
+  const strip=useRef<HTMLDivElement>(null),root=useRef<HTMLDivElement>(null);
+  useEdgeBack(root,{enabled:true,priority:60,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
   useEffect(()=>{ensure(m);const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=o}},[]);
   useEffect(()=>{ensure(m);const t=window.setInterval(()=>ensure(m),30000);return()=>clearInterval(t)},[m,ensure]);
   useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const el=strip.current?.children[index] as HTMLElement|undefined;el?.scrollIntoView?.({inline:'center',block:'nearest'})},[index]);
@@ -58,10 +60,10 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
   const canShare=typeof navigator!=='undefined'&&typeof navigator.share==='function'&&typeof navigator.canShare==='function';
   const u=map[m.id]?.url;
   const e=errs[m.id];
-  return <div className={'gv'+(full?' full':'')} role="dialog" aria-modal="true" aria-label="Medien">
+  return <div ref={root} className={'gv'+(full?' full':'')} role="dialog" aria-modal="true" aria-label="Medien">
     <header className="gv-head"><button type="button" className="gv-round" aria-label="Schließen" onClick={onClose}><ChevronLeft size={22}/></button><h2>Existing media</h2><span/></header>
     <div className="gv-stage" ref={box}>
-      <div className="gv-frame">{e?<div className="gv-load err" role="alert"><p>{e}</p><button type="button" className="gv-retry" onClick={()=>void retry(m)}>Erneut versuchen</button></div>:!u?<p className="gv-load" role="status">Wird geladen …</p>:m.kind==='video'?<video key={m.id+u.slice(-12)} src={u} controls playsInline preload="metadata" onLoadedMetadata={()=>good(m)} onError={()=>bad(m)}/>:<img key={m.id} src={u} alt={kindLabel(m.kind)+' '+(index+1)} onLoad={()=>good(m)} onError={()=>bad(m)} className={m.kind==='signature'?'sig-img':''}/>}</div>
+      <div className="gv-frame">{e?<div className="gv-load err" role="alert"><p>{e}</p><button type="button" className="gv-retry" onClick={()=>void retry(m)}>Erneut versuchen</button></div>:!u?<p className="gv-load" role="status">Wird geladen …</p>:m.kind==='video'?<video data-edge-back-exclude key={m.id+u.slice(-12)} src={u} controls playsInline preload="metadata" onLoadedMetadata={()=>good(m)} onError={()=>bad(m)}/>:<img key={m.id} src={u} alt={kindLabel(m.kind)+' '+(index+1)} onLoad={()=>good(m)} onError={()=>bad(m)} className={m.kind==='signature'?'sig-img':''}/>}</div>
       <span className="gv-count">{index+1} / {items.length}</span>
       <button type="button" className="gv-fs" aria-label={full?'Vollbild beenden':'Vollbild'} onClick={toggleFull}>{full?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button>
       {items.length>1&&<><button type="button" className="gv-nav l" aria-label="Zurück" onClick={()=>go(-1)}><ChevronLeft size={22}/></button><button type="button" className="gv-nav r" aria-label="Weiter" onClick={()=>go(1)}><ChevronRight size={22}/></button></>}
@@ -70,6 +72,6 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
       <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label="Teilen" disabled={!!busy} onClick={share}><Share2 size={18}/></button>}<button type="button" className="gv-round" aria-label="Herunterladen" disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
     {msg&&<p className="gv-msg" role="alert">{msg}</p>}
     <h3 className="gv-title">Media ({items.filter(i=>i.kind==='photo').length} photos{items.some(i=>i.kind==='video')?', '+items.filter(i=>i.kind==='video').length+' videos':''})</h3>
-    <div className="gv-strip" ref={strip}>{items.map((i,n)=><button type="button" key={i.id} className={n===index?'on':''} aria-label={'Medium '+(n+1)} aria-current={n===index} onClick={()=>{setMsg('');setIndex(n)}}>{i.kind==='video'?<span><VideoIcon size={20}/></span>:map[i.id]&&!errs[i.id]?<img src={map[i.id].url} alt="" loading="lazy" onLoad={()=>good(i)} onError={()=>bad(i)}/>:<span title={errs[i.id]}>{errs[i.id]?<AlertTriangle size={20}/>:<Camera size={20}/>}</span>}<b>{n+1}</b></button>)}</div>
+    <div className="gv-strip" ref={strip} data-edge-back-exclude>{items.map((i,n)=><button type="button" key={i.id} className={n===index?'on':''} aria-label={'Medium '+(n+1)} aria-current={n===index} onClick={()=>{setMsg('');setIndex(n)}}>{i.kind==='video'?<span><VideoIcon size={20}/></span>:map[i.id]&&!errs[i.id]?<img src={map[i.id].url} alt="" loading="lazy" onLoad={()=>good(i)} onError={()=>bad(i)}/>:<span title={errs[i.id]}>{errs[i.id]?<AlertTriangle size={20}/>:<Camera size={20}/>}</span>}<b>{n+1}</b></button>)}</div>
   </div>;
 }

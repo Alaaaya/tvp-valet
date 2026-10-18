@@ -3,6 +3,7 @@ import {ChevronLeft,RotateCcw,Bus,Car,Building2,Ship} from 'lucide-react';
 import type {Booking} from '../model';
 import {SERVICE_TYPES,bookingService,defaultMainFilters,normalizeMainFilters,type MainBookingFilters,type ServiceType} from './booking-filters';
 import {trapTab} from './undo-controls';
+import {useEdgeBack} from './use-edge-back';
 import '../main-filter.css';
 
 export interface MainFilterViewProps{filter:MainBookingFilters;onChange:(next:MainBookingFilters)=>void;date:string;onDate:(date:string)=>void;onClose:()=>void;rows:Booking[];userId?:string}
@@ -14,6 +15,7 @@ export function parseHours(v:string):number|null{const t=v.trim().replace(',','.
 export function MainFilterView({filter:raw,onChange,date,onDate,onClose,rows,userId}:MainFilterViewProps){
   const filter=normalizeMainFilters(raw);
   const box=useRef<HTMLDivElement>(null);
+  useEdgeBack(box,{enabled:true,priority:40,onBack:()=>{onClose()}});
   const[prodOpen,setProdOpen]=useState(filter.products.length>0),[placeOpen,setPlaceOpen]=useState(filter.placements.length>0);
   const[bef,setBef]=useState(String(filter.before)),[aft,setAft]=useState(String(filter.after));
   useEffect(()=>{setBef(String(filter.before))},[filter.before]);useEffect(()=>{setAft(String(filter.after))},[filter.after]);
