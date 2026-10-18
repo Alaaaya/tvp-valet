@@ -2,6 +2,8 @@ import React from 'react';
 import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ScanLine,Settings} from 'lucide-react';
 import {clock,money,stamp,type Booking} from '../model';
 import {displayComment} from './comments';
+import {paymentInstruction} from './payment-note';
+import '../payment-note.css';
 import type {BookingOperations,BookingOperationAction} from './operations';
 import '../booking-detail.css';
 
@@ -50,7 +52,7 @@ export function serviceInfo(b:Pick<Booking,'product'|'covered'>,location:string)
 const dateLong=(v:string)=>new Date(v).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Berlin'}).replace(',','');
 
 export function BookingDetailView(p:BookingDetailViewProps){
-  const b=p.booking,o=p.ops,due=Math.max(0,b.total-b.paid),c=displayComment(b.comment,true),info=serviceInfo(b,c.location);
+  const b=p.booking,o=p.ops,due=Math.max(0,b.total-b.paid),c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
     const key=b.id+':'+a;
     return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> {label} · {stamp(at)}</>:p.opsBusy===key?'Wird gespeichert …':label}</button>;
@@ -58,6 +60,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
   return <div className="bd">
     <header className="bd-head"><button type="button" aria-label="Schließen" className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>Booking #{b.code}</h2><button type="button" aria-label="Bearbeiten" className="bd-round" onClick={p.onEdit}><Settings size={21}/></button></header>
     <div className="pp-strip ext">External ID: {b.external_id||b.code}</div>
+    {pn&&<div className="bd-pay-note" role="alert"><Banknote size={18}/>{pn}</div>}
     {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> Outstanding amount: {money(due)}</div>}
     <section className="bd-identity">
       <div><span className="bd-label">Name</span><strong>{b.customer_name}</strong>
