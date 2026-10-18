@@ -80,7 +80,7 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
  useEffect(()=>{onDirtyChange?.(dirty)},[dirty]);useEffect(()=>()=>onDirtyChange?.(false),[]);
  useEffect(()=>{if(ask){opener.current=document.activeElement as HTMLElement|null;dlg.current?.querySelector('button')?.focus()}else opener.current?.focus?.()},[ask]);
  const trap=(e:React.KeyboardEvent)=>{if(e.key==='Escape'){e.stopPropagation();setAsk(false);return}if(e.key!=='Tab')return;const bs=Array.from(dlg.current?.querySelectorAll('button')||[]) as HTMLElement[];if(!bs.length)return;const f=bs[0],l=bs[bs.length-1];if(e.shiftKey&&document.activeElement===f){e.preventDefault();l.focus()}else if(!e.shiftKey&&document.activeElement===l){e.preventDefault();f.focus()}else if(!dlg.current?.contains(document.activeElement)){e.preventDefault();f.focus()}};
- useEdgeBack(root,{enabled:true,priority:30,blocked:ask||busy,onBack:()=>{back()}});
+ useEdgeBack(root,{enabled:true,priority:30,blocked:ask||busy,onBack:()=>{if(busy||inflight.current)return false;if(dirty){setAsk(true);return false}onBack()}});
  const legacy=!x.first_name&&!x.last_name&&booking.customer_name.trim();
  const save=async()=>{if(!can||inflight.current)return;inflight.current=true;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{inflight.current=false;setBusy(false)}};
  const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
