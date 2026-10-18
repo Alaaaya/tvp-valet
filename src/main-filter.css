@@ -18,3 +18,4 @@
 .mf-chip.on{background:#d9534f;border-color:#d9534f;color:#fff}.mf-chip:disabled{opacity:.5}
 .mf-hint{display:block;margin:10px 4px 0}
 .mf-reset{width:100%;margin-top:18px;min-height:48px;border-radius:12px;background:#6dbdae;color:#fff;font-size:17px;font-weight:700}
+.mf-date{width:min(150px,48vw);min-width:130px;padding-inline:8px}
