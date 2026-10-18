@@ -15,3 +15,10 @@ it('identity switches synchronously invalidate old booking and flight work befor
  expect(s).toContain('},[session,authUid,demo])');
  expect(s).toContain('[date,mf,query,view,session,authUid,demo,selected?.id]');
 });
+
+it('late legacy media results cannot cross account or booking switches',()=>{
+ expect(s).toContain('const id=++photoReq.current,uid=sessionUid.current');
+ expect(s).toContain('id===photoReq.current&&uid===sessionUid.current');
+ expect(s).toContain('if(valid())setPhotos(items)');
+ expect(s).toContain('const resetSessionState=()=>{photoReq.current++');
+});
