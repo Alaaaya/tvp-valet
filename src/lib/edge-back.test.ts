@@ -44,13 +44,49 @@ describe('edge helpers', () => {
     expect(parts).not.toContain('a');
     for (const s of ['input', 'textarea', 'select', 'canvas', 'video']) expect(parts).toContain(s);
   });
-  it('click suppressor is one-shot, expires, clearable', () => {
-    let t = 0;
-    const s = createClickSuppressor(() => t, 600);
-    expect(s.consume()).toBe(false); // plain tap untouched
-    s.arm(); expect(s.consume()).toBe(true); expect(s.consume()).toBe(false);
-    s.arm(); t = 1000; expect(s.consume()).toBe(false);
-    s.arm(); s.clear(); expect(s.consume()).toBe(false);
+  describe('click suppressor bound to one gesture', () => {
+    const mk = () => { let t = 0; const s = createClickSuppressor(() => t); return { s, adv: (ms: number) => { t += ms; } }; };
+    const btn = {}, other = {};
+    it('tap with no lock never swallows', () => {
+      const { s } = mk(); s.fresh(1);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(false);
+    });
+    it('swallows exactly one released click on origin', () => {
+      const { s } = mk(); s.lock(1, btn); s.release(1);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(true);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(false);
+    });
+    it('window starts at release: a drag held longer than ttl still suppresses', () => {
+      const { s, adv } = mk(); s.lock(1, btn); adv(5000); s.release(1);
+      adv(100); expect(s.consume({ target: btn, detail: 1 })).toBe(true);
+    });
+    it('click before release is not consumed and keeps state', () => {
+      const { s } = mk(); s.lock(1, btn);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(false);
+      expect(s.state).toBe('held');
+    });
+    it('expires after release', () => {
+      const { s, adv } = mk(); s.lock(1, btn); s.release(1); adv(800);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(false);
+    });
+    it('keyboard click (detail 0) and unrelated target are not swallowed', () => {
+      const a = mk(); a.s.lock(1, btn); a.s.release(1);
+      expect(a.s.consume({ target: btn, detail: 0 })).toBe(false);
+      const b = mk(); b.s.lock(1, btn); b.s.release(1);
+      expect(b.s.consume({ target: other, detail: 1 })).toBe(false);
+    });
+    it('wrong id release (cancel of another touch) does not open window', () => {
+      const { s } = mk(); s.lock(1, btn); s.release(2);
+      expect(s.state).toBe('held');
+    });
+    it('fresh input start anywhere clears a released window', () => {
+      const { s } = mk(); s.lock(1, btn); s.release(1); s.fresh();
+      expect(s.consume({ target: btn, detail: 1 })).toBe(false);
+    });
+    it('touchcancel path is a release like touchend', () => {
+      const { s } = mk(); s.lock(7, btn); s.release(7);
+      expect(s.consume({ target: btn, detail: 1 })).toBe(true);
+    });
   });
   it('registry nested priority + blocked', () => {
     const r = createRegistry();

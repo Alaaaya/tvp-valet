@@ -76,17 +76,38 @@ export function isExcludedTarget(
   return false;
 }
 
-/** After a horizontal edge-back drag started on a button/link, swallow only the ensuing click. */
-export function createClickSuppressor(now: () => number, ttlMs = 600) {
+export interface ClickLike { target: unknown; detail: number; isTrusted?: boolean }
+/**
+ * Swallows the single synthetic click that follows ONE horizontal edge-back gesture.
+ * Bound to the gesture's origin target + input id; the window only starts at release
+ * (so a long held drag never expires early). Keyboard clicks (detail 0), clicks on
+ * unrelated elements, and clicks after any fresh input start are never swallowed.
+ */
+export function createClickSuppressor(
+  now: () => number,
+  related: (a: unknown, b: unknown) => boolean = (a, b) => a === b,
+  ttlMs = 700,
+) {
+  let origin: unknown = null;
+  let pid: unknown = null;
+  let state: 'off' | 'held' | 'released' = 'off';
   let until = 0;
+  const reset = () => { origin = null; pid = null; state = 'off'; until = 0; };
   return {
-    arm() { until = now() + ttlMs; },
-    clear() { until = 0; },
+    get state() { return state; },
+    /** horizontal intent locked for this input id, started on origin */
+    lock(id: unknown, target: unknown) { origin = target; pid = id; state = 'held'; until = 0; },
+    /** input released/cancelled: now (and only now) the click window opens */
+    release(id: unknown) { if (state === 'held' && id === pid) { state = 'released'; until = now() + ttlMs; } },
+    /** any fresh input start (touch/pointer/key) anywhere ends the gesture's association */
+    fresh(id?: unknown) { if (state === 'held' && id !== undefined && id === pid) return; reset(); },
+    clear: reset,
     /** true = swallow this click (one-shot) */
-    consume(): boolean {
-      if (until && now() <= until) { until = 0; return true; }
-      until = 0;
-      return false;
+    consume(ev: ClickLike): boolean {
+      if (state !== 'released') return false;
+      const ok = now() <= until && ev.detail > 0 && related(ev.target, origin);
+      reset();
+      return ok;
     },
   };
 }
