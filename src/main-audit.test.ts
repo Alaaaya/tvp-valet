@@ -22,3 +22,5 @@ it('late legacy media results cannot cross account or booking switches',()=>{
  expect(s).toContain('if(valid())setPhotos(items)');
  expect(s).toContain('const resetSessionState=()=>{photoReq.current++');
 });
+
+it('header filter exists only on the two views that render its filter sheet',()=>{expect(s).toContain("{(view==='today'||view==='new')&&<button type=\"button\" aria-label=\"Filter\"");});
