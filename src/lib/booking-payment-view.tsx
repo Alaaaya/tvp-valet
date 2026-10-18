@@ -95,7 +95,7 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
   {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?'Zahlung nur für bestätigte Buchungen.':'Zahlung nur für Admin/Mitarbeiter verfügbar.'}</p>}
   <div className="bpay-soon">{['Zahlungslink per E-Mail','Rechnung per E-Mail','QR-Zahlung'].map(t=><button key={t} type="button" disabled aria-disabled="true">{t} <em>bald</em></button>)}</div>
   {open&&<div className="bpay-sheet" onClick={e=>{e.stopPropagation();if(e.target===e.currentTarget)close();}} onPointerDown={e=>e.stopPropagation()}>
-   <div className="bpay-card" ref={cardRef} role="dialog" aria-modal="true" aria-labelledby="bpay-title" tabIndex={-1} onClick={e=>e.stopPropagation()}>
+   <div className="bpay-card" data-edge-back-modal ref={cardRef} role="dialog" aria-modal="true" aria-labelledby="bpay-title" tabIndex={-1} onClick={e=>e.stopPropagation()}>
     <h4 id="bpay-title">Zahlungsart</h4>
     <div className="bpay-methods" role="radiogroup">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
     {blocked&&<p className="bpay-note" role="note">{CASH_BLOCK_TEXT}</p>}
