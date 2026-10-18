@@ -7,3 +7,10 @@ describe('use-edge-back', () => {
     expect(registry.size()).toBe(0);
   });
 });
+import { readFileSync } from 'node:fs';
+describe('edge-back css', () => {
+  it('has no shadow or blur', () => {
+    const css = readFileSync(new URL('../edge-back.css', import.meta.url), 'utf8').replace(/\/\*[^]*?\*\//g, '');
+    expect(css).not.toMatch(/box-shadow\s*:\s*[^n]|blur|backdrop/);
+  });
+});
