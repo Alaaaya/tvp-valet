@@ -97,53 +97,71 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       },
     });
     cancelRef.current = () => ctl.cancel();
-    const sup = createClickSuppressor(() => performance.now());
-    let locked = false;
-    const lockMove = (v: boolean) => { if (v) { locked = true; sup.arm(); } return v; };
-    const onClick = (ev: MouseEvent) => {
-      if (sup.consume()) { ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); }
+    const rel = (a: unknown, b: unknown) => {
+      const x = a as Node | null, y = b as Node | null;
+      return !!x && !!y && (x === y || x.contains(y) || y.contains(x));
     };
-    const resetLock = () => { locked = false; sup.clear(); };
+    const sup = createClickSuppressor(() => performance.now(), rel);
+    let ownerId: unknown = null; // input id this hook's controller locked
+    let originEl: EventTarget | null = null;
+    let startId: unknown = null, startEl: EventTarget | null = null;
+    const lockMove = (id: unknown, v: boolean) => {
+      if (v && ownerId === null) { ownerId = id; sup.lock(id, startEl); originEl = startEl; }
+      return v;
+    };
+    const releaseInput = (id: unknown) => { if (ownerId !== null && id === ownerId) { sup.release(id); ownerId = null; } };
+    const onClick = (ev: MouseEvent) => {
+      if (sup.consume({ target: ev.target, detail: ev.detail })) {
+        ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation();
+      }
+    };
+    const onFresh = (id: unknown, el: EventTarget | null) => { sup.fresh(); ownerId = null; originEl = null; startId = id; startEl = el; };
+    const onKey = () => sup.clear();
     const inRoot = (t: EventTarget | null) => !!(t && ref.current && ref.current.contains(t as Node));
     const onTouchStart = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
+      onFresh(t.identifier, ev.target);
       if (!inRoot(ev.target)) return;
-      resetLock();
       ctl.start(t.identifier, t.clientX, t.clientY, ev.target as unknown as ElementLike, getOx);
     };
     const onTouchMove = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
-      if (lockMove(ctl.move(t.identifier, t.clientX, t.clientY)) && ev.cancelable) ev.preventDefault();
+      if (lockMove(t.identifier, ctl.move(t.identifier, t.clientX, t.clientY)) && ev.cancelable) ev.preventDefault();
     };
-    const onTouchEnd = (ev: TouchEvent) => { const t = ev.changedTouches[0]; if (t) ctl.end(t.identifier); };
-    const onCancel = () => ctl.cancel();
+    const onTouchEnd = (ev: TouchEvent) => { const t = ev.changedTouches[0]; if (t) { releaseInput(t.identifier); ctl.end(t.identifier); } };
+    const onTouchCancel = (ev: TouchEvent) => { const t = ev.changedTouches[0]; if (t) releaseInput(t.identifier); ctl.cancel(); };
+    const onPtrCancel = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') releaseInput('p' + ev.pointerId); ctl.cancel(); };
+    const onCancel = () => { if (ownerId !== null) { sup.release(ownerId); ownerId = null; } ctl.cancel(); };
     const onVis = () => { if (document.visibilityState !== 'visible') ctl.cancel(); };
     const onPtrDown = (ev: PointerEvent) => {
-      if (ev.pointerType === 'touch' || !ev.isPrimary || !inRoot(ev.target)) return;
-      resetLock();
+      if (ev.pointerType === 'touch') return;
+      onFresh('p' + ev.pointerId, ev.target);
+      if (!ev.isPrimary || !inRoot(ev.target)) return;
       ctl.start('p' + ev.pointerId, ev.clientX, ev.clientY, ev.target as unknown as ElementLike, getOx);
     };
-    const onPtrMove = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') lockMove(ctl.move('p' + ev.pointerId, ev.clientX, ev.clientY)); };
-    const onPtrUp = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') ctl.end('p' + ev.pointerId); };
+    const onPtrMove = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') lockMove('p' + ev.pointerId, ctl.move('p' + ev.pointerId, ev.clientX, ev.clientY)); };
+    const onPtrUp = (ev: PointerEvent) => { if (ev.pointerType !== 'touch') { releaseInput('p' + ev.pointerId); ctl.end('p' + ev.pointerId); } };
     const on = [
       ['touchstart', onTouchStart, { passive: true }],
       ['touchmove', onTouchMove, { passive: false }],
       ['touchend', onTouchEnd, { passive: true }],
-      ['touchcancel', onCancel, { passive: true }],
+      ['touchcancel', onTouchCancel, { passive: true }],
       ['pointerdown', onPtrDown, { passive: true }],
       ['pointermove', onPtrMove, { passive: true }],
       ['pointerup', onPtrUp, { passive: true }],
-      ['pointercancel', onCancel, { passive: true }],
+      ['pointercancel', onPtrCancel, { passive: true }],
     ] as const;
     for (const [n, f, p] of on) window.addEventListener(n, f as EventListener, p);
     window.addEventListener('click', onClick, true);
+    window.addEventListener('keydown', onKey, true);
     window.addEventListener('blur', onCancel);
     document.addEventListener('visibilitychange', onVis);
     return () => {
       for (const [n, f] of on) window.removeEventListener(n, f as EventListener);
       window.removeEventListener('click', onClick, true);
+      window.removeEventListener('keydown', onKey, true);
       window.removeEventListener('blur', onCancel);
       document.removeEventListener('visibilitychange', onVis);
       ctl.destroy();
