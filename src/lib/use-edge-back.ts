@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import {
   createController,
+  dialogsBlock,
   registry,
   shouldUseCustomGesture,
   type BackResult,
@@ -23,14 +24,11 @@ const getOx = (el: ElementLike) =>
 /** a visible modal/alert dialog outside the root blocks swiping the page underneath */
 function hasForeignDialog(root: HTMLElement | null): boolean {
   if (typeof document === 'undefined') return false;
-  const ds = document.querySelectorAll('[role="alertdialog"],[role="dialog"],dialog[open],[aria-modal="true"],[data-edge-back-modal]');
-  for (const d of Array.from(ds)) {
-    if (d === root || (root && d.contains(root))) continue; // own dialog-root / ancestor allowed; nested dialogs inside root block
-    const el = d as HTMLElement;
-    if (el.hidden || el.getAttribute('aria-hidden') === 'true') continue;
-    if (el.getClientRects().length > 0) return true;
-  }
-  return false;
+  const ds = Array.from(document.querySelectorAll<HTMLElement>(
+    '[role="alertdialog"],[role="dialog"],dialog[open],[aria-modal="true"],[data-edge-back-modal]',
+  ));
+  return dialogsBlock(ds, root, (d) => !!root && d.contains(root), (el) =>
+    !el.hidden && el.getAttribute('aria-hidden') !== 'true' && el.getClientRects().length > 0);
 }
 
 /** register a blocker (e.g. a custom payment confirm) that stops lower back gestures while active */

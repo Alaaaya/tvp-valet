@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decideIntent, shouldComplete, isEdgeStart, shouldUseCustomGesture, isExcludedTarget, createRegistry, createController, registry } from './edge-back';
+import { dialogsBlock, decideIntent, shouldComplete, isEdgeStart, shouldUseCustomGesture, isExcludedTarget, createRegistry, createController, registry } from './edge-back';
 
 const mkRoot = () => { const cls = new Set<string>(); return { style: { transform: 'x' } as any, offsetWidth: 400, classList: { add: (c: string) => cls.add(c), remove: (c: string) => cls.delete(c) }, cls }; };
 function setup(onBack: () => any = () => {}, over: any = {}) {
@@ -94,6 +94,19 @@ describe('controller', () => {
   it('disabled mid-drag cancels', () => {
     const s = setup(); s.c.start(1, 5, 0, null); s.c.move(1, 30, 0); s.entry.enabled = false; s.c.move(1, 60, 0);
     expect(s.c.phase).toBe('idle'); expect(s.root.style.transform).toBe('x'); registry.remove(s.entry);
+  });
+  it('dialog rule', () => {
+    const root = 'root', anc = 'anc', nested = 'nested', other = 'other';
+    const contains = (d: string) => d === anc;
+    expect(dialogsBlock([root, anc], root, contains, () => true)).toBe(false);
+    expect(dialogsBlock([nested], root, contains, () => true)).toBe(true);
+    expect(dialogsBlock([other], root, contains, () => true)).toBe(true);
+    expect(dialogsBlock([other], root, contains, () => false)).toBe(false);
+  });
+  it('registry blocked at release cancels', () => {
+    let n = 0; const s = setup(() => { n++; }); s.c.start(1, 5, 0, null); s.c.move(1, 30, 0); s.c.move(1, 300, 0);
+    const top = registry.add({ root: 9, priority: 9, enabled: true, blocked: false }); s.c.end(1);
+    expect(n).toBe(0); expect(s.c.phase).toBe('idle'); registry.remove(top); registry.remove(s.entry);
   });
   it('disabled / blocked / lower priority cannot start; cancel cleans', () => {
     const s = setup(); const top = registry.add({ root: 9, priority: 9, enabled: true, blocked: false });

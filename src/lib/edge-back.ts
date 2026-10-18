@@ -225,7 +225,7 @@ export function createController(o: ControllerOpts) {
       if (pid !== id) return;
       if (phase === 'pending') { cleanup(); return; }
       if (phase !== 'dragging') return;
-      if (boundRoot !== o.root()) { self.cancel(); return; }
+      if (boundRoot !== o.root() || o.entry()?.enabled === false || o.entry()?.blocked || registry.active() !== o.entry() || o.externalBlocked?.()) { self.cancel(); return; }
       if (o.now() - lastT > 100) vel = 0; // held still before release: not a flick
       const go = shouldComplete(dx, width, vel);
       const my = epoch;
@@ -253,4 +253,13 @@ export function createController(o: ControllerOpts) {
     destroy() { self.cancel(); },
   };
   return self;
+}
+
+/** pure dialog rule: root itself or its ancestors are fine; every other visible dialog (incl. nested in root) blocks */
+export function dialogsBlock<D>(dialogs: D[], root: D | null, containsRoot: (d: D) => boolean, visible: (d: D) => boolean): boolean {
+  for (const d of dialogs) {
+    if (d === root || (root !== null && containsRoot(d))) continue;
+    if (visible(d)) return true;
+  }
+  return false;
 }
