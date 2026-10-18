@@ -1,4 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
+import {useEdgeBackBlock} from './use-edge-back';
 import type {Booking} from '../model';
 import '../booking-payment.css';
 
@@ -50,6 +51,7 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
  const [busy,setBusy]=useState(false);
  const [err,setErr]=useState('');
  const busyRef=useRef(false);
+ useEdgeBackBlock(open||confirm||busy);
  const cardRef=useRef<HTMLDivElement>(null);const openerRef=useRef<HTMLElement|null>(null);
  const req=useRef({key:'',id:''});
  const v=validateAmount(amount,due);
