@@ -2,7 +2,9 @@ import React from 'react';
 import {PlaneLanding,PlaneTakeoff,Car,Users,Phone,KeyRound,Check,Banknote,MessageSquare} from 'lucide-react';
 import {money,clock,type Booking} from '../model';
 import {displayComment} from './comments';
+import {paymentInstruction} from './payment-note';
 import '../booking-list-row.css';
+import '../payment-note.css';
 
 export interface PartnerBadge{label:string;product:string;cls:'ag'|'ap'|'fsp'|'pl'|'pr'|'f2m'|'web'}
 /** Shows the actual stored product code plus a provider label. Only real mappings; unknown sources get no badge. */
@@ -52,11 +54,11 @@ export function rowComment(b:Pick<Booking,'comment'|'external_id'|'code'>){
  }).filter(Boolean).join('\n').trim();
 }
 export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
- const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b);
+ const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b),pn=!!paymentInstruction(b);
  const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
  const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
- return <article className={'blr '+kind+(completed?' done':'')}>
+ return <article className={'blr '+kind+(completed?' done':'')+(pn?' pay-note':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?'Annahme ':'Rückgabe ')+time+' '+b.plate+' '+b.customer_name}>
    <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label="erledigt"><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><Users size={18}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
    <span className="blr-body">
