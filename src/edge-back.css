@@ -10,3 +10,9 @@
 @media (prefers-reduced-motion: reduce) {
   .edge-back-settling { transition: none !important; }
 }
+/* Short secondary pages must accept edge gestures in their empty viewport area.
+   Keep the bookings shell's dedicated rows-only scrolling unchanged. */
+.app:not(.fixed-top) > .workspace {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
