@@ -9,7 +9,7 @@ import {blank} from '../model';
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT=true;
 const bk={...blank(),code:'A1',plate:'AB1',spot:'5',status:'confirmed'} as any;
 async function setup(extra:any={}){
- const host=document.createElement('div');document.body.appendChild(host);const root=createRoot(host);
+ const {host,root}=mount();
  const onClose=vi.fn(),onChangeLocation=extra.onChangeLocation||vi.fn(async()=>{});
  await act(async()=>{root.render(<BookingActionsSheet booking={bk} onClose={onClose} onEditBooking={()=>{}} onChangeLocation={onChangeLocation}/>)});
  const click=async(el:Element|null)=>{await act(async()=>{(el as HTMLElement).dispatchEvent(new MouseEvent('click',{bubbles:true}))})};
@@ -19,7 +19,9 @@ async function setup(extra:any={}){
  await act(async()=>{const set=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!;set.call(input,'12');input.dispatchEvent(new Event('input',{bubbles:true}))});
  return {host,click,onClose,root};
 }
-afterEach(()=>{document.body.innerHTML='';vi.restoreAllMocks()});
+const mounted:{root:ReturnType<typeof createRoot>;host:HTMLElement}[]=[];
+const mount=()=>{const host=document.createElement('div');document.body.appendChild(host);const root=createRoot(host);mounted.push({root,host});return {host,root}};
+afterEach(async()=>{for(const m of mounted.splice(0)){await act(async()=>{m.root.unmount()});m.host.remove()}vi.restoreAllMocks()});
 describe('actions sheet location draft guard',()=>{
  for(const path of ['x','scrim','escape','cancel'] as const)it('declined confirm keeps draft via '+path,async()=>{
   const conf=vi.spyOn(window,'confirm').mockReturnValue(false);const s=await setup();
@@ -28,7 +30,7 @@ describe('actions sheet location draft guard',()=>{
   expect(conf).toHaveBeenCalledTimes(1);expect((s.host.querySelector('input[data-first]') as HTMLInputElement).value).toBe('12');expect(s.onClose).not.toHaveBeenCalled();
   conf.mockReturnValue(true);await fire();expect(s.host.querySelector('input[data-first]')).toBeNull();
  });
- it('untouched form leaves without prompt',async()=>{const conf=vi.spyOn(window,'confirm');const host=document.createElement('div');document.body.appendChild(host);const root=createRoot(host);
+ it('untouched form leaves without prompt',async()=>{const conf=vi.spyOn(window,'confirm');const {host,root}=mount();
   await act(async()=>{root.render(<BookingActionsSheet booking={bk} onClose={()=>{}} onEditBooking={()=>{}} onChangeLocation={async()=>{}}/>)});
   await act(async()=>{[...host.querySelectorAll('.bas-item')].find(i=>i.textContent?.startsWith('Change location'))!.dispatchEvent(new MouseEvent('click',{bubbles:true}))});
   await act(async()=>{host.querySelector('.bas-x')!.dispatchEvent(new MouseEvent('click',{bubbles:true}))});expect(conf).not.toHaveBeenCalled()});
