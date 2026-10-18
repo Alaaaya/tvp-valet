@@ -26,7 +26,10 @@ export function useSignedUrls(){
 }
 
 type Undo={undone_at?:string|null;undone_by?:string|null};const undone=(m:MediaItem)=>(m as MediaItem&Undo).undone_at||null;
-export function MediaGallery({bookingId,demo,refreshKey,local,addTile}:{bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];addTile?:React.ReactNode}){
+type GalleryProps={bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];addTile?:React.ReactNode};
+/** Keyed by booking: items, open viewer, signed-URL cache and errors can never carry over to another booking, even if the parent forgets a key. */
+export function MediaGallery(p:GalleryProps){return <MediaGalleryInner key={p.bookingId} {...p}/>}
+function MediaGalleryInner({bookingId,demo,refreshKey,local,addTile}:GalleryProps){
   const[items,setItems]=useState<MediaItem[]>([]),[err,setErr]=useState(''),[open,setOpen]=useState<number|null>(null),[loading,setLoading]=useState(false);
   const{map,errs,ensure,bad,good,retry}=useSignedUrls();const[reload,setReload]=useState(0);
   useEffect(()=>{if(demo)return;let dead=false;setLoading(true);setErr('');
