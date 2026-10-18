@@ -1,6 +1,5 @@
-.blr.pay-note,.blr.pay-note .blr-main,.blr.pay-note .blr-time,.blr.pay-note.done .blr-time,.blr.out.pay-note .blr-time,.blr.out.pay-note.done .blr-time{background:#e7d3fa}
-.blr.pay-note .blr-plate,.blr.pay-note .blr-time strong{color:#111}
-.blr.pay-note .blr-time{border-left-color:#7a3fb5}
+.blr.pay-note,.blr.pay-note .blr-main,.blr.pay-note .blr-time,.blr.pay-note.done .blr-time,.blr.out.pay-note .blr-time,.blr.out.pay-note.done .blr-time,.app.fixed-top .blr.pay-note .blr-time,.app.fixed-top .blr.pay-note.done .blr-time,.app.fixed-top .blr.out.pay-note .blr-time,.app.fixed-top .blr.out.pay-note.done .blr-time{background:#e7d3fa}
+.blr.pay-note .blr-plate,.blr.pay-note .blr-time strong,.app.fixed-top .blr.pay-note .blr-plate,.app.fixed-top .blr.pay-note .blr-time strong{color:#111}
 .blr.pay-note .blr-comment,.blr.pay-note .blr-name,.blr.pay-note .blr-code{color:#2a1a3a}
 .blr.pay-note .blr-pay,.blr.pay-note .blr-cover,.blr.pay-note .blr-badge{background:#fff}
 .bd-pay-note{margin:8px 12px;padding:10px 12px;border:2px solid #7a3fb5;border-radius:8px;background:#e7d3fa;color:#111;font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere}
