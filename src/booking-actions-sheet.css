@@ -23,3 +23,4 @@
 .bas-btn.primary{background:#2d696a;color:#fff;border-color:#2d696a}
 .bas-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b}
 .bas-list{padding:4px 16px 12px}.bas-list p{display:flex;justify-content:space-between;gap:12px;margin:0;padding:12px 0;border-bottom:1px solid #edf1ef;font-size:14px}
+.bas button:focus-visible,.bas input:focus-visible{outline:3px solid #2d696a;outline-offset:-3px}

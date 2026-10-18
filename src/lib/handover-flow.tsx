@@ -16,7 +16,7 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
   const root=useRef<HTMLDivElement>(null);
   useEdgeBack(root,{enabled:step==='details',priority:70,blocked:step==='camera'||askLeave||busy,onBack:()=>{setStep('camera')}});
   const label=action==='in'?'Check-in':'Check-out';
-  const leave=()=>{if(busy)return;if(media.length||strokes.length||km||comment)setAskLeave(true);else onClose()};
+  const leave=()=>{if(busy)return;if(media.length||strokes.length||comment.trim()||km!==(booking.km==null?'':String(booking.km))||key!==(booking.key_cash||'')||flight!==((action==='in'?booking.flight_in:booking.flight_out)||'')||poor)setAskLeave(true);else onClose()};
 
   async function save(e:React.FormEvent){
     e.preventDefault();if(saving.current)return;
@@ -60,6 +60,6 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
       </div>
       <div className="ho-save"><button className="ho-savebtn" disabled={busy}>{busy?(progress||'Wird gespeichert …'):<>Save <Check size={18}/></>}</button></div>
     </form>}
-    {askLeave&&<div className="ho-ask" role="alertdialog" aria-modal="true" aria-label="Abbrechen?"><div><h3>Vorgang abbrechen?</h3><p>Aufgenommene Medien und Eingaben gehen verloren.</p><button type="button" className="ho-savebtn" onClick={()=>setAskLeave(false)}>Weitermachen</button><button type="button" className="ho-discard" onClick={onClose}>Verwerfen</button></div></div>}
+    {askLeave&&<div className="ho-ask" role="alertdialog" aria-modal="true" aria-label="Abbrechen?" onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();setAskLeave(false)}}}><div><h3>Vorgang abbrechen?</h3><p>Aufgenommene Medien und Eingaben gehen verloren.</p><button type="button" className="ho-savebtn" autoFocus onClick={()=>setAskLeave(false)}>Weitermachen</button><button type="button" className="ho-discard" onClick={onClose}>Verwerfen</button></div></div>}
   </div>;
 }
