@@ -7,3 +7,11 @@ it('resetSessionState clears per-user state and runs when the user id changes',(
 it('main upload allows only jpeg/png/webp with matching extension',()=>{expect(s).toContain("validateMedia(file,'photo')");expect(s).not.toMatch(/file\.type\.startsWith\('image\/'\)/);expect(s).toContain('accept="image/jpeg,image/png,image/webp"');expect(s).toContain("contentType:mime");expect(s).toContain("mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg'");
  for(const type of ['image/svg+xml','image/gif','text/html','image/heic','application/pdf',''])expect(()=>validateMedia(new File(['x'],'a',{type}),'photo')).toThrow();
  for(const type of ['image/jpeg','image/png','image/webp'])expect(validateMedia(new File(['x'],'a',{type}),'photo')).toBe(type)});
+it('identity switches synchronously invalidate old booking and flight work before resetting state',()=>{
+ expect(s).toContain("sessionUid.current=uid;resetSessionState();setAuthUid(uid)");
+ expect(s).toContain('bookingGeneration.current++;flightGeneration.current++;opsReq.current++;bookingCtl.current?.abort();flightCtl.current?.abort()');
+ expect(s).toContain('&&uid===sessionUid.current');
+ expect(s).toContain("auth.data.session?.user.id!==uid");
+ expect(s).toContain('},[session,authUid,demo])');
+ expect(s).toContain('[date,mf,query,view,session,authUid,demo,selected?.id]');
+});
