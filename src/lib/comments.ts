@@ -36,3 +36,18 @@ export function displayComment(raw:string,deduplicateImportedNotes=false):Displa
  const human=notes.join('\n');
  result.text=[deduplicateImportedNotes&&result.imported?uniqueNoteLines(normalizeImportedNoteText(human)):human,...separateNotes.map(n=>deduplicateImportedNotes&&result.imported?uniqueNoteLines(normalizeImportedNoteText(n)):n)].filter(Boolean).join('\n').trim();return result;
 }
+
+/** Hide only exact external-reference pipe tokens in display text, never stored notes. */
+export function omitExternalReference(text:string,externalId?:string|null,code?:string):string{
+ const id=externalId?.trim();
+ if(!id||id===code)return text;
+ const reference=id.split('|').map(part=>part.trim());
+ return text.split('\n').map(line=>{
+  const parts=line.split('|'),kept:string[]=[];
+  for(let i=0;i<parts.length;){
+   if(reference.every((part,j)=>parts[i+j]?.trim()===part))i+=reference.length;
+   else kept.push(parts[i++]);
+  }
+  return kept.join('|').trim();
+ }).filter(Boolean).join('\n').trim();
+}
