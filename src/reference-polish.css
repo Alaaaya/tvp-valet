@@ -134,3 +134,8 @@ html .app.fixed-top .blr-pay{font-size:calc(9.5px * var(--list-scale,1))}
 html .app.fixed-top .blr-l3 svg.fa{width:calc(12px * var(--list-scale,1));height:auto}
 html .app.fixed-top .blr-key svg.fa,html .app.fixed-top .blr-keycode svg.fa{width:calc(11px * var(--list-scale,1));height:auto}
 html .app.fixed-top .blr-key svg.fa{width:calc(9px * var(--list-scale,1));height:calc(9px * var(--list-scale,1))}
+/* plate black, ParkingPro (Arial) font for list rows */
+html .app.fixed-top .blr{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif}
+html .app.fixed-top .blr-plate,html .app.fixed-top .blr.pay-note .blr-plate{color:#000;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-weight:700;letter-spacing:.2px}
+html .app.fixed-top .blr-time>strong{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-weight:400;color:#222;font-size:calc(15px * var(--list-scale,1));letter-spacing:0}
+html .app.fixed-top .blr-tf>span{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;color:#222}
