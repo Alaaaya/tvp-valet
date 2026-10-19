@@ -3,6 +3,7 @@ import React,{useEffect,useRef,useState} from 'react';
 import {useEdgeBackBlock} from './use-edge-back';
 import type {Booking} from '../model';
 import '../booking-payment.css';
+import {Fa} from './fa-icons';
 
 export type PayMethod='cash'|'card'|'bank_transfer';
 export const METHODS:{id:PayMethod;label:string}[]=[{id:'cash',label:"Bargeld"},{id:'card',label:"Karte"},{id:'bank_transfer',label:"Überweisung"}];
@@ -92,9 +93,9 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
  return <section className="bpay" aria-label={tr("Zahlung")}>
   {!hideSummary&&<h3 className="bpay-h">{tr("Kostenübersicht")}</h3>}
   {!hideSummary&&<dl className="bpay-sum"><div><dt>{tr("Gesamt")}</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>{tr("Bezahlt")}</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':'ok'}><dt>{tr("Offen")}</dt><dd>{fmtEur(due)}</dd></div></dl>}
-  {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={e=>{openerRef.current=e.currentTarget;setOpen(true);}}>{tr("Als bezahlt markieren")}</button>}
+  {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={e=>{openerRef.current=e.currentTarget;setOpen(true);}}><Fa name="money-bill-1-regular" size={17}/>{tr("Als bezahlt markieren")}</button>}
   {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?tr("Zahlung nur für bestätigte Buchungen."):tr("Zahlung nur für Admin/Mitarbeiter verfügbar.")}</p>}
-  <div className="bpay-soon">{[tr("Zahlungslink per E-Mail"),tr("Rechnung per E-Mail"),tr("QR-Zahlung")].map(t=><button key={t} type="button" disabled aria-disabled="true">{t} <em>{tr("bald")}</em></button>)}</div>
+  {due>0&&<div className="bpay-soon">{([[tr("Zahlungslink per E-Mail"),'envelope'],[tr("Rechnung per E-Mail"),'file-lines'],[tr("QR-Zahlung"),'qrcode']] as const).map(([t,i])=><button key={t} type="button" disabled aria-disabled="true">{t}<Fa name={i} size={15}/> <em>{tr("bald")}</em></button>)}</div>}
   {open&&<div className="bpay-sheet" onClick={e=>{e.stopPropagation();if(e.target===e.currentTarget)close();}} onPointerDown={e=>e.stopPropagation()}>
    <div className="bpay-card" data-edge-back-modal ref={cardRef} role="dialog" aria-modal="true" aria-labelledby="bpay-title" tabIndex={-1} onClick={e=>e.stopPropagation()}>
     <h4 id="bpay-title">{tr("Zahlungsart")}</h4>
