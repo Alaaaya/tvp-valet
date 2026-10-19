@@ -65,7 +65,7 @@ html .app.fixed-top .blr-time{padding-left:3px}
 /* IMG_0579 detail section ink anchors at 390 CSS px. Keep list polish above. */
 html .bd .fp-head .reference-icon-plane{transform:translateY(.5px) scaleY(1.0714286) rotate(-45deg);transform-origin:50% 50%}
 html .bd .summary-cost h3{position:relative;top:-1px;font-weight:700}
-html .bd .summary-cost p:first-of-type>span:first-child{font-weight:400;-webkit-text-stroke:.19px currentColor}
+html .bd .summary-cost p:first-of-type>span:first-child{font-weight:400;-webkit-text-stroke:.08px currentColor}
 html .bd .summary-cost .bd-days{font-weight:400;color:#999}
 html .bd .summary-cost p:first-of-type{border-bottom-color:#cbede8}
 html .bd .summary-cost{padding-top:19px}
