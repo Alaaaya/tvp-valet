@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 /** Keep the SDK's persisted session authoritative, including after a suspended tab resumes. */
 export interface StoredSession { user: {id:string}; access_token?:string }
 interface SessionAuth {
@@ -32,7 +31,7 @@ export function observeSession(
     } catch {
       if(disposed||started!==revision)return;
       // A network/storage error isn't a logout. Never remove SDK credentials here.
-      onError(new Error(tr("Sitzung konnte gerade nicht geladen werden. Bitte Verbindung prüfen.")));
+      onError(new Error('Sitzung konnte gerade nicht geladen werden. Bitte Verbindung prüfen.'));
       if(attempt<3)retry=setTimeout(()=>{retry=undefined;void read()},1000*2**attempt++);
     } finally {inflight=false}
   };

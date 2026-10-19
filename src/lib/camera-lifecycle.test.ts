@@ -36,11 +36,11 @@ describe('recorder final payload source guards',()=>{
     expect(source).toContain('if(recording||finalizingRef.current||m===mode)return;');
     expect(source).toContain("async function toggleRecord(){\n    if(finalizingRef.current)return;");
     expect(source).toContain('disabled={!ready||finalizing}');
-    expect(source).toContain('aria-label={tr("Zurück")} disabled={recording||finalizing}');
+    expect(source).toContain('aria-label="Zurück" disabled={recording||finalizing}');
   });
   it('uses the same finalization path for size and duration auto-stop',()=>{
-    expect(source).toContain('setNote(tr("Video auf 45 MB begrenzt."));stopRecorder(false)');
-    expect(source).toContain('setNote(tr("Video auf 120 Sekunden begrenzt."));stopRecorder(false)');
+    expect(source).toContain("setNote('Video auf 45 MB begrenzt.');stopRecorder(false)");
+    expect(source).toContain("setNote('Video auf 120 Sekunden begrenzt.');stopRecorder(false)");
   });
   it('releases error/discard state and detaches failed recorder callbacks',()=>{
     expect(stop).toContain('if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;');

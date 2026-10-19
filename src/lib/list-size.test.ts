@@ -21,7 +21,7 @@ it('counter visual height is 41 with a 44px+ hit area and no min-height override
 it('flight stays fully visible in time pane and placeholder is short', () => {
   const c = readFileSync('src/reference-list.css', 'utf8');
   expect(c).toContain('.blr-tf>span{overflow:visible;text-overflow:clip;white-space:nowrap');
-  expect(readFileSync('src/main.tsx', 'utf8')).toContain('placeholder={tr("Kennzeichen oder Name")}');
+  expect(readFileSync('src/main.tsx', 'utf8')).toContain('placeholder="Kennzeichen oder Name"');
 });
 it('counter hit-area pseudo-element is not clipped', () => {
   expect(readFileSync('src/reference-list.css', 'utf8')).toContain('position:relative;overflow:visible}');

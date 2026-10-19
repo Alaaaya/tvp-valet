@@ -1,11 +1,10 @@
-import {t as tr} from './i18n';
 import React,{useEffect,useRef,useState} from 'react';
 import {useEdgeBackBlock} from './use-edge-back';
 import type {Booking} from '../model';
 import '../booking-payment.css';
 
 export type PayMethod='cash'|'card'|'bank_transfer';
-export const METHODS:{id:PayMethod;label:string}[]=[{id:'cash',label:"Bargeld"},{id:'card',label:"Karte"},{id:'bank_transfer',label:"Überweisung"}];
+export const METHODS:{id:PayMethod;label:string}[]=[{id:'cash',label:'Bargeld'},{id:'card',label:'Karte'},{id:'bank_transfer',label:'Überweisung'}];
 export type RecordPayment=(a:{booking:Booking;requestId:string;amountCents:number;method:PayMethod})=>Promise<Booking>;
 
 export const toCents=(v:unknown)=>Math.round((Number(v)||0)*100);
@@ -22,9 +21,9 @@ export function parseEuroToCents(s:string):number|null{
 }
 export function validateAmount(s:string,due:number):{cents:number|null;error:string}{
  const c=parseEuroToCents(s);
- if(c===null)return{cents:null,error:tr("Bitte gültigen Betrag eingeben (z. B. 25,50).")};
- if(c<=0)return{cents:null,error:tr("Betrag muss größer als 0 sein.")};
- if(c>due)return{cents:null,error:tr("Betrag höher als offener Betrag (")+fmtEur(due)+').'};
+ if(c===null)return{cents:null,error:'Bitte gültigen Betrag eingeben (z. B. 25,50).'};
+ if(c<=0)return{cents:null,error:'Betrag muss größer als 0 sein.'};
+ if(c>due)return{cents:null,error:'Betrag höher als offener Betrag ('+fmtEur(due)+').'};
  return{cents:c,error:''};
 }
 /** UUIDv4 via CSPRNG only; returns null when unavailable (no fake fallback). */
@@ -39,7 +38,7 @@ export type Receipt={paid_after_cents:number};
 /** Adapter: pass backend recordBookingPayment; result is the booking with authoritative paid (other fields stale, parent should refresh). */
 export const adaptReceipt=(record:(i:{booking:Booking;requestId:string;amountCents:number;method:PayMethod})=>Promise<Receipt>):RecordPayment=>async input=>{const rc=await record(input);return{...input.booking,paid:rc.paid_after_cents/100};};
 export const cashBlocked=(b:{key_cash?:string|null})=>/[0-9]/.test(b.key_cash??'');
-export const CASH_BLOCK_TEXT="Barzahlung gesperrt: Es gibt bereits einen Bargeld-/Schlüsselvermerk, der erst geklärt werden muss. Karte oder Überweisung sind möglich.";
+export const CASH_BLOCK_TEXT='Barzahlung gesperrt: Es gibt bereits einen Bargeld-/Schlüsselvermerk, der erst geklärt werden muss. Karte oder Überweisung sind möglich.';
 
 type Props={booking:Booking;onPaid:(b:Booking)=>void;disabled?:boolean;recordPayment?:RecordPayment;initialOpen?:boolean;hideSummary?:boolean};
 
@@ -84,31 +83,31 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
   if(busyRef.current||!canPay||!recordPayment||v.cents===null||(method==='cash'&&blocked)||v.cents>dueCents(booking))return;
   const snap=booking;
   busyRef.current=true;setBusy(true);setErr('');
-  try{const rid=requestId();if(!rid)throw new Error(tr("Sichere Anfrage-ID nicht verfügbar. Zahlung nicht möglich."));const updated=await recordPayment({booking:snap,requestId:rid,amountCents:v.cents,method});
+  try{const rid=requestId();if(!rid)throw new Error('Sichere Anfrage-ID nicht verfügbar. Zahlung nicht möglich.');const updated=await recordPayment({booking:snap,requestId:rid,amountCents:v.cents,method});
    req.current={key:'',id:''};setOpen(false);onPaid(updated);}
-  catch(e:any){setErr(e?.message||tr("Zahlung konnte nicht gespeichert werden."));}
+  catch(e:any){setErr(e?.message||'Zahlung konnte nicht gespeichert werden.');}
   finally{busyRef.current=false;setBusy(false);}
  };
- return <section className="bpay" aria-label={tr("Zahlung")}>
-  {!hideSummary&&<h3 className="bpay-h">{tr("Kostenübersicht")}</h3>}
-  {!hideSummary&&<dl className="bpay-sum"><div><dt>{tr("Gesamt")}</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>{tr("Bezahlt")}</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':'ok'}><dt>{tr("Offen")}</dt><dd>{fmtEur(due)}</dd></div></dl>}
-  {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={e=>{openerRef.current=e.currentTarget;setOpen(true);}}>{tr("Als bezahlt markieren")}</button>}
-  {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?tr("Zahlung nur für bestätigte Buchungen."):tr("Zahlung nur für Admin/Mitarbeiter verfügbar.")}</p>}
-  <div className="bpay-soon">{[tr("Zahlungslink per E-Mail"),tr("Rechnung per E-Mail"),'QR-Zahlung'].map(t=><button key={t} type="button" disabled aria-disabled="true">{t} <em>{tr("bald")}</em></button>)}</div>
+ return <section className="bpay" aria-label="Zahlung">
+  {!hideSummary&&<h3 className="bpay-h">Kostenübersicht</h3>}
+  {!hideSummary&&<dl className="bpay-sum"><div><dt>Gesamt</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>Bezahlt</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':'ok'}><dt>Offen</dt><dd>{fmtEur(due)}</dd></div></dl>}
+  {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={e=>{openerRef.current=e.currentTarget;setOpen(true);}}>Als bezahlt markieren</button>}
+  {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?'Zahlung nur für bestätigte Buchungen.':'Zahlung nur für Admin/Mitarbeiter verfügbar.'}</p>}
+  <div className="bpay-soon">{['Zahlungslink per E-Mail','Rechnung per E-Mail','QR-Zahlung'].map(t=><button key={t} type="button" disabled aria-disabled="true">{t} <em>bald</em></button>)}</div>
   {open&&<div className="bpay-sheet" onClick={e=>{e.stopPropagation();if(e.target===e.currentTarget)close();}} onPointerDown={e=>e.stopPropagation()}>
    <div className="bpay-card" data-edge-back-modal ref={cardRef} role="dialog" aria-modal="true" aria-labelledby="bpay-title" tabIndex={-1} onClick={e=>e.stopPropagation()}>
-    <h4 id="bpay-title">{tr("Zahlungsart")}</h4>
-    <div className="bpay-methods" role="radiogroup" aria-label={tr("Zahlungsart")}>{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{tr(m.label as import("./i18n").TranslationKey)}</button>)}</div>
-    {blocked&&<p className="bpay-note" role="note">{tr(CASH_BLOCK_TEXT)}</p>}
-    <label className="bpay-l" htmlFor="bpay-amt">{tr("Betrag (€), offen")}{fmtEur(due)}</label>
+    <h4 id="bpay-title">Zahlungsart</h4>
+    <div className="bpay-methods" role="radiogroup" aria-label="Zahlungsart">{METHODS.map(m=><button key={m.id} type="button" role="radio" aria-checked={method===m.id} className={method===m.id?'on':''} disabled={busy||(m.id==='cash'&&blocked)} onClick={()=>{setMethod(m.id);setConfirm(false);}}>{m.label}</button>)}</div>
+    {blocked&&<p className="bpay-note" role="note">{CASH_BLOCK_TEXT}</p>}
+    <label className="bpay-l" htmlFor="bpay-amt">Betrag (€), offen {fmtEur(due)}</label>
     <input id="bpay-amt" className="bpay-in" inputMode="decimal" autoComplete="off" value={amount} disabled={busy} onChange={e=>{setAmount(e.target.value);setConfirm(false);}} aria-invalid={!!v.error} aria-describedby={v.error?'bpay-amt-err':undefined}/>
     {v.error&&<p id="bpay-amt-err" className="bpay-err" role="alert">{v.error}</p>}
-    {confirm&&canPay&&v.cents!==null&&<p className="bpay-conf">{fmtEur(v.cents)} {tr("per")}{tr(METHODS.find(m=>m.id===method)!.label as import("./i18n").TranslationKey)} {tr("buchen? Verbucht wird mit deinem Namen und Zeitstempel.")}</p>}
+    {confirm&&canPay&&v.cents!==null&&<p className="bpay-conf">{fmtEur(v.cents)} per {METHODS.find(m=>m.id===method)!.label} buchen? Verbucht wird mit deinem Namen und Zeitstempel.</p>}
     {err&&<p className="bpay-err" role="alert">{err}</p>}
     <div className="bpay-act">
-     <button type="button" className="bpay-cancel" disabled={busy} onClick={close}>{tr("Abbrechen")}</button>
-     {!(confirm&&canPay)?<button type="button" className="bpay-ok" disabled={v.cents===null} onClick={()=>setConfirm(true)}>{tr("Weiter")}</button>
-      :<button type="button" className="bpay-ok" disabled={busy||v.cents===null||(method==='cash'&&blocked)} onClick={submit}>{busy?tr("Speichern…"):tr("Bestätigen")}</button>}
+     <button type="button" className="bpay-cancel" disabled={busy} onClick={close}>Abbrechen</button>
+     {!(confirm&&canPay)?<button type="button" className="bpay-ok" disabled={v.cents===null} onClick={()=>setConfirm(true)}>Weiter</button>
+      :<button type="button" className="bpay-ok" disabled={busy||v.cents===null||(method==='cash'&&blocked)} onClick={submit}>{busy?'Speichern…':'Bestätigen'}</button>}
     </div>
    </div></div>}
  </section>;

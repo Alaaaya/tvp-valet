@@ -20,7 +20,7 @@ describe('solid standalone header',()=>{
   const header=main.slice(main.indexOf('<header className="topbar">'),main.indexOf('</header><section className="page">'));
   expect(header).toContain('className="header-actions"');
   expect(header).not.toContain('Buchung erstellen');
-  expect((header.match(/aria-label=\{tr\("Filter"\)\}/g)||[]).length).toBe(1);
+  expect((header.match(/aria-label="Filter"/g)||[]).length).toBe(1);
   expect(main).toMatch(/className="drawer-action"[^]*?setSelected\(blank\(\)\);setEditing\(true\);setPhotos\(\[\]\)[^]*?Buchung erstellen/);
   expect(css).toContain('.header-actions>button{width:44px;min-height:44px;');
  });

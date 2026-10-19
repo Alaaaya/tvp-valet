@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 import {withoutQaFixtures,isQaFixtureId} from './qa-fixtures';
 import {db} from '../api';
 import type {Booking} from '../model';
@@ -12,14 +11,14 @@ export type BookingPayment={
 export type PaymentInput={booking:Booking;requestId:string;amountCents:number;method:PaymentMethod};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const maxCents=999999999999;
-function validId(id:string){if(!uuid.test(id))throw new Error(tr("Ungültige Anfrage-ID"));}
+function validId(id:string){if(!uuid.test(id))throw new Error('Ungültige Anfrage-ID');}
 function cents(value:number):number {
- if(!Number.isFinite(value)||value<0)throw new Error(tr("Ungültiger Geldbetrag"));
+ if(!Number.isFinite(value)||value<0)throw new Error('Ungültiger Geldbetrag');
  const decimal=value.toFixed(2);
  const [whole,fraction]=decimal.split('.');
  const rounded=Number(whole)*100+Number(fraction);
  if(Number(decimal)!==value||!Number.isSafeInteger(rounded)||rounded>maxCents)
-  throw new Error(tr("Geldbeträge benötigen volle Cent"));
+  throw new Error('Geldbeträge benötigen volle Cent');
  return rounded;
 }
 export function outstandingCents(booking:Pick<Booking,'total'|'paid'>):number {
@@ -30,33 +29,33 @@ export function hasLegacyCashConflict(booking:Pick<Booking,'key_cash'>):boolean 
  return /[0-9]/.test(booking.key_cash??'');
 }
 function failure(error:{code?:string;message?:string}):Error {
- if(error.code==='PT409'||error.code==='40001')return new Error(tr("Die Buchung wurde inzwischen geändert. Bitte neu laden."));
- if(error.code==='42501')return new Error(tr("Keine Berechtigung für diese Zahlung."));
- return new Error(error.message||tr("Zahlung fehlgeschlagen"));
+ if(error.code==='PT409'||error.code==='40001')return new Error('Die Buchung wurde inzwischen geändert. Bitte neu laden.');
+ if(error.code==='42501')return new Error('Keine Berechtigung für diese Zahlung.');
+ return new Error(error.message||'Zahlung fehlgeschlagen');
 }
 /** Preserve the whole input when retrying after an uncertain response. Never generate a new ID automatically. */
 export async function recordBookingPayment({booking,requestId,amountCents,method}:PaymentInput):Promise<BookingPayment> {
  validId(requestId);validId(booking.id);
- if(!['cash','card','bank_transfer'].includes(method))throw new Error(tr("Ungültige Zahlungsart"));
- if(!Number.isSafeInteger(amountCents)||amountCents<=0||amountCents>maxCents)throw new Error(tr("Bitte einen positiven Betrag in Cent angeben"));
+ if(!['cash','card','bank_transfer'].includes(method))throw new Error('Ungültige Zahlungsart');
+ if(!Number.isSafeInteger(amountCents)||amountCents<=0||amountCents>maxCents)throw new Error('Bitte einen positiven Betrag in Cent angeben');
  const paid=cents(booking.paid),total=cents(booking.total);
- if(amountCents>total-paid)throw new Error(tr("Der Betrag übersteigt den offenen Restbetrag"));
- if(booking.status!=='confirmed')throw new Error(tr("Die Buchung ist nicht bestätigt"));
- if(method==='cash'&&hasLegacyCashConflict(booking))throw new Error(tr("Vorhandener Bargeld-/Schlüsselvermerk muss vor einer Barzahlung geklärt werden."));
- if(!db)throw new Error(tr("Backend nicht eingerichtet"));
+ if(amountCents>total-paid)throw new Error('Der Betrag übersteigt den offenen Restbetrag');
+ if(booking.status!=='confirmed')throw new Error('Die Buchung ist nicht bestätigt');
+ if(method==='cash'&&hasLegacyCashConflict(booking))throw new Error('Vorhandener Bargeld-/Schlüsselvermerk muss vor einer Barzahlung geklärt werden.');
+ if(!db)throw new Error('Backend nicht eingerichtet');
  const {data,error}=await db.rpc('record_booking_payment',{
   p_request_id:requestId,p_booking_id:booking.id,p_amount_cents:amountCents,p_method:method,
   p_expected_paid_cents:paid,p_expected_total_cents:total
  });
  if(error)throw failure(error);
  if(!data||data.id!==requestId||data.booking_id!==booking.id||data.amount_cents!==amountCents||data.method!==method)
-  throw new Error(tr("Keine gültige Zahlungsbestätigung vom Server"));
+  throw new Error('Keine gültige Zahlungsbestätigung vom Server');
  return data as BookingPayment;
 }
 /** Non-snapshot paginated history preview. Never use it as an authoritative cash total. */
 export async function loadBookingPayments(bookingId?:string):Promise<BookingPayment[]> {
  if(bookingId!==undefined)validId(bookingId);
- if(!db)throw new Error(tr("Backend nicht eingerichtet"));
+ if(!db)throw new Error('Backend nicht eingerichtet');
  const result:BookingPayment[]=[];
  // Do not silently truncate the employee report at Supabase's default row limit.
  for(let offset=0;;offset+=1000){
@@ -64,7 +63,7 @@ export async function loadBookingPayments(bookingId?:string):Promise<BookingPaym
   if(bookingId!==undefined)query=query.eq('booking_id',bookingId);
   const {data,error}=await query.range(offset,offset+999);
   if(error)throw failure(error);
-  if(!Array.isArray(data))throw new Error(tr("Zahlungen konnten nicht geladen werden"));
+  if(!Array.isArray(data))throw new Error('Zahlungen konnten nicht geladen werden');
   result.push(...data as BookingPayment[]);
   if(data.length<1000)return result;
  }
@@ -98,7 +97,7 @@ export function employeeCashTotals(allBookings:readonly Booking[],allPayments:re
  for(const payment of payments){
   if(seenPayments.has(payment.id)||!selected.has(payment.booking_id)||payment.method!=='cash')continue;
   seenPayments.add(payment.id);
-  if(!Number.isSafeInteger(payment.amount_cents)||payment.amount_cents<=0)throw new Error(tr("Ungültiger Zahlungsbeleg"));
+  if(!Number.isSafeInteger(payment.amount_cents)||payment.amount_cents<=0)throw new Error('Ungültiger Zahlungsbeleg');
   cashBookings.add(payment.booking_id);
   add(payment.actor_id,payment.actor_name,'ledger',payment.amount_cents);
  }
@@ -120,8 +119,8 @@ export function employeeCashTotals(allBookings:readonly Booking[],allPayments:re
  }
  const list=[...totals.values()];
  const total=list.reduce((sum,row)=>sum+row.cashCents,0);
- if(!Number.isSafeInteger(total))throw new Error(tr("Bargeldsumme ist zu groß"));
+ if(!Number.isSafeInteger(total))throw new Error('Bargeldsumme ist zu groß');
  return {totals:list,conflictBookingIds,unparsedBookingIds,
   totalCents:null,previewTotalCents:conflictBookingIds.length||unparsedBookingIds.length?null:total,
-  snapshotConsistent:false,label:tr("Vorschau, kein konsistenter Buchungs-/Zahlungsstand")};
+  snapshotConsistent:false,label:'Vorschau, kein konsistenter Buchungs-/Zahlungsstand'};
 }

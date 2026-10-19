@@ -1,6 +1,6 @@
 import {readFileSync} from 'node:fs';import {expect,it} from 'vitest';import {validateMedia} from './lib/handover-api';
 const s=readFileSync('src/main.tsx','utf8');
-it('customer search input has an accessible name',()=>{expect(s).toMatch(/<input aria-label=\{tr\("Alle Buchungen durchsuchen"\)\} type="search"/)});
+it('customer search input has an accessible name',()=>{expect(s).toMatch(/<input aria-label="Alle Buchungen durchsuchen" type="search"/)});
 it('login inputs keep autofill attributes and required',()=>{expect(s).toMatch(/type="email" required autoComplete="username"/);expect(s).toMatch(/type="password" required autoComplete="current-password"/)});
 it('sign out is local scope, respects unsaved guard and resets session state',()=>{expect(s).toContain("signOut({scope:'local'})");expect(s).toMatch(/drawer-signout" onClick=\{\(\)=>\{if\(!canLeavePage\(\)\)return;run/);expect(s).not.toMatch(/signOut\(\)/);expect(s).toMatch(/signOut\(\{scope:'local'\}\);if\(so\)throw so\}setSession\(false\);setDemo\(false\);resetSessionState\(\)/)});
 it('resetSessionState clears per-user state and runs when the user id changes',()=>{const m=s.slice(s.indexOf('const resetSessionState='),s.indexOf('const[gear,setGear]'));for(const k of ['setSelected(null)','setEditing(false)','setGear(false)','setCallAsk(false)','setFlow(null)','setStaff([])','setRows([])','setOps({})','setPhotos([])',"setQuery('')","setPassword('')",'setMe(null)'])expect(m).toContain(k);expect(s).toMatch(/uid!==sessionUid\.current\)\{sessionUid\.current=uid;resetSessionState\(\)/)});
@@ -23,4 +23,4 @@ it('late legacy media results cannot cross account or booking switches',()=>{
  expect(s).toContain('const resetSessionState=()=>{photoReq.current++');
 });
 
-it('header filter exists only on the two views that render its filter sheet',()=>{expect(s).toContain("{(view==='today'||view==='new')&&<button type=\"button\" aria-label={tr(\"Filter\")}");});
+it('header filter exists only on the two views that render its filter sheet',()=>{expect(s).toContain("{(view==='today'||view==='new')&&<button type=\"button\" aria-label=\"Filter\"");});
