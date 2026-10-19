@@ -9,5 +9,5 @@
 .app.fixed-top .blr-cc,.app.fixed-top .blr-pn{color:#1fb19b}
 /* counters: ref blocks x18..184 / 206..371 of 390, 41 tall inside a 53 strip; 44px hit area kept via ::after */
 .app.fixed-top .counters.counters{padding:6px 18px 5px;gap:22px;height:53px;box-sizing:border-box}
-.app.fixed-top .counters .counter{height:41px;position:relative}
+.app.fixed-top .counters .counter{height:41px;min-height:41px;position:relative}
 .app.fixed-top .counters .counter::after{content:"";position:absolute;inset:-2px 0}
