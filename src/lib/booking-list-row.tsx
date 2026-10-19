@@ -5,6 +5,7 @@ import {money,clock,type Booking} from '../model';
 import {displayComment,omitExternalReference} from './comments';
 import {paymentInstruction} from './payment-note';
 import '../booking-list-row.css';
+import {Fa} from './fa-icons';
 import '../payment-note.css';
 
 export interface PartnerBadge{label:string;product:string;cls:'ag'|'ap'|'fsp'|'pl'|'pr'|'f2m'|'web'}
@@ -51,17 +52,17 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')+(pn?' pay-note':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?tr("Annahme "):tr("Rückgabe "))+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label={tr("erledigt")}><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><PersonStanding className="blr-ico-person" size={18}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
+   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label={tr("erledigt")}><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Fa name="car-side" size={20}/><Fa name="person" className="blr-ico-person" size={16}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<Fa name="plane" size={14}/>:<Fa name="plane" size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
    <span className="blr-body">
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
-    <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
-    <span className="blr-line blr-l3">{b.phone&&<Phone size={16} aria-label={tr("Telefon")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
+    <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><Fa name="key" size={13}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
+    <span className="blr-line blr-l3">{b.phone&&<Fa name="phone" size={14} aria-label={tr("Telefon")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
     {c&&<span className="blr-comment" title={c}>{c}</span>}
     {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
    <span className="blr-side">
     <span className={'blr-cover '+(b.covered?'cov':'free')}>{b.covered?tr("Über"):tr("Frei")}</span>
-    <span className="blr-meta">{typeof commentCount==='number'&&commentCount>0&&<span className="blr-cc"><MessageSquare size={16}/>{commentCount}</span>}{b.persons>0&&<span className="blr-pn">{b.persons}<Users size={16}/></span>}</span>
+    <span className="blr-meta">{typeof commentCount==='number'&&commentCount>0&&<span className="blr-cc"><Fa name="comment" size={15}/>{commentCount}</span>}{b.persons>0&&<span className="blr-pn">{b.persons}<Fa name="users" size={17}/></span>}</span>
     {m.kind!=='none'&&<span className={'blr-pay '+m.kind} aria-label={m.text} title={m.text}>{money(m.kind==='due'?Math.max(0,(b.total||0)-(b.paid||0)):(b.paid||0))}</span>}
    </span>
   </button>
