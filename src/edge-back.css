@@ -16,3 +16,18 @@
   min-height: 100vh;
   min-height: 100dvh;
 }
+
+
+/* Gesture-only visual exception. The origin workspace remains the real mounted tree. */
+.modal-backdrop.edge-back-revealing{background:transparent}
+.modal-backdrop.edge-back-revealing::before{
+ content:'';position:absolute;inset:0;background:#333;opacity:var(--back-dim,.28);pointer-events:none;
+}
+.edge-back-underlay{pointer-events:none}
+.edge-back-revealing>.edge-back-dragging,.edge-back-revealing>.edge-back-settling{
+ position:relative;outline:0;box-shadow:-8px 0 14px -6px #0008;
+}
+.edge-back-settling{transition-timing-function:cubic-bezier(.2,.8,.2,1)}
+.modal-backdrop.edge-back-revealing::before{z-index:0;background:#555;opacity:var(--back-dim,.28)}
+.edge-back-revealing>.detail{z-index:1;overflow:visible}
+.edge-back-revealing>.detail::after{content:'';position:absolute;right:100%;top:0;bottom:0;width:12px;box-shadow:8px 0 12px 0 #0009;pointer-events:none}

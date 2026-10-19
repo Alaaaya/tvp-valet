@@ -1,6 +1,7 @@
 import {t as tr,getLanguage} from './i18n';
 import React from 'react';
-import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ScanLine} from 'lucide-react';
+import {OdometerCapture} from './odometer-capture';
+import {Banknote,Calculator,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ParkingSquare,LogIn,LogOut} from 'lucide-react';
 import {clock,money,stamp,type Booking} from '../model';
 import {displayComment} from './comments';
 import {paymentInstruction} from './payment-note';
@@ -65,20 +66,20 @@ export function BookingDetailView(p:BookingDetailViewProps){
     {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> {tr("Outstanding amount:")}{' '}{money(due)}</div>}
     <section className="bd-identity">
       <div><span className="bd-label">{tr("Name")}</span><strong>{b.customer_name}</strong>
-        {b.phone&&<a href={'tel:'+b.phone}>{b.phone}</a>}
-        {b.email&&<a href={'mailto:'+b.email}>{b.email}</a>}
+        {b.phone&&<a href={'tel:'+b.phone}><bdi>{b.phone}</bdi></a>}
+        {b.email&&<a href={'mailto:'+b.email}><bdi>{b.email}</bdi></a>}
         <button type="button" className="pp-link" onClick={p.onEdit}>{personsLabel(b.persons)}</button></div>
       <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
-        <span className="bd-key"><KeyRound size={13}/> {b.key_cash||'–'}</span>
-        <button type="button" className="bd-outline" onClick={p.onEdit}>{tr("+ KM and comment")}</button>
-        <button type="button" className="bd-outline" disabled aria-describedby={'ocr-'+b.id}><ScanLine size={14}/>  {tr("Scan odometer")}</button>
-        <small id={'ocr-'+b.id}>{tr("Odometer scan is not available yet (no OCR).")}</small></div>
+        <span className="bd-location"><bdi>{b.spot||c.location||"–"}</bdi><ParkingSquare size={16}/></span>
+        <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>
+        <button type="button" className="bd-outline" onClick={p.onEdit}><Plus size={15}/>{tr("+ KM and comment").replace(/^\+\s*/,"")}</button>
+        <OdometerCapture key={b.id} onEdit={p.onEdit}/></div>
     </section>
     <div className="split-handover">{(['in','out'] as const).map(k=>{const at=k==='in'?b.checked_in_at:b.checked_out_at,when=k==='in'?b.arrival_at:b.departure_at;return <section className={k} key={k}>
       <h3><Car size={17}/>{k==='in'?tr("PARKING DATE"):tr("RETURN DATE")}</h3>
       <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>{tr("Mileage:")}{' '}{b.km==null?"–":b.km}</span>
-        <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={15}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:k==='in'?tr('Check-in'):tr('Check-out')}</button></div>
+        <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:<>{k==='in'?<LogIn size={17}/>:<LogOut size={17}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         {!b.checked_in_at&&!b.checked_out_at?p.calledSlot:k==='in'?act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act'):null}
         {b.checked_in_at&&k==='out'&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}
@@ -89,7 +90,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.opsLoadErr&&!p.demo&&<small role="status">{tr("Ablauf konnte nicht geladen werden:")}{p.opsLoadErr}</small>}
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
-    <section className="summary-cost"><h3>{tr("Cost overview")}</h3>
+    <section className="summary-cost"><h3><Calculator size={21}/>{tr("Cost overview")}</h3>
       <p><span>{tr("Parking (")}{b.product||b.platform}{")"}<small className="bd-days">{parkingDays(b)} {tr("days")}</small></span><span>{money(b.total)}</span></p>
       <p><span>{tr("Total amount")}</span><span>{money(b.total)}</span></p>
       <p><span>{tr("Paid")}</span><span>{money(b.paid)}</span></p>

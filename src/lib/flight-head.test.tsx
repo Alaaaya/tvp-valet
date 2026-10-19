@@ -11,7 +11,7 @@ describe('FlightHead',()=>{
   });
   it('parking panel empty when number missing',()=>{
     const h=r(<FlightHead kind="in" number={null} hint="Keine Live-Daten für diesen Flug"/>);
-    expect(h).not.toContain('Kein Flug');expect(h).not.toContain('Keine');expect(h).toContain('<strong></strong>');
+    expect(h).not.toContain('Kein Flug');expect(h).not.toContain('Keine');expect(h).toBe('');
   });
   it('return keeps live time and delay',()=>{
     const h=r(<FlightHead kind="out" number="BY123" time="12:00" delay={21}/>);
@@ -20,6 +20,6 @@ describe('FlightHead',()=>{
   it('return keeps loading, error and missing hints',()=>{
     expect(r(<FlightHead kind="out" number="BY1" hint="Live-Daten werden geladen…"/>)).toContain('Live-Daten werden geladen…');
     expect(r(<FlightHead kind="out" number="BY1" time="12:00" title="Veraltet" ariaLabel="x"/>)).toContain('title="Veraltet"');
-    expect(r(<FlightHead kind="out" number={null}/>)).toContain('Kein Flug');
+    expect(r(<FlightHead kind="out" number={null}/>)).toBe('');
   });
 });

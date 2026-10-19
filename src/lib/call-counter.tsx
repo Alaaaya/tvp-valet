@@ -52,7 +52,7 @@ export function CallCounter({calledAt,checkedInAt,checkedOutAt,compact,now}:{cal
   const cls='call-counter'+(compact?' call-counter--compact':'')+(r.state==='frozen'?' is-frozen':'');
   return <div className={cls} title={r.title} data-state={r.state}>
     <span className="cc-main">{tr("Angerufen")}{' '}{r.time}</span>
-    <span className="cc-dur">{r.state==='frozen'?`Anruf→Übergabe ${r.minutes} Min`:`seit ${r.minutes} Min`}</span>
+    <span className="cc-dur">{r.state==='frozen'?`${tr('Anruf→Übergabe')} ${r.minutes} ${tr('Min')}`:`${tr('seit')} ${r.minutes} ${tr('Min')}`}</span>
     {compact?null:<span className="cc-date">{r.date}</span>}
   </div>;
 }

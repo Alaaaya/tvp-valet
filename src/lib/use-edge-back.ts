@@ -17,6 +17,7 @@ export interface EdgeBackOptions {
   blocked?: boolean;
   /** change (e.g. selected booking id) cancels the current gesture even if the DOM root is reused */
   key?: unknown;
+  underlay?: RefObject<HTMLElement | null>;
 }
 
 const getOx = (el: ElementLike) =>
@@ -76,7 +77,31 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
     entryRef.current = entry;
     const html = document.documentElement;
     let prevOx = '';
+    let under:HTMLElement|null=null, parent:HTMLElement|null=null;
+    let savedUnder='', savedParent='',savedAria:string|null=null,savedInert=false;
+    const visual={
+      begin(){
+        under=optsRef.current.underlay?.current??null;
+        if(!under)return;
+        parent=ref.current?.parentElement??null;
+        savedUnder=under.getAttribute('style')??'';savedParent=parent?.getAttribute('style')??'';
+        savedAria=under.getAttribute('aria-hidden');savedInert=under.inert;
+        under.inert=true;under.setAttribute('aria-hidden','true');
+        under.classList.add('edge-back-underlay');
+        under.style.willChange='transform';
+        parent?.classList.add('edge-back-revealing');
+      },
+      update(p:number){if(!under)return;under.style.transform='translate3d('+(-30*(1-p))+'%,0,0)';parent?.style.setProperty('--back-dim',String(.28*(1-p)))},
+      settle(ms:number){if(under)under.style.transition='transform '+ms+'ms cubic-bezier(.2,.8,.2,1)';if(parent)parent.style.transition='--back-dim '+ms+'ms'},
+      cleanup(){if(!under)return;under.setAttribute('style',savedUnder);under.classList.remove('edge-back-underlay');under.inert=savedInert;
+        if(savedAria===null)under.removeAttribute('aria-hidden');else under.setAttribute('aria-hidden',savedAria);
+        if(parent){parent.setAttribute('style',savedParent);parent.classList.remove('edge-back-revealing')}
+        under=null;parent=null;
+      }
+    };
     const ctl = createController({
+      visual,
+      frame:fn=>requestAnimationFrame(fn),cancelFrame:id=>cancelAnimationFrame(id as number),
       root: () => {
         const r = ref.current;
         entry.root = r;

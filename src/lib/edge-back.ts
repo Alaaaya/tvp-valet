@@ -1,7 +1,7 @@
 export const EDGE_START_PX = 20;
 export const LOCK_PX = 8;
 export const LOCK_RATIO = 1.3;
-export const COMPLETE_RATIO = 0.33;
+export const COMPLETE_RATIO = 0.4;
 export const FLICK_VELOCITY = 0.5; // px/ms
 export const FLICK_MIN_PX = 40;
 
@@ -22,6 +22,7 @@ export function decideIntent(dx: number, dy: number): Intent {
 }
 
 export function shouldComplete(dx: number, width: number, velocity: number): boolean {
+  if (velocity <= -FLICK_VELOCITY) return false;
   if (dx >= width * COMPLETE_RATIO && dx > 0) return true;
   return velocity >= FLICK_VELOCITY && dx >= FLICK_MIN_PX;
 }
@@ -164,6 +165,9 @@ export interface ControllerOpts {
   externalBlocked?: () => boolean;
   viewportWidth: () => number;
   now: () => number;
+  visual?: {begin():void;update(progress:number):void;settle(ms:number):void;cleanup():void};
+  frame?: (fn:()=>void)=>unknown;
+  cancelFrame?: (id:unknown)=>void;
   settleMs?: number;
   schedule?: (fn: () => void, ms: number) => unknown;
   clearSchedule?: (h: unknown) => void;
@@ -176,6 +180,7 @@ export function createController(o: ControllerOpts) {
   let sx = 0, sy = 0, dx = 0, lastX = 0, lastT = 0, vel = 0, width = 1, raf = false;
   let saved: { transform: string; transition: string; willChange: string } | null = null;
   let timer: unknown = null;
+  let frameId: unknown = null;
   let epoch = 0;
   let boundRoot: RootLike | null = null;
   const settleMs = o.settleMs ?? 220;
@@ -184,6 +189,7 @@ export function createController(o: ControllerOpts) {
 
   const apply = (x: number) => {
     if (boundRoot) boundRoot.style.transform = x ? 'translate3d(' + x + 'px,0,0)' : '';
+    o.visual?.update(x / width);
   };
   const begin = (r: RootLike) => {
     boundRoot = r;
@@ -192,8 +198,11 @@ export function createController(o: ControllerOpts) {
     r.style.transition = 'none';
     r.classList.add('edge-back-dragging');
     o.clip?.set();
+    o.visual?.begin();
   };
   const cleanup = () => {
+    if(frameId!==null){o.cancelFrame?.(frameId);frameId=null} raf=false;
+    o.visual?.cleanup();
     if (timer != null) { clear(timer); timer = null; }
     const r = boundRoot;
     if (r && saved) {
@@ -209,11 +218,13 @@ export function createController(o: ControllerOpts) {
   const settle = (to: number, done: () => void) => {
     const r = boundRoot;
     if (!r) return done();
+    if(frameId!==null){o.cancelFrame?.(frameId);frameId=null} raf=false;
     phase = 'settling';
     const my = epoch;
     r.classList.remove('edge-back-dragging');
     r.classList.add('edge-back-settling');
     if (o.reducedMotion()) { apply(to); done(); return; }
+    o.visual?.settle(settleMs);
     r.style.transition = 'transform ' + settleMs + 'ms cubic-bezier(.2,.8,.2,1)';
     apply(to);
     timer = schedule(() => { timer = null; if (my === epoch) done(); }, settleMs);
@@ -254,7 +265,7 @@ export function createController(o: ControllerOpts) {
       const t = o.now();
       dx = clampDrag(x - sx, width);
       if (t > lastT) { const v = (x - lastX) / (t - lastT); vel = vel * 0.5 + v * 0.5; lastX = x; lastT = t; }
-      if (!raf) { raf = true; apply(dx); raf = false; }
+      if (o.frame) { if(!raf){raf=true;frameId=o.frame(()=>{raf=false;frameId=null;if(phase==='dragging')apply(dx)})} } else apply(dx);
       return true;
     },
     end(pid: unknown): void {

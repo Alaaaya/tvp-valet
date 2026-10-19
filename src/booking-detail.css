@@ -82,3 +82,47 @@
 .bd .bd-round:last-child:before{inset:0 -3px}
 .bd .bd-round .lucide-chevron-left{width:24px;height:24px;stroke-width:2}
 .bd .bd-round .reference-gear{width:21px;height:21px;fill:currentColor;stroke:none}
+
+/* Real-device follow-up, sampled sRGB flat fills from IMG_0576/0579.
+   Keep the 44px hit target, paint the circle directly inside it. */
+.bd .bd-head,.bd .bd-head h2,.bd .bd-round{filter:none;text-shadow:none;box-shadow:none;opacity:1}
+.bd .bd-head h2{transform:none;line-height:22px;-webkit-font-smoothing:antialiased}
+.bd .bd-round{transform:none;translate:none;isolation:auto;background:#148080;border:1px solid #629c9c;box-shadow:none;border-radius:50%}
+.bd .bd-round:before{content:none}
+.bd .bd-identity{color:#0d3b33;font-family:Arial,sans-serif;font-size:14px;line-height:1.3}
+.bd .bd-label{color:#0d3b33;font-size:12px;font-weight:700}
+.bd .bd-identity strong{color:#0d3b33;font-weight:700}
+.bd .bd-identity a,.bd .pp-link{color:#1976d2;font-weight:700}
+.bd .bd-identity a{line-height:18px;min-height:22px}
+.bd .pp-link{justify-content:flex-start;padding:0;min-height:32px;text-align:start}
+.bd .bd-key,.bd .bd-location{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.bd .bd-location svg{color:#1976d2;fill:#1976d2;stroke:#fff;border-radius:2px}
+.bd .bd-key svg{stroke-width:3;color:#0d3b33;flex:none}
+.bd .bd-outline{color:#1976d2;border:1px solid #1976d2;font-weight:700;line-height:16px;gap:4px}
+.bd .bd-outline svg{flex:none;stroke-width:2.5}
+.bd .odometer-local{width:100%;min-width:0}
+.bd .odometer-capture{width:100%;opacity:1;cursor:pointer}
+.odometer-preview{margin-top:8px;max-width:100%}
+.odometer-preview img{display:block;width:100%;max-height:180px;object-fit:contain}
+.odometer-preview p{font-size:12px;line-height:1.5}
+.odometer-preview button{margin-block:4px}
+.bd .split-handover section.in,.bd .flight-panel.in{background:#37a068!important}
+.bd .split-handover section.out,.bd .flight-panel.out{background:#e43d3d!important}
+.bd .split-handover h3{font-family:Arial,sans-serif}
+.bd .handover-date>button{font-weight:700;color:#27834d;border-color:#37a068;background:#c5f5d4}
+.bd .out .handover-date>button{color:#bf3030;border-color:#e43d3d;background:#fdd6d6}
+.bd .handover-date>button svg{stroke-width:2.7;flex:none}
+.bd .fp-head{display:flex;flex-wrap:wrap;align-items:center;gap:5px;direction:ltr;min-width:0}
+.bd .fp-head strong{font-weight:700;min-width:0}
+.bd .fp-time{margin-inline-start:auto;font-size:14px;line-height:20px;direction:ltr;unicode-bidi:isolate}
+.bd .fp-head>svg{flex:none;stroke-width:2.5}
+.bd .fp-hint{margin:0;width:100%;white-space:normal}
+.bd .flight-panel .op-btn{display:flex;flex-wrap:wrap;gap:3px 5px;min-height:44px;line-height:18px;font-weight:700}
+.bd .flight-panel .op-btn>.call-counter{flex-basis:100%;background:transparent;border:0;padding:0;box-shadow:none;justify-content:center;margin:0;font-size:10px;color:inherit;gap:4px;min-height:14px;line-height:14px}
+.bd .flight-panel .op-btn .cc-main,.bd .flight-panel .op-btn .cc-date{display:none}
+.bd .flight-panel .op-btn .cc-dur{color:inherit;font-weight:700;font-size:10px;line-height:14px}
+.bd .summary-cost{color:#0d3b33;font-family:Arial,sans-serif}
+.bd .summary-cost h3{font-weight:700;font-size:17px;gap:8px}
+.bd .summary-cost h3 svg{stroke-width:2.4}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.bd .bd-identity a[href^="mailto"]{font-size:13px;overflow-wrap:break-word;word-break:normal;hyphens:none}
