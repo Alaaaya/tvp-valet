@@ -1,6 +1,7 @@
 import {t as tr} from './i18n';
 import React,{useEffect,useMemo,useRef,useState} from 'react';
-import {ChevronLeft,RotateCcw,Bus,Car,Building2,Ship} from 'lucide-react';
+import {ChevronLeft,RotateCcw,Building2} from 'lucide-react';
+import {Fa} from './fa-icons';
 import type {Booking} from '../model';
 import {SERVICE_TYPES,bookingService,defaultMainFilters,normalizeMainFilters,type MainBookingFilters,type ServiceType} from './booking-filters';
 import {trapTab} from './undo-controls';
@@ -9,7 +10,8 @@ import '../main-filter.css';
 
 export interface MainFilterViewProps{filter:MainBookingFilters;onChange:(next:MainBookingFilters)=>void;date:string;onDate:(date:string)=>void;onClose:()=>void;rows:Booking[];userId?:string}
 const NOT_STORED="Nicht gespeichert";
-export const SERVICE_ICON:Record<ServiceType,React.ReactNode>={Shuttle:<Bus size={16}/>,Valet:<Car size={16}/>,Terminal:<Building2 size={16}/>,Cruise:<Ship size={16}/>,'Valet/Shuttle':<Car size={16}/>,'Shuttle/Valet':<Bus size={16}/>};
+const VALET_ICO=<span className="mf-ico"><Fa name="car-side" size={15}/><Fa name="person" size={11}/></span>;
+export const SERVICE_ICON:Record<ServiceType,React.ReactNode>={Shuttle:<span className="mf-ico"><Fa name="van-shuttle" size={17}/></span>,Valet:VALET_ICO,Terminal:<span className="mf-ico"><Building2 size={15}/></span>,Cruise:<span className="mf-ico"><Fa name="ship" size={17}/></span>,'Valet/Shuttle':<span className="mf-ico"><Fa name="car-side" size={13}/><Fa name="van-shuttle" size={15}/></span>,'Shuttle/Valet':<span className="mf-ico"><Fa name="van-shuttle" size={15}/><Fa name="car-side" size={13}/></span>};
 /** Hours: finite 0..24, fractions allowed; anything else keeps the previous value. */
 export function parseHours(v:string):number|null{const t=v.trim().replace(',','.');if(t===''||!/^\d+(\.\d+)?$/.test(t))return null;const n=Number(t);return Number.isFinite(n)&&n>=0&&n<=24?n:null}
 
