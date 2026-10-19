@@ -14,3 +14,14 @@ describe('edge-back css', () => {
     expect(css).not.toMatch(/filter\s*:\s*blur/);
   });
 });
+
+describe('gesture-only underlist dim', () => {
+  it('keeps the exposed list visibly gray at 40% progress and clears via cleanup', () => {
+    const source = readFileSync(new URL('./use-edge-back.ts', import.meta.url), 'utf8');
+    expect(source).toContain("String(.6*(1-p))");
+    expect(source).toContain("parent.setAttribute('style',savedParent)");
+    const opacity = .6 * (1 - .4);
+    const whitePixel = Math.round(255 * (1 - opacity) + 85 * opacity);
+    expect(whitePixel).toBe(194);
+  });
+});

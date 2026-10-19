@@ -91,7 +91,7 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
         under.style.willChange='transform';
         parent?.classList.add('edge-back-revealing');
       },
-      update(p:number){if(!under)return;under.style.transform='translate3d('+(-30*(1-p))+'%,0,0)';parent?.style.setProperty('--back-dim',String(.28*(1-p)))},
+      update(p:number){if(!under)return;under.style.transform='translate3d('+(-30*(1-p))+'%,0,0)';parent?.style.setProperty('--back-dim',String(.6*(1-p)))},
       settle(ms:number){if(under)under.style.transition='transform '+ms+'ms cubic-bezier(.2,.8,.2,1)';if(parent)parent.style.transition='--back-dim '+ms+'ms'},
       cleanup(){if(!under)return;under.setAttribute('style',savedUnder);under.classList.remove('edge-back-underlay');under.inert=savedInert;
         if(savedAria===null)under.removeAttribute('aria-hidden');else under.setAttribute('aria-hidden',savedAria);
