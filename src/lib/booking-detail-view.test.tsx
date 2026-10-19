@@ -38,3 +38,13 @@ it('reference typography keeps normal labels, links and flights with bold values
  expect(c).toContain('.bd .bd-days{display:inline');
  expect(c).toContain('.bd .summary-cost .bd-cost-total{justify-content:flex-end}');
 });
+
+it('reference primary geometry moves optional metadata and payment controls into an accessible secondary disclosure',()=>{
+ const b=Object.freeze({...base,checked_in_at:null,key_cash:'10€ Wael',spot:'P3'});const before=JSON.stringify(b);
+ const h=r(<BookingDetailView {...props(b,{productLabel:'Actual catalog label',paymentSlot:<button id="existing-payment">Pay</button>})}/>);
+ const primary=h.slice(h.indexOf('bd-identity'),h.indexOf('bd-secondary'));
+ expect(primary).not.toContain('External ID:');expect(primary).not.toContain('bd-location');expect(primary).not.toContain('bd-key');expect(primary).not.toContain('existing-payment');
+ expect(primary).toContain('Parken (Actual catalog label)');expect(primary).toContain('Total amount');expect(primary).toContain('Paid');
+ expect(h).toContain('<details class="bd-secondary">');expect(h).toContain('206095322');expect(h).toContain('P3');expect(h).toContain('10€ Wael');expect(h).toContain('existing-payment');expect(JSON.stringify(b)).toBe(before);
+ const due=r(<BookingDetailView {...props({...b,paid:0})}/>);expect(due).toContain('<details class="bd-secondary" open="">');
+});
