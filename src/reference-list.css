@@ -1,0 +1,13 @@
+/* Main list matched to ParkingPro refs IMG_0573/0574 (1290px wide = 3.308 px per CSS px at 390). Measured: row 280->85, time pane 183->55, stripe 15->4. */
+.app.fixed-top .blr-plate{color:#0e5046;font-weight:800}
+.app.fixed-top .blr-badge{background:#fff;border:1px solid #ff0058;color:#ff0058}
+.app.fixed-top .blr-badge.ag,.app.fixed-top .blr-badge.ap,.app.fixed-top .blr-badge.fsp,.app.fixed-top .blr-badge.pl,.app.fixed-top .blr-badge.pr{background:#fff;border-color:#ff0058;color:#ff0058}
+.app.fixed-top .blr-code,.app.fixed-top .blr-keycode,.app.fixed-top .blr-name{color:#808080}
+.app.fixed-top .blr-cover{background:#fff;border:1px solid #000;color:#000}
+.app.fixed-top .blr-pay{background:#fff;border:1px solid #38a169;color:#2f855a}
+.app.fixed-top .blr-pay.due{border-color:#e53e3e;color:#e53e3e}
+.app.fixed-top .blr-cc,.app.fixed-top .blr-pn{color:#1fb19b}
+/* counters: ref blocks x18..184 / 206..371 of 390, 41 tall inside a 53 strip; 44px hit area kept via ::after */
+.app.fixed-top .counters.counters{padding:6px 18px 5px;gap:22px;height:53px;box-sizing:border-box}
+.app.fixed-top .counters .counter{height:41px;position:relative}
+.app.fixed-top .counters .counter::after{content:"";position:absolute;inset:-2px 0}

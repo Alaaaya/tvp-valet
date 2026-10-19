@@ -1,5 +1,5 @@
 /* Preference scales list geometry, never the viewport or its hit areas. */
-.app{--list-scale:1.2}
+.app{--list-scale:1}
 .app.fixed-top .blr-main{grid-template-columns:calc(55px * var(--list-scale)) minmax(0,1fr) auto;gap:calc(4px * var(--list-scale));min-height:calc(85px * var(--list-scale));height:calc(85px * var(--list-scale));max-height:calc(85px * var(--list-scale));padding-right:calc(6px * var(--list-scale))}
 .app.fixed-top .blr-time,.app.fixed-top .blr.done .blr-time{gap:calc(3px * var(--list-scale));padding:calc(4px * var(--list-scale)) calc(1px * var(--list-scale));border-left-width:calc(4px * var(--list-scale))}
 .app.fixed-top .blr-time strong{font-size:calc(13px * var(--list-scale))}
