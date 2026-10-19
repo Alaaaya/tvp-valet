@@ -1,3 +1,4 @@
+import {t as tr} from './i18n';
 /** No storage or service-worker changes: deployment checks are read-only. */
 export interface BuildUpdateEnvironment {
   fetch: (url: string, options: RequestInit) => Promise<Pick<Response, 'ok' | 'text'>>;
@@ -57,7 +58,7 @@ export function startBuildUpdates(options: BuildUpdateOptions) {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let cancel!: () => void;
     const cancelled = new Promise<never>((_, reject) => {
-      cancel = () => { controller.abort(); reject(new Error('Deployment check cancelled')); };
+      cancel = () => { controller.abort(); reject(new Error(tr("Deployment check cancelled"))); };
       timer = env.setTimeout(cancel, options.timeoutMs ?? 10_000);
     });
     cancelRequest = cancel;

@@ -17,3 +17,19 @@
 .app.fixed-top .blr-time strong{font-size:14px;font-weight:600}
 .app.fixed-top .blr-plate{font-size:14px;font-weight:900}
 .app.fixed-top .blr-badge{border-width:1.5px;font-weight:800}
+
+/* Reference header, native 1290px images normalized to 390 CSS px.
+   Equal grid tracks keep title on viewport centre regardless of controls. */
+.topbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:0;padding-inline:10px;letter-spacing:0}
+.topbar>strong{grid-column:2;min-width:0;justify-self:stretch;text-align:center;font-size:17px;font-weight:700;line-height:1.2}
+.topbar>.header-actions{grid-column:3;justify-self:end}
+.topbar>button{grid-column:1}
+.topbar svg{stroke-width:2}
+.app.fixed-top .search-row{height:43.5px;padding:0 6px;gap:6px;overflow:visible}
+.app.fixed-top .search{position:relative;background:transparent;padding:0 0 0 25px;border-radius:0;gap:0;height:44px;min-height:44px}
+.app.fixed-top .search>svg{position:absolute;inset-inline-start:0;color:#fff;width:19px;height:19px}
+.app.fixed-top .search input{height:30px;min-height:30px;background:#fff;border-radius:5px;padding:2px 6px;color:#333;font-size:16px}
+.app.fixed-top .now-button{height:44px;min-height:44px;padding:0 8px;background:transparent;position:relative;isolation:isolate}
+.app.fixed-top .now-button:before{content:"";position:absolute;inset:7px 0;background:#0e5046;border-radius:20px;z-index:-1}
+.app.fixed-top .cam-search{width:44px;min-width:44px;height:44px;min-height:44px;border-radius:0;background:transparent}
+.app.fixed-top .cam-search svg{border:1.5px solid #fff;border-radius:5px;width:28px;height:25px;padding:2px}
