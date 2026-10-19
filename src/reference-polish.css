@@ -121,3 +121,16 @@ html .app.fixed-top .blr-tf>svg.fa{width:calc(12px * var(--list-scale,1))}
 html .app.fixed-top .blr-pn{gap:3px}
 html .app.fixed-top .blr-pn svg.fa{width:calc(17px * var(--list-scale,1))}
 html .app.fixed-top .now-button svg.fa{width:16px;height:16px}
+/* ---- sizes pass: match IMG_0592 icon/text proportions ---- */
+html .app.fixed-top .blr-main{grid-template-columns:calc(56px * var(--list-scale,1)) minmax(0,1fr) auto}
+html .app.fixed-top .blr-ico svg.fa-car-side{width:calc(12px * var(--list-scale,1))}
+html .app.fixed-top .blr-ico svg.fa-person{height:calc(10px * var(--list-scale,1))}
+html .app.fixed-top .blr-tf>svg.fa{width:calc(10px * var(--list-scale,1))}
+html .app.fixed-top .blr-time>strong{font-size:calc(14px * var(--list-scale,1))}
+html .app.fixed-top .blr-pn svg.fa{width:calc(15px * var(--list-scale,1))}
+html .app.fixed-top .blr-cc svg.fa{width:calc(13px * var(--list-scale,1))}
+html .app.fixed-top .blr-cover{font-size:calc(10px * var(--list-scale,1));padding:0 5px}
+html .app.fixed-top .blr-pay{font-size:calc(9.5px * var(--list-scale,1))}
+html .app.fixed-top .blr-l3 svg.fa{width:calc(12px * var(--list-scale,1));height:auto}
+html .app.fixed-top .blr-key svg.fa,html .app.fixed-top .blr-keycode svg.fa{width:calc(11px * var(--list-scale,1));height:auto}
+html .app.fixed-top .blr-key svg.fa{width:calc(9px * var(--list-scale,1));height:calc(9px * var(--list-scale,1))}
