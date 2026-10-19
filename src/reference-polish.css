@@ -100,3 +100,24 @@ html .app.fixed-top .blr-pay{font-size:calc(10px * var(--list-scale,1));padding:
 html .app.fixed-top .blr-plate{font-size:calc(12px * var(--list-scale,1));font-weight:700}
 html .app.fixed-top .blr-pn{font-size:calc(12px * var(--list-scale,1))}
 html .app.fixed-top .blr-pn svg{width:calc(15px * var(--list-scale,1));height:calc(15px * var(--list-scale,1))}
+
+/* ---- Font Awesome glyphs (reference icon family) ---- */
+html svg.fa{stroke:none;flex:none}
+html .app.fixed-top .blr-ico svg.fa{fill:#173b37;stroke:none}
+html .app.fixed-top .blr-ico{align-items:flex-end;gap:1px}
+html .app.fixed-top .blr-ico svg.fa-person{display:inline-block;width:auto;height:calc(15px * var(--list-scale,1));margin:0}
+html .app.fixed-top .blr-ico svg.fa-car-side{width:calc(20px * var(--list-scale,1));height:auto}
+html .app.fixed-top .blr-tf>svg.fa{fill:#2f6fd0;width:calc(14px * var(--list-scale,1));height:auto}
+html .blr-l3 svg.fa,html .app.fixed-top .blr-l3 svg.fa{fill:#2bb08f;stroke:none}
+html .app.fixed-top .blr-pn svg.fa{fill:#1fa38b;width:calc(19px * var(--list-scale,1));height:auto}
+html .app.fixed-top .blr-cc svg.fa{fill:#0d3b33;width:calc(15px * var(--list-scale,1));height:auto}
+html .app.fixed-top .cam-search svg.fa{fill:#fff;stroke:none;width:30px;height:auto;border:0;padding:0}
+html .app.fixed-top .search svg.fa{fill:#fff;stroke:none}
+html .app.fixed-top .now-button svg.fa{fill:#fff}
+html .topbar svg.fa{fill:#fff}
+html .app.fixed-top .blr-ico svg.fa-car-side{width:calc(15px * var(--list-scale,1))}
+html .app.fixed-top .blr-ico svg.fa-person{height:calc(12px * var(--list-scale,1))}
+html .app.fixed-top .blr-tf>svg.fa{width:calc(12px * var(--list-scale,1))}
+html .app.fixed-top .blr-pn{gap:3px}
+html .app.fixed-top .blr-pn svg.fa{width:calc(17px * var(--list-scale,1))}
+html .app.fixed-top .now-button svg.fa{width:16px;height:16px}
