@@ -12,6 +12,9 @@ describe('edge-back css', () => {
   it('has no shadow or blur', () => {
     const css = readFileSync(new URL('../edge-back.css', import.meta.url), 'utf8').replace(/\/\*[^]*?\*\//g, '');
     expect(css).not.toMatch(/filter\s*:\s*blur/);
+    expect(css).not.toMatch(/box-shadow\s*:\s*(?!none)[^;}]+/);
+    expect(css).not.toMatch(/(?:linear|radial)-gradient|drop-shadow/);
+    expect(css).toContain('.edge-back-revealing>.detail::before,.edge-back-revealing>.detail::after{content:none');
   });
 });
 
