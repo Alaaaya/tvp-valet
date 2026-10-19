@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 it('counter visual height is 41 with a 44px+ hit area and no min-height override', () => {
   const c = readFileSync('src/reference-list.css', 'utf8');
   expect(c).toContain('.counter{height:41px;min-height:41px;position:relative;overflow:visible}');
-  expect(c).toContain('.counter::after{content:"";position:absolute;inset:-2px 0}');
+  expect(c).toContain('.counter::after{content:"";position:absolute;inset:-3px 0}');
 });
 it('flight stays fully visible in time pane and placeholder is short', () => {
   const c = readFileSync('src/reference-list.css', 'utf8');
