@@ -23,3 +23,6 @@ it('flight stays fully visible in time pane and placeholder is short', () => {
   expect(c).toContain('.blr-tf>span{overflow:visible;text-overflow:clip;white-space:nowrap');
   expect(readFileSync('src/main.tsx', 'utf8')).toContain('placeholder="Kennzeichen oder Name"');
 });
+it('counter hit-area pseudo-element is not clipped', () => {
+  expect(readFileSync('src/reference-list.css', 'utf8')).toContain('position:relative;overflow:visible}');
+});
