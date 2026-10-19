@@ -135,7 +135,62 @@ html .app.fixed-top .blr-l3 svg.fa{width:calc(12px * var(--list-scale,1));height
 html .app.fixed-top .blr-key svg.fa,html .app.fixed-top .blr-keycode svg.fa{width:calc(11px * var(--list-scale,1));height:auto}
 html .app.fixed-top .blr-key svg.fa{width:calc(9px * var(--list-scale,1));height:calc(9px * var(--list-scale,1))}
 /* plate black, ParkingPro (Arial) font for list rows */
-html .app.fixed-top .blr{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif}
-html .app.fixed-top .blr-plate,html .app.fixed-top .blr.pay-note .blr-plate{color:#000;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-weight:700;letter-spacing:.2px}
-html .app.fixed-top .blr-time>strong{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-weight:400;color:#222;font-size:calc(15px * var(--list-scale,1));letter-spacing:0}
-html .app.fixed-top .blr-tf>span{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;color:#222}
+html .app.fixed-top .blr{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+html .app.fixed-top .blr-plate,html .app.fixed-top .blr.pay-note .blr-plate{color:#000;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;font-weight:700;letter-spacing:.2px}
+html .app.fixed-top .blr-time>strong{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;font-weight:400;color:#222;font-size:calc(15px * var(--list-scale,1));letter-spacing:0}
+html .app.fixed-top .blr-tf>span{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;color:#222}
+
+/* ---- Detail = IMG_0593/0594 (ParkingPro booking), font sizes from the screenshot ---- */
+html body .bd{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+html body .bd .bd-head{background:#2f6b6a}
+html body .bd .bd-head h2{font-size:18px;font-weight:500;transform:none}
+html body .bd .pp-strip.ext,html body .bd .pp-strip.due{display:none}
+html body .bd .bd-identity{font-size:13px;color:#222}
+html body .bd .bd-identity .bd-label{font-size:13px;font-weight:400;color:#222}
+html body .bd .bd-identity strong{font-size:14px;font-weight:700;color:#1b2b2b}
+html body .bd .bd-identity a,html body .bd .bd-identity .pp-link{font-size:14px;font-weight:400;color:#3b7dc4}
+html body .bd .bd-identity a[href^="mailto"]{font-size:14px}
+html body .bd .bd-contact-count{font-size:14px;font-weight:400;color:#222}
+html body .bd .bd-outline{font-size:12px;font-weight:700;color:#3b6fc4;border-color:#3b6fc4;white-space:nowrap;min-height:30px;padding:3px 9px}
+html body .bd .split-handover section.in,html body .bd .flight-panel.in{background:#5a9e6f!important}
+html body .bd .split-handover section.out,html body .bd .flight-panel.out{background:#d24b45!important}
+html body .bd .split-handover h3{font-size:13px;font-weight:700}
+html body .bd .handover-date{font-size:14px;color:#222}
+html body .bd .handover-date>strong{font-size:14px;font-weight:700}
+html body .bd .handover-date>button{font-size:12.5px;font-weight:700;color:#4a8f5f;border-color:#5a9e6f;background:#d0f3dc}
+html body .bd .out .handover-date>button{color:#c64540;border-color:#d24b45;background:#f7d6d6}
+html body .bd .flight-panel{font-size:14px}
+html body .bd .flight-panel button,html body .bd .pp-called button{font-size:12.5px;font-weight:700}
+html body .bd .summary-cost{font-size:14px}
+html body .bd .summary-cost h3,html body .bd .summary-location h3,html body .bd .summary-media h3{font-size:16px;font-weight:700}
+html body .bd,html body .bd .bd-head h2,html body .bd .bd-identity,html body .bd .split-handover h3,html body .bd .summary-cost{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+html body .bd .bd-head h2{font-size:17px}
+html body .bd .bd-identity{padding-top:20px;padding-bottom:20px}
+html body .bd .bd-outline{font-size:11.5px;padding:3px 7px;letter-spacing:-.1px;max-width:none}
+html body .bd .bd-outline small{font-size:9.5px}
+html body .bd .op-btn,html body .op-btn{font-weight:700}
+html body .bd .flight-panel .op-btn,html body .bd .flight-panel .fp-act{font-weight:700;font-size:12.5px}
+/* detail lower part = IMG_0594 */
+html body .bd .summary-media h3,html body .bd .summary-cost h3{display:flex;align-items:center;gap:8px;color:#1d4a44;font-size:17px;font-weight:700}
+html body .bd .summary-media h3 svg.fa{fill:#1d4a44;width:18px;height:auto}
+html body .bd .add-comment,html body .bd .upload{width:68px;height:68px;min-width:68px;border:2px solid #6fb3a7;border-radius:6px;background:#d8efea;box-shadow:inset 0 0 0 3px #d8efea,inset 0 0 0 4px #9ccfc5;color:#2d5f57;display:grid;place-items:center}
+html body .bd .add-comment svg.fa,html body .bd .upload svg.fa{fill:#2d5f57;width:26px;height:26px}
+html body .bd .bd-comments p{font-style:italic;color:#4f9a8d;font-size:15px}
+html body .bd .bd-service{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#1d4a44}
+html body .bd .bd-service .bd-svc-ico{display:inline-flex;align-items:flex-end;gap:1px}
+html body .bd .bd-service .bd-svc-ico svg.fa{fill:#1d2b2b}
+html body .bd .bd-service>span{display:inline-flex;align-items:center;gap:10px;flex-direction:row}
+html body .bd .bd-service>span b{font-size:15px;color:#1d4a44}
+html body .bd .bd-service>span small{order:9;font-size:15px;font-weight:700;color:#1d4a44;text-transform:none}
+html body .bd .bd-service .bd-product{font-size:15px;font-weight:700;color:#1d4a44;gap:6px}
+html body .bd .bd-service .bd-product-dot{width:18px;height:18px;background:#000!important}
+html body .bd .bd-service .bd-loc{font-size:15px;font-weight:700;color:#1d4a44}
+html body .bd .bpay-soon{display:none}
+html body .bd .add-comment,html body .bd .upload{width:58px;height:58px;min-width:58px}
+html body .bd .add-comment svg.fa,html body .bd .upload svg.fa{stroke:#2d5f57;stroke-width:44;width:24px;height:24px;overflow:visible}
+html body .bd .bd-service>span:not(.bd-product):not(.bd-loc):not(.bd-svc-ico){display:contents}
+html body .bd .bd-service>span>b{order:1}
+html body .bd .bd-service .bd-product{order:2}
+html body .bd .bd-service>span>small{order:3;margin-left:auto}
+html body .bd .bd-service .bd-loc{order:4}
+html body .bd .bd-service>span>small{margin-left:22px}
