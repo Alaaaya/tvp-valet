@@ -53,3 +53,11 @@ it('uses filled reference icons without losing accessible action labels',()=>{
  expect(h).toContain('Check-in');expect(h).toContain('Check-out');
  expect(h).toContain('aria-hidden="true"');expect(h).not.toContain('reference-check-action');
 });
+it('keeps measured reference controls at normal weight and compact solid glyph sizes',()=>{
+ const c=readFileSync('src/booking-detail.css','utf8');
+ expect(c).toContain('handover-date>button{font-size:12px;font-weight:400}');
+ expect(c).toContain('handover-date>button{font-size:12.5px}');
+ expect(c).toContain('reference-icon-phone{width:9px;height:9px}');
+ expect(c).toContain('summary-cost h3{font-size:14.5px');
+ expect(c).toContain('fp-head{position:relative;top:-4px}');
+});

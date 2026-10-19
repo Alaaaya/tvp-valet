@@ -214,3 +214,28 @@ html .bd .summary-cost p:first-of-type>span:last-child{font-size:13.5px}
 html .bd .summary-cost p:first-of-type+.bd-cost-total>span:first-child{font-weight:600}
 html .bd .summary-cost p{margin-inline-end:8px}
 html .bd .summary-cost .bd-cost-total>span:last-child{min-width:76px}
+
+/* Measured same-label ink boxes from IMG_0579, rather than rasterization assumptions. */
+html .bd .handover-date>button{font-size:12px;font-weight:400}
+html .bd .handover-date>button .reference-icon{width:13px;height:13px}
+html .bd .flight-panel .op-btn{font-size:12px;font-weight:400;background:#c5f5d4;color:#27834d}
+html .bd .flight-panel.out .op-btn{background:#fdd6d6;color:#bf3030}
+html .bd .flight-panel .op-btn .reference-icon-phone{width:11px;height:11px}
+html .bd .split-handover h3 .reference-icon{width:14px;height:14px}
+html .bd .fp-head{gap:4px}
+html .bd .fp-head .reference-icon-plane{width:16px;height:16px;margin-inline-start:3px}
+html .bd .summary-cost h3{font-size:14.5px;gap:5px}
+html .bd .summary-cost h3 .reference-icon{width:14px;height:13px;margin-inline-start:-2px}
+html .bd .summary-cost p{font-size:13.5px}
+html .bd .summary-cost p:first-of-type{margin-inline-start:8px}
+html .bd .summary-cost p:first-of-type+.bd-cost-total>span:first-child{font-weight:400}
+/* Glyph-group alignment measured with foreground contrast, independently of booking text. */
+html .bd .handover-date>button{gap:4px;padding-top:3px;padding-bottom:1px}
+html .bd .flight-panel .op-btn{padding-top:5px;padding-bottom:1px}
+html .bd .flight-panel .op-btn .reference-icon-phone{width:9px;height:9px}
+html .bd .split-handover h3 .reference-icon{width:15px;height:14px;position:relative;inset-inline-start:-1px;top:1px}
+html .bd .fp-head{position:relative;top:-4px}
+html .bd .fp-head .reference-icon-plane{position:relative;left:1px}
+html .bd .summary-cost .bd-cost-total{position:relative;top:1px}
+html .bd .handover-date>button{font-size:12.5px}
+html .bd .flight-panel .op-btn .reference-icon-phone{position:relative;top:-.5px}
