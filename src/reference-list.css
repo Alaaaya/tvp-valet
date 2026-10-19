@@ -33,3 +33,10 @@
 .app.fixed-top .now-button:before{content:"";position:absolute;inset:7px 0;background:#0e5046;border-radius:20px;z-index:-1}
 .app.fixed-top .cam-search{width:44px;min-width:44px;height:44px;min-height:44px;border-radius:0;background:transparent}
 .app.fixed-top .cam-search svg{border:1.5px solid #fff;border-radius:5px;width:28px;height:25px;padding:2px}
+
+/* IMG_0574 normalized 1290->390: toolbar bottom 88, glyph centre 72.
+   Native status area is not drawn; the browser supplies env() in standalone. */
+.app.fixed-top .topbar{padding-inline:2px;grid-template-columns:44px minmax(0,1fr) 44px}
+.app.fixed-top .topbar>strong{font-size:16px;line-height:20px;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.app.fixed-top .topbar svg{width:20px;height:20px;stroke-width:2.2}
+.app.fixed-top .header-actions svg{fill:currentColor;stroke-width:1.3}
