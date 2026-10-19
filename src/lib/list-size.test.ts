@@ -11,3 +11,10 @@ it('persists valid choices and survives storage errors',()=>{
  expect(readListSize({getItem:()=>value})).toBe(135);
  expect(()=>writeListSize({setItem:()=>{throw Error()}},150)).not.toThrow();
 });
+
+import { readFileSync } from 'node:fs';
+it('counter visual height is 41 with a 44px+ hit area and no min-height override', () => {
+  const c = readFileSync('src/reference-list.css', 'utf8');
+  expect(c).toContain('.counter{height:41px;min-height:41px;position:relative}');
+  expect(c).toContain('.counter::after{content:"";position:absolute;inset:-2px 0}');
+});
