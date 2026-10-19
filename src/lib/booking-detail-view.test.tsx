@@ -66,7 +66,8 @@ it('last reference layer preserves the final control, plane and cost corrections
  expect(c).toContain('handover-date>button{font-size:12.5px;font-weight:400}');
  expect(c).not.toContain('handover-date>button{font-size:12px');
  expect(c).toContain('translateY(.5px) scaleY(1.0714286) rotate(-45deg)');
- expect(c).toContain('summary-cost p:first-of-type>span:first-child{font-weight:400}');
+ expect(c).toContain('summary-cost p:first-of-type>span:first-child{font-weight:400;-webkit-text-stroke:.19px currentColor}');
  expect(c).toContain('summary-cost .bd-days{font-weight:400;color:#999}');
  expect(c).toContain('summary-cost .bd-cost-total{gap:14px}');
+ expect(c).toContain('font-size:13px;position:relative;top:-.5px;transform:scaleX(.96);transform-origin:right center');
 });
