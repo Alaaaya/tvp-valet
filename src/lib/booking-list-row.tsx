@@ -1,6 +1,6 @@
 import {t as tr} from './i18n';
 import React from 'react';
-import {PlaneLanding,PlaneTakeoff,Car,Users,Phone,KeyRound,Check,Banknote,MessageSquare} from 'lucide-react';
+import {PlaneLanding,PlaneTakeoff,Car,Users,Phone,KeyRound,Check,Banknote,MessageSquare,PersonStanding} from 'lucide-react';
 import {money,clock,type Booking} from '../model';
 import {displayComment,omitExternalReference} from './comments';
 import {paymentInstruction} from './payment-note';
@@ -51,7 +51,7 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
  return <article className={'blr '+kind+(completed?' done':'')+(pn?' pay-note':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?tr("Annahme "):tr("Rückgabe "))+time+' '+b.plate+' '+b.customer_name}>
-   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label={tr("erledigt")}><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><Users size={18}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
+   <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label={tr("erledigt")}><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Car size={20}/><PersonStanding className="blr-ico-person" size={18}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<PlaneLanding size={14}/>:<PlaneTakeoff size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
    <span className="blr-body">
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
     <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><KeyRound size={15}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
