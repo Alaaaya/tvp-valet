@@ -19,3 +19,6 @@
 .flight-panel .fp-act{background:#d0f5d8}
 .flight-panel.out .fp-act{background:#f8d9d8}
 .pp-ride .op-btn.ride{background:#7dc6ba}
+.flight-panel .fp-act{color:#1f6b3c}
+.flight-panel.out .fp-act{color:#a52d27}
+.counter>div>span,.fp-head strong{font-weight:700}
