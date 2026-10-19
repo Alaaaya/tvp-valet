@@ -6,7 +6,7 @@ describe('pwa assets',()=>{
   const m=JSON.parse(manifestRaw);
   it('manifest is relative standalone',()=>{
     expect(m.id).toBe('./');expect(m.start_url).toBe('./');expect(m.scope).toBe('./');
-    expect(m.display).toBe('standalone');expect(m.theme_color).toBe('#0f6b67');
+    expect(m.display).toBe('standalone');expect(m.theme_color).toBe('#0d6b6b');
   });
   it('icons are relative and include maskable 512',()=>{
     for(const i of m.icons)expect(i.src.startsWith('icons/')).toBe(true);

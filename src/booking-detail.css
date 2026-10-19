@@ -59,3 +59,15 @@
 .bd .summary-media .mg-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
 .bd .summary-media .mg-grid>*{width:100%;min-width:0;min-height:0;aspect-ratio:1}
 .bd .pp-called:has(>small),.bd .pp-called:has(>.error){padding:8px 10px}
+
+/* Display-P3 reference converted through its ICC profile into sRGB, not raw channels. */
+.bd .bd-head{height:calc(48px + env(safe-area-inset-top));min-height:48px;padding-inline:14px;background:#0c6a6a}
+.bd .bd-head h2{font-size:16px;line-height:20px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd .bd-round:before{inset:3px;border-color:#629c9c;background:#148080}
+.bd .bd-round svg{width:21px;height:21px;stroke-width:2.3}
+.bd .bd-head h2{font-size:15.5px;font-weight:600}
+.bd .bd-round:before{inset:0;border-width:1px}
+.bd .bd-round .lucide-settings>path{fill:currentColor;stroke-width:1}
+.bd .bd-round .lucide-settings>circle{fill:#148080;stroke:#148080}
+.bd .bd-round .lucide-chevron-left{width:24px;height:24px;stroke-width:2.6}
+.bd .bd-round:before{box-shadow:inset 0 -1px 0 #88b4b4}

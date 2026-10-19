@@ -6,13 +6,13 @@ import manifestRaw from '../public/manifest.webmanifest?raw';
 const css=readFileSync('src/style.css','utf8');
 describe('solid standalone header',()=>{
  it('matches browser and installed theme colors',()=>{
-  expect(html).toContain('name="theme-color" content="#0f6b67"');
-  expect(JSON.parse(manifestRaw).theme_color).toBe('#0f6b67');
-  expect(css).toContain('html:root{background:#0f6b67}');
+  expect(html).toContain('name="theme-color" content="#0d6b6b"');
+  expect(JSON.parse(manifestRaw).theme_color).toBe('#0d6b6b');
+  expect(css).toContain('html:root{background:#0d6b6b}');
  });
  it('paints the safe area with opaque chrome without blur',()=>{
   expect(css).toContain('.topbar,.detail>header,.filter-screen>header{');
-  expect(css).toContain('background:#0f6b67!important;background-image:none!important;');
+  expect(css).toContain('background:#0d6b6b!important;background-image:none!important;');
   expect(css).toContain('opacity:1;backdrop-filter:none;-webkit-backdrop-filter:none;');
   expect(css).toContain('height:calc(56px + env(safe-area-inset-top))!important;padding-top:env(safe-area-inset-top)');
  });
@@ -32,6 +32,6 @@ describe('no fog anywhere',()=>{
   expect(css).not.toMatch(/#[0-9a-fA-F]{8}\b|#[0-9a-fA-F]{4}\b/);
   expect(css).not.toMatch(/backdrop-filter:(?!none)/);
   expect(html).toContain('status-bar-style" content="default"');
-  expect(html).toContain('name="theme-color" content="#0f6b67"');
+  expect(html).toContain('name="theme-color" content="#0d6b6b"');
  });
 });
