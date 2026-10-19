@@ -60,3 +60,4 @@ html .app.fixed-top .blr-time{padding-inline:0}
 html .app.fixed-top .blr-tf>svg{width:14px;height:14px}
 html .app.fixed-top .blr-time>strong{font-weight:400;font-size:calc(15px * var(--list-scale,1))}
 html .app.fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale,1)) minmax(0,1fr) auto}
+html .app.fixed-top .blr-time{padding-left:3px}
