@@ -61,3 +61,12 @@ it('keeps measured reference controls at normal weight and compact solid glyph s
  expect(c).toContain('summary-cost h3{font-size:14.5px');
  expect(c).toContain('fp-head{position:relative;top:-4px}');
 });
+it('last reference layer preserves the final control, plane and cost corrections',()=>{
+ const c=readFileSync('src/reference-polish.css','utf8');
+ expect(c).toContain('handover-date>button{font-size:12.5px;font-weight:400}');
+ expect(c).not.toContain('handover-date>button{font-size:12px');
+ expect(c).toContain('translateY(.5px) scaleY(1.0714286) rotate(-45deg)');
+ expect(c).toContain('summary-cost p:first-of-type>span:first-child{font-weight:400}');
+ expect(c).toContain('summary-cost .bd-days{font-weight:400;color:#999}');
+ expect(c).toContain('summary-cost .bd-cost-total{gap:14px}');
+});
