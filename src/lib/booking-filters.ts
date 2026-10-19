@@ -48,7 +48,7 @@ export function mainBookingEvents(rows:readonly Booking[],date:string,input:Main
 }
 
 export type BlockingKey='noshow'|'cancelled'|'status'|'assigned'|'products'|'placements'|'services'|'platform'|'done'|'type';
-export const BLOCKING_LABELS:Record<BlockingKey,string>={noshow:'No-Shows',cancelled:'Stornierte',status:'Status',assigned:'Nur meine',products:'Produkt',placements:'Platzart',services:'Service',platform:'Plattform',done:'Erledigte',type:'Richtung'};
+export const BLOCKING_LABELS:Record<BlockingKey,string>={noshow:'No-Shows',cancelled:"Stornierte",status:'Status',assigned:"Nur meine",products:"Produkt",placements:"Platzart",services:"Service",platform:"Plattform",done:"Erledigte",type:'Richtung'};
 /** Names the specific active filters that hide a booking. Date window is not a filter here. */
 export function blockingMainFilters(b:Booking,f:MainBookingFilters,userId:string):BlockingKey[]{
  const k:BlockingKey[]=[],ns=b.status==='no_show'||(b.status==='confirmed'&&sameMinuteNoShow(b));

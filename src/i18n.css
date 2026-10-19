@@ -1,0 +1,13 @@
+.language-setting{margin-block:18px;border:1px solid #cfd8dc;padding:12px}.language-setting select{font-size:16px;min-height:44px;width:100%}
+[dir=rtl] .topbar>button{grid-column:1}
+[dir=rtl] .topbar>.header-actions{grid-column:3}
+[dir=rtl] .bd-head>button:first-child svg,[dir=rtl] .mf-back svg,[dir=rtl] .nf-back svg{transform:scaleX(-1)}
+[dir=rtl] .fp-time{margin-left:0;margin-inline-start:auto}
+[dir=rtl] .search{padding-left:0;padding-inline-start:25px}
+[dir=rtl] .bd-identity,[dir=rtl] .summary-cost,[dir=rtl] .summary-media{text-align:start}
+[dir=rtl] .bd-identity a,[dir=rtl] .fp-time,[dir=rtl] .blr-time,[dir=rtl] input[type=tel],[dir=rtl] input[type=email],[dir=rtl] input[type=date],[dir=rtl] input[type=datetime-local]{direction:ltr;unicode-bidi:isolate}
+input,textarea,select{font-size:max(16px,1em)}
+.bd-identity a{overflow-wrap:anywhere}.bd-identity>div{min-width:0}
+
+.blr-code,.blr-plate,.blr-keycode,.counter>strong{direction:ltr;unicode-bidi:isolate}
+[dir=rtl] .date-strip svg{transform:scaleX(-1)}
