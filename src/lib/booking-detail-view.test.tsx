@@ -45,3 +45,11 @@ it('legitimate optional metadata and payment remain visible in their original se
  expect(h).not.toContain('bd-secondary');expect(h).toContain('206095322');expect(h).toContain('P3');expect(h).toContain('10€ Wael');expect(h).toContain('existing-payment');expect(h).toContain('Parken (Actual catalog label)');expect(JSON.stringify(b)).toBe(before);
  expect(h.indexOf('bd-location')).toBeLessThan(h.indexOf('split-handover'));expect(h.indexOf('existing-payment')).toBeLessThan(h.indexOf('summary-location'));
 });
+
+it('uses filled reference icons without losing accessible action labels',()=>{
+ const h=r(<BookingDetailView {...props({...base,checked_in_at:null})}/>);
+ expect(h).toContain('reference-icon-car');expect(h).toContain('reference-icon-calculator');
+ expect(h).toContain('reference-icon-checkin');expect(h).toContain('reference-icon-checkout');
+ expect(h).toContain('Check-in');expect(h).toContain('Check-out');
+ expect(h).toContain('aria-hidden="true"');expect(h).not.toContain('reference-check-action');
+});
