@@ -13,7 +13,7 @@ html .blr-badge{font-weight:700}
 html .bd .bd-outline{font-weight:700;white-space:nowrap;width:max-content;max-width:100%}
 html .bd .bd-outline small{font-weight:600}
 html .bd .split-handover h3{justify-content:flex-start;padding-inline:10px;gap:8px;letter-spacing:.2px}
-html .bd .handover-date>button{font-size:13px;font-weight:700}
-html .bd .flight-panel .op-btn,html .bd .flight-panel .fp-act{font-size:13px;font-weight:700}
+html .bd .handover-date>button{font-size:13px;font-weight:600}
+html .bd .flight-panel .op-btn,html .bd .flight-panel .fp-act{font-size:12px;font-weight:600}
 html .bd .summary-cost p:last-of-type{justify-content:flex-end;gap:18px}
 html .bd .odometer-capture{white-space:normal;text-align:start;width:auto}

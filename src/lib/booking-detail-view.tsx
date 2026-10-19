@@ -1,7 +1,8 @@
 import {t as tr,getLanguage} from './i18n';
 import React from 'react';
+import {ReferenceIcon} from './reference-icon';
 import {OdometerCapture} from './odometer-capture';
-import {Banknote,Calculator,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ParkingSquare} from 'lucide-react';
+import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ParkingSquare} from 'lucide-react';
 import {clock,money,stamp,type Booking} from '../model';
 import {displayComment} from './comments';
 import {paymentInstruction} from './payment-note';
@@ -86,9 +87,9 @@ export function BookingDetailView(p:BookingDetailViewProps){
         <OdometerCapture key={b.id} onEdit={p.onEdit}/></div>
     </section>
     <div className="split-handover">{(['in','out'] as const).map(k=>{const at=k==='in'?b.checked_in_at:b.checked_out_at,when=k==='in'?b.arrival_at:b.departure_at;return <section className={k} key={k}>
-      <h3><svg className="reference-car" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="none" d="m5 4-2 6v9h2v-2h14v2h2v-9l-2-6H5zm1.4 2h11.2l1.3 4H5.1l1.3-4zM6 12a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm12 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/></svg>{k==='in'?tr("PARKING DATE"):tr("RETURN DATE")}</h3>
+      <h3><ReferenceIcon name="car" size={18}/>{k==='in'?tr("PARKING DATE"):tr("RETURN DATE")}</h3>
       <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>{tr("Mileage:")}{' '}{b.km==null?"–":b.km}</span>
-        <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:<>{<svg className="reference-check-action" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" stroke="none" d={k==='in'?'M10 17v-3H2v-4h8V7l5 5-5 5zM12 2h10v20H12v-2h8V4h-8V2z':'M14 7v3H6v4h8v3l5-5-5-5zM2 2h10v2H4v16h8v2H2V2z'}/></svg>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
+        <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:<>{<ReferenceIcon name={k==='in'?'checkin':'checkout'} size={15}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         {!b.checked_in_at&&!b.checked_out_at?p.calledSlot:k==='in'?act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act'):null}
         {b.checked_in_at&&k==='out'&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}
@@ -99,7 +100,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.opsLoadErr&&!p.demo&&<small role="status">{tr("Ablauf konnte nicht geladen werden:")}{p.opsLoadErr}</small>}
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
-    <section className="summary-cost"><h3><Calculator size={21}/>{tr("Cost overview")}</h3>
+    <section className="summary-cost"><h3><ReferenceIcon name="calculator" size={14}/>{tr("Cost overview")}</h3>
       <p><span>{getLanguage()==='ar'?tr("Parking ("):"Parken ("}{p.productLabel||b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{detailMoney(b.paid)}</span></p>
