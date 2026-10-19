@@ -71,3 +71,14 @@
 .bd .bd-round .lucide-settings>circle{fill:#148080;stroke:#148080}
 .bd .bd-round .lucide-chevron-left{width:24px;height:24px;stroke-width:2.6}
 .bd .bd-round:before{box-shadow:inset 0 -1px 0 #88b4b4}
+
+/* IMG_0576 normalized independently to 390px. Title/buttons sit 4px above
+   the toolbar midpoint; visual oval does not shrink the 44px hit target. */
+.bd .bd-head h2{font-family:Arial,sans-serif;font-weight:600;transform:translateY(-4px)}
+.bd .bd-round{transform:translateY(-4px)}
+.bd .bd-round:first-child{translate:2px 0}
+.bd .bd-round:last-child{translate:-7px 0}
+.bd .bd-round:before{inset:0 2px;border-color:#629c9c;background:#148080}
+.bd .bd-round:last-child:before{inset:0 -3px}
+.bd .bd-round .lucide-chevron-left{width:24px;height:24px;stroke-width:2}
+.bd .bd-round .reference-gear{width:21px;height:21px;fill:currentColor;stroke:none}
