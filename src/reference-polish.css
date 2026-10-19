@@ -274,3 +274,14 @@ html body .bd .summary-media h3 svg.fa{width:15px}
 html body .bd .summary-media{--pp-pb:16px;padding-top:16px}
 html body .bd .bd-comments>p{font-size:13.5px;margin:4px 0 0;color:#4f9a8d}
 html body .bd .flight-panel .fp-actions .op-btn,html body .bd .handover-date>button{font-weight:600}
+
+/* ==== Pass 3: list (IMG_0592-3) measured: time 13px, plate 13px bold, code 12px ==== */
+html .app.fixed-top .blr-time>strong{font-size:calc(13px * var(--list-scale,1))}
+html .app.fixed-top .blr-plate,html .app.fixed-top .blr.pay-note .blr-plate{font-size:calc(13px * var(--list-scale,1))}
+html .app.fixed-top .blr-code{font-size:calc(12px * var(--list-scale,1))}
+html .app.fixed-top .topbar>strong{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;font-weight:600;font-size:17px}
+html .app.fixed-top .counters .counter span{font-size:12px;font-weight:400}
+html .app.fixed-top .counters .counter strong,html .app.fixed-top .counters .counter strong small{font-weight:600}
+html .app.fixed-top .now-button{font-weight:600}
+html .app.fixed-top .topbar svg.fa-filter{width:15px;height:auto}
+html .app.fixed-top .topbar>strong{font-weight:500}
