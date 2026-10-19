@@ -402,3 +402,5 @@ html body .mf-row{padding-left:9px}
 html body .mf-sub{padding-left:9px}
 html body .mf-chip{padding:0 15px}
 html body .mf-chips{gap:9px 8px}
+html body .bd .flight-panel .fp-actions .op-btn,html body .bd .flight-panel .fp-actions .op-btn span{font-size:11.5px}
+html body .bd .handover-date>button{font-size:12px}
