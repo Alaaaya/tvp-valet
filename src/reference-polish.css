@@ -307,3 +307,61 @@ html body .bas-undo .undo-btn{min-height:47px;height:47px;border:0;border-bottom
 html body .bas-undo .undo-btn svg{display:none}
 html body .bas-item{padding-left:15px}
 html body .bas-undo .undo-btn{padding-left:15px}
+
+/* ==== Pass 3: Edit form (IMG_0535-0537) ==== */
+html body .be-screen{background:#cdeae6;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;color:#1d2b2b}
+html body .be-head{height:calc(55px + env(safe-area-inset-top));min-height:55px;box-sizing:border-box;padding:env(safe-area-inset-top) 9px 0;background:#2f696a;position:sticky;top:0;z-index:3;display:grid;grid-template-columns:72px 1fr 72px;align-items:center}
+html body .be-head h2{font-size:15px;font-weight:500;text-align:center;line-height:20px}
+html body .be-back{width:40px;height:40px;min-height:40px;padding:0;background:#3c7a7a;border:1px solid #5c9696;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+html body .be-back svg{stroke-width:2.2}
+html body .be-save{justify-self:end;width:72px;height:40px;min-height:40px;padding:0;border-radius:20px;border:1px solid #2a8a7c;background:#2f7a72;color:#fff;font-size:15px;font-weight:600}
+html body .be-save:disabled{background:#2f7a72;color:#4e9e92;border-color:#2a8a7c}
+html body .be-ext{height:22px;padding:0 10px;line-height:22px;background:#b1ded7;color:#244a46;font-size:13px;text-align:center;position:sticky;top:calc(55px + env(safe-area-inset-top));z-index:2}
+html body .be-body{padding:0 5px 0;gap:19px}
+html body .be-card{background:#ecf6f5;border-radius:0;padding:20px 18.5px 17px;gap:0;border-bottom:1px solid #a9d6cd}
+html body .be-card h3{font-size:17px;font-weight:700;color:#1d4a44;gap:6px;line-height:22px;margin:0 0 6px}
+html body .be-card h3 svg.fa{fill:#4f9a8d}
+html body .be-field{gap:2px;font-size:13px;line-height:16px;color:#1d2b2b;margin-top:12px}
+html body .be-field>span:first-child{font-size:13px;font-weight:400}
+html body .be-row{gap:18px}
+html body .be-screen input,html body .be-screen textarea{min-height:36px;height:36px;border:1px solid #7fb0a8;border-radius:3px;padding:0 10px;background:#fff;color:#1d2b2b;font-size:16px}
+html body .be-screen textarea{height:auto;min-height:96px;padding:8px 34px 8px 10px}
+html body .be-screen ::placeholder{color:#8cc3b9}
+html body .be-screen input:disabled,html body .be-screen textarea:disabled{background:#fff;color:#1d2b2b;-webkit-text-fill-color:#1d2b2b;opacity:1}
+html body .be-clear{width:36px;height:36px;right:0;color:#a6b0ae}
+html body .be-clear svg.fa{fill:#a6b0ae;width:12px;height:auto}
+html body .be-wrap input{padding-right:36px}
+html body .be-tawrap .be-star{position:absolute;right:12px;top:12px;fill:#a6b0ae;pointer-events:none}
+html body .be-note{font-size:11px;line-height:14px;color:#5c6f6c;margin-top:6px}
+html body .be-steplabel{display:block;margin-top:12px;font-size:13px;line-height:16px;color:#1d2b2b}
+html body .be-stepper{margin-top:2px;height:36px;border:1px solid #7fb0a8;border-radius:3px;background:#fff}
+html body .be-stepper span{justify-content:center;font-size:15px;color:#3a8f80;padding:0}
+html body .be-stepper span b{color:#1d2b2b}
+html body .be-stepper button{width:57px;min-height:34px;height:34px;padding:0;background:#a9dcd2;color:#1d4a44;font-size:18px;font-weight:700;display:grid;place-items:center}
+html body .be-stepper button svg.fa{fill:#1d4a44}
+html body .be-stepper button:disabled{opacity:1;color:#1d4a44}
+/* date sections: header on the page tint, fields in a white block with green left bar */
+html body .be-card.be-date{background:transparent;border:0;padding:0;margin:0 0 0;gap:0}
+html body .be-date header{height:48px;padding:0 13px 0 9px}
+html body .be-date header h3{margin:0}
+html body .be-date header h3 svg.fa{fill:#4f9a8d}
+html body .be-date header button{min-width:40px;min-height:40px;padding:0;color:#4f9a8d}
+html body .be-date header button svg.fa{fill:#4f9a8d}
+html body .be-date header button:disabled{opacity:.5}
+html body .be-date>.be-row,html body .be-date>.be-field{background:#fff;border-left:4px solid #5a9e6f;margin:0;padding-inline:14px 14px}
+html body .be-date>.be-row{grid-template-columns:minmax(0,1.85fr) minmax(0,1fr);gap:14px;padding-top:9px;padding-bottom:4px}
+html body .be-date>.be-row input{height:40px;min-height:40px}
+html body .be-date>.be-field{padding-top:12px;padding-bottom:9px}
+html body .be-foot{background:#cdeae6;padding:18px 5px max(14px,env(safe-area-inset-bottom))}
+html body .be-update{min-height:40px;height:40px;border-radius:3px;border:1px solid #4f9a8d;background:#4f9a8d;color:#fff;font-size:15px;font-weight:600}
+html body .be-update svg.fa{fill:currentColor}
+html body .be-update:disabled{background:#a6d7ce;border-color:#93cbc0;color:#e3f4f0}
+html body .be-head{grid-template-columns:minmax(72px,1fr) auto minmax(72px,1fr)}
+html body .be-head h2{font-weight:600}
+html body .be-save{width:auto;min-width:72px;padding:0 14px}
+html body .be-field{gap:0;margin-top:18px}
+html body .be-card h3{margin-bottom:0}
+html body .be-card>h3+.be-row>.be-field,html body .be-card>h3+.be-field{margin-top:12px}
+html body .be-steplabel{margin-top:18px}
+html body .be-date>.be-field{margin-top:0}
+html body .be-date>.be-row>.be-field{margin-top:0}

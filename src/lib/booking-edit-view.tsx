@@ -1,7 +1,8 @@
 import {t as tr} from './i18n';
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import '../booking-edit.css';
-import {ArrowLeft,CalendarDays,Car,MessageSquare,Pencil,Save,User,X,Minus,Plus} from 'lucide-react';
+import {ChevronLeft,X} from 'lucide-react';
+import {Fa} from './fa-icons';
 import {formatInTimeZone,fromZonedTime} from 'date-fns-tz';
 import type {Booking} from '../model';
 import {displayComment} from './comments';
@@ -85,26 +86,26 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
  const legacy=!x.first_name&&!x.last_name&&booking.customer_name.trim();
  const save=async()=>{if(!can||inflight.current)return;inflight.current=true;setBusy(true);setErr('');try{await onSave(buildPatch(booking,x,role))}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{inflight.current=false;setBusy(false)}};
  const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
- const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} maxLength={k==='first_name'||k==='last_name'?120:k==='car_description'?500:undefined} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><X size={14}/></button>}</span></label>};
+ const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} maxLength={k==='first_name'||k==='last_name'?120:k==='car_description'?500:undefined} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><Fa name="xmark" size={14}/></button>}</span></label>};
  const when=(kind:'in'|'out')=>{const p=kind==='in'?'arrival':'departure',f=kind==='in'?'flight_in':'flight_out',dis=!canEdit(role,(p+'_date') as keyof EditDraft),open=dateEdit[kind]&&!dis;
-  return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?tr("Parking date"):tr("Return date")}</h3><button type="button" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+' bearbeiten'} disabled={dis} aria-expanded={open} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
+  return <section className="be-card be-date"><header><h3><Fa name="calendar-regular" size={17}/>{kind==='in'?tr("Parking date"):tr("Return date")}</h3><button type="button" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+' bearbeiten'} disabled={dis} aria-expanded={open} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Fa name="pen-to-square-regular" size={20}/></button></header>
   <div className="be-row"><input type="date" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+tr(" Datum")} disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+tr(" Uhrzeit")} disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
   {inp(f,tr("Flight number"))}</section>};
- return <div ref={root} className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label={tr("Zurück")} disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>{tr("Edit")}</h2><button type="button" className="be-save" disabled={!can} onClick={save}>{tr("Save")}</button></header>
- <div className="be-ext">{tr("Extern ID:")}{booking.external_id||booking.code}</div>
+ return <div ref={root} className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label={tr("Zurück")} disabled={busy} onClick={back}><ChevronLeft size={24}/></button><h2>{tr("Edit")}</h2><button type="button" className="be-save" disabled={!can} onClick={save}>{tr("Save")}</button></header>
+ <div className="be-ext">{tr("Extern ID:")}{' '}{booking.external_id||booking.code}</div>
  {err&&<div className="be-err" role="alert">{err}</div>}
  <div className="be-body">
- <section className="be-card"><h3><User size={18}/>{tr("Customer details")}</h3>
+ <section className="be-card"><h3><Fa name="user" size={16}/>{tr("Customer details")}</h3>
   <div className="be-row">{inp('first_name',tr("First name"))}{inp('last_name',tr("Last name"))}</div>
   {legacy&&<small className="be-note">{tr("Gespeicherter Name (alt):")}{booking.customer_name}. Vor- und Nachname werden nicht automatisch getrennt.</small>}
   {inp('phone',tr("Phone"),{type:'tel',clear:true})}{inp('email',tr("Mail address"),{type:'email',clear:true})}
-  <div className="be-stepper"><span><b>{x.persons}</b> {x.persons===1?'person':'persons'}</span><button type="button" aria-label={tr("Weniger Personen")} disabled={!canEdit(role,'persons')||x.persons<=1} onClick={()=>set('persons',x.persons-1)}><Minus size={18}/></button><button type="button" aria-label={tr("Mehr Personen")} disabled={!canEdit(role,'persons')} onClick={()=>set('persons',x.persons+1)}><Plus size={18}/></button></div></section>
- <section className="be-card"><h3><Car size={18}/>{tr("Car details")}</h3>{inp('plate',tr("License Plate"))}{inp('car_description',tr("Car description"))}{inp('key_cash',tr("Key code"))}{inp('km',tr("Mileage"),{type:'number'})}{inp('spot',tr("Spot"))}</section>
+  <span className="be-steplabel">{tr("Number of persons")}</span><div className="be-stepper"><span><b>{x.persons}</b> {x.persons===1?'person':'persons'}</span><button type="button" aria-label={tr("Weniger Personen")} disabled={!canEdit(role,'persons')||x.persons<=1} onClick={()=>set('persons',x.persons-1)}><b aria-hidden="true">-</b></button><button type="button" aria-label={tr("Mehr Personen")} disabled={!canEdit(role,'persons')} onClick={()=>set('persons',x.persons+1)}><Fa name="plus" size={15}/></button></div></section>
+ <section className="be-card"><h3><Fa name="car" size={17}/>{tr("Car details")}</h3>{inp('plate',tr("License Plate"))}{inp('car_description',tr("Car description"))}{inp('key_cash',tr("Key code"))}{inp('km',tr("Mileage"),{type:'number'})}{inp('spot',tr("Spot"))}</section>
  {when('in')}{when('out')}
- <section className="be-card"><h3><MessageSquare size={18}/>{tr("Add internal comment")}</h3>{(()=>{const c=displayComment(booking.comment).text;return c?<p className="be-existing">{c}</p>:null})()}<label className="be-field"><span>{tr("Comment")}</span><textarea rows={4} value={x.new_comment} placeholder={tr("Comment")} onChange={e=>set('new_comment',e.target.value)}/></label></section>
+ <section className="be-card"><h3><Fa name="comment" size={17}/>{tr("Add internal comment")}</h3>{(()=>{const c=displayComment(booking.comment).text;return c?<p className="be-existing">{c}</p>:null})()}<label className="be-field"><span>{tr("Comment")}</span><span className="be-wrap be-tawrap"><textarea rows={4} value={x.new_comment} placeholder={tr("Comment")} onChange={e=>set('new_comment',e.target.value)}/><Fa name="star" size={15} className="be-star"/></span></label></section>
  {dirty&&problems.map(p=><p key={p} className="be-err" role="alert">{p}</p>)}
  </div>
- <footer className="be-foot"><button type="button" className="be-update" disabled={!can} onClick={save}><Save size={18}/>{busy?tr("Wird gespeichert …"):tr("Update booking")}</button></footer>
+ <footer className="be-foot"><button type="button" className="be-update" disabled={!can} onClick={save}><Fa name="floppy-disk" size={16}/>{busy?tr("Wird gespeichert …"):tr("Update booking")}</button></footer>
  {ask&&<div className="be-dialog" role="alertdialog" aria-modal="true" aria-label={tr("Ungespeicherte Änderungen")} ref={dlg} onKeyDown={trap}><div><p>{tr("Ungespeicherte Änderungen verwerfen?")}</p><button type="button" onClick={()=>setAsk(false)}>{tr("Weiter bearbeiten")}</button><button type="button" className="danger" disabled={busy} onClick={onBack}>{tr("Verwerfen")}</button></div></div>}
  </div>;
 }

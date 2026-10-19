@@ -3458,5 +3458,10 @@
     "Add phone number",
     "Telefonnummer hinzufügen",
     "إضافة رقم الهاتف"
+  ],
+  "Number of persons": [
+    "Number of persons",
+    "Anzahl Personen",
+    "عدد الأشخاص"
   ]
 }
