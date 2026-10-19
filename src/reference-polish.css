@@ -13,7 +13,7 @@ html .blr-badge{font-weight:700}
 html .bd .bd-outline{font-weight:700;white-space:nowrap;width:max-content;max-width:100%}
 html .bd .bd-outline small{font-weight:600}
 html .bd .split-handover h3{justify-content:flex-start;padding-inline:10px;gap:8px;letter-spacing:.2px}
-html .bd .handover-date>button{font-size:12px;font-weight:400}
+html .bd .handover-date>button{font-size:12.5px;font-weight:400}
 html .bd .flight-panel .op-btn,html .bd .flight-panel .fp-act{font-size:12px;font-weight:400}
 html .bd .summary-cost p:last-of-type{justify-content:flex-end;gap:18px}
 html .bd .odometer-capture{white-space:normal;text-align:start;width:auto}
@@ -61,3 +61,18 @@ html .app.fixed-top .blr-tf>svg{width:14px;height:14px}
 html .app.fixed-top .blr-time>strong{font-weight:400;font-size:calc(15px * var(--list-scale,1))}
 html .app.fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale,1)) minmax(0,1fr) auto}
 html .app.fixed-top .blr-time{padding-left:3px}
+
+/* IMG_0579 detail section ink anchors at 390 CSS px. Keep list polish above. */
+html .bd .fp-head .reference-icon-plane{transform:translateY(.5px) scaleY(1.0714286) rotate(-45deg);transform-origin:50% 50%}
+html .bd .summary-cost h3{position:relative;top:-1px;font-weight:700}
+html .bd .summary-cost p:first-of-type>span:first-child{font-weight:400}
+html .bd .summary-cost .bd-days{font-weight:400;color:#999}
+html .bd .summary-cost p:first-of-type{border-bottom-color:#f9fcfc}
+html .bd .summary-cost{padding-top:19px}
+html .bd .summary-cost .bd-cost-total{gap:14px}
+html .bd .summary-cost h3{font-size:14.6px;top:-.5px}
+html .bd .summary-cost .bd-cost-total>span:first-child,
+html .bd .summary-cost .bd-cost-total>span:last-child,
+html .bd .summary-cost p:first-of-type+.bd-cost-total>span:first-child{font-size:13px;font-weight:400;-webkit-text-stroke:.2px currentColor}
+html .bd .summary-cost .bd-cost-total+.bd-cost-total{gap:13px}
+html .bd .summary-cost .bd-cost-total+.bd-cost-total>span:first-child{font-size:12.5px;position:relative;top:-.5px;-webkit-text-stroke:.2px currentColor}
