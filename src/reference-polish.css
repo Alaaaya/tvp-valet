@@ -17,3 +17,46 @@ html .bd .handover-date>button{font-size:12px;font-weight:400}
 html .bd .flight-panel .op-btn,html .bd .flight-panel .fp-act{font-size:12px;font-weight:400}
 html .bd .summary-cost p:last-of-type{justify-content:flex-end;gap:18px}
 html .bd .odometer-capture{white-space:normal;text-align:start;width:auto}
+
+/* ---- IMG_0592 list match (ParkingPro "Open bookings Today") ---- */
+/* provider badges keep their own colors like the reference */
+html .app.fixed-top .blr-badge{border-width:1.5px;border-radius:6px;font-weight:700;padding:0 6px}
+html .app.fixed-top .blr-badge.ap{border-color:#2f5fb3;color:#2f5fb3;background:#e8efff}
+html .app.fixed-top .blr-badge.ag{border-color:#e0457b;color:#e0457b;background:#ffe8f0}
+html .app.fixed-top .blr-badge.fsp{border-color:#3d4f4f;color:#2b3b3b;background:#eef1f1}
+html .app.fixed-top .blr-badge.pl{border-color:#7a4ad0;color:#7a4ad0;background:#f2ecff}
+html .app.fixed-top .blr-badge.pr{border-color:#c9781f;color:#c9781f;background:#fff4e6}
+html .app.fixed-top .blr-badge.web{border-color:#3d4f4f;color:#2b3b3b;background:#eef1f1}
+/* plate teal, bold not black-heavy; booking code readable grey */
+html .app.fixed-top .blr-plate{color:#0d6b5e;font-weight:700}
+html .app.fixed-top .blr-code{color:#5f6b6b;font-size:max(13px,13px * var(--list-scale,1))}
+/* filled teal phone, filled people */
+html .blr-l3 svg{fill:#1fa37a;color:#1fa37a;stroke-width:1.5}
+html .blr-pn svg,html .blr-cc svg{fill:currentColor}
+html .blr-cc{color:#0d3b33}
+/* time column: dark car glyph, plane blue inline */
+html .app.fixed-top .blr-ico{color:#173b37}
+html .app.fixed-top .blr-ico svg{fill:#173b37;stroke:#173b37}
+html .blr-tf svg{fill:#2f6fd0;color:#2f6fd0}
+html .app.fixed-top .blr-time strong{color:#173b37}
+/* right column pills: squared like reference, bold uppercase */
+html .app.fixed-top .blr-pay{border-radius:6px;border-width:2px;text-transform:uppercase;font-weight:800;letter-spacing:.2px}
+html .app.fixed-top .blr-cover{border-radius:7px;border-width:1.5px;font-weight:700}
+/* search row: rounded-rect Now, plain white camera glyph */
+html .app.fixed-top .now-button:before{border-radius:8px;inset:4px 0}
+html .app.fixed-top .search input{border-radius:8px}
+html .app.fixed-top .cam-search svg{border:0;padding:0;width:30px;height:30px;fill:#fff;color:#136a5d;stroke:#136a5d;stroke-width:1.6}
+/* plane sits inline before the time, flight number underneath (reference) */
+html .app.fixed-top .blr-time{display:grid;grid-template-columns:auto auto;justify-content:center;align-content:center;column-gap:1px;row-gap:3px;justify-items:center}
+html .app.fixed-top .blr-time>.blr-check{position:absolute}
+html .app.fixed-top .blr-ico{grid-column:1/-1;order:1}
+html .app.fixed-top .blr-time>strong{grid-column:2;order:3}
+html .app.fixed-top .blr-tf{display:contents}
+html .app.fixed-top .blr-tf>svg{grid-column:1;order:2;align-self:center;width:16px;height:16px}
+html .app.fixed-top .blr-tf>span{grid-column:1/-1;order:4}
+html .app.fixed-top .blr-time:not(:has(.blr-tf))>strong{grid-column:1/-1}
+html .app.fixed-top .blr-time>strong{white-space:nowrap;letter-spacing:-.2px}
+html .app.fixed-top .blr-time{padding-inline:0}
+html .app.fixed-top .blr-tf>svg{width:14px;height:14px}
+html .app.fixed-top .blr-time>strong{font-weight:400;font-size:calc(15px * var(--list-scale,1))}
+html .app.fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale,1)) minmax(0,1fr) auto}
