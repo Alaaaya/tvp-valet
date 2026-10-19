@@ -1,6 +1,6 @@
 import {t as tr,getLanguage} from './i18n';
 import React from 'react';
-import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ScanLine,Settings} from 'lucide-react';
+import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ScanLine} from 'lucide-react';
 import {clock,money,stamp,type Booking} from '../model';
 import {displayComment} from './comments';
 import {paymentInstruction} from './payment-note';
@@ -59,7 +59,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
     return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> {label} {"·"}{' '}{stamp(at)}</>:p.opsBusy===key?tr("Wird gespeichert …"):label}</button>;
   };
   return <div className="bd">
-    <header className="bd-head"><button type="button" aria-label={tr("Schließen")} className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>{tr("Booking #")}<bdi>{b.code}</bdi></h2><button type="button" aria-label={tr("Bearbeiten")} className="bd-round" onClick={p.onEdit}><Settings size={21}/></button></header>
+    <header className="bd-head"><button type="button" aria-label={tr("Schließen")} className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>{tr("Booking #")}<bdi>{b.code}</bdi></h2><button type="button" aria-label={tr("Bearbeiten")} className="bd-round" onClick={p.onEdit}><svg className="reference-gear" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M9.5 1.5h5l.7 3a8 8 0 0 1 1.4.8l3-.9 2.5 4.3-2.3 2.1a8 8 0 0 1 0 1.6l2.3 2.1-2.5 4.3-3-.9a8 8 0 0 1-1.4.8l-.7 3h-5l-.7-3a8 8 0 0 1-1.4-.8l-3 .9-2.5-4.3 2.3-2.1a8 8 0 0 1 0-1.6L1.9 8.7l2.5-4.3 3 .9a8 8 0 0 1 1.4-.8l.7-3ZM12 7.8a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4Z"/></svg></button></header>
     {b.external_id?.trim()&&<div className="pp-strip ext">{tr("External ID:")}<bdi>{b.external_id}</bdi></div>}
     {pn&&<div className="bd-pay-note" role="alert"><Banknote size={18}/>{pn}</div>}
     {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> {tr("Outstanding amount:")}{' '}{money(due)}</div>}
