@@ -144,7 +144,6 @@ html .app.fixed-top .blr-tf>span{font-family:-apple-system,BlinkMacSystemFont,"S
 html body .bd{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
 html body .bd .bd-head{background:#2f6b6a}
 html body .bd .bd-head h2{font-size:18px;font-weight:500;transform:none}
-html body .bd .pp-strip.ext,html body .bd .pp-strip.due{display:none}
 html body .bd .bd-identity{font-size:13px;color:#222}
 html body .bd .bd-identity .bd-label{font-size:13px;font-weight:400;color:#222}
 html body .bd .bd-identity strong{font-size:14px;font-weight:700;color:#1b2b2b}
@@ -176,21 +175,102 @@ html body .bd .summary-media h3 svg.fa{fill:#1d4a44;width:18px;height:auto}
 html body .bd .add-comment,html body .bd .upload{width:68px;height:68px;min-width:68px;border:2px solid #6fb3a7;border-radius:6px;background:#d8efea;box-shadow:inset 0 0 0 3px #d8efea,inset 0 0 0 4px #9ccfc5;color:#2d5f57;display:grid;place-items:center}
 html body .bd .add-comment svg.fa,html body .bd .upload svg.fa{fill:#2d5f57;width:26px;height:26px}
 html body .bd .bd-comments p{font-style:italic;color:#4f9a8d;font-size:15px}
-html body .bd .bd-service{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#1d4a44}
-html body .bd .bd-service .bd-svc-ico{display:inline-flex;align-items:flex-end;gap:1px}
-html body .bd .bd-service .bd-svc-ico svg.fa{fill:#1d2b2b}
-html body .bd .bd-service>span{display:inline-flex;align-items:center;gap:10px;flex-direction:row}
-html body .bd .bd-service>span b{font-size:15px;color:#1d4a44}
-html body .bd .bd-service>span small{order:9;font-size:15px;font-weight:700;color:#1d4a44;text-transform:none}
-html body .bd .bd-service .bd-product{font-size:15px;font-weight:700;color:#1d4a44;gap:6px}
-html body .bd .bd-service .bd-product-dot{width:18px;height:18px;background:#000!important}
-html body .bd .bd-service .bd-loc{font-size:15px;font-weight:700;color:#1d4a44}
-html body .bd .bpay-soon{display:none}
 html body .bd .add-comment,html body .bd .upload{width:58px;height:58px;min-width:58px}
 html body .bd .add-comment svg.fa,html body .bd .upload svg.fa{stroke:#2d5f57;stroke-width:44;width:24px;height:24px;overflow:visible}
-html body .bd .bd-service>span:not(.bd-product):not(.bd-loc):not(.bd-svc-ico){display:contents}
-html body .bd .bd-service>span>b{order:1}
-html body .bd .bd-service .bd-product{order:2}
-html body .bd .bd-service>span>small{order:3;margin-left:auto}
-html body .bd .bd-service .bd-loc{order:4}
-html body .bd .bd-service>span>small{margin-left:22px}
+
+/* ==== Pass 3: ParkingPro detail parity (IMG_0540-2/0541/0528-0530/0594-2), measured at 390pt ==== */
+html body .bd .bd-head{height:calc(55px + env(safe-area-inset-top));min-height:55px;padding-inline:9px;background:#2f696a}
+html body .bd .bd-head h2{font-size:17px;font-weight:600;line-height:22px}
+html body .bd .bd-round{width:40px;height:40px;min-height:40px;background:#3c7a7a;border:1px solid #5c9696;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+/* strips (sticky under the header like ParkingPro) */
+html body .bd .pp-strip.ext{display:flex;position:sticky;top:calc(55px + env(safe-area-inset-top));z-index:2;min-height:22px;height:22px;padding:0 10px;background:#b1ded7;color:#244a46;font-size:14px;font-weight:400;line-height:22px;gap:4px}
+html body .bd .pp-strip.due{display:flex;min-height:28.5px;padding:0 10px;background:#fbebee;color:#c9463f;font-size:14px;font-weight:400;line-height:20px;gap:5px;top:calc(77px + env(safe-area-inset-top))}
+html body .bd .pp-strip.due b{font-weight:700;color:#c43c36}
+html body .bd .pp-strip.due svg{fill:#c9463f;color:#c9463f;width:17px;height:auto;margin-inline-end:2px}
+html body .bd .bd-head+.pp-strip.due,html body .bd .bd-head+.bd-pay-note+.pp-strip.due{top:calc(55px + env(safe-area-inset-top))}
+/* identity: tight 20px line pitch */
+html body .bd .bd-identity{padding:17px 10px 19px;gap:10px;line-height:20px;border-bottom:9.5px solid #cdeae6}
+html body .bd .bd-identity>div{gap:0}
+html body .bd .bd-identity .bd-label{line-height:16px}
+html body .bd .bd-identity strong{line-height:18px;margin-bottom:2px}
+html body .bd .bd-identity a,html body .bd .bd-identity .pp-link{line-height:20px;min-height:20px;font-size:13.5px}
+html body .bd .bd-contact{line-height:20px}
+html body .bd .bd-contact-count{font-size:13px;color:#2b3a3a}
+html body .bd .bd-identity .bd-key,html body .bd .bd-identity .bd-location,html body .bd .bd-identity .bd-vehicle,html body .bd .bd-identity .pp-check{font-size:13.5px;line-height:20px;min-height:20px}
+html body .bd .bd-outline{min-height:22px;height:22px;padding:0 8px;margin-top:7px;border:1.5px solid #3b6fc4;border-radius:4px;font-size:12px;font-weight:700;line-height:19px;gap:4px;color:#3b6fc4;background:#fff}
+html body .bd .bd-key+.bd-outline,html body .bd .pp-check+.bd-outline{margin-top:6px}
+html body .bd .bd-outline svg{width:11px;height:11px;stroke-width:3.2;flex:none}
+html body .bd .bd-outline small{font-size:10px;font-weight:600}
+/* PARKING / RETURN columns */
+html body .bd .split-handover h3{height:33px;min-height:33px;font-size:13px;letter-spacing:.3px}
+html body .bd .handover-date{height:122px;padding:9px 10px 12px;gap:0}
+html body .bd .handover-date>strong,html body .bd .handover-date>strong+strong{font-size:14px;line-height:20px;font-weight:700}
+html body .bd .handover-date>span{font-size:14px;line-height:20px}
+html body .bd .handover-date>button{height:40px;min-height:40px;margin-top:auto;border-radius:4px;border:1px solid #5aa171;font-size:12.5px;font-weight:700;color:#4f9a68;background:#d0f4d8}
+html body .bd .out .handover-date>button{border-color:#d34c46;color:#cc4a43;background:#f7d8d6}
+html body .bd .handover-date>button:disabled{opacity:1}
+html body .bd .flight-panel{height:251px;min-height:251px;padding:6px 10px 9px;display:flex;flex-direction:column;gap:0}
+html body .bd .fp-head{top:0;min-height:24px;font-size:14px}
+html body .bd .fp-head strong{font-size:14px;font-weight:400;line-height:20px}
+html body .bd .fp-head .fp-time{font-size:14px;font-weight:400}
+html body .bd .fp-actions{margin-top:auto;display:flex;flex-direction:column;gap:12px;height:86px;justify-content:flex-start}
+html body .bd .fp-actions>.op-btn,html body .bd .fp-actions>.fp-act,html body .bd .flight-panel .fp-actions .op-btn{margin:0;width:100%;height:38px;min-height:38px;padding:0 6px;border:0;border-radius:3px;font-size:12.5px;font-weight:700;line-height:16px;background:#d0f4d8;color:#4f9a68;justify-content:center;align-items:center;align-content:center;opacity:1}
+html body .bd .flight-panel.out .fp-actions .op-btn{background:#f7d8d6;color:#cc4a43}
+html body .bd .flight-panel.out .fp-actions .op-btn+.op-btn{height:35px;min-height:35px}
+html body .bd .fp-actions .op-btn:disabled{opacity:1}
+html body .bd .fp-actions .op-btn .reference-icon-phone{width:11px;height:11px;margin-inline-end:4px;top:0}
+html body .bd .fp-actions .op-btn:has(.call-counter){height:auto;min-height:38px;padding-block:3px}
+html body .bd .fp-driver{width:100%;height:35px;min-height:35px;margin:0;border:0;border-radius:3px;background:#fff;color:#222;font-size:10px;font-weight:400}
+html body .bd .pp-called{background:#cdeae6;padding:6px 10px;font-size:12px;color:#4a6b66}
+html body .bd .pp-called:not(:has(>*)){display:none}
+html body .bd .bd-head h2{font-weight:500}
+html body .bd .flight-panel .fp-actions .fp-driver{font-size:10px;font-weight:400;color:#222;background:#fff;border:0;padding:0 6px;line-height:12px}
+html body .bd .pp-strip.due svg.fa{width:18px}
+html body .bd .bd-outline svg.fa{fill:#3b6fc4;stroke:none;width:10px;height:auto}
+html body .bd .bd-outline.odometer-capture svg.fa{width:12px}
+/* cost overview + payment (IMG_0541 / 0594-2) */
+html body .bd .summary-cost h3{font-size:15px;margin-bottom:17px}
+html body .bd .summary-cost>p{font-size:14px}
+html body .bd .summary-cost>p.bd-due{margin-top:18px;justify-content:flex-end;gap:18px}
+html body .bd .summary-cost>p.bd-due>strong,html body .bd .summary-cost>p.bd-due>strong:last-child{font-size:16px;font-weight:700;color:#111}
+html body .bd .summary-cost>p.bd-due.is-due>strong{color:#d0433d}
+html body .bd .summary-cost .bpay{background:transparent;border:0;padding:12px 0 6px;display:flex;flex-direction:column;align-items:center;gap:9px}
+html body .bd .summary-cost .bpay p.bpay-note{order:5;display:block;margin:0;padding:0;border:0;font-size:11px;line-height:14px;color:#6b7c7e;text-align:center;justify-content:center}
+html body .bd .summary-cost .bpay>button,html body .bd .summary-cost .bpay-soon>button{width:284px;max-width:100%;height:35px;min-height:35px;padding:0 10px;border-radius:3px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:14px;font-weight:700;line-height:18px}
+html body .bd .summary-cost .bpay>button.bpay-main{background:#4a7fcf;border:1px solid #2d5ea6;color:#fff}
+html body .bd .summary-cost .bpay>button.bpay-main svg{fill:#fff;width:17px;height:auto}
+html body .bd .summary-cost .bpay>button.bpay-main:disabled{opacity:.6}
+html body .bd .summary-cost .bpay-soon{display:flex;flex-direction:column;align-items:center;gap:9px;margin:0;width:100%}
+html body .bd .summary-cost .bpay-soon>button{background:#d1ebe6;border:1px solid #74b4a7;color:#1d4a44;text-align:center;opacity:.85;cursor:not-allowed}
+html body .bd .summary-cost .bpay-soon>button svg{order:-1;fill:#1d4a44;width:15px;height:auto}
+html body .bd .summary-cost .bpay-soon em{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;padding:0;margin:0}
+/* ParkingPro double divider between sections: 1px line, 4.5px fill, 1px line */
+html body .bd .summary-cost,html body .bd .summary-location,html body .bd .summary-media{border-bottom:0;padding-bottom:calc(var(--pp-pb,14px) + 6.5px);background:linear-gradient(#87c0b4,#87c0b4) left bottom/100% 1px no-repeat,linear-gradient(#cdeae7,#cdeae7) left bottom 1px/100% 4.5px no-repeat,linear-gradient(#87c0b4,#87c0b4) left bottom 5.5px/100% 1px no-repeat,#fff}
+html body .bd .summary-cost{--pp-pb:14px;padding-top:19px}
+/* valet service row (IMG_0530/0541): [car+person Valet / COVERED] [dot over product] [location] */
+html body .bd .pp-svc>span{display:flex}
+html body .bd .pp-svc .bd-svc-cell{flex-direction:column;align-items:flex-start;gap:3px}
+html body .bd .pp-svc .bd-svc-line{display:inline-flex;align-items:center;gap:3px}
+html body .bd .pp-svc .bd-svc-line b{font-size:14px;color:#1d4a44;order:0;margin:0}
+html body .bd .pp-svc .bd-svc-ico{display:inline-flex;align-items:flex-end;gap:0}
+html body .bd .pp-svc .bd-svc-ico svg.fa{fill:#1d2b2b}
+html body .bd .pp-svc .bd-svc-ico svg.fa-car-side{width:15px;height:auto}
+html body .bd .pp-svc .bd-svc-ico svg.fa-person{width:auto;height:11px}
+html body .bd .pp-svc .bd-svc-cell>small{order:0;margin:0;font-size:10px;line-height:12px;font-weight:700;letter-spacing:.6px;color:#3a9584;text-transform:uppercase}
+html body .bd .pp-svc .bd-product{order:0;display:flex;flex-direction:column;align-items:stretch;gap:2px;font-size:14px;color:#1d4a44;min-width:0}
+html body .bd .pp-svc .bd-product>span{overflow-wrap:anywhere}
+html body .bd .pp-svc .bd-product-dot{align-self:center;width:15px;height:15px;border-radius:50%;background:#e8325a!important;margin-top:-6px}
+html body .bd .pp-svc .pp-dot-ag{background:#e055a5!important}
+html body .bd .pp-svc .pp-dot-ap{background:#2f5fb3!important}
+html body .bd .pp-svc .pp-dot-fsp,html body .bd .pp-svc .pp-dot-web,html body .bd .pp-svc .pp-dot-none{background:#000!important}
+html body .bd .pp-svc .pp-dot-pl{background:#e8325a!important}
+html body .bd .pp-svc .pp-dot-f2m{background:#7a4ad0!important}
+html body .bd .pp-svc .pp-dot-pr{background:#c9781f!important}
+html body .bd .pp-svc .bd-loc{order:0;margin:0;font-size:14px;color:#1d4a44;padding-inline-start:4px}
+html body .bd .summary-cost .bpay>button.bpay-main svg{width:18px}
+html body .bd .summary-cost .bpay-soon>button svg{width:14px}
+html body .bd .summary-media h3{font-size:15px;gap:7px;margin:4px 0 14px}
+html body .bd .summary-media h3 svg.fa{width:15px}
+html body .bd .summary-media{--pp-pb:16px;padding-top:16px}
+html body .bd .bd-comments>p{font-size:13.5px;margin:4px 0 0;color:#4f9a8d}
+html body .bd .flight-panel .fp-actions .op-btn,html body .bd .handover-date>button{font-weight:600}
