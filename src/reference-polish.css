@@ -285,3 +285,25 @@ html .app.fixed-top .counters .counter strong,html .app.fixed-top .counters .cou
 html .app.fixed-top .now-button{font-weight:600}
 html .app.fixed-top .topbar svg.fa-filter{width:15px;height:auto}
 html .app.fixed-top .topbar>strong{font-weight:500}
+
+/* ==== Pass 3: Edit action sheet (IMG_0533/0534) ==== */
+html body .bas{border-radius:16px 16px 0 0;padding:0 0 max(8px,env(safe-area-inset-bottom));font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif}
+html body .bas-handle{width:40px;height:4px;border-radius:2px;background:#b4e2d9;margin:17px auto 0}
+html body .bas-head{height:76px;padding:0 14px 0 15px;border-bottom:1px solid #d6e9e5;box-sizing:border-box}
+html body .bas-head h2{font-size:15px;font-weight:600;color:#1d4a44;line-height:20px}
+html body .bas-x{width:33px;height:33px;min-height:33px;min-width:33px;padding:0;border:0;border-radius:50%;background:#e4f3f0;color:#1d4a44;display:grid;place-items:center}
+html body .bas-x svg{width:15px;height:15px;stroke-width:3.4}
+html body .bas-sec{margin:0;padding:19px 15px 4px;font-size:10px;line-height:12px;font-weight:700;letter-spacing:1.1px;color:#2f6b62;text-transform:uppercase}
+html body .bas [role=menu]{padding-bottom:4px}
+html body .bas-item{flex-direction:row;align-items:center;justify-content:space-between;gap:8px;min-height:47px;height:47px;padding:0 15px 0 24px;margin-left:9px;width:calc(100% - 9px);border-top:0;border-bottom:1px solid #e6efed;font-size:14px;line-height:18px;font-weight:400;color:#1d2b2b;background:#fff}
+html body .bas-item.danger{color:#c9463f}
+html body .bas-item:disabled{color:#a9b5b3;opacity:1}
+html body .bas-item.danger:disabled{color:#e2a5a1}
+html body .bas-item small{font-size:10px;color:#a3b0ae;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%}
+html body .bas-sec+.bas-item{margin-top:0}
+html body .bas-item:last-child{margin-left:0;width:100%;padding-left:15px;margin-top:6px;border-top:0}
+html body .bas-undo{margin-left:9px;width:calc(100% - 9px)}
+html body .bas-undo .undo-btn{min-height:47px;height:47px;border:0;border-bottom:1px solid #e6efed;border-radius:0;padding:0 15px 0 24px;background:#fff;color:#c9463f;font-size:14px;font-weight:400;justify-content:flex-start;box-shadow:none}
+html body .bas-undo .undo-btn svg{display:none}
+html body .bas-item{padding-left:15px}
+html body .bas-undo .undo-btn{padding-left:15px}
