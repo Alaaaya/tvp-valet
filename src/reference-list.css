@@ -7,10 +7,10 @@
 .app.fixed-top .blr-pay{background:#fff;border:1px solid #38a169;color:#2f855a}
 .app.fixed-top .blr-pay.due{border-color:#e53e3e;color:#e53e3e}
 .app.fixed-top .blr-cc,.app.fixed-top .blr-pn{color:#1fb19b}
-/* counters: ref blocks x18..184 / 206..371 of 390, 41 tall inside a 53 strip; 44px hit area kept via ::after */
+/* counters: ref blocks 41 tall; ::after inset -3px from padding edge (1px border) = 45px hit area */
 .app.fixed-top .counters.counters{padding:6px 18px 5px;gap:22px;height:53px;box-sizing:border-box}
 .app.fixed-top .counters .counter{height:41px;min-height:41px;position:relative;overflow:visible}
-.app.fixed-top .counters .counter::after{content:"";position:absolute;inset:-2px 0}
+.app.fixed-top .counters .counter::after{content:"";position:absolute;inset:-3px 0}
 /* flight must stay fully visible in the 51px content width of the time pane: icon above, number below, never clipped */
 .app.fixed-top .blr-tf{flex-direction:column;align-items:center;gap:1px;max-width:none;width:100%;font-size:10px;line-height:11px}
 .app.fixed-top .blr-tf>span{overflow:visible;text-overflow:clip;white-space:nowrap;display:flex;flex-direction:column;align-items:center}
