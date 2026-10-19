@@ -3428,5 +3428,30 @@
     ". The curve is projected from imported bookings.",
     ". Die Kurve ist eine Projektion aus importierten Buchungen.",
     ". المنحنى تقدير مبني على الحجوزات المستوردة."
+  ],
+  "Odometer photo": [
+    "Odometer photo",
+    "Kilometerstand-Foto",
+    "صورة عداد المسافة"
+  ],
+  "Local photo only. Read the mileage and enter it with KM and comment. Nothing is saved automatically.": [
+    "Local photo only. Read the mileage and enter it with KM and comment. Nothing is saved automatically.",
+    "Nur lokales Foto. Kilometerstand ablesen und mit KM und Kommentar eingeben. Nichts wird automatisch gespeichert.",
+    "الصورة محلية فقط. اقرأ العداد وأدخله من KM والتعليق. لا يتم حفظ أي شيء تلقائياً."
+  ],
+  "seit": [
+    "since",
+    "seit",
+    "منذ"
+  ],
+  "Min": [
+    "min",
+    "Min",
+    "د"
+  ],
+  "Anruf→Übergabe": [
+    "Call to handover",
+    "Anruf→Übergabe",
+    "من الاتصال حتى التسليم"
   ]
 }

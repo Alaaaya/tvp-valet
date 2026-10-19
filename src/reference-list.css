@@ -46,3 +46,28 @@
 .app.fixed-top .topbar::after{content:"";position:absolute;inset: auto 0 0;height:6px;background:#1fb19b;pointer-events:none}
 .app.fixed-top .topbar>strong{font-family:Arial,sans-serif;font-weight:700;transform:translateY(-1px)}
 .app.fixed-top .topbar>button svg{stroke-width:2.8}
+
+/* Real iPhone follow-up. No transformed title raster layer and no font shadow.
+   The two explicit line boxes fit inside the button even with a chosen border. */
+.app.fixed-top .topbar,.app.fixed-top .topbar>strong{
+ text-shadow:none;filter:none;-webkit-backdrop-filter:none;backdrop-filter:none;opacity:1;
+}
+.app.fixed-top .topbar>strong{
+ transform:none;will-change:auto;color:#fff;-webkit-text-fill-color:#fff;
+ font-family:Arial,sans-serif;font-weight:700;line-height:22px;align-self:center;
+ -webkit-font-smoothing:antialiased;
+}
+.app.fixed-top .counters .counter{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+ height:44px;min-height:44px;padding:2px 8px;overflow:visible;line-height:normal;
+}
+.app.fixed-top .counters.counters{height:56px}
+.app.fixed-top .counters .counter>div{height:16px;min-height:16px;line-height:16px}
+.app.fixed-top .counters .counter>div>span{line-height:16px}
+.app.fixed-top .counters .counter strong{
+ display:block;flex:none;height:22px;line-height:22px;font-family:Arial,sans-serif;
+ font-size:18px;font-weight:700;letter-spacing:0;overflow:visible;
+}
+.app.fixed-top .counters .counter strong small{
+ font:inherit;line-height:inherit;vertical-align:baseline;opacity:1;
+}

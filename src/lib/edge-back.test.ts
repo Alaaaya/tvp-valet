@@ -17,7 +17,7 @@ describe('edge helpers', () => {
     expect(decideIntent(2, 10)).toBe('vertical');
   });
   it('complete thresholds', () => {
-    expect(shouldComplete(133, 400, 0)).toBe(true);
+    expect(shouldComplete(160, 400, 0)).toBe(true);
     expect(shouldComplete(100, 400, 0.1)).toBe(false);
     expect(shouldComplete(50, 400, 0.6)).toBe(true);
     expect(shouldComplete(30, 400, 2)).toBe(false);
@@ -174,4 +174,12 @@ describe('controller', () => {
     expect(s.c.phase).toBe('idle'); expect(s.clip()).toBe(0); expect(s.root.style.transform).toBe('x');
     registry.remove(s.entry);
   });
+});
+
+it('native forty percent boundary and intentional reversing flick',()=>{
+ expect(shouldComplete(100,400,0)).toBe(false);
+ expect(shouldComplete(159,400,0)).toBe(false);
+ expect(shouldComplete(160,400,0)).toBe(true);
+ expect(shouldComplete(240,400,0)).toBe(true);
+ expect(shouldComplete(240,400,-.8)).toBe(false);
 });
