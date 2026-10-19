@@ -164,3 +164,9 @@
 .bd .bd-contact{display:flex;align-items:baseline;justify-content:space-between;gap:5px;width:100%;min-width:0}
 .bd .bd-contact a{min-width:0}
 .bd .bd-contact-count{margin-inline-start:auto;flex:none;color:#143b33;font-size:12px;font-weight:400;direction:ltr;unicode-bidi:isolate}
+/* 0579 glyph-box measurements: 14px values/dates; compact 22px outlines. */
+.bd .bd-identity strong{font-size:14px;line-height:18px}
+.bd .handover-date>strong{font-size:14px;line-height:18px}
+.bd .bd-outline{min-height:22px;line-height:16px;padding-block:2px}
+.bd .summary-cost h3{font-size:16px}
+.bd .fp-head>svg{fill:currentColor;stroke-width:1}
