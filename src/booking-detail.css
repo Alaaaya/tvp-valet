@@ -175,21 +175,11 @@
 .bd .handover-date>button{min-height:38px;height:38px;font-weight:400;border-width:1px}
 .bd .flight-panel .op-btn{font-weight:400}
 
-/* 0579 normal flow excludes native iOS status chrome and the deliberately omitted ride action.
-   The reference identity is 157px, banners 36px, dates 121px, flights 204px. */
-.bd .bd-identity{min-height:157px;border-bottom-color:#c6ebe5;padding-top:10px;padding-bottom:12px}
-.bd .summary-cost{padding:14px 10px 12px;border-bottom:8px solid #c6ebe5}
-.bd .summary-cost h3{margin-bottom:14px}
-.bd .summary-cost p{margin:8px 0;line-height:17px}
-.bd .summary-cost p:first-of-type{padding-bottom:10px;margin-bottom:10px}
-.bd .bd-secondary{background:#fff;border-bottom:8px solid #c6ebe5;font-size:13px;color:#0d3b33}
-.bd .bd-secondary>summary{padding:12px 10px;min-height:44px;cursor:pointer;font-weight:400}
-.bd .bd-secondary-info,.bd .bd-secondary-due{padding:8px 10px;display:flex;justify-content:space-between;gap:10px}
-.bd .bd-secondary .bpay{border:0}
-/* Compact 0579 cost block, without the removed ride action or placeholder payment rows. */
-.bd .summary-cost{padding:10px 10px}
-.bd .summary-cost h3{margin-bottom:10px}
-.bd .summary-cost p{margin:4px 0;font-size:13px;line-height:17px}
-.bd .summary-cost p:first-of-type{padding-bottom:6px;margin-bottom:6px}
-.bd .summary-cost .bd-days{line-height:inherit}
-.bd .split-handover h3 svg,.bd .flight-panel .op-btn>.lucide-phone{fill:currentColor;stroke-width:1}
+/* Independently aligned date/flight reference. Optional booking rows retain original flow. */
+.bd .handover-date>strong+strong{font-size:13px;line-height:18px}
+.bd .handover-date>button{font-size:13px;font-weight:600;border:1px solid #37a068;color:#27834d}
+.bd .out .handover-date>button{border-color:#e43d3d;color:#bf3030}
+.bd .fp-head strong{font-size:13px;font-weight:400}
+.bd .flight-panel .op-btn{font-size:12px;font-weight:600}
+.bd .flight-panel .op-btn>.lucide-phone{fill:currentColor;stroke-width:1}
+.bd .reference-check-action,.bd .reference-car{stroke:none}
