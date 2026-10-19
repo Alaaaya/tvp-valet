@@ -65,9 +65,9 @@ html .app.fixed-top .blr-time{padding-left:3px}
 /* IMG_0579 detail section ink anchors at 390 CSS px. Keep list polish above. */
 html .bd .fp-head .reference-icon-plane{transform:translateY(.5px) scaleY(1.0714286) rotate(-45deg);transform-origin:50% 50%}
 html .bd .summary-cost h3{position:relative;top:-1px;font-weight:700}
-html .bd .summary-cost p:first-of-type>span:first-child{font-weight:400}
+html .bd .summary-cost p:first-of-type>span:first-child{font-weight:400;-webkit-text-stroke:.2px currentColor}
 html .bd .summary-cost .bd-days{font-weight:400;color:#999}
-html .bd .summary-cost p:first-of-type{border-bottom-color:#f9fcfc}
+html .bd .summary-cost p:first-of-type{border-bottom-color:#cbede8}
 html .bd .summary-cost{padding-top:19px}
 html .bd .summary-cost .bd-cost-total{gap:14px}
 html .bd .summary-cost h3{font-size:14.6px;top:-.5px}
@@ -75,7 +75,7 @@ html .bd .summary-cost .bd-cost-total>span:first-child,
 html .bd .summary-cost .bd-cost-total>span:last-child,
 html .bd .summary-cost p:first-of-type+.bd-cost-total>span:first-child{font-size:13px;font-weight:400;-webkit-text-stroke:.2px currentColor}
 html .bd .summary-cost .bd-cost-total+.bd-cost-total{gap:13px}
-html .bd .summary-cost .bd-cost-total+.bd-cost-total>span:first-child{font-size:12.5px;position:relative;top:-.5px;-webkit-text-stroke:.2px currentColor}
+html .bd .summary-cost .bd-cost-total+.bd-cost-total>span:first-child{font-size:13px;position:relative;top:-1px;-webkit-text-stroke:.2px currentColor}
 /* ---- IMG_0592 pass 2: proportions measured side by side ---- */
 html .blr-ico svg+svg{display:none}
 html .app.fixed-top .blr-ico{display:inline-flex;align-items:flex-end;gap:0}
