@@ -1,6 +1,6 @@
 export const LIST_SIZE_KEY='tvp:list-size:v1';
-export const LIST_SIZES=[{label:'S',percent:85},{label:'M',percent:120},{label:'L',percent:135},{label:'XL',percent:150}] as const;
-export const DEFAULT_LIST_SIZE=120;
+export const LIST_SIZES=[{label:'S',percent:85},{label:'M',percent:100},{label:'M+',percent:120},{label:'L',percent:135},{label:'XL',percent:150}] as const;
+export const DEFAULT_LIST_SIZE=100;
 export function normalizeListSize(value:unknown):number {
  if(typeof value!=='number'||!Number.isFinite(value))return DEFAULT_LIST_SIZE;
  return LIST_SIZES.some(s=>s.percent===value)?value:DEFAULT_LIST_SIZE;

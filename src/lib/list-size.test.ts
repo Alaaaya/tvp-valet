@@ -1,10 +1,10 @@
 import{expect,it}from'vitest';
-import{readListSize,writeListSize,normalizeListSize,LIST_SIZE_KEY}from'./list-size';
-it('defaults to medium120 and validates corrupt persisted settings',()=>{
- for(const raw of [null,'broken','null','"150"','{}','[]','0','200','100','1e400'])expect(readListSize({getItem:()=>raw})).toBe(120);
- for(const n of [85,120,135,150])expect(readListSize({getItem:()=>JSON.stringify(n)})).toBe(n);
- expect(readListSize({getItem:()=>{throw Error()}})).toBe(120);
- expect(normalizeListSize(NaN)).toBe(120);
+import{readListSize,writeListSize,normalizeListSize,LIST_SIZE_KEY,LIST_SIZES}from'./list-size';
+it('defaults to medium100 and validates corrupt persisted settings',()=>{
+ for(const raw of [null,'broken','null','"150"','{}','[]','0','200','99','1e400'])expect(readListSize({getItem:()=>raw})).toBe(100);
+ for(const n of [85,100,120,135,150])expect(readListSize({getItem:()=>JSON.stringify(n)})).toBe(n);
+ expect(readListSize({getItem:()=>{throw Error()}})).toBe(100);
+ expect(normalizeListSize(NaN)).toBe(100);expect(LIST_SIZES.map(s=>s.percent)).toEqual([85,100,120,135,150]);
 });
 it('persists valid choices and survives storage errors',()=>{
  let value='';writeListSize({setItem:(key,v)=>{expect(key).toBe(LIST_SIZE_KEY);value=v}},135);
