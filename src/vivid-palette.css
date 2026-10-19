@@ -1,0 +1,21 @@
+/* Vivid solid palette sampled from ParkingPro screenshots (see tmp/tvp-vivid-palette/sampled-map-v2.json). Colors only. */
+.topbar,.app.fixed-top .topbar{background:#0d6b6b!important}
+.app.fixed-top .counters{background:#1fb19b}
+.search-row,.app.fixed-top .search-row{background:#136a5d!important}
+.now-button{background:#0e5046}
+.counter.incoming{background:#38a169!important}
+.counter.outgoing{background:#e53e3e!important}
+.blr-time{background:#c6f6d5;border-left-color:#38a169}
+.blr.out .blr-time{background:#fed7d7;border-left-color:#e53e3e}
+.blr.done .blr-time{border-left-color:#38a169}
+.blr.out.done .blr-time{border-left-color:#e53e3e}
+.time-block{background:#c6f6d5!important}.booking-row.out .time-block{background:#fed7d7!important}
+.bd-head{background:#306a6a}
+.bd{background:#cfebe6}
+.split-handover section.in{background:#579f6e!important}
+.split-handover section.out{background:#d44c46!important}
+.flight-panel{background:#579f6e}
+.flight-panel.out{background:#d44c46}
+.flight-panel .fp-act{background:#d0f5d8}
+.flight-panel.out .fp-act{background:#f8d9d8}
+.pp-ride .op-btn.ride{background:#7dc6ba}
