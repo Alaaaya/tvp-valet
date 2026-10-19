@@ -24,3 +24,17 @@ describe('booking detail view',()=>{
 
 it('external ID absent is not invented',()=>{expect(r(<BookingDetailView {...props({...base,external_id:''})}/>)).not.toContain('External ID:');expect(r(<BookingDetailView {...props(base)}/>)).toContain('206095322')});
 it('before checkin call slot appears in both flight columns',()=>{const h=r(<BookingDetailView {...props({...base,checked_in_at:null},{calledSlot:<b className="call-fixture"/>})}/>);expect(h.match(/call-fixture/g)).toHaveLength(2);expect(h).not.toContain('Mark as taken away')});
+
+it('reference contact counts use supplied real totals outside normal links',()=>{
+ const b=Object.freeze({...base,phone:'+49 123',email:'a@b.c',comment:'Fahrzeug: {"description":"Actual car"}'});
+ const before=JSON.stringify(b);const h=r(<BookingDetailView {...props(b,{contactCounts:{phone:3,email:1}})}/>);
+ expect(h).toContain('bd-contact-count');expect(h).toContain('(3)');expect(h).toContain('(1)');expect(h).toContain('Actual car');expect(h).toContain(' · 9 days');expect(h).toContain('bd-cost-total');expect(JSON.stringify(b)).toBe(before);
+});
+it('reference typography keeps normal labels, links and flights with bold values',()=>{
+ const c=readFileSync('src/booking-detail.css','utf8');
+ expect(c).toContain('.bd .bd-label{font-size:14px;font-weight:400');
+ expect(c).toContain('.bd .bd-identity a,.bd .pp-link{font-size:14px;font-weight:400');
+ expect(c).toContain('.bd .fp-head strong{font-size:14px;font-weight:400');
+ expect(c).toContain('.bd .bd-days{display:inline');
+ expect(c).toContain('.bd .summary-cost .bd-cost-total{justify-content:flex-end}');
+});
