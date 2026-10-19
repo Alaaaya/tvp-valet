@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 /** Minimal auth surface keeps recovery independently testable. */
 export interface RecoveryAuth {
   refreshSession(): Promise<{data:{session:{access_token:string}|null};error:unknown}>;
@@ -6,9 +5,9 @@ export interface RecoveryAuth {
   signOut?(opts?:{scope?:'local'|'global'|'others'}):Promise<unknown>;
 }
 /** Refresh credentials are definitively unusable: user must sign in again. */
-export class TerminalSessionError extends Error {constructor(){super(tr("Sitzung abgelaufen. Bitte erneut anmelden."));this.name='TerminalSessionError'}}
+export class TerminalSessionError extends Error {constructor(){super('Sitzung abgelaufen. Bitte erneut anmelden.');this.name='TerminalSessionError'}}
 /** Temporary failure (network/5xx): keep the session, retry later. */
-export class TransientSessionError extends Error {constructor(){super(tr("Sitzung konnte gerade nicht erneuert werden. Bitte Verbindung prüfen."));this.name='TransientSessionError'}}
+export class TransientSessionError extends Error {constructor(){super('Sitzung konnte gerade nicht erneuert werden. Bitte Verbindung prüfen.');this.name='TransientSessionError'}}
 function terminalRefreshError(e:unknown):boolean{
   if(!e||typeof e!=='object')return false;
   const x=e as {status?:number;code?:string;name?:string;message?:string};
@@ -104,7 +103,7 @@ export function createRecoveringFetch(baseUrl:string, getAuth:()=>RecoveryAuth|n
     let token:string;
     try {token=await refreshSessionSafely(auth,failedToken)} catch {return response}
     const headers=new Headers(replay.headers);
-    headers.set('Authorization',tr("Bearer ")+token);
+    headers.set('Authorization','Bearer '+token);
     return fetcher(new Request(replay,{headers}));
   };
 }

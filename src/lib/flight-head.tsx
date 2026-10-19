@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 import React from 'react';
 import {PlaneTakeoff} from 'lucide-react';
 
@@ -7,5 +6,5 @@ type Props={kind:'in'|'out';number?:string|null;time?:string;delay?:number;title
 /** Departure (parking, green) shows only the flight number. Return (red) shows live/recorded time and hints. */
 export function FlightHead({kind,number,time,delay=0,title,ariaLabel,hint}:Props){
   if(kind==='in')return <div className="fp-head"><PlaneTakeoff size={20}/><strong>{number||''}</strong></div>;
-  return <div className="fp-head"><PlaneTakeoff size={20}/><strong>{number||tr("Kein Flug")}</strong>{time&&<span className="fp-time" {...(title?{title,'aria-label':ariaLabel}:{})}>{time}{delay!==0&&<small>{delay>0?'+':'−'}{Math.abs(delay)}{tr("′")}</small>}</span>}{hint&&<small className="fp-hint" role="status">{hint}</small>}</div>;
+  return <div className="fp-head"><PlaneTakeoff size={20}/><strong>{number||'Kein Flug'}</strong>{time&&<span className="fp-time" {...(title?{title,'aria-label':ariaLabel}:{})}>{time}{delay!==0&&<small>{delay>0?'+':'−'}{Math.abs(delay)}′</small>}</span>}{hint&&<small className="fp-hint" role="status">{hint}</small>}</div>;
 }

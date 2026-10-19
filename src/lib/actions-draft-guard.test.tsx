@@ -1,7 +1,5 @@
 // @vitest-environment jsdom
 import React from 'react';
-// This suite exercises dismissal, not locale wording.
-vi.mock('./i18n',async importOriginal=>({...await importOriginal<typeof import('./i18n')>(),t:(key:string)=>key}));
 import {createRoot} from 'react-dom/client';
 import {act} from 'react';
 import {describe,expect,it,vi,afterEach} from 'vitest';

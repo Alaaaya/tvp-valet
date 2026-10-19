@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import '../booking-edit.css';
 import {ArrowLeft,CalendarDays,Car,MessageSquare,Pencil,Save,User,X,Minus,Plus} from 'lucide-react';
@@ -36,16 +35,16 @@ export function isDirty(b:EditableBooking,x:EditDraft):boolean{
 export function validate(b:EditableBooking,x:EditDraft):string[]{
  const e:string[]=[];
  const a=toBerlinIso(x.arrival_date,x.arrival_time),r=toBerlinIso(x.departure_date,x.departure_time);
- if(!a||!r)e.push(tr("Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)"));
- else if(Date.parse(r)<Date.parse(a))e.push(tr("Rückgabe muss nach der Annahme liegen"));
+ if(!a||!r)e.push('Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)');
+ else if(Date.parse(r)<Date.parse(a))e.push('Rückgabe muss nach der Annahme liegen');
  const o=toDraft(b);
- if(x.first_name.length>120||x.last_name.length>120)e.push(tr("Vor- und Nachname: maximal 120 Zeichen"));
- if(x.car_description.length>500)e.push(tr("Fahrzeugbeschreibung: maximal 500 Zeichen"));
- if(o.plate!==x.plate&&!x.plate.trim())e.push(tr("Kennzeichen darf nicht leer sein"));
- if(NAMES.some(k=>o[k]!==x[k])&&!x.first_name.trim()&&!x.last_name.trim())e.push(tr("Name darf nicht leer sein"));
+ if(x.first_name.length>120||x.last_name.length>120)e.push('Vor- und Nachname: maximal 120 Zeichen');
+ if(x.car_description.length>500)e.push('Fahrzeugbeschreibung: maximal 500 Zeichen');
+ if(o.plate!==x.plate&&!x.plate.trim())e.push('Kennzeichen darf nicht leer sein');
+ if(NAMES.some(k=>o[k]!==x[k])&&!x.first_name.trim()&&!x.last_name.trim())e.push('Name darf nicht leer sein');
  const legacyUntouched=b.persons===0&&x.persons===0;
- if(!legacyUntouched&&(!Number.isInteger(x.persons)||x.persons<1))e.push(tr("Personen: mindestens 1"));
- if(x.km!==''&&!(/^\d+$/.test(x.km.trim())&&Number.isSafeInteger(Number(x.km))))e.push(tr("Kilometerstand ungültig"));
+ if(!legacyUntouched&&(!Number.isInteger(x.persons)||x.persons<1))e.push('Personen: mindestens 1');
+ if(x.km!==''&&!(/^\d+$/.test(x.km.trim())&&Number.isSafeInteger(Number(x.km))))e.push('Kilometerstand ungültig');
  return e;
 }
 /** Human note goes before any import provenance block so displayComment keeps both. */
@@ -87,24 +86,24 @@ export function BookingEditView({booking,role,onBack,onSave,onDirtyChange}:Booki
  const back=()=>{if(busy||inflight.current)return;dirty?setAsk(true):onBack()};
  const inp=(k:keyof EditDraft,label:string,o:{type?:string;clear?:boolean}={})=>{const dis=!canEdit(role,k);return <label className="be-field"><span>{label}</span><span className="be-wrap"><input type={o.type||'text'} value={String(x[k])} disabled={dis} maxLength={k==='first_name'||k==='last_name'?120:k==='car_description'?500:undefined} placeholder={label} onChange={e=>set(k,e.target.value)}/>{o.clear&&x[k]&&!dis&&<button type="button" className="be-clear" aria-label={label+' leeren'} onClick={()=>set(k,'')}><X size={14}/></button>}</span></label>};
  const when=(kind:'in'|'out')=>{const p=kind==='in'?'arrival':'departure',f=kind==='in'?'flight_in':'flight_out',dis=!canEdit(role,(p+'_date') as keyof EditDraft),open=dateEdit[kind]&&!dis;
-  return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?tr("Parking date"):tr("Return date")}</h3><button type="button" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+' bearbeiten'} disabled={dis} aria-expanded={open} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
-  <div className="be-row"><input type="date" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+' Datum'} disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label={(kind==='in'?tr("Parking date"):tr("Return date"))+' Uhrzeit'} disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
-  {inp(f,tr("Flight number"))}</section>};
- return <div ref={root} className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label={tr("Zurück")} disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>{tr("Edit")}</h2><button type="button" className="be-save" disabled={!can} onClick={save}>{tr("Save")}</button></header>
- <div className="be-ext">{tr("Extern ID:")}{booking.external_id||booking.code}</div>
+  return <section className="be-card be-date"><header><h3><CalendarDays size={18}/>{kind==='in'?'Parking date':'Return date'}</h3><button type="button" aria-label={(kind==='in'?'Parking date':'Return date')+' bearbeiten'} disabled={dis} aria-expanded={open} onClick={()=>setDateEdit(s=>({...s,[kind]:!s[kind]}))}><Pencil size={16}/></button></header>
+  <div className="be-row"><input type="date" aria-label={(kind==='in'?'Parking date':'Return date')+' Datum'} disabled={!open} value={String(x[(p+'_date') as keyof EditDraft])} onChange={e=>set((p+'_date') as keyof EditDraft,e.target.value)}/><input type="time" aria-label={(kind==='in'?'Parking date':'Return date')+' Uhrzeit'} disabled={!open} value={String(x[(p+'_time') as keyof EditDraft])} onChange={e=>set((p+'_time') as keyof EditDraft,e.target.value)}/></div>
+  {inp(f,'Flight number')}</section>};
+ return <div ref={root} className="be-screen"><header className="be-head"><button type="button" className="be-back" aria-label="Zurück" disabled={busy} onClick={back}><ArrowLeft size={20}/></button><h2>Edit</h2><button type="button" className="be-save" disabled={!can} onClick={save}>Save</button></header>
+ <div className="be-ext">Extern ID: {booking.external_id||booking.code}</div>
  {err&&<div className="be-err" role="alert">{err}</div>}
  <div className="be-body">
- <section className="be-card"><h3><User size={18}/>{tr("Customer details")}</h3>
-  <div className="be-row">{inp('first_name',tr("First name"))}{inp('last_name',tr("Last name"))}</div>
-  {legacy&&<small className="be-note">{tr("Gespeicherter Name (alt):")}{booking.customer_name}. Vor- und Nachname werden nicht automatisch getrennt.</small>}
-  {inp('phone',tr("Phone"),{type:'tel',clear:true})}{inp('email',tr("Mail address"),{type:'email',clear:true})}
-  <div className="be-stepper"><span><b>{x.persons}</b> {x.persons===1?'person':'persons'}</span><button type="button" aria-label={tr("Weniger Personen")} disabled={!canEdit(role,'persons')||x.persons<=1} onClick={()=>set('persons',x.persons-1)}><Minus size={18}/></button><button type="button" aria-label={tr("Mehr Personen")} disabled={!canEdit(role,'persons')} onClick={()=>set('persons',x.persons+1)}><Plus size={18}/></button></div></section>
- <section className="be-card"><h3><Car size={18}/>{tr("Car details")}</h3>{inp('plate',tr("License Plate"))}{inp('car_description',tr("Car description"))}{inp('key_cash',tr("Key code"))}{inp('km',tr("Mileage"),{type:'number'})}{inp('spot',tr("Spot"))}</section>
+ <section className="be-card"><h3><User size={18}/>Customer details</h3>
+  <div className="be-row">{inp('first_name','First name')}{inp('last_name','Last name')}</div>
+  {legacy&&<small className="be-note">Gespeicherter Name (alt): {booking.customer_name}. Vor- und Nachname werden nicht automatisch getrennt.</small>}
+  {inp('phone','Phone',{type:'tel',clear:true})}{inp('email','Mail address',{type:'email',clear:true})}
+  <div className="be-stepper"><span><b>{x.persons}</b> {x.persons===1?'person':'persons'}</span><button type="button" aria-label="Weniger Personen" disabled={!canEdit(role,'persons')||x.persons<=1} onClick={()=>set('persons',x.persons-1)}><Minus size={18}/></button><button type="button" aria-label="Mehr Personen" disabled={!canEdit(role,'persons')} onClick={()=>set('persons',x.persons+1)}><Plus size={18}/></button></div></section>
+ <section className="be-card"><h3><Car size={18}/>Car details</h3>{inp('plate','License Plate')}{inp('car_description','Car description')}{inp('key_cash','Key code')}{inp('km','Mileage',{type:'number'})}{inp('spot','Spot')}</section>
  {when('in')}{when('out')}
- <section className="be-card"><h3><MessageSquare size={18}/>{tr("Add internal comment")}</h3>{(()=>{const c=displayComment(booking.comment).text;return c?<p className="be-existing">{c}</p>:null})()}<label className="be-field"><span>{tr("Comment")}</span><textarea rows={4} value={x.new_comment} placeholder={tr("Comment")} onChange={e=>set('new_comment',e.target.value)}/></label></section>
+ <section className="be-card"><h3><MessageSquare size={18}/>Add internal comment</h3>{(()=>{const c=displayComment(booking.comment).text;return c?<p className="be-existing">{c}</p>:null})()}<label className="be-field"><span>Comment</span><textarea rows={4} value={x.new_comment} placeholder="Comment" onChange={e=>set('new_comment',e.target.value)}/></label></section>
  {dirty&&problems.map(p=><p key={p} className="be-err" role="alert">{p}</p>)}
  </div>
- <footer className="be-foot"><button type="button" className="be-update" disabled={!can} onClick={save}><Save size={18}/>{busy?tr("Wird gespeichert …"):tr("Update booking")}</button></footer>
- {ask&&<div className="be-dialog" role="alertdialog" aria-modal="true" aria-label={tr("Ungespeicherte Änderungen")} ref={dlg} onKeyDown={trap}><div><p>{tr("Ungespeicherte Änderungen verwerfen?")}</p><button type="button" onClick={()=>setAsk(false)}>{tr("Weiter bearbeiten")}</button><button type="button" className="danger" disabled={busy} onClick={onBack}>{tr("Verwerfen")}</button></div></div>}
+ <footer className="be-foot"><button type="button" className="be-update" disabled={!can} onClick={save}><Save size={18}/>{busy?'Wird gespeichert …':'Update booking'}</button></footer>
+ {ask&&<div className="be-dialog" role="alertdialog" aria-modal="true" aria-label="Ungespeicherte Änderungen" ref={dlg} onKeyDown={trap}><div><p>Ungespeicherte Änderungen verwerfen?</p><button type="button" onClick={()=>setAsk(false)}>Weiter bearbeiten</button><button type="button" className="danger" disabled={busy} onClick={onBack}>Verwerfen</button></div></div>}
  </div>;
 }

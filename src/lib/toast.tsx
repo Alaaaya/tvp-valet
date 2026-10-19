@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 import React,{useEffect} from 'react';
 import {X} from 'lucide-react';
 import '../toast.css';
@@ -16,5 +15,5 @@ export function createToastTimer(ms:number=TOAST_MS){
 export function Toast({toast,onHide,ms=TOAST_MS}:{toast:ToastState|null;onHide:()=>void;ms?:number}){
  useEffect(()=>{if(!toast)return;const t=createToastTimer(ms);t.schedule(onHide);return t.cancel},[toast?.n,toast?.text,ms]);
  if(!toast)return null;
- return <div className="toast" role="status" aria-live="polite"><span>{toast.text}</span><button type="button" aria-label={tr("Hinweis schließen")} onClick={onHide}><X size={16}/></button></div>;
+ return <div className="toast" role="status" aria-live="polite"><span>{toast.text}</span><button type="button" aria-label="Hinweis schließen" onClick={onHide}><X size={16}/></button></div>;
 }

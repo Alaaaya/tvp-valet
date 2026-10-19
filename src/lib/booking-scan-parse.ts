@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 /** Pure helpers for the booking scanner. Nothing here navigates, evals or touches the network. */
 export const MAX_CODE_LEN=40;
 const CODE_RE=/^[A-Za-z0-9][A-Za-z0-9-]{2,39}$/;
@@ -11,16 +10,16 @@ export function isValidBookingCode(s:string):boolean{return CODE_RE.test(s)}
 
 /** Extract a booking code from raw QR text. Only a plain code, or a code in a known URL param / last path segment. */
 export function parseQrPayload(raw:string,opts:{expectedHosts?:string[]}={}):QrParse{
-  if(typeof raw!=='string')return{ok:false,reason:tr("Kein Text im QR-Code.")};
+  if(typeof raw!=='string')return{ok:false,reason:'Kein Text im QR-Code.'};
   const t=raw.trim().replace(/^#/,'');
-  if(!t)return{ok:false,reason:tr("Der QR-Code ist leer.")};
-  if(t.length>2048)return{ok:false,reason:tr("Der QR-Code ist zu lang.")};
+  if(!t)return{ok:false,reason:'Der QR-Code ist leer.'};
+  if(t.length>2048)return{ok:false,reason:'Der QR-Code ist zu lang.'};
   if(isValidBookingCode(t))return{ok:true,code:t.toUpperCase(),source:'plain'};
-  if(/[\u0000-\u001f\s]/.test(t)&&!/^https?:\/\//i.test(t))return{ok:false,reason:tr("QR-Inhalt ist kein Buchungscode: ")+preview(t)};
+  if(/[\u0000-\u001f\s]/.test(t)&&!/^https?:\/\//i.test(t))return{ok:false,reason:'QR-Inhalt ist kein Buchungscode: '+preview(t)};
   let u:URL;
-  try{u=new URL(t)}catch{return{ok:false,reason:tr("QR-Inhalt ist kein Buchungscode: ")+preview(t)}}
-  if(u.protocol!=='https:'&&u.protocol!=='http:')return{ok:false,reason:tr("QR-Inhalt ist kein Buchungscode: ")+preview(t)};
-  if(opts.expectedHosts&&!opts.expectedHosts.map(h=>h.toLowerCase()).includes(u.hostname.toLowerCase()))return{ok:false,reason:tr("Unbekannter Link (")+u.hostname+tr("). Nur Buchungscodes werden übernommen.")};
+  try{u=new URL(t)}catch{return{ok:false,reason:'QR-Inhalt ist kein Buchungscode: '+preview(t)}}
+  if(u.protocol!=='https:'&&u.protocol!=='http:')return{ok:false,reason:'QR-Inhalt ist kein Buchungscode: '+preview(t)};
+  if(opts.expectedHosts&&!opts.expectedHosts.map(h=>h.toLowerCase()).includes(u.hostname.toLowerCase()))return{ok:false,reason:'Unbekannter Link ('+u.hostname+'). Nur Buchungscodes werden übernommen.'};
   const found:string[]=[];
   for(const [name,v] of u.searchParams){
     if(!PARAM_KEYS.includes(name.toLowerCase()))continue;
@@ -31,7 +30,7 @@ export function parseQrPayload(raw:string,opts:{expectedHosts?:string[]}={}):QrP
   if(found.length>1)return{ok:true,code:found[0],source:'url-param',alternatives:found.slice(1)};
   const seg=u.pathname.split('/').filter(Boolean).pop();
   if(seg){let d=seg;try{d=decodeURIComponent(seg)}catch{/* keep raw */}d=d.replace(/^#/,'');if(isValidBookingCode(d)&&/\d/.test(d))return{ok:true,code:d.toUpperCase(),source:'url-path'}}
-  return{ok:false,reason:tr("Link ohne erkennbaren Buchungscode: ")+preview(t)};
+  return{ok:false,reason:'Link ohne erkennbaren Buchungscode: '+preview(t)};
 }
 function preview(s:string){const x=s.replace(/[\u0000-\u001f]+/g,' ');return '"'+(x.length>60?x.slice(0,57)+'…':x)+'"'}
 

@@ -1,4 +1,3 @@
-import {t as tr} from './i18n';
 import {useEffect,useRef,useState} from 'react';
 /** List-only pull-down-to-refresh. Touch gesture at scrollTop 0 opens a solid gap inside the list (padding-top, spinner in ::before),
  *  runs one real refresh, then snaps back. No document bounce: the list uses overscroll-behavior:contain. */
@@ -7,7 +6,7 @@ export type PullEl={scrollTop:number;style:{setProperty(k:string,v:string):void;
  addEventListener(t:string,f:(e:any)=>void,o?:any):void;removeEventListener(t:string,f:(e:any)=>void,o?:any):void;contains?(n:any):boolean};
 export const pullGap=(dy:number)=>Math.max(0,Math.min(PULL.max,dy*PULL.resistance));
 const FORM=/^(INPUT|TEXTAREA|SELECT|VIDEO|CANVAS)$/;
-export class RefreshAbort extends Error{constructor(){super(tr("Aktualisierung abgebrochen"))}}
+export class RefreshAbort extends Error{constructor(){super('Aktualisierung abgebrochen')}}
 /** Rejects with RefreshAbort once the signal fires, so a hung request can never keep the gap open. */
 export function abortable<T>(p:Promise<T>,s:AbortSignal):Promise<T>{
  return new Promise<T>((res,rej)=>{if(s.aborted)return rej(new RefreshAbort());const f=()=>rej(new RefreshAbort());s.addEventListener('abort',f,{once:true});
