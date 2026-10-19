@@ -9,6 +9,7 @@ import {paymentInstruction} from './payment-note';
 import '../payment-note.css';
 import type {BookingOperations,BookingOperationAction} from './operations';
 import '../booking-detail.css';
+import {Fa} from './fa-icons';
 
 export interface BookingDetailViewProps{
   booking:Booking;
@@ -105,10 +106,10 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{detailMoney(b.paid)}</span></p>
       <p><strong>{tr("Total due payable")}</strong><strong>{detailMoney(due)}</strong></p>{p.paymentSlot}</section>
-    <div className="summary-location bd-service"><Car size={18}/><span>{info.service&&<b>{tr("Valet")}</b>}<small>{tr(b.covered?"COVERED":"OPEN")}</small></span><span className="bd-product"><i className="bd-product-dot" aria-hidden="true"/>{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
-    <section className="summary-media"><h3><Camera size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
-    <section className="summary-media bd-comments"><h3><MessageSquare size={18}/>  {tr("Comments")}</h3>
-      <button type="button" className="add-comment" aria-label={tr("Kommentar hinzufügen")} onClick={p.onEdit}><Plus/></button>
+    <div className="summary-location bd-service"><span className="bd-svc-ico"><Fa name="car-side" size={18}/><Fa name="person" size={14}/></span><span>{info.service&&<b>{tr("Valet")}</b>}<small>{tr(b.covered?"COVERED":"OPEN")}</small></span><span className="bd-product"><i className="bd-product-dot" aria-hidden="true"/>{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
+    <section className="summary-media"><h3><Fa name="camera" size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
+    <section className="summary-media bd-comments"><h3><Fa name="comment" size={18}/>  {tr("Comments")}</h3>
+      <button type="button" className="add-comment" aria-label={tr("Kommentar hinzufügen")} onClick={p.onEdit}><Fa name="plus" size={26}/></button>
       <p>{c.text||tr("There are no comments")}</p>
       {p.admin&&c.imported&&<details className="provenance"><summary>{tr("Importquelle")}</summary><p>{tr("ParkingPro-Import")}</p>{c.vehicle&&<p>{tr("Fahrzeug ·")}{c.vehicle}</p>}{c.location&&<p>{tr("Standort ·")}{c.location}</p>}</details>}</section>
   </div>;
