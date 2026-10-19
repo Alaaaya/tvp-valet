@@ -160,3 +160,7 @@
 .bd .summary-cost .bd-cost-total{justify-content:flex-end}
 .bd .bd-cost-total>span:first-child{text-align:end}
 .bd .summary-cost p:first-of-type{padding-bottom:10px;margin-bottom:10px}
+
+.bd .bd-contact{display:flex;align-items:baseline;justify-content:space-between;gap:5px;width:100%;min-width:0}
+.bd .bd-contact a{min-width:0}
+.bd .bd-contact-count{margin-inline-start:auto;flex:none;color:#143b33;font-size:12px;font-weight:400;direction:ltr;unicode-bidi:isolate}

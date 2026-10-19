@@ -15,6 +15,7 @@ export interface BookingDetailViewProps{
   ops?:BookingOperations;
   /** booking exists in the database (actions need it) */
   known:boolean;
+  contactCounts?:{phone:number;email:number};
   busy?:boolean;
   opsBusy?:string;
   opsErr?:string;
@@ -67,8 +68,8 @@ export function BookingDetailView(p:BookingDetailViewProps){
     <section className="bd-identity">
       <div><span className="bd-label">{tr("Name")}</span><strong>{b.customer_name}</strong>
         {!b.phone&&<button type="button" className="pp-link bd-add-phone" onClick={p.onEdit}>{tr("Add phone number")}</button>}
-        {b.phone&&<a href={'tel:'+b.phone}><bdi>{b.phone}</bdi></a>}
-        {b.email&&<a href={'mailto:'+b.email}><bdi>{b.email}</bdi></a>}
+        {b.phone&&<span className="bd-contact"><a href={'tel:'+b.phone}><bdi>{b.phone}</bdi></a>{p.contactCounts&&<span className="bd-contact-count">({p.contactCounts.phone})</span>}</span>}
+        {b.email&&<span className="bd-contact"><a href={'mailto:'+b.email}><bdi>{b.email}</bdi></a>{p.contactCounts&&<span className="bd-contact-count">({p.contactCounts.email})</span>}</span>}
         <button type="button" className="pp-link" onClick={p.onEdit}>{personsLabel(b.persons)}</button></div>
       <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
