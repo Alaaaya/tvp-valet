@@ -11,6 +11,8 @@ import '../booking-detail.css';
 
 export interface BookingDetailViewProps{
   booking:Booking;
+  /** Product label resolved from the actual products catalog, never guessed from the code. */
+  productLabel?:string;
   /** actual stored operations for this booking, if any */
   ops?:BookingOperations;
   /** booking exists in the database (actions need it) */
@@ -52,6 +54,10 @@ export function serviceInfo(b:Pick<Booking,'product'|'covered'>,location:string)
   const valet=/-V-/i.test(b.product||'');
   return {service:valet?'Valet':'',physical:b.covered?'COVERED':'OPEN',product:b.product||'',location:location||b.product||''};
 }
+export function detailMoney(n:number){
+  const lang=getLanguage();
+  return lang==='en'?new Intl.NumberFormat('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+'€':new Intl.NumberFormat(lang==='ar'?'ar-EG':'de-DE',{style:'currency',currency:'EUR'}).format(n);
+}
 const dateLong=(v:string)=>new Date(v).toLocaleDateString(getLanguage()==='ar'?'ar-EG':getLanguage()==='de'?'de-DE':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Berlin'}).replace(',','');
 
 export function BookingDetailView(p:BookingDetailViewProps){
@@ -62,7 +68,6 @@ export function BookingDetailView(p:BookingDetailViewProps){
   };
   return <div className="bd">
     <header className="bd-head"><button type="button" aria-label={tr("Schließen")} className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>{tr("Booking #")}<bdi>{b.code}</bdi></h2><button type="button" aria-label={tr("Bearbeiten")} className="bd-round" onClick={p.onEdit}><svg className="reference-gear" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M9.5 1.5h5l.7 3a8 8 0 0 1 1.4.8l3-.9 2.5 4.3-2.3 2.1a8 8 0 0 1 0 1.6l2.3 2.1-2.5 4.3-3-.9a8 8 0 0 1-1.4.8l-.7 3h-5l-.7-3a8 8 0 0 1-1.4-.8l-3 .9-2.5-4.3 2.3-2.1a8 8 0 0 1 0-1.6L1.9 8.7l2.5-4.3 3 .9a8 8 0 0 1 1.4-.8l.7-3ZM12 7.8a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4Z"/></svg></button></header>
-    {b.external_id?.trim()&&<div className="pp-strip ext">{tr("External ID:")}<bdi>{b.external_id}</bdi></div>}
     {pn&&<div className="bd-pay-note" role="alert"><Banknote size={18}/>{pn}</div>}
     {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> {tr("Outstanding amount:")}{' '}{money(due)}</div>}
     <section className="bd-identity">
@@ -74,8 +79,6 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
         {c.vehicle&&<span className="bd-vehicle">{c.vehicle}</span>}
-        <span className="bd-location"><bdi>{b.spot||c.location||"–"}</bdi><ParkingSquare size={16}/></span>
-        <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>
         <button type="button" className="bd-outline" onClick={p.onEdit}><Plus size={15}/>{tr("+ KM and comment").replace(/^\+\s*/,"")}</button>
         <OdometerCapture key={b.id} onEdit={p.onEdit}/></div>
     </section>
@@ -94,10 +97,20 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
     <section className="summary-cost"><h3><Calculator size={21}/>{tr("Cost overview")}</h3>
-      <p><span>{tr("Parking (")}{b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{money(b.total)}</span></p>
-      <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{money(b.total)}</span></p>
-      <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{money(b.paid)}</span></p>
-      <p><strong>{tr("Total due payable")}</strong><strong>{money(due)}</strong></p>{p.paymentSlot}</section>
+      <p><span>{getLanguage()==='ar'?tr("Parking ("):"Parken ("}{p.productLabel||b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{detailMoney(b.total)}</span></p>
+      <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>
+      <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{detailMoney(b.paid)}</span></p>
+    </section>
+    <details className="bd-secondary" open={due>0||undefined}>
+      <summary>{tr("Buchungsdetails")}</summary>
+      {b.external_id?.trim()&&<div className="pp-strip ext">{tr("External ID:")}<bdi>{b.external_id}</bdi></div>}
+      <div className="bd-secondary-info">
+        <span className="bd-location"><bdi>{b.spot||c.location||"–"}</bdi><ParkingSquare size={16}/></span>
+        <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>
+      </div>
+      <p className="bd-secondary-due"><strong>{tr("Total due payable")}</strong><strong>{detailMoney(due)}</strong></p>
+      {p.paymentSlot}
+    </details>
     <div className="summary-location bd-service"><Car size={18}/><span>{info.service&&<b>{tr("Valet")}</b>}<small>{tr(b.covered?"COVERED":"OPEN")}</small></span><span className="bd-product"><i className="bd-product-dot" aria-hidden="true"/>{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
     <section className="summary-media"><h3><Camera size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
     <section className="summary-media bd-comments"><h3><MessageSquare size={18}/>  {tr("Comments")}</h3>
