@@ -1,3 +1,4 @@
+import {t as tr} from './i18n';
 import {loadImageFile} from './booking-scan-qr';
 import {extractPlateCandidates,type PlateCandidate} from './booking-scan-parse';
 import coreSimd from 'tesseract.js-core/tesseract-core-simd-lstm.wasm.js?url';
@@ -27,7 +28,7 @@ export function createPlateOcr(paths:OcrPaths=bundledPaths()):PlateOcr{
     let wk:Worker;
     try{wk=await make(paths)}catch(e){if(paths.corePath!==coreSimd)throw e;wk=await make({...paths,corePath:coreBasic})}
     if(disposed){void wk.terminate();throw new Error('abgebrochen')}
-    await wk.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- ',tessedit_pageseg_mode:'7',user_defined_dpi:'300'});
+    await wk.setParameters({tessedit_char_whitelist:tr("ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- "),tessedit_pageseg_mode:'7',user_defined_dpi:'300'});
     return wk;
   })().catch(e=>{w=null;throw e}));
   const kill=()=>{const p=w;w=null;if(p)void p.then(x=>x.terminate()).catch(()=>undefined)};
@@ -74,8 +75,8 @@ export async function preparePlatePhoto(file:Blob):Promise<Blob>{
   try{
     const k=Math.min(1,OCR_SIDE/Math.max(im.width,im.height));
     const c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
-    const g=c.getContext('2d');if(!g)throw new Error('Bildverarbeitung nicht verfügbar.');
+    const g=c.getContext('2d');if(!g)throw new Error(tr("Bildverarbeitung nicht verfügbar."));
     g.drawImage(im.source,0,0,c.width,c.height);
-    return await new Promise<Blob>((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Bild konnte nicht verarbeitet werden.')),'image/png'));
+    return await new Promise<Blob>((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error(tr("Bild konnte nicht verarbeitet werden."))),'image/png'));
   }finally{im.release()}
 }

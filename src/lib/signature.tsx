@@ -1,3 +1,4 @@
+import {t as tr} from './i18n';
 import React,{useEffect,useRef,useState} from 'react';
 import SignaturePad,{type PointGroup} from 'signature_pad';
 import {Maximize2,Trash2,Check} from 'lucide-react';
@@ -10,7 +11,7 @@ export async function renderSignature(groups:PointGroup[]):Promise<Blob>{
   const c=document.createElement('canvas');c.width=SIG_W;c.height=SIG_H;
   const p=new SignaturePad(c,{backgroundColor:'#fff',minWidth:PEN.minWidth*SIG_W/360,maxWidth:PEN.maxWidth*SIG_W/360,penColor:PEN.penColor});p.fromData(groups);
   const url=p.toDataURL('image/png');p.off();
-  const b=await (await fetch(url)).blob();if(!b.size)throw Error('Unterschrift konnte nicht erstellt werden.');return b;
+  const b=await (await fetch(url)).blob();if(!b.size)throw Error(tr("Unterschrift konnte nicht erstellt werden."));return b;
 }
 // groups are stored in a logical SIG_W x SIG_H space; the visible canvas scales uniformly (2:1)
 function Pad({groups,onChange}:{groups:PointGroup[];onChange:(g:PointGroup[])=>void}){
@@ -25,14 +26,14 @@ function Pad({groups,onChange}:{groups:PointGroup[];onChange:(g:PointGroup[])=>v
     return()=>{ro.disconnect();sp.off();pad.current=null};
   },[]);
   useEffect(()=>{const c=cv.current,sp=pad.current;if(!c||!sp||!c.offsetWidth)return;if(!groups.length&&!sp.isEmpty()){sp.clear()}},[groups]);
-  return <canvas ref={cv} className="sig-canvas" aria-label="Unterschriftenfeld" role="img"/>;
+  return <canvas ref={cv} className="sig-canvas" aria-label={tr("Unterschriftenfeld")} role="img"/>;
 }
 export function SignatureField({strokes,onChange}:{strokes:PointGroup[];onChange:(s:PointGroup[])=>void}){
   const[fs,setFs]=useState(false);
   useEffect(()=>{if(!fs)return;const k=(e:KeyboardEvent)=>{if(e.key==='Escape')setFs(false)};window.addEventListener('keydown',k);return()=>window.removeEventListener('keydown',k)},[fs]);
   return <div className="sig">
-    <div className="sig-bar"><button type="button" onClick={()=>setFs(true)}><Maximize2 size={15}/> Full screen</button><button type="button" disabled={!strokes.length} onClick={()=>onChange([])}><Trash2 size={15}/> Reset</button></div>
+    <div className="sig-bar"><button type="button" onClick={()=>setFs(true)}><Maximize2 size={15}/>  {tr("Full screen")}</button><button type="button" disabled={!strokes.length} onClick={()=>onChange([])}><Trash2 size={15}/>   {tr("Reset")}</button></div>
     {!fs&&<Pad groups={strokes} onChange={onChange}/>}
-    {fs&&<div className="sig-full" role="dialog" aria-modal="true" aria-label="Unterschrift Vollbild"><div className="sig-bar"><button type="button" disabled={!strokes.length} onClick={()=>onChange([])}><Trash2 size={15}/> Reset</button><button type="button" className="ok" onClick={()=>setFs(false)}><Check size={15}/> Done</button></div><div className="sig-full-box"><Pad groups={strokes} onChange={onChange}/></div></div>}
+    {fs&&<div className="sig-full" role="dialog" aria-modal="true" aria-label={tr("Unterschrift Vollbild")}><div className="sig-bar"><button type="button" disabled={!strokes.length} onClick={()=>onChange([])}><Trash2 size={15}/>   {tr("Reset")}</button><button type="button" className="ok" onClick={()=>setFs(false)}><Check size={15}/>  {tr("Done")}</button></div><div className="sig-full-box"><Pad groups={strokes} onChange={onChange}/></div></div>}
   </div>;
 }

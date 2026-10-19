@@ -1,0 +1,3357 @@
+{
+  "Backend nicht eingerichtet": [
+    "Backend not configured",
+    "Backend nicht eingerichtet",
+    "لم يتم إعداد الخادم الخلفي"
+  ],
+  "Nur importierte Buchungen enthalten; zukünftige Auslastung möglicherweise unvollständig.": [
+    "Only imported bookings included; future occupancy may be incomplete.",
+    "Nur importierte Buchungen enthalten; zukünftige Auslastung möglicherweise unvollständig.",
+    "يشمل الحجوزات المستوردة فقط؛ قد تكون الإشغالات المستقبلية غير مكتملة."
+  ],
+  "Max occupancy: ": [
+    "Max occupancy: ",
+    "Max. Auslastung: ",
+    "الحد الأقصى للإشغال: "
+  ],
+  "Max occupancy: –": [
+    "Max occupancy: –",
+    "Max. Auslastung: –",
+    "الحد الأقصى للإشغال: –"
+  ],
+  "Zurück": [
+    "Back",
+    "Zurück",
+    "رجوع"
+  ],
+  "Analytics": [
+    "Analytics",
+    "Analysen",
+    "التحليلات"
+  ],
+  "Ansicht": [
+    "View",
+    "Ansicht",
+    "العرض"
+  ],
+  "Chart": [
+    "Chart",
+    "Diagramm",
+    "رسم بياني"
+  ],
+  "Table": [
+    "Table",
+    "Tabelle",
+    "جدول"
+  ],
+  "2 aufbewahrte QA-Testbuchungen sind ausgeschlossen.": [
+    "2 retained QA test bookings are excluded.",
+    "2 aufbewahrte QA-Testbuchungen sind ausgeschlossen.",
+    "تم استبعاد حجزي اختبار QA محفوظين."
+  ],
+  "Parking Occupancy Analytics - 30 Day Outlook": [
+    "Parking Occupancy Analytics - 30 Day Outlook",
+    "Parkplatzauslastungs-Analyse – 30-Tage-Ausblick",
+    "تحليلات إشغال المواقف - توقعات 30 يومًا"
+  ],
+  "Arriving": [
+    "Arriving",
+    "Ankommend",
+    "وصول"
+  ],
+  "Departing": [
+    "Departing",
+    "Abfahrend",
+    "مغادرة"
+  ],
+  "Max occupancy": [
+    "Max occupancy",
+    "Max. Auslastung",
+    "الحد الأقصى للإشغال"
+  ],
+  "Auslastung 30 Tage. ": [
+    "Occupancy 30 days. ",
+    "Auslastung 30 Tage. ",
+    "الإشغال خلال 30 يومًا. "
+  ],
+  "Parking occupancy overview for the next 30 days": [
+    "Parking occupancy overview for the next 30 days",
+    "Übersicht der Parkplatzauslastung für die nächsten 30 Tage",
+    "نظرة عامة على إشغال المواقف للأيام الثلاثين القادمة"
+  ],
+  "Date": [
+    "Date",
+    "Datum",
+    "التاريخ"
+  ],
+  "End of day": [
+    "End of day",
+    "Tagesende",
+    "نهاية اليوم"
+  ],
+  "Aktuell geparkt:": [
+    "Currently parked:",
+    "Aktuell geparkt:",
+    "متوقفة حاليًا:"
+  ],
+  "Fahrzeug(e) mit unbekanntem Check-out sind überfällig und werden weiter als geparkt mitgezählt.": [
+    "Vehicle(s) with unknown check-out are overdue and are still counted as parked.",
+    "Fahrzeug(e) mit unbekanntem Check-out sind überfällig und werden weiter als geparkt mitgezählt.",
+    "المركبات ذات تسجيل الخروج غير المعروف متأخرة ولا تزال تُحتسب كمتوقفة."
+  ],
+  "Sitzung abgelaufen. Bitte erneut anmelden.": [
+    "Session expired. Please sign in again.",
+    "Sitzung abgelaufen. Bitte erneut anmelden.",
+    "انتهت الجلسة. يرجى تسجيل الدخول مجددًا."
+  ],
+  "Sitzung konnte gerade nicht erneuert werden. Bitte Verbindung prüfen.": [
+    "Session could not be renewed right now. Please check your connection.",
+    "Sitzung konnte gerade nicht erneuert werden. Bitte Verbindung prüfen.",
+    "تعذر تجديد الجلسة حاليًا. يرجى التحقق من الاتصال."
+  ],
+  "Bearer ": [
+    "Bearer ",
+    "Bearer ",
+    "Bearer "
+  ],
+  "Verlauf ist noch nicht verfügbar.": [
+    "History is not available yet.",
+    "Verlauf ist noch nicht verfügbar.",
+    "السجل غير متاح بعد."
+  ],
+  "Keine Anrufe erfasst.": [
+    "No calls recorded.",
+    "Keine Anrufe erfasst.",
+    "لم تُسجَّل أي مكالمات."
+  ],
+  "Keine Standortänderungen erfasst.": [
+    "No location changes recorded.",
+    "Keine Standortänderungen erfasst.",
+    "لم تُسجَّل أي تغييرات في الموقع."
+  ],
+  "Booking #": [
+    "Booking #",
+    "Buchung #",
+    "حجز #"
+  ],
+  "External ID: ": [
+    "External ID: ",
+    "Externe ID: ",
+    "المعرّف الخارجي: "
+  ],
+  "Platform: ": [
+    "Platform: ",
+    "Plattform: ",
+    "المنصة: "
+  ],
+  "Name: ": [
+    "Name: ",
+    "Name: ",
+    "الاسم: "
+  ],
+  "Phone: ": [
+    "Phone: ",
+    "Telefon: ",
+    "الهاتف: "
+  ],
+  "Email: ": [
+    "Email: ",
+    "E-Mail: ",
+    "البريد الإلكتروني: "
+  ],
+  "Persons: ": [
+    "Persons: ",
+    "Personen: ",
+    "الأشخاص: "
+  ],
+  "Car: ": [
+    "Car: ",
+    "Fahrzeug: ",
+    "السيارة: "
+  ],
+  "Product: ": [
+    "Product: ",
+    "Produkt: ",
+    "المنتج: "
+  ],
+  "Spot: ": [
+    "Spot: ",
+    "Stellplatz: ",
+    "الموقف: "
+  ],
+  "Parking: ": [
+    "Parking: ",
+    "Parken: ",
+    "الإيقاف: "
+  ],
+  "Return: ": [
+    "Return: ",
+    "Rückgabe: ",
+    "الاستلام: "
+  ],
+  "Flight in: ": [
+    "Flight in: ",
+    "Hinflug: ",
+    "رحلة الذهاب: "
+  ],
+  "Flight out: ": [
+    "Flight out: ",
+    "Rückflug: ",
+    "رحلة العودة: "
+  ],
+  "Total: ": [
+    "Total: ",
+    "Gesamt: ",
+    "الإجمالي: "
+  ],
+  "Paid: ": [
+    "Paid: ",
+    "Bezahlt: ",
+    "المدفوع: "
+  ],
+  "Due: ": [
+    "Due: ",
+    "Offen: ",
+    "المستحق: "
+  ],
+  "Kopieren wird von diesem Gerät nicht unterstützt.": [
+    "Copying is not supported on this device.",
+    "Kopieren wird von diesem Gerät nicht unterstützt.",
+    "النسخ غير مدعوم على هذا الجهاز."
+  ],
+  "Ungespeicherten Standort verwerfen?": [
+    "Discard unsaved location?",
+    "Ungespeicherten Standort verwerfen?",
+    "تجاهل الموقع غير المحفوظ؟"
+  ],
+  "Edit": [
+    "Edit",
+    "Bearbeiten",
+    "تعديل"
+  ],
+  "Change location": [
+    "Change location",
+    "Standort ändern",
+    "تغيير الموقع"
+  ],
+  "Location history": [
+    "Location history",
+    "Standortverlauf",
+    "سجل المواقع"
+  ],
+  "Calllist history": [
+    "Call list history",
+    "Anruflistenverlauf",
+    "سجل قائمة المكالمات"
+  ],
+  "Cancel booking": [
+    "Cancel booking",
+    "Buchung stornieren",
+    "إلغاء الحجز"
+  ],
+  "No show": [
+    "No show",
+    "No-Show",
+    "لم يحضر"
+  ],
+  "Schließen": [
+    "Close",
+    "Schließen",
+    "إغلاق"
+  ],
+  "MODIFY": [
+    "MODIFY",
+    "ÄNDERN",
+    "تعديل"
+  ],
+  "Edit booking": [
+    "Edit booking",
+    "Buchung bearbeiten",
+    "تعديل الحجز"
+  ],
+  "Nicht verfügbar": [
+    "Not available",
+    "Nicht verfügbar",
+    "غير متاح"
+  ],
+  "TOOLS": [
+    "TOOLS",
+    "WERKZEUGE",
+    "الأدوات"
+  ],
+  "Copy booking details": [
+    "Copy booking details",
+    "Buchungsdetails kopieren",
+    "نسخ تفاصيل الحجز"
+  ],
+  "Buchungsdetails kopiert": [
+    "Booking details copied",
+    "Buchungsdetails kopiert",
+    "تم نسخ تفاصيل الحجز"
+  ],
+  "STATUS": [
+    "STATUS",
+    "STATUS",
+    "الحالة"
+  ],
+  "Buchung ist nicht aktiv": [
+    "Booking is not active",
+    "Buchung ist nicht aktiv",
+    "الحجز غير نشط"
+  ],
+  "Bereits eingecheckt": [
+    "Already checked in",
+    "Bereits eingecheckt",
+    "تم تسجيل الدخول مسبقًا"
+  ],
+  "Reset check-in": [
+    "Reset check-in",
+    "Check-in zurücksetzen",
+    "إعادة تعيين تسجيل الدخول"
+  ],
+  "Bitte zuerst den Check-out rückgängig machen.": [
+    "Please undo the check-out first.",
+    "Bitte zuerst den Check-out rückgängig machen.",
+    "يرجى التراجع عن تسجيل الخروج أولًا."
+  ],
+  "Close": [
+    "Close",
+    "Schließen",
+    "إغلاق"
+  ],
+  "Aktuell: Platz": [
+    "Current: spot",
+    "Aktuell: Platz",
+    "الحالي: الموقف"
+  ],
+  "Neuer Stellplatz": [
+    "New spot",
+    "Neuer Stellplatz",
+    "موقف جديد"
+  ],
+  "z. B. 12": [
+    "e.g. 12",
+    "z. B. 12",
+    "مثلًا 12"
+  ],
+  "Abbrechen": [
+    "Cancel",
+    "Abbrechen",
+    "إلغاء"
+  ],
+  "Wird gespeichert …": [
+    "Saving …",
+    "Wird gespeichert …",
+    "جارٍ الحفظ …"
+  ],
+  "Speichern": [
+    "Save",
+    "Speichern",
+    "حفظ"
+  ],
+  "Kunde angerufen": [
+    "Customer called",
+    "Kunde angerufen",
+    "تم الاتصال بالعميل"
+  ],
+  "· #": [
+    "· #",
+    "· #",
+    "· #"
+  ],
+  "wird storniert. Das wird protokolliert.": [
+    "will be cancelled. This will be logged.",
+    "wird storniert. Das wird protokolliert.",
+    "سيتم إلغاؤه. سيُسجَّل ذلك."
+  ],
+  "Erneut versuchen": [
+    "Try again",
+    "Erneut versuchen",
+    "إعادة المحاولة"
+  ],
+  "Buchung stornieren": [
+    "Cancel booking",
+    "Buchung stornieren",
+    "إلغاء الحجز"
+  ],
+  "wird als No-Show markiert. Das wird protokolliert.": [
+    "will be marked as no-show. This will be logged.",
+    "wird als No-Show markiert. Das wird protokolliert.",
+    "سيتم وضع علامة لم يحضر. سيُسجَّل ذلك."
+  ],
+  "Als No-Show markieren": [
+    "Mark as no-show",
+    "Als No-Show markieren",
+    "وضع علامة لم يحضر"
+  ],
+  "Ungültige Anfrage-ID": [
+    "Invalid request ID",
+    "Ungültige Anfrage-ID",
+    "معرّف طلب غير صالح"
+  ],
+  "Die Buchung wurde inzwischen geändert. Bitte neu laden.": [
+    "The booking has since been modified. Please reload.",
+    "Die Buchung wurde inzwischen geändert. Bitte neu laden.",
+    "تم تعديل الحجز في هذه الأثناء. يرجى إعادة التحميل."
+  ],
+  "Keine Berechtigung für diese Aktion.": [
+    "No permission for this action.",
+    "Keine Berechtigung für diese Aktion.",
+    "لا توجد صلاحية لهذا الإجراء."
+  ],
+  "Aktion fehlgeschlagen": [
+    "Action failed",
+    "Aktion fehlgeschlagen",
+    "فشل الإجراء"
+  ],
+  "Ungültiger Buchungsstand. Bitte neu laden.": [
+    "Invalid booking state. Please reload.",
+    "Ungültiger Buchungsstand. Bitte neu laden.",
+    "حالة حجز غير صالحة. يرجى إعادة التحميل."
+  ],
+  "Keine Bestätigung vom Server": [
+    "No confirmation from server",
+    "Keine Bestätigung vom Server",
+    "لا يوجد تأكيد من الخادم"
+  ],
+  "Ungültiger Status": [
+    "Invalid status",
+    "Ungültiger Status",
+    "حالة غير صالحة"
+  ],
+  "Bitte zuerst Check-out und Check-in ausdrücklich rückgängig machen.": [
+    "Please explicitly undo check-out and check-in first.",
+    "Bitte zuerst Check-out und Check-in ausdrücklich rückgängig machen.",
+    "يرجى التراجع صراحةً عن تسجيل الخروج وتسجيل الدخول أولًا."
+  ],
+  "Die Buchung ist nicht bestätigt.": [
+    "The booking is not confirmed.",
+    "Die Buchung ist nicht bestätigt.",
+    "الحجز غير مؤكد."
+  ],
+  "Bitte einen Stellplatz mit 1 bis 100 Zeichen angeben.": [
+    "Please enter a spot with 1 to 100 characters.",
+    "Bitte einen Stellplatz mit 1 bis 100 Zeichen angeben.",
+    "يرجى إدخال موقف من 1 إلى 100 حرف."
+  ],
+  "Standortänderung nur für offene bestätigte Buchungen.": [
+    "Location change only for open confirmed bookings.",
+    "Standortänderung nur für offene bestätigte Buchungen.",
+    "تغيير الموقع متاح فقط للحجوزات المؤكدة المفتوحة."
+  ],
+  "Der Stellplatz ist unverändert.": [
+    "The spot is unchanged.",
+    "Der Stellplatz ist unverändert.",
+    "الموقف لم يتغير."
+  ],
+  "Verlauf konnte nicht geladen werden": [
+    "History could not be loaded",
+    "Verlauf konnte nicht geladen werden",
+    "تعذر تحميل السجل"
+  ],
+  "There are no comments": [
+    "There are no comments",
+    "Keine Kommentare vorhanden",
+    "لا توجد تعليقات"
+  ],
+  "Odometer scan is not available yet (no OCR).": [
+    "Odometer scan is not available yet (no OCR).",
+    "Kilometerstand-Scan ist noch nicht verfügbar (kein OCR).",
+    "مسح عداد المسافات غير متاح بعد (بدون OCR)."
+  ],
+  "Add number of persons": [
+    "Add number of persons",
+    "Personenanzahl hinzufügen",
+    "إضافة عدد الأشخاص"
+  ],
+  "·": [
+    "·",
+    "·",
+    "·"
+  ],
+  "Bearbeiten": [
+    "Edit",
+    "Bearbeiten",
+    "تعديل"
+  ],
+  "External ID:": [
+    "External ID:",
+    "Externe ID:",
+    "المعرّف الخارجي:"
+  ],
+  "Outstanding amount:": [
+    "Outstanding amount:",
+    "Offener Betrag:",
+    "المبلغ المستحق:"
+  ],
+  "Name": [
+    "Name",
+    "Name",
+    "الاسم"
+  ],
+  "Car": [
+    "Car",
+    "Fahrzeug",
+    "السيارة"
+  ],
+  "Eingecheckt": [
+    "Checked in",
+    "Eingecheckt",
+    "تم تسجيل الدخول"
+  ],
+  "+ KM and comment": [
+    "+ KM and comment",
+    "+ KM und Kommentar",
+    "+ كم وتعليق"
+  ],
+  "Scan odometer": [
+    "Scan odometer",
+    "Kilometerstand scannen",
+    "مسح عداد المسافات"
+  ],
+  "PARKING DATE": [
+    "PARKING DATE",
+    "PARKDATUM",
+    "تاريخ الإيقاف"
+  ],
+  "RETURN DATE": [
+    "RETURN DATE",
+    "RÜCKGABEDATUM",
+    "تاريخ الاستلام"
+  ],
+  "Mileage:": [
+    "Mileage:",
+    "Kilometerstand:",
+    "المسافة المقطوعة:"
+  ],
+  "Mark as taken away": [
+    "Mark as taken away",
+    "Als abgeholt markieren",
+    "وضع علامة تم الأخذ"
+  ],
+  "Mark as retrieved": [
+    "Mark as retrieved",
+    "Als zurückgebracht markieren",
+    "وضع علامة تم الاسترجاع"
+  ],
+  "Not assigned to driver": [
+    "Not assigned to driver",
+    "Keinem Fahrer zugewiesen",
+    "غير مُسند إلى سائق"
+  ],
+  "Kundenanruf": [
+    "Customer call",
+    "Kundenanruf",
+    "مكالمة العميل"
+  ],
+  "Ablauf konnte nicht geladen werden:": [
+    "Timeline could not be loaded:",
+    "Ablauf konnte nicht geladen werden:",
+    "تعذر تحميل التسلسل:"
+  ],
+  "Demo, nur lokal": [
+    "Demo, local only",
+    "Demo, nur lokal",
+    "تجريبي، محلي فقط"
+  ],
+  "Cost overview": [
+    "Cost overview",
+    "Kostenübersicht",
+    "نظرة عامة على التكاليف"
+  ],
+  "Parking (": [
+    "Parking (",
+    "Parken (",
+    "الإيقاف ("
+  ],
+  ")": [
+    ")",
+    ")",
+    ")"
+  ],
+  "days": [
+    "days",
+    "Tage",
+    "أيام"
+  ],
+  "Total amount": [
+    "Total amount",
+    "Gesamtbetrag",
+    "المبلغ الإجمالي"
+  ],
+  "Paid": [
+    "Paid",
+    "Bezahlt",
+    "مدفوع"
+  ],
+  "Total due payable": [
+    "Total due payable",
+    "Gesamt fällig",
+    "إجمالي المستحق للدفع"
+  ],
+  "Media": [
+    "Media",
+    "Medien",
+    "الوسائط"
+  ],
+  "Comments": [
+    "Comments",
+    "Kommentare",
+    "التعليقات"
+  ],
+  "Kommentar hinzufügen": [
+    "Add comment",
+    "Kommentar hinzufügen",
+    "إضافة تعليق"
+  ],
+  "Importquelle": [
+    "Import source",
+    "Importquelle",
+    "مصدر الاستيراد"
+  ],
+  "ParkingPro-Import": [
+    "ParkingPro import",
+    "ParkingPro-Import",
+    "استيراد ParkingPro"
+  ],
+  "Fahrzeug ·": [
+    "Vehicle ·",
+    "Fahrzeug ·",
+    "المركبة ·"
+  ],
+  "Standort ·": [
+    "Location ·",
+    "Standort ·",
+    "الموقع ·"
+  ],
+  "Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)": [
+    "Valid date and time required (non-existent local time not allowed)",
+    "Gültiges Datum und gültige Uhrzeit erforderlich (nicht existierende Ortszeit nicht erlaubt)",
+    "يلزم إدخال تاريخ ووقت صالحين (التوقيت المحلي غير الموجود غير مسموح به)"
+  ],
+  "Rückgabe muss nach der Annahme liegen": [
+    "Return must be after drop-off",
+    "Rückgabe muss nach der Annahme liegen",
+    "يجب أن يكون الاسترجاع بعد الاستلام"
+  ],
+  "Vor- und Nachname: maximal 120 Zeichen": [
+    "First and last name: maximum 120 characters",
+    "Vor- und Nachname: maximal 120 Zeichen",
+    "الاسم الأول واسم العائلة: 120 حرفًا كحد أقصى"
+  ],
+  "Fahrzeugbeschreibung: maximal 500 Zeichen": [
+    "Vehicle description: maximum 500 characters",
+    "Fahrzeugbeschreibung: maximal 500 Zeichen",
+    "وصف المركبة: 500 حرف كحد أقصى"
+  ],
+  "Kennzeichen darf nicht leer sein": [
+    "License plate must not be empty",
+    "Kennzeichen darf nicht leer sein",
+    "لا يجوز ترك رقم اللوحة فارغًا"
+  ],
+  "Name darf nicht leer sein": [
+    "Name must not be empty",
+    "Name darf nicht leer sein",
+    "لا يجوز ترك الاسم فارغًا"
+  ],
+  "Personen: mindestens 1": [
+    "Persons: at least 1",
+    "Personen: mindestens 1",
+    "الأشخاص: 1 على الأقل"
+  ],
+  "Kilometerstand ungültig": [
+    "Mileage invalid",
+    "Kilometerstand ungültig",
+    "قراءة العداد غير صالحة"
+  ],
+  "Parking date": [
+    "Parking date",
+    "Parkdatum",
+    "تاريخ الوقوف"
+  ],
+  "Return date": [
+    "Return date",
+    "Rückgabedatum",
+    "تاريخ الاسترجاع"
+  ],
+  "Flight number": [
+    "Flight number",
+    "Flugnummer",
+    "رقم الرحلة"
+  ],
+  "Save": [
+    "Save",
+    "Speichern",
+    "حفظ"
+  ],
+  "Extern ID:": [
+    "External ID:",
+    "Externe ID:",
+    "المعرّف الخارجي:"
+  ],
+  "Customer details": [
+    "Customer details",
+    "Kundendaten",
+    "بيانات العميل"
+  ],
+  "First name": [
+    "First name",
+    "Vorname",
+    "الاسم الأول"
+  ],
+  "Last name": [
+    "Last name",
+    "Nachname",
+    "اسم العائلة"
+  ],
+  "Gespeicherter Name (alt):": [
+    "Saved name (old):",
+    "Gespeicherter Name (alt):",
+    "الاسم المحفوظ (القديم):"
+  ],
+  "Phone": [
+    "Phone",
+    "Telefon",
+    "الهاتف"
+  ],
+  "Mail address": [
+    "Email address",
+    "E-Mail-Adresse",
+    "البريد الإلكتروني"
+  ],
+  "Weniger Personen": [
+    "Fewer persons",
+    "Weniger Personen",
+    "أشخاص أقل"
+  ],
+  "Mehr Personen": [
+    "More persons",
+    "Mehr Personen",
+    "أشخاص أكثر"
+  ],
+  "Car details": [
+    "Car details",
+    "Fahrzeugdaten",
+    "بيانات السيارة"
+  ],
+  "License Plate": [
+    "License Plate",
+    "Kennzeichen",
+    "رقم اللوحة"
+  ],
+  "Car description": [
+    "Car description",
+    "Fahrzeugbeschreibung",
+    "وصف السيارة"
+  ],
+  "Key code": [
+    "Key code",
+    "Schlüsselcode",
+    "رمز المفتاح"
+  ],
+  "Mileage": [
+    "Mileage",
+    "Kilometerstand",
+    "قراءة العداد"
+  ],
+  "Spot": [
+    "Spot",
+    "Stellplatz",
+    "الموقف"
+  ],
+  "Add internal comment": [
+    "Add internal comment",
+    "Internen Kommentar hinzufügen",
+    "إضافة تعليق داخلي"
+  ],
+  "Comment": [
+    "Comment",
+    "Kommentar",
+    "تعليق"
+  ],
+  "Update booking": [
+    "Update booking",
+    "Buchung aktualisieren",
+    "تحديث الحجز"
+  ],
+  "Ungespeicherte Änderungen": [
+    "Unsaved changes",
+    "Ungespeicherte Änderungen",
+    "تغييرات غير محفوظة"
+  ],
+  "Ungespeicherte Änderungen verwerfen?": [
+    "Discard unsaved changes?",
+    "Ungespeicherte Änderungen verwerfen?",
+    "هل تريد تجاهل التغييرات غير المحفوظة؟"
+  ],
+  "Weiter bearbeiten": [
+    "Continue editing",
+    "Weiter bearbeiten",
+    "متابعة التعديل"
+  ],
+  "Verwerfen": [
+    "Discard",
+    "Verwerfen",
+    "تجاهل"
+  ],
+  "Stornierte": [
+    "Cancelled",
+    "Stornierte",
+    "الملغاة"
+  ],
+  "Nur meine": [
+    "Only mine",
+    "Nur meine",
+    "الخاصة بي فقط"
+  ],
+  "Produkt": [
+    "Product",
+    "Produkt",
+    "المنتج"
+  ],
+  "Platzart": [
+    "Spot type",
+    "Platzart",
+    "نوع الموقف"
+  ],
+  "Service": [
+    "Service",
+    "Service",
+    "الخدمة"
+  ],
+  "Plattform": [
+    "Platform",
+    "Plattform",
+    "المنصة"
+  ],
+  "Erledigte": [
+    "Completed",
+    "Erledigte",
+    "المنجزة"
+  ],
+  "WEB ": [
+    "WEB ",
+    "WEB ",
+    "WEB "
+  ],
+  "Direkt Web": [
+    "Direct Web",
+    "Direkt Web",
+    "ويب مباشر"
+  ],
+  "Offen | ": [
+    "Open | ",
+    "Offen | ",
+    "مفتوح | "
+  ],
+  "Bezahlt | ": [
+    "Paid | ",
+    "Bezahlt | ",
+    "مدفوع | "
+  ],
+  "Annahme ": [
+    "Drop-off ",
+    "Annahme ",
+    "الاستلام "
+  ],
+  "Rückgabe ": [
+    "Return ",
+    "Rückgabe ",
+    "الاسترجاع "
+  ],
+  "erledigt": [
+    "done",
+    "erledigt",
+    "منجز"
+  ],
+  "Telefon": [
+    "Phone",
+    "Telefon",
+    "الهاتف"
+  ],
+  "Über": [
+    "About",
+    "Über",
+    "حول"
+  ],
+  "Frei": [
+    "Free",
+    "Frei",
+    "متاح"
+  ],
+  "Bargeld": [
+    "Cash",
+    "Bargeld",
+    "نقدًا"
+  ],
+  "Karte": [
+    "Card",
+    "Karte",
+    "بطاقة"
+  ],
+  "Überweisung": [
+    "Bank transfer",
+    "Überweisung",
+    "تحويل بنكي"
+  ],
+  "Bitte gültigen Betrag eingeben (z. B. 25,50).": [
+    "Please enter a valid amount (e.g. 25.50).",
+    "Bitte gültigen Betrag eingeben (z. B. 25,50).",
+    "يرجى إدخال مبلغ صالح (مثلًا 25,50)."
+  ],
+  "Betrag muss größer als 0 sein.": [
+    "Amount must be greater than 0.",
+    "Betrag muss größer als 0 sein.",
+    "يجب أن يكون المبلغ أكبر من 0."
+  ],
+  "Betrag höher als offener Betrag (": [
+    "Amount exceeds outstanding amount (",
+    "Betrag höher als offener Betrag (",
+    "المبلغ أعلى من المبلغ المستحق ("
+  ],
+  "Barzahlung gesperrt: Es gibt bereits einen Bargeld-/Schlüsselvermerk, der erst geklärt werden muss. Karte oder Überweisung sind möglich.": [
+    "Cash payment blocked: there is already a cash/key note that must be resolved first. Card or bank transfer are possible.",
+    "Barzahlung gesperrt: Es gibt bereits einen Bargeld-/Schlüsselvermerk, der erst geklärt werden muss. Karte oder Überweisung sind möglich.",
+    "الدفع النقدي محظور: توجد بالفعل ملاحظة نقد/مفتاح يجب توضيحها أولًا. الدفع بالبطاقة أو التحويل البنكي ممكن."
+  ],
+  "Sichere Anfrage-ID nicht verfügbar. Zahlung nicht möglich.": [
+    "Secure request ID not available. Payment not possible.",
+    "Sichere Anfrage-ID nicht verfügbar. Zahlung nicht möglich.",
+    "معرّف الطلب الآمن غير متوفر. الدفع غير ممكن."
+  ],
+  "Zahlung konnte nicht gespeichert werden.": [
+    "Payment could not be saved.",
+    "Zahlung konnte nicht gespeichert werden.",
+    "تعذر حفظ الدفعة."
+  ],
+  "Zahlung": [
+    "Payment",
+    "Zahlung",
+    "الدفع"
+  ],
+  "Kostenübersicht": [
+    "Cost overview",
+    "Kostenübersicht",
+    "ملخص التكاليف"
+  ],
+  "Gesamt": [
+    "Total",
+    "Gesamt",
+    "الإجمالي"
+  ],
+  "Bezahlt": [
+    "Paid",
+    "Bezahlt",
+    "مدفوع"
+  ],
+  "Offen": [
+    "Outstanding",
+    "Offen",
+    "مستحق"
+  ],
+  "Als bezahlt markieren": [
+    "Mark as paid",
+    "Als bezahlt markieren",
+    "وضع علامة كمدفوع"
+  ],
+  "Zahlung nur für bestätigte Buchungen.": [
+    "Payment only for confirmed bookings.",
+    "Zahlung nur für bestätigte Buchungen.",
+    "الدفع متاح فقط للحجوزات المؤكدة."
+  ],
+  "Zahlung nur für Admin/Mitarbeiter verfügbar.": [
+    "Payment only available for admin/staff.",
+    "Zahlung nur für Admin/Mitarbeiter verfügbar.",
+    "الدفع متاح فقط للمسؤول/الموظفين."
+  ],
+  "Zahlungslink per E-Mail": [
+    "Payment link by email",
+    "Zahlungslink per E-Mail",
+    "رابط الدفع عبر البريد الإلكتروني"
+  ],
+  "Rechnung per E-Mail": [
+    "Invoice by email",
+    "Rechnung per E-Mail",
+    "الفاتورة عبر البريد الإلكتروني"
+  ],
+  "bald": [
+    "soon",
+    "bald",
+    "قريبًا"
+  ],
+  "Zahlungsart": [
+    "Payment method",
+    "Zahlungsart",
+    "طريقة الدفع"
+  ],
+  "Betrag (€), offen": [
+    "Amount (€), outstanding",
+    "Betrag (€), offen",
+    "المبلغ (€)، مستحق"
+  ],
+  "per": [
+    "via",
+    "per",
+    "عبر"
+  ],
+  "buchen? Verbucht wird mit deinem Namen und Zeitstempel.": [
+    "record? It will be recorded with your name and timestamp.",
+    "buchen? Verbucht wird mit deinem Namen und Zeitstempel.",
+    "تسجيل؟ سيتم التسجيل باسمك مع الطابع الزمني."
+  ],
+  "Weiter": [
+    "Continue",
+    "Weiter",
+    "متابعة"
+  ],
+  "Speichern…": [
+    "Saving…",
+    "Speichern…",
+    "جارٍ الحفظ…"
+  ],
+  "Bestätigen": [
+    "Confirm",
+    "Bestätigen",
+    "تأكيد"
+  ],
+  "Ungültiger Geldbetrag": [
+    "Invalid monetary amount",
+    "Ungültiger Geldbetrag",
+    "مبلغ مالي غير صالح"
+  ],
+  "Geldbeträge benötigen volle Cent": [
+    "Monetary amounts require whole cents",
+    "Geldbeträge benötigen volle Cent",
+    "المبالغ المالية تتطلب سنتات كاملة"
+  ],
+  "Keine Berechtigung für diese Zahlung.": [
+    "No permission for this payment.",
+    "Keine Berechtigung für diese Zahlung.",
+    "لا توجد صلاحية لهذه الدفعة."
+  ],
+  "Zahlung fehlgeschlagen": [
+    "Payment failed",
+    "Zahlung fehlgeschlagen",
+    "فشل الدفع"
+  ],
+  "Ungültige Zahlungsart": [
+    "Invalid payment method",
+    "Ungültige Zahlungsart",
+    "طريقة دفع غير صالحة"
+  ],
+  "Bitte einen positiven Betrag in Cent angeben": [
+    "Please specify a positive amount in cents",
+    "Bitte einen positiven Betrag in Cent angeben",
+    "يرجى إدخال مبلغ موجب بالسنت"
+  ],
+  "Der Betrag übersteigt den offenen Restbetrag": [
+    "The amount exceeds the outstanding balance",
+    "Der Betrag übersteigt den offenen Restbetrag",
+    "المبلغ يتجاوز الرصيد المستحق"
+  ],
+  "Die Buchung ist nicht bestätigt": [
+    "The booking is not confirmed",
+    "Die Buchung ist nicht bestätigt",
+    "الحجز غير مؤكد"
+  ],
+  "Vorhandener Bargeld-/Schlüsselvermerk muss vor einer Barzahlung geklärt werden.": [
+    "Existing cash/key note must be resolved before a cash payment.",
+    "Vorhandener Bargeld-/Schlüsselvermerk muss vor einer Barzahlung geklärt werden.",
+    "يجب توضيح ملاحظة النقد/المفتاح الموجودة قبل الدفع النقدي."
+  ],
+  "Keine gültige Zahlungsbestätigung vom Server": [
+    "No valid payment confirmation from server",
+    "Keine gültige Zahlungsbestätigung vom Server",
+    "لا يوجد تأكيد دفع صالح من الخادم"
+  ],
+  "Zahlungen konnten nicht geladen werden": [
+    "Payments could not be loaded",
+    "Zahlungen konnten nicht geladen werden",
+    "تعذر تحميل الدفعات"
+  ],
+  "Ungültiger Zahlungsbeleg": [
+    "Invalid payment receipt",
+    "Ungültiger Zahlungsbeleg",
+    "إيصال دفع غير صالح"
+  ],
+  "Bargeldsumme ist zu groß": [
+    "Cash amount is too large",
+    "Bargeldsumme ist zu groß",
+    "المبلغ النقدي كبير جدًا"
+  ],
+  "Vorschau, kein konsistenter Buchungs-/Zahlungsstand": [
+    "Preview, no consistent booking/payment state",
+    "Vorschau, kein konsistenter Buchungs-/Zahlungsstand",
+    "معاينة، لا توجد حالة حجز/دفع متسقة"
+  ],
+  "Ungültiges Feld: ": [
+    "Invalid field: ",
+    "Ungültiges Feld: ",
+    "حقل غير صالح: "
+  ],
+  "Personen: 1 bis 100": [
+    "Persons: 1 to 100",
+    "Personen: 1 bis 100",
+    "الأشخاص: من 1 إلى 100"
+  ],
+  "Ungültiger Zeitpunkt": [
+    "Invalid date/time",
+    "Ungültiger Zeitpunkt",
+    "وقت غير صالح"
+  ],
+  "Name und Kennzeichen dürfen nicht leer sein": [
+    "Name and license plate must not be empty",
+    "Name und Kennzeichen dürfen nicht leer sein",
+    "لا يجوز أن يكون الاسم ورقم اللوحة فارغين"
+  ],
+  "Keine Änderungen": [
+    "No changes",
+    "Keine Änderungen",
+    "لا توجد تغييرات"
+  ],
+  "Keine Berechtigung für diese Änderung.": [
+    "No permission for this change.",
+    "Keine Berechtigung für diese Änderung.",
+    "لا توجد صلاحية لهذا التغيير."
+  ],
+  "Speichern fehlgeschlagen": [
+    "Save failed",
+    "Speichern fehlgeschlagen",
+    "فشل الحفظ"
+  ],
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- ": [
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- ",
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- ",
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789- "
+  ],
+  "Bildverarbeitung nicht verfügbar.": [
+    "Image processing not available.",
+    "Bildverarbeitung nicht verfügbar.",
+    "معالجة الصور غير متوفرة."
+  ],
+  "Bild konnte nicht verarbeitet werden.": [
+    "Image could not be processed.",
+    "Bild konnte nicht verarbeitet werden.",
+    "تعذر معالجة الصورة."
+  ],
+  "Kein Text im QR-Code.": [
+    "No text in QR code.",
+    "Kein Text im QR-Code.",
+    "لا يوجد نص في رمز QR."
+  ],
+  "Der QR-Code ist leer.": [
+    "The QR code is empty.",
+    "Der QR-Code ist leer.",
+    "رمز QR فارغ."
+  ],
+  "Der QR-Code ist zu lang.": [
+    "The QR code is too long.",
+    "Der QR-Code ist zu lang.",
+    "رمز QR طويل جدًا."
+  ],
+  "QR-Inhalt ist kein Buchungscode: ": [
+    "QR content is not a booking code: ",
+    "QR-Inhalt ist kein Buchungscode: ",
+    "محتوى QR ليس رمز حجز: "
+  ],
+  "Unbekannter Link (": [
+    "Unknown link (",
+    "Unbekannter Link (",
+    "رابط غير معروف ("
+  ],
+  "). Nur Buchungscodes werden übernommen.": [
+    "). Only booking codes are accepted.",
+    "). Nur Buchungscodes werden übernommen.",
+    "). يتم قبول رموز الحجز فقط."
+  ],
+  "Link ohne erkennbaren Buchungscode: ": [
+    "Link without recognizable booking code: ",
+    "Link ohne erkennbaren Buchungscode: ",
+    "رابط بدون رمز حجز يمكن التعرف عليه: "
+  ],
+  "Das Foto ist zu groß (max. 15 MB).": [
+    "The photo is too large (max. 15 MB).",
+    "Das Foto ist zu groß (max. 15 MB).",
+    "الصورة كبيرة جدًا (الحد الأقصى 15 ميغابايت)."
+  ],
+  "Das Foto ist leer.": [
+    "The photo is empty.",
+    "Das Foto ist leer.",
+    "الصورة فارغة."
+  ],
+  "Bitte ein Foto auswählen.": [
+    "Please select a photo.",
+    "Bitte ein Foto auswählen.",
+    "يرجى اختيار صورة."
+  ],
+  "Das Foto konnte nicht gelesen werden.": [
+    "The photo could not be read.",
+    "Das Foto konnte nicht gelesen werden.",
+    "تعذر قراءة الصورة."
+  ],
+  "Das Foto hat zu viele Pixel. Bitte mit niedrigerer Auflösung aufnehmen.": [
+    "The photo has too many pixels. Please capture at a lower resolution.",
+    "Das Foto hat zu viele Pixel. Bitte mit niedrigerer Auflösung aufnehmen.",
+    "الصورة تحتوي على عدد كبير جدًا من البكسلات. يرجى التصوير بدقة أقل."
+  ],
+  "Scan": [
+    "Scan",
+    "Scan",
+    "Scan"
+  ],
+  "QR code": [
+    "QR code",
+    "QR code",
+    "QR code"
+  ],
+  "License plate": [
+    "License plate",
+    "Kennzeichen",
+    "لوحة الترخيص"
+  ],
+  "Buchungscode": [
+    "Booking code",
+    "Buchungscode",
+    "رمز الحجز"
+  ],
+  "Kennzeichen": [
+    "License plate",
+    "Kennzeichen",
+    "لوحة الترخيص"
+  ],
+  "Ungültiger Buchungscode. Erlaubt sind Buchstaben, Ziffern und Bindestriche (3-40 Zeichen).": [
+    "Invalid booking code. Letters, digits and hyphens are allowed (3-40 characters).",
+    "Ungültiger Buchungscode. Erlaubt sind Buchstaben, Ziffern und Bindestriche (3-40 Zeichen).",
+    "رمز الحجز غير صالح. يُسمح بالحروف والأرقام والشرطات (3-40 حرفًا)."
+  ],
+  "Erkennungssicherheit": [
+    "Recognition confidence",
+    "Erkennungssicherheit",
+    "دقة التعرّف"
+  ],
+  "%": [
+    "%",
+    "%",
+    "%"
+  ],
+  "Erneut scannen": [
+    "Scan again",
+    "Erneut scannen",
+    "إعادة المسح"
+  ],
+  "Suchen": [
+    "Search",
+    "Suchen",
+    "بحث"
+  ],
+  "Mehrere Codes im QR-Link gefunden. Bitte den richtigen auswählen. Es wird kein Link geöffnet.": [
+    "Multiple codes found in the QR link. Please select the correct one. No link will be opened.",
+    "Mehrere Codes im QR-Link gefunden. Bitte den richtigen auswählen. Es wird kein Link geöffnet.",
+    "تم العثور على عدة رموز في رابط QR. يُرجى اختيار الرمز الصحيح. لن يتم فتح أي رابط."
+  ],
+  "Code aus QR-Link gelesen. Es wird kein Link geöffnet.": [
+    "Code read from QR link. No link will be opened.",
+    "Code aus QR-Link gelesen. Es wird kein Link geöffnet.",
+    "تمت قراءة الرمز من رابط QR. لن يتم فتح أي رابط."
+  ],
+  "Kamerazugriff wurde nicht erlaubt. Foto oder manuelle Eingabe nutzen.": [
+    "Camera access was not allowed. Use a photo or manual entry.",
+    "Kamerazugriff wurde nicht erlaubt. Foto oder manuelle Eingabe nutzen.",
+    "لم يُسمح بالوصول إلى الكاميرا. استخدم صورة أو الإدخال اليدوي."
+  ],
+  "Keine Kamera verfügbar. Foto oder manuelle Eingabe nutzen.": [
+    "No camera available. Use a photo or manual entry.",
+    "Keine Kamera verfügbar. Foto oder manuelle Eingabe nutzen.",
+    "لا توجد كاميرا متاحة. استخدم صورة أو الإدخال اليدوي."
+  ],
+  "Kamera pausiert. Zurück und erneut öffnen.": [
+    "Camera paused. Go back and open again.",
+    "Kamera pausiert. Zurück und erneut öffnen.",
+    "الكاميرا متوقفة مؤقتًا. ارجع وافتحها مجددًا."
+  ],
+  "Kein QR-Code im Foto erkannt.": [
+    "No QR code detected in the photo.",
+    "Kein QR-Code im Foto erkannt.",
+    "لم يتم التعرّف على رمز QR في الصورة."
+  ],
+  "Foto konnte nicht gelesen werden.": [
+    "Photo could not be read.",
+    "Foto konnte nicht gelesen werden.",
+    "تعذّرت قراءة الصورة."
+  ],
+  "Kamera": [
+    "Camera",
+    "Kamera",
+    "الكاميرا"
+  ],
+  "Kamera wird gestartet…": [
+    "Starting camera…",
+    "Kamera wird gestartet…",
+    "جارٍ تشغيل الكاميرا…"
+  ],
+  "Keine Live-Kamera": [
+    "No live camera",
+    "Keine Live-Kamera",
+    "لا توجد كاميرا مباشرة"
+  ],
+  "Foto aufnehmen": [
+    "Take photo",
+    "Foto aufnehmen",
+    "التقاط صورة"
+  ],
+  "Code manuell eingeben": [
+    "Enter code manually",
+    "Code manuell eingeben",
+    "إدخال الرمز يدويًا"
+  ],
+  "z. B. AF-YA4TQSG": [
+    "e.g. AF-YA4TQSG",
+    "z. B. AF-YA4TQSG",
+    "مثال: AF-YA4TQSG"
+  ],
+  "Bitte ein Foto bis 15 MB auswählen.": [
+    "Please select a photo up to 15 MB.",
+    "Bitte ein Foto bis 15 MB auswählen.",
+    "يُرجى اختيار صورة بحجم أقصاه 15 ميغابايت."
+  ],
+  "Ungültiges Foto.": [
+    "Invalid photo.",
+    "Ungültiges Foto.",
+    "صورة غير صالحة."
+  ],
+  "Kein Kennzeichen erkannt. Foto näher aufnehmen oder manuell eingeben.": [
+    "No license plate detected. Take the photo closer or enter manually.",
+    "Kein Kennzeichen erkannt. Foto näher aufnehmen oder manuell eingeben.",
+    "لم يتم التعرّف على لوحة الترخيص. التقط الصورة من مسافة أقرب أو أدخلها يدويًا."
+  ],
+  "Bitte mit dem Fahrzeug vergleichen. Das Foto bleibt auf diesem Gerät.": [
+    "Please compare with the vehicle. The photo stays on this device.",
+    "Bitte mit dem Fahrzeug vergleichen. Das Foto bleibt auf diesem Gerät.",
+    "يُرجى المقارنة مع المركبة. تبقى الصورة على هذا الجهاز."
+  ],
+  "Texterkennung fehlgeschlagen: ": [
+    "Text recognition failed: ",
+    "Texterkennung fehlgeschlagen: ",
+    "فشل التعرّف على النص: "
+  ],
+  "Texterkennung abgebrochen.": [
+    "Text recognition cancelled.",
+    "Texterkennung abgebrochen.",
+    "تم إلغاء التعرّف على النص."
+  ],
+  "Foto des Kennzeichens": [
+    "Photo of the license plate",
+    "Foto des Kennzeichens",
+    "صورة لوحة الترخيص"
+  ],
+  "Kennzeichen wird auf dem Gerät gelesen…": [
+    "Reading license plate on the device…",
+    "Kennzeichen wird auf dem Gerät gelesen…",
+    "جارٍ قراءة لوحة الترخيص على الجهاز…"
+  ],
+  "Kennzeichen fotografieren": [
+    "Photograph license plate",
+    "Kennzeichen fotografieren",
+    "تصوير لوحة الترخيص"
+  ],
+  "Kennzeichen manuell": [
+    "License plate manually",
+    "Kennzeichen manuell",
+    "لوحة الترخيص يدويًا"
+  ],
+  "z. B. D AB 1234": [
+    "e.g. D AB 1234",
+    "z. B. D AB 1234",
+    "مثال: D AB 1234"
+  ],
+  "Deployment check cancelled": [
+    "Deployment check cancelled",
+    "Bereitstellungsprüfung abgebrochen",
+    "تم إلغاء فحص النشر"
+  ],
+  "Angerufen": [
+    "Called",
+    "Angerufen",
+    "تم الاتصال"
+  ],
+  "Video ist leer oder ungültig.": [
+    "Video is empty or invalid.",
+    "Video ist leer oder ungültig.",
+    "الفيديو فارغ أو غير صالح."
+  ],
+  "Video ist größer als 45 MB. Bitte eine kürzere Aufnahme wählen.": [
+    "Video is larger than 45 MB. Please choose a shorter recording.",
+    "Video ist größer als 45 MB. Bitte eine kürzere Aufnahme wählen.",
+    "حجم الفيديو أكبر من 45 ميغابايت. يرجى اختيار تسجيل أقصر."
+  ],
+  "Videodauer konnte nicht geprüft werden. Bitte eine andere Aufnahme wählen.": [
+    "Video duration could not be verified. Please choose another recording.",
+    "Videodauer konnte nicht geprüft werden. Bitte eine andere Aufnahme wählen.",
+    "تعذر التحقق من مدة الفيديو. يرجى اختيار تسجيل آخر."
+  ],
+  "Video ist länger als 120 Sekunden. Bitte eine kürzere Aufnahme wählen.": [
+    "Video is longer than 120 seconds. Please choose a shorter recording.",
+    "Video ist länger als 120 Sekunden. Bitte eine kürzere Aufnahme wählen.",
+    "الفيديو أطول من 120 ثانية. يرجى اختيار تسجيل أقصر."
+  ],
+  "Videodauer konnte nicht rechtzeitig geprüft werden. Bitte erneut versuchen.": [
+    "Video duration could not be verified in time. Please try again.",
+    "Videodauer konnte nicht rechtzeitig geprüft werden. Bitte erneut versuchen.",
+    "تعذر التحقق من مدة الفيديو في الوقت المناسب. يرجى المحاولة مرة أخرى."
+  ],
+  "Video konnte nicht gelesen werden. Bitte eine andere Aufnahme wählen.": [
+    "Video could not be read. Please choose another recording.",
+    "Video konnte nicht gelesen werden. Bitte eine andere Aufnahme wählen.",
+    "تعذر قراءة الفيديو. يرجى اختيار تسجيل آخر."
+  ],
+  "Videoaufnahme konnte nicht abgeschlossen werden.": [
+    "Video recording could not be completed.",
+    "Videoaufnahme konnte nicht abgeschlossen werden.",
+    "تعذر إكمال تسجيل الفيديو."
+  ],
+  "Live-Kamera wird von diesem Browser nicht unterstützt. Aufnahme über die Kamera-App.": [
+    "Live camera is not supported by this browser. Recording via the camera app.",
+    "Live-Kamera wird von diesem Browser nicht unterstützt. Aufnahme über die Kamera-App.",
+    "الكاميرا المباشرة غير مدعومة في هذا المتصفح. التسجيل عبر تطبيق الكاميرا."
+  ],
+  "Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App.": [
+    "Camera access denied. Recording via the camera app instead.",
+    "Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App.",
+    "تم رفض الوصول إلى الكاميرا. التسجيل عبر تطبيق الكاميرا بدلاً من ذلك."
+  ],
+  "Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App.": [
+    "Camera not available. Recording via the camera app instead.",
+    "Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App.",
+    "الكاميرا غير متوفرة. التسجيل عبر تطبيق الكاميرا بدلاً من ذلك."
+  ],
+  "Vorschau konnte nicht gestartet werden.": [
+    "Preview could not be started.",
+    "Vorschau konnte nicht gestartet werden.",
+    "تعذر بدء المعاينة."
+  ],
+  "Zoom wird vom Gerät nicht angenommen.": [
+    "Zoom is not supported by the device.",
+    "Zoom wird vom Gerät nicht angenommen.",
+    "التكبير/التصغير غير مدعوم من الجهاز."
+  ],
+  "Blitz wird vom Gerät nicht angenommen.": [
+    "Flash is not supported by the device.",
+    "Blitz wird vom Gerät nicht angenommen.",
+    "الفلاش غير مدعوم من الجهاز."
+  ],
+  "Maximal ": [
+    "Maximum ",
+    "Maximal ",
+    "الحد الأقصى "
+  ],
+  "Foto konnte nicht erstellt werden.": [
+    "Photo could not be taken.",
+    "Foto konnte nicht erstellt werden.",
+    "تعذر التقاط الصورة."
+  ],
+  "Foto ist größer als 10 MB.": [
+    "Photo is larger than 10 MB.",
+    "Foto ist größer als 10 MB.",
+    "حجم الصورة أكبر من 10 ميغابايت."
+  ],
+  "Videoaufnahme wird in diesem Browser nicht unterstützt.": [
+    "Video recording is not supported in this browser.",
+    "Videoaufnahme wird in diesem Browser nicht unterstützt.",
+    "تسجيل الفيديو غير مدعوم في هذا المتصفح."
+  ],
+  "Videoaufnahme konnte nicht gestartet werden.": [
+    "Video recording could not be started.",
+    "Videoaufnahme konnte nicht gestartet werden.",
+    "تعذر بدء تسجيل الفيديو."
+  ],
+  "Videoaufnahme fehlgeschlagen": [
+    "Video recording failed",
+    "Videoaufnahme fehlgeschlagen",
+    "فشل تسجيل الفيديو"
+  ],
+  "Video auf 45 MB begrenzt.": [
+    "Video limited to 45 MB.",
+    "Video auf 45 MB begrenzt.",
+    "الفيديو محدود بـ 45 ميغابايت."
+  ],
+  "Videoaufnahme konnte nicht gestartet werden": [
+    "Video recording could not be started",
+    "Videoaufnahme konnte nicht gestartet werden",
+    "تعذر بدء تسجيل الفيديو"
+  ],
+  "Video auf 120 Sekunden begrenzt.": [
+    "Video limited to 120 seconds.",
+    "Video auf 120 Sekunden begrenzt.",
+    "الفيديو محدود بـ 120 ثانية."
+  ],
+  "Foto / Video aufnehmen": [
+    "Take photo / video",
+    "Foto / Video aufnehmen",
+    "التقاط صورة / فيديو"
+  ],
+  "Aufnahme über Kamera-App": [
+    "Recording via camera app",
+    "Aufnahme über Kamera-App",
+    "التسجيل عبر تطبيق الكاميرا"
+  ],
+  "Blitz aus": [
+    "Flash off",
+    "Blitz aus",
+    "إيقاف الفلاش"
+  ],
+  "Blitz an": [
+    "Flash on",
+    "Blitz an",
+    "تشغيل الفلاش"
+  ],
+  "Blitz nicht verfügbar": [
+    "Flash not available",
+    "Blitz nicht verfügbar",
+    "الفلاش غير متوفر"
+  ],
+  ":": [
+    ":",
+    ":",
+    ":"
+  ],
+  "Zoom": [
+    "Zoom",
+    "Zoom",
+    "تكبير/تصغير"
+  ],
+  "Verkleinern": [
+    "Zoom out",
+    "Verkleinern",
+    "تصغير"
+  ],
+  "Vergrößern": [
+    "Zoom in",
+    "Vergrößern",
+    "تكبير"
+  ],
+  "Zoom in der Kamera-App": [
+    "Zoom in the camera app",
+    "Zoom in der Kamera-App",
+    "التكبير/التصغير في تطبيق الكاميرا"
+  ],
+  "Zoom nicht verfügbar": [
+    "Zoom not available",
+    "Zoom nicht verfügbar",
+    "التكبير/التصغير غير متوفر"
+  ],
+  "Aufgenommene Medien": [
+    "Captured media",
+    "Aufgenommene Medien",
+    "الوسائط الملتقطة"
+  ],
+  "Aufnahme ": [
+    "Recording ",
+    "Aufnahme ",
+    "تسجيل "
+  ],
+  "×": [
+    "×",
+    "×",
+    "×"
+  ],
+  "Photo": [
+    "Photo",
+    "Photo",
+    "صورة"
+  ],
+  "Video": [
+    "Video",
+    "Video",
+    "فيديو"
+  ],
+  "Kamera-App öffnen": [
+    "Open camera app",
+    "Kamera-App öffnen",
+    "فتح تطبيق الكاميرا"
+  ],
+  "Aufnahme stoppen": [
+    "Stop recording",
+    "Aufnahme stoppen",
+    "إيقاف التسجيل"
+  ],
+  "Aufnahme starten": [
+    "Start recording",
+    "Aufnahme starten",
+    "بدء التسجيل"
+  ],
+  "Done": [
+    "Done",
+    "Done",
+    "تم"
+  ],
+  "No media captured yet": [
+    "No media captured yet",
+    "No media captured yet",
+    "لم يتم التقاط أي وسائط بعد"
+  ],
+  "Anruf nur für offene bestätigte Buchungen.": [
+    "Call only for open confirmed bookings.",
+    "Anruf nur für offene bestätigte Buchungen.",
+    "الاتصال متاح فقط للحجوزات المؤكدة المفتوحة."
+  ],
+  "Erneuten Anruf bitte ausdrücklich bestätigen.": [
+    "Please explicitly confirm another call.",
+    "Erneuten Anruf bitte ausdrücklich bestätigen.",
+    "يرجى تأكيد إعادة الاتصال صراحةً."
+  ],
+  "Anruf konnte nicht gespeichert werden": [
+    "Call could not be saved",
+    "Anruf konnte nicht gespeichert werden",
+    "تعذر حفظ المكالمة"
+  ],
+  "planmäßig ": [
+    "scheduled ",
+    "planmäßig ",
+    "في الموعد المحدد "
+  ],
+  "erwartet ": [
+    "expected ",
+    "erwartet ",
+    "متوقع "
+  ],
+  "gelandet ": [
+    "landed ",
+    "gelandet ",
+    "هبطت "
+  ],
+  "gestartet ": [
+    "departed ",
+    "gestartet ",
+    "أقلعت "
+  ],
+  "Live ab Flugtag": [
+    "Live from flight date",
+    "Live ab Flugtag",
+    "مباشر ابتداءً من يوم الرحلة"
+  ],
+  "Quelle DUS · Stand ": [
+    "Source DUS · As of ",
+    "Quelle DUS · Stand ",
+    "المصدر DUS · اعتباراً من "
+  ],
+  "Kein Flug": [
+    "No flight",
+    "Kein Flug",
+    "لا توجد رحلة"
+  ],
+  "Flugzeiten derzeit nicht verfügbar · ": [
+    "Flight times currently not available · ",
+    "Flugzeiten derzeit nicht verfügbar · ",
+    "أوقات الرحلات غير متوفرة حالياً · "
+  ],
+  "Live ab Flugtag · Flugplan wird geladen …": [
+    "Live from flight date · Loading flight schedule …",
+    "Live ab Flugtag · Flugplan wird geladen …",
+    "مباشر ابتداءً من يوم الرحلة · جارٍ تحميل جدول الرحلات …"
+  ],
+  "Keine Flugplandaten für ": [
+    "No flight schedule data for ",
+    "Keine Flugplandaten für ",
+    "لا توجد بيانات لجدول الرحلات لـ "
+  ],
+  "Flugzeiten werden geladen …": [
+    "Flight times are loading …",
+    "Flugzeiten werden geladen …",
+    "جارٍ تحميل أوقات الرحلات …"
+  ],
+  "erfasst ": [
+    "recorded ",
+    "erfasst ",
+    "تم تسجيله "
+  ],
+  "′": [
+    "′",
+    "′",
+    "′"
+  ],
+  "Flugzeiten konnten nicht geladen werden": [
+    "Flight times could not be loaded",
+    "Flugzeiten konnten nicht geladen werden",
+    "تعذر تحميل أوقات الرحلات"
+  ],
+  "Ungültige Antwort der Live-Flugquelle": [
+    "Invalid response from live flight source",
+    "Ungültige Antwort der Live-Flugquelle",
+    "استجابة غير صالحة من مصدر الرحلات المباشرة"
+  ],
+  "Keine Medien-URL erhalten.": [
+    "No media URL received.",
+    "Keine Medien-URL erhalten.",
+    "لم يتم استلام عنوان URL للوسائط."
+  ],
+  "Medium konnte nicht geladen werden.": [
+    "Media could not be loaded.",
+    "Medium konnte nicht geladen werden.",
+    "تعذر تحميل الوسيط."
+  ],
+  "Fahrzeugdokumentation": [
+    "Vehicle documentation",
+    "Fahrzeugdokumentation",
+    "توثيق المركبة"
+  ],
+  "Medien konnten nicht geladen werden:": [
+    "Media could not be loaded:",
+    "Medien konnten nicht geladen werden:",
+    "تعذر تحميل الوسائط:"
+  ],
+  "Medien werden geladen …": [
+    "Media is loading …",
+    "Medien werden geladen …",
+    "جارٍ تحميل الوسائط …"
+  ],
+  "Noch keine Medien.": [
+    "No media yet.",
+    "Noch keine Medien.",
+    "لا توجد وسائط بعد."
+  ],
+  "Medium ": [
+    "Media ",
+    "Medium ",
+    "وسيط "
+  ],
+  ", rückgängig gemacht": [
+    ", undone",
+    ", rückgängig gemacht",
+    "، تم التراجع"
+  ],
+  "Rückgängig gemacht": [
+    "Undone",
+    "Rückgängig gemacht",
+    "تم التراجع"
+  ],
+  "Download fehlgeschlagen: ": [
+    "Download failed: ",
+    "Download fehlgeschlagen: ",
+    "فشل التنزيل: "
+  ],
+  "Teilen wird von diesem Gerät nicht unterstützt. Bitte Download nutzen.": [
+    "Sharing is not supported by this device. Please use download.",
+    "Teilen wird von diesem Gerät nicht unterstützt. Bitte Download nutzen.",
+    "المشاركة غير مدعومة من هذا الجهاز. يرجى استخدام التنزيل."
+  ],
+  "Teilen fehlgeschlagen: ": [
+    "Sharing failed: ",
+    "Teilen fehlgeschlagen: ",
+    "فشلت المشاركة: "
+  ],
+  "Medien": [
+    "Media",
+    "Medien",
+    "الوسائط"
+  ],
+  "Existing media": [
+    "Existing media",
+    "Vorhandene Medien",
+    "الوسائط الموجودة"
+  ],
+  "Wird geladen …": [
+    "Loading …",
+    "Wird geladen …",
+    "جارٍ التحميل …"
+  ],
+  "/": [
+    "/",
+    "/",
+    "/"
+  ],
+  "Vollbild beenden": [
+    "Exit full screen",
+    "Vollbild beenden",
+    "إنهاء ملء الشاشة"
+  ],
+  "Vollbild": [
+    "Full screen",
+    "Vollbild",
+    "ملء الشاشة"
+  ],
+  "Rückgängig gemacht ·": [
+    "Undone ·",
+    "Rückgängig gemacht ·",
+    "تم التراجع ·"
+  ],
+  "Teilen": [
+    "Share",
+    "Teilen",
+    "مشاركة"
+  ],
+  "Herunterladen": [
+    "Download",
+    "Herunterladen",
+    "تنزيل"
+  ],
+  "Media (": [
+    "Media (",
+    "Medien (",
+    "الوسائط ("
+  ],
+  "photos": [
+    "photos",
+    "Fotos",
+    "صور"
+  ],
+  "Dieses Medienformat wird nicht unterstützt. Bitte JPEG, PNG, WebP, MP4 oder WebM wählen.": [
+    "This media format is not supported. Please choose JPEG, PNG, WebP, MP4 or WebM.",
+    "Dieses Medienformat wird nicht unterstützt. Bitte JPEG, PNG, WebP, MP4 oder WebM wählen.",
+    "صيغة الوسائط هذه غير مدعومة. يرجى اختيار JPEG أو PNG أو WebP أو MP4 أو WebM."
+  ],
+  "Video muss zwischen 1 Byte und 50 MB groß sein.": [
+    "Video must be between 1 byte and 50 MB.",
+    "Video muss zwischen 1 Byte und 50 MB groß sein.",
+    "يجب أن يكون حجم الفيديو بين 1 بايت و50 ميغابايت."
+  ],
+  "Bild muss zwischen 1 Byte und 10 MB groß sein.": [
+    "Image must be between 1 byte and 10 MB.",
+    "Bild muss zwischen 1 Byte und 10 MB groß sein.",
+    "يجب أن يكون حجم الصورة بين 1 بايت و10 ميغابايت."
+  ],
+  "Ungültige Aufnahmezeit.": [
+    "Invalid capture time.",
+    "Ungültige Aufnahmezeit.",
+    "وقت التقاط غير صالح."
+  ],
+  "Ungültige Medienzuordnung.": [
+    "Invalid media assignment.",
+    "Ungültige Medienzuordnung.",
+    "ربط وسائط غير صالح."
+  ],
+  "Backend nicht eingerichtet.": [
+    "Backend not configured.",
+    "Backend nicht eingerichtet.",
+    "الخادم الخلفي غير مُعدّ."
+  ],
+  "Kilometerstand muss eine positive ganze Zahl sein.": [
+    "Mileage must be a positive whole number.",
+    "Kilometerstand muss eine positive ganze Zahl sein.",
+    "يجب أن تكون قراءة العداد عددًا صحيحًا موجبًا."
+  ],
+  "Ein Eingabefeld ist zu lang.": [
+    "An input field is too long.",
+    "Ein Eingabefeld ist zu lang.",
+    "أحد حقول الإدخال طويل جدًا."
+  ],
+  "Maximal 40 Aufnahmen und eine Unterschrift pro Übergabe.": [
+    "Maximum 40 captures and one signature per handover.",
+    "Maximal 40 Aufnahmen und eine Unterschrift pro Übergabe.",
+    "بحد أقصى 40 لقطة وتوقيع واحد لكل تسليم."
+  ],
+  "Doppelte Medienzuordnung.": [
+    "Duplicate media assignment.",
+    "Doppelte Medienzuordnung.",
+    "ربط وسائط مكرر."
+  ],
+  "Ungültige Mediendaten.": [
+    "Invalid media data.",
+    "Ungültige Mediendaten.",
+    "بيانات وسائط غير صالحة."
+  ],
+  "Ungültige Buchung.": [
+    "Invalid booking.",
+    "Ungültige Buchung.",
+    "حجز غير صالح."
+  ],
+  "Medienlink konnte nicht erstellt werden.": [
+    "Media link could not be created.",
+    "Medienlink konnte nicht erstellt werden.",
+    "تعذر إنشاء رابط الوسائط."
+  ],
+  "Download fehlgeschlagen.": [
+    "Download failed.",
+    "Download fehlgeschlagen.",
+    "فشل التنزيل."
+  ],
+  "Ungültige Übergabe.": [
+    "Invalid handover.",
+    "Ungültige Übergabe.",
+    "تسليم غير صالح."
+  ],
+  "Diese Übergabe wurde rückgängig gemacht. Bitte eine neue Übergabe beginnen.": [
+    "This handover has been undone. Please start a new handover.",
+    "Diese Übergabe wurde rückgängig gemacht. Bitte eine neue Übergabe beginnen.",
+    "تم التراجع عن هذا التسليم. يرجى بدء تسليم جديد."
+  ],
+  "Diese Übergabe-ID wurde bereits verwendet.": [
+    "This handover ID has already been used.",
+    "Diese Übergabe-ID wurde bereits verwendet.",
+    "معرّف التسليم هذا مستخدم من قبل."
+  ],
+  "Die Übergabe wurde inzwischen geändert oder rückgängig gemacht. Bitte schließen, die Buchung neu öffnen und die Übergabe erneut beginnen. Bereits hochgeladene Entwürfe gelten nicht als bestätigte Übergabe.": [
+    "The handover has since been changed or undone. Please close, reopen the booking and start the handover again. Drafts already uploaded do not count as a confirmed handover.",
+    "Die Übergabe wurde inzwischen geändert oder rückgängig gemacht. Bitte schließen, die Buchung neu öffnen und die Übergabe erneut beginnen. Bereits hochgeladene Entwürfe gelten nicht als bestätigte Übergabe.",
+    "تم تغيير التسليم أو التراجع عنه في الأثناء. يرجى الإغلاق وإعادة فتح الحجز وبدء التسليم من جديد. المسودات المرفوعة مسبقًا لا تُعد تسليمًا مؤكدًا."
+  ],
+  "Medien gespeichert, Übergabe noch nicht bestätigt. Bitte erneut speichern. ": [
+    "Media saved, handover not yet confirmed. Please save again. ",
+    "Medien gespeichert, Übergabe noch nicht bestätigt. Bitte erneut speichern. ",
+    "تم حفظ الوسائط، لم يُؤكد التسليم بعد. يرجى الحفظ مجددًا. "
+  ],
+  "Keine Speicherbestätigung erhalten. Bitte erneut speichern.": [
+    "No save confirmation received. Please save again.",
+    "Keine Speicherbestätigung erhalten. Bitte erneut speichern.",
+    "لم يُستلم تأكيد الحفظ. يرجى الحفظ مجددًا."
+  ],
+  "Bitte einen gültigen Kilometerstand eingeben.": [
+    "Please enter a valid mileage.",
+    "Bitte einen gültigen Kilometerstand eingeben.",
+    "يرجى إدخال قراءة عداد صالحة."
+  ],
+  "Wird hochgeladen … ": [
+    "Uploading … ",
+    "Wird hochgeladen … ",
+    "جارٍ الرفع … "
+  ],
+  "Zurück zur Kamera": [
+    "Back to camera",
+    "Zurück zur Kamera",
+    "العودة إلى الكاميرا"
+  ],
+  "Booking": [
+    "Booking",
+    "Buchung",
+    "الحجز"
+  ],
+  "You skipped media. Proceeding to signature.": [
+    "You skipped media. Proceeding to signature.",
+    "Medien übersprungen. Weiter zur Unterschrift.",
+    "تخطيت الوسائط. الانتقال إلى التوقيع."
+  ],
+  "details ·": [
+    "details ·",
+    "Details ·",
+    "التفاصيل ·"
+  ],
+  "Car mileage": [
+    "Car mileage",
+    "Kilometerstand",
+    "قراءة عداد السيارة"
+  ],
+  "Fill in (optional)": [
+    "Fill in (optional)",
+    "Ausfüllen (optional)",
+    "أدخل (اختياري)"
+  ],
+  "Kilometerstand bitte manuell eingeben": [
+    "Please enter mileage manually",
+    "Kilometerstand bitte manuell eingeben",
+    "يرجى إدخال قراءة العداد يدويًا"
+  ],
+  "Scan odometer (unavailable)": [
+    "Scan odometer (unavailable)",
+    "Kilometerstand scannen (nicht verfügbar)",
+    "مسح العداد (غير متاح)"
+  ],
+  "Arrival": [
+    "Arrival",
+    "Ankunft",
+    "الوصول"
+  ],
+  "Departure": [
+    "Departure",
+    "Abflug",
+    "المغادرة"
+  ],
+  "flight number": [
+    "flight number",
+    "Flugnummer",
+    "رقم الرحلة"
+  ],
+  "Photos taken in poor visibility": [
+    "Photos taken in poor visibility",
+    "Fotos bei schlechter Sicht aufgenommen",
+    "صور التُقطت في رؤية ضعيفة"
+  ],
+  "Neuer Kommentar": [
+    "New comment",
+    "Neuer Kommentar",
+    "تعليق جديد"
+  ],
+  "Enter new comment": [
+    "Enter new comment",
+    "Neuen Kommentar eingeben",
+    "أدخل تعليقًا جديدًا"
+  ],
+  "Customer signature": [
+    "Customer signature",
+    "Kundenunterschrift",
+    "توقيع العميل"
+  ],
+  "(optional)": [
+    "(optional)",
+    "(optional)",
+    "(اختياري)"
+  ],
+  "werden gespeichert.": [
+    "will be saved.",
+    "werden gespeichert.",
+    "سيتم حفظها."
+  ],
+  "Abbrechen?": [
+    "Cancel?",
+    "Abbrechen?",
+    "إلغاء؟"
+  ],
+  "Vorgang abbrechen?": [
+    "Cancel operation?",
+    "Vorgang abbrechen?",
+    "إلغاء العملية؟"
+  ],
+  "Aufgenommene Medien und Eingaben gehen verloren.": [
+    "Captured media and inputs will be lost.",
+    "Aufgenommene Medien und Eingaben gehen verloren.",
+    "ستُفقد الوسائط الملتقطة والمدخلات."
+  ],
+  "Weitermachen": [
+    "Continue",
+    "Weitermachen",
+    "متابعة"
+  ],
+  "Ungültige Rücknahme.": [
+    "Invalid undo.",
+    "Ungültige Rücknahme.",
+    "تراجع غير صالح."
+  ],
+  "Diese Übergabe kann nicht rückgängig gemacht werden.": [
+    "This handover cannot be undone.",
+    "Diese Übergabe kann nicht rückgängig gemacht werden.",
+    "لا يمكن التراجع عن هذا التسليم."
+  ],
+  "Die Buchung wurde inzwischen geändert. Bitte schließen, neu laden und erneut prüfen.": [
+    "The booking has since been changed. Please close, reload and check again.",
+    "Die Buchung wurde inzwischen geändert. Bitte schließen, neu laden und erneut prüfen.",
+    "تم تغيير الحجز في الأثناء. يرجى الإغلاق وإعادة التحميل والتحقق مجددًا."
+  ],
+  "Keine Bestätigung erhalten. Bitte mit derselben Rücknahme erneut versuchen.": [
+    "No confirmation received. Please retry with the same undo.",
+    "Keine Bestätigung erhalten. Bitte mit derselben Rücknahme erneut versuchen.",
+    "لم يُستلم تأكيد. يرجى إعادة المحاولة بنفس التراجع."
+  ],
+  "Buchung nach Rücknahme bitte neu laden.": [
+    "Please reload the booking after undo.",
+    "Buchung nach Rücknahme bitte neu laden.",
+    "يرجى إعادة تحميل الحجز بعد التراجع."
+  ],
+  "Nicht gespeichert": [
+    "Not saved",
+    "Nicht gespeichert",
+    "غير محفوظ"
+  ],
+  "✓": [
+    "✓",
+    "✓",
+    "✓"
+  ],
+  "Filter Buchungen": [
+    "Filter bookings",
+    "Filter Buchungen",
+    "تصفية الحجوزات"
+  ],
+  "Filter schließen": [
+    "Close filters",
+    "Filter schließen",
+    "إغلاق التصفية"
+  ],
+  "Filters": [
+    "Filters",
+    "Filter",
+    "عوامل التصفية"
+  ],
+  "Show bookings for": [
+    "Show bookings for",
+    "Buchungen anzeigen für",
+    "عرض الحجوزات لـ"
+  ],
+  "Datum": [
+    "Date",
+    "Datum",
+    "التاريخ"
+  ],
+  "Booking status": [
+    "Booking status",
+    "Buchungsstatus",
+    "حالة الحجز"
+  ],
+  "Show checked-in/out bookings": [
+    "Show checked-in/out bookings",
+    "Ein-/ausgecheckte Buchungen anzeigen",
+    "عرض حجوزات الدخول/الخروج"
+  ],
+  "Cancelled bookings": [
+    "Cancelled bookings",
+    "Stornierte Buchungen",
+    "الحجوزات الملغاة"
+  ],
+  "Deleted bookings": [
+    "Deleted bookings",
+    "Gelöschte Buchungen",
+    "الحجوزات المحذوفة"
+  ],
+  "Kein Löschstatus gespeichert": [
+    "No deletion status stored",
+    "Kein Löschstatus gespeichert",
+    "لا توجد حالة حذف محفوظة"
+  ],
+  "Rejected bookings": [
+    "Rejected bookings",
+    "Abgelehnte Buchungen",
+    "الحجوزات المرفوضة"
+  ],
+  "Kein Ablehnungsstatus gespeichert": [
+    "No rejection status stored",
+    "Kein Ablehnungsstatus gespeichert",
+    "لا توجد حالة رفض محفوظة"
+  ],
+  "No shows": [
+    "No shows",
+    "No-Shows",
+    "عدم الحضور"
+  ],
+  "Show bookings": [
+    "Show bookings",
+    "Buchungen anzeigen",
+    "عرض الحجوزات"
+  ],
+  "Assigned to me": [
+    "Assigned to me",
+    "Mir zugewiesen",
+    "المسندة إليّ"
+  ],
+  "Nicht angemeldet": [
+    "Not signed in",
+    "Nicht angemeldet",
+    "غير مسجل الدخول"
+  ],
+  "Filter airports": [
+    "Filter airports",
+    "Flughäfen filtern",
+    "تصفية المطارات"
+  ],
+  "Keine Flughafen-Angabe in den Buchungen": [
+    "No airport specified in the bookings",
+    "Keine Flughafen-Angabe in den Buchungen",
+    "لا يوجد مطار محدد في الحجوزات"
+  ],
+  "Filter product locations": [
+    "Filter product locations",
+    "Produktstandorte filtern",
+    "تصفية مواقع المنتجات"
+  ],
+  "Keine Produkte vorhanden": [
+    "No products available",
+    "Keine Produkte vorhanden",
+    "لا توجد منتجات"
+  ],
+  "Produkte": [
+    "Products",
+    "Produkte",
+    "المنتجات"
+  ],
+  "Filter placement locations": [
+    "Filter placement locations",
+    "Platzierungsorte filtern",
+    "تصفية مواقع الإيقاف"
+  ],
+  "Keine Buchungen vorhanden": [
+    "No bookings available",
+    "Keine Buchungen vorhanden",
+    "لا توجد حجوزات"
+  ],
+  "Platzierung": [
+    "Placement",
+    "Platzierung",
+    "موقع الإيقاف"
+  ],
+  "Covered": [
+    "Covered",
+    "Überdacht",
+    "مسقوف"
+  ],
+  "Keine überdachten Buchungen": [
+    "No covered bookings",
+    "Keine überdachten Buchungen",
+    "لا توجد حجوزات مسقوفة"
+  ],
+  "Open": [
+    "Open",
+    "Freifläche",
+    "مكشوف"
+  ],
+  "Keine Freiflächen-Buchungen": [
+    "No open-air bookings",
+    "Keine Freiflächen-Buchungen",
+    "لا توجد حجوزات مكشوفة"
+  ],
+  "Display options": [
+    "Display options",
+    "Anzeigeoptionen",
+    "خيارات العرض"
+  ],
+  "Use flight times": [
+    "Use flight times",
+    "Flugzeiten verwenden",
+    "استخدام أوقات الرحلات"
+  ],
+  "Outbound: use/show flight time": [
+    "Outbound: use/show flight time",
+    "Hinflug: Flugzeit verwenden/anzeigen",
+    "الذهاب: استخدام/عرض وقت الرحلة"
+  ],
+  "Flugzeiten sind aus": [
+    "Flight times are off",
+    "Flugzeiten sind aus",
+    "أوقات الرحلات معطلة"
+  ],
+  "Return: use/show flight time": [
+    "Return: use/show flight time",
+    "Rückflug: Flugzeit verwenden/anzeigen",
+    "العودة: استخدام/عرض وقت الرحلة"
+  ],
+  "Hours before date boundary": [
+    "Hours before date boundary",
+    "Stunden vor Datumsgrenze",
+    "ساعات قبل حد التاريخ"
+  ],
+  "Hours after date boundary": [
+    "Hours after date boundary",
+    "Stunden nach Datumsgrenze",
+    "ساعات بعد حد التاريخ"
+  ],
+  "Type of bookings": [
+    "Type of bookings",
+    "Buchungsart",
+    "نوع الحجوزات"
+  ],
+  "All": [
+    "All",
+    "Alle",
+    "الكل"
+  ],
+  "Incoming": [
+    "Incoming",
+    "Eingehend",
+    "واردة"
+  ],
+  "Outgoing": [
+    "Outgoing",
+    "Ausgehend",
+    "صادرة"
+  ],
+  "Service type": [
+    "Service type",
+    "Serviceart",
+    "نوع الخدمة"
+  ],
+  "Ausgegraute Optionen gibt es in den Buchungsdaten nicht. Nur Valet lässt sich aus den Produktcodes ableiten.": [
+    "Greyed-out options do not exist in the booking data. Only Valet can be derived from the product codes.",
+    "Ausgegraute Optionen gibt es in den Buchungsdaten nicht. Nur Valet lässt sich aus den Produktcodes ableiten.",
+    "الخيارات الرمادية غير موجودة في بيانات الحجز. يمكن استنتاج Valet فقط من رموز المنتجات."
+  ],
+  "Reset filters": [
+    "Reset filters",
+    "Filter zurücksetzen",
+    "إعادة تعيين التصفية"
+  ],
+  "Nicht in den Daten vorhanden": [
+    "Not present in the data",
+    "Nicht in den Daten vorhanden",
+    "غير موجود في البيانات"
+  ],
+  "Filter neue Buchungen": [
+    "Filter new bookings",
+    "Filter neue Buchungen",
+    "تصفية الحجوزات الجديدة"
+  ],
+  "Produkt (nur eines oder alle)": [
+    "Product (one only or all)",
+    "Produkt (nur eines oder alle)",
+    "المنتج (واحد فقط أو الكل)"
+  ],
+  "Produktstandort": [
+    "Product location",
+    "Produktstandort",
+    "موقع المنتج"
+  ],
+  "Alle Produkte": [
+    "All products",
+    "Alle Produkte",
+    "كل المنتجات"
+  ],
+  "Ausgegraute Optionen gibt es in den Buchungsdaten nicht und filtern daher nichts. Nur Valet lässt sich aus den Produktcodes ableiten.": [
+    "Greyed-out options do not exist in the booking data and therefore filter nothing. Only Valet can be derived from the product codes.",
+    "Ausgegraute Optionen gibt es in den Buchungsdaten nicht und filtern daher nichts. Nur Valet lässt sich aus den Produktcodes ableiten.",
+    "الخيارات الرمادية غير موجودة في بيانات الحجز ولذلك لا تصفي شيئًا. يمكن استنتاج Valet فقط من رموز المنتجات."
+  ],
+  "New:": [
+    "New:",
+    "Neu:",
+    "جديد:"
+  ],
+  "Arriving today:": [
+    "Arriving today:",
+    "Ankunft heute:",
+    "الوصول اليوم:"
+  ],
+  "Vorheriger Tag": [
+    "Previous day",
+    "Vorheriger Tag",
+    "اليوم السابق"
+  ],
+  "Nächster Tag": [
+    "Next day",
+    "Nächster Tag",
+    "اليوم التالي"
+  ],
+  "Kommentar vorhanden": [
+    "Comment available",
+    "Kommentar vorhanden",
+    "يوجد تعليق"
+  ],
+  "|": [
+    "|",
+    "|",
+    "|"
+  ],
+  "Buchung(en) durch Filter ausgeblendet.": [
+    "booking(s) hidden by filters.",
+    "Buchung(en) durch Filter ausgeblendet.",
+    "حجز/حجوزات مخفية بواسطة التصفية."
+  ],
+  "Keine Buchungen an diesem Tag erstellt.": [
+    "No bookings created on this day.",
+    "Keine Buchungen an diesem Tag erstellt.",
+    "لم تُنشأ حجوزات في هذا اليوم."
+  ],
+  "Erstellt zeigt das gespeicherte Erstellungsdatum. ParkingPro-Importe übernehmen ursprüngliches Datum; fehlt Quelle, kann Importzeitpunkt verwendet werden.": [
+    "Created shows the stored creation date. ParkingPro imports keep the original date; if the source is missing, the import time may be used.",
+    "Erstellt zeigt das gespeicherte Erstellungsdatum. ParkingPro-Importe übernehmen ursprüngliches Datum; fehlt Quelle, kann Importzeitpunkt verwendet werden.",
+    "يعرض «أُنشئ» تاريخ الإنشاء المحفوظ. تحتفظ واردات ParkingPro بالتاريخ الأصلي؛ وإن غاب المصدر فقد يُستخدم وقت الاستيراد."
+  ],
+  "Invalid start date": [
+    "Invalid start date",
+    "Ungültiges Startdatum",
+    "تاريخ بدء غير صالح"
+  ],
+  "Invalid day count": [
+    "Invalid day count",
+    "Invalid day count",
+    "عدد أيام غير صالح"
+  ],
+  "Invalid current time": [
+    "Invalid current time",
+    "Invalid current time",
+    "الوقت الحالي غير صالح"
+  ],
+  "Aktualisierung abgebrochen": [
+    "Update canceled",
+    "Aktualisierung abgebrochen",
+    "تم إلغاء التحديث"
+  ],
+  "Scan-Ergebnis": [
+    "Scan result",
+    "Scan-Ergebnis",
+    "نتيجة المسح"
+  ],
+  "Mehrere Treffer. Bitte Buchung wählen.": [
+    "Multiple matches. Please select a booking.",
+    "Mehrere Treffer. Bitte Buchung wählen.",
+    "نتائج متعددة. يُرجى اختيار الحجز."
+  ],
+  "Datum gewechselt. Diese Buchung wird weiterhin durch die aktiven Filter ausgeblendet. Es wurde kein Filter automatisch geändert.": [
+    "Date changed. This booking is still hidden by the active filters. No filter was changed automatically.",
+    "Datum gewechselt. Diese Buchung wird weiterhin durch die aktiven Filter ausgeblendet. Es wurde kein Filter automatisch geändert.",
+    "تم تغيير التاريخ. لا يزال هذا الحجز مخفيًا بسبب الفلاتر النشطة. لم يتم تغيير أي فلتر تلقائيًا."
+  ],
+  "Keine Übereinstimmung in der aktuellen Liste.": [
+    "No match in the current list.",
+    "Keine Übereinstimmung in der aktuellen Liste.",
+    "لا يوجد تطابق في القائمة الحالية."
+  ],
+  "Die Buchung ": [
+    "The booking ",
+    "Die Buchung ",
+    "الحجز "
+  ],
+  ") liegt außerhalb von Datum oder Filter.": [
+    ") is outside the date or filter.",
+    ") liegt außerhalb von Datum oder Filter.",
+    ") خارج نطاق التاريخ أو الفلتر."
+  ],
+  "Filter ausschalten:": [
+    "Turn off filter:",
+    "Filter ausschalten:",
+    "إيقاف الفلتر:"
+  ],
+  "Zum": [
+    "Jump to",
+    "Zum",
+    "الانتقال إلى"
+  ],
+  "springen": [
+    "open",
+    "springen",
+    "افتح"
+  ],
+  "Keine Buchung mit diesem Kennzeichen oder Code gefunden.": [
+    "No booking found with this license plate or code.",
+    "Keine Buchung mit diesem Kennzeichen oder Code gefunden.",
+    "لم يتم العثور على حجز بهذه اللوحة أو هذا الرمز."
+  ],
+  "Sitzung konnte gerade nicht geladen werden. Bitte Verbindung prüfen.": [
+    "Session could not be loaded right now. Please check your connection.",
+    "Sitzung konnte gerade nicht geladen werden. Bitte Verbindung prüfen.",
+    "تعذّر تحميل الجلسة حاليًا. يُرجى التحقق من الاتصال."
+  ],
+  "Unterschrift konnte nicht erstellt werden.": [
+    "Signature could not be created.",
+    "Unterschrift konnte nicht erstellt werden.",
+    "تعذّر إنشاء التوقيع."
+  ],
+  "Unterschriftenfeld": [
+    "Signature field",
+    "Unterschriftenfeld",
+    "حقل التوقيع"
+  ],
+  "Full screen": [
+    "Full screen",
+    "Vollbild",
+    "ملء الشاشة"
+  ],
+  "Reset": [
+    "Reset",
+    "Zurücksetzen",
+    "إعادة تعيين"
+  ],
+  "Unterschrift Vollbild": [
+    "Signature full screen",
+    "Unterschrift Vollbild",
+    "التوقيع بملء الشاشة"
+  ],
+  "Hinweis schließen": [
+    "Close notice",
+    "Hinweis schließen",
+    "إغلاق التنبيه"
+  ],
+  "Fotos und Unterschriften bleiben erhalten und werden als „Rückgängig gemacht“ markiert.": [
+    "Photos and signatures are kept and marked as “Undone”.",
+    "Fotos und Unterschriften bleiben erhalten und werden als „Rückgängig gemacht“ markiert.",
+    "تبقى الصور والتوقيعات محفوظة ويتم وسمها بـ «تم التراجع»."
+  ],
+  "Der Check-out wird zurückgenommen. Das Fahrzeug gilt danach wieder als eingecheckt und steht zur Rückgabe an. ": [
+    "The check-out will be reverted. The vehicle will then count as checked in again and be pending return. ",
+    "Der Check-out wird zurückgenommen. Das Fahrzeug gilt danach wieder als eingecheckt und steht zur Rückgabe an. ",
+    "سيتم التراجع عن تسجيل الخروج. ستُعتبر المركبة بعد ذلك مسجّلة الدخول مجددًا وفي انتظار الإرجاع. "
+  ],
+  "Der Check-in wird zurückgenommen. Das Fahrzeug gilt danach wieder als erwartet und noch nicht angenommen. ": [
+    "The check-in will be reverted. The vehicle will then count as expected again and not yet accepted. ",
+    "Der Check-in wird zurückgenommen. Das Fahrzeug gilt danach wieder als erwartet und noch nicht angenommen. ",
+    "سيتم التراجع عن تسجيل الدخول. ستُعتبر المركبة بعد ذلك متوقعة مجددًا ولم يتم استلامها بعد. "
+  ],
+  "Übergabe rückgängig": [
+    "Undo handover",
+    "Übergabe rückgängig",
+    "التراجع عن التسليم"
+  ],
+  "rückgängig": [
+    "undo",
+    "rückgängig",
+    "تراجع"
+  ],
+  "rückgängig machen?": [
+    "undo?",
+    "rückgängig machen?",
+    "هل تريد التراجع؟"
+  ],
+  "Wird rückgängig gemacht …": [
+    "Undoing …",
+    "Wird rückgängig gemacht …",
+    "جارٍ التراجع …"
+  ],
+  "Demo: Aktion nur lokal gespeichert": [
+    "Demo: action saved locally only",
+    "Demo: Aktion nur lokal gespeichert",
+    "تجريبي: تم حفظ الإجراء محليًا فقط"
+  ],
+  "Supabase-Zugang fehlt noch.": [
+    "Supabase access is still missing.",
+    "Supabase-Zugang fehlt noch.",
+    "بيانات الوصول إلى Supabase غير متوفرة بعد."
+  ],
+  "Alaa · Demo": [
+    "Alaa · Demo",
+    "Alaa · Demo",
+    "علاء · تجريبي"
+  ],
+  "Demo aktiv · Änderungen bleiben nur bis zum Neuladen.": [
+    "Demo active · Changes persist only until reload.",
+    "Demo aktiv · Änderungen bleiben nur bis zum Neuladen.",
+    "الوضع التجريبي نشط · تبقى التغييرات حتى إعادة التحميل فقط."
+  ],
+  "Name und Kennzeichen fehlen.": [
+    "Name and license plate are missing.",
+    "Name und Kennzeichen fehlen.",
+    "الاسم ورقم اللوحة مفقودان."
+  ],
+  "Rückgabe muss nach Annahme liegen.": [
+    "Return must be after check-in.",
+    "Rückgabe muss nach Annahme liegen.",
+    "يجب أن يكون موعد الإرجاع بعد الاستلام."
+  ],
+  "Buchung gespeichert": [
+    "Booking saved",
+    "Buchung gespeichert",
+    "تم حفظ الحجز"
+  ],
+  "Buchung zuerst speichern.": [
+    "Save the booking first.",
+    "Buchung zuerst speichern.",
+    "احفظ الحجز أولًا."
+  ],
+  "Bereits eingecheckt.": [
+    "Already checked in.",
+    "Bereits eingecheckt.",
+    "تم تسجيل الدخول مسبقًا."
+  ],
+  "Bereits ausgecheckt.": [
+    "Already checked out.",
+    "Bereits ausgecheckt.",
+    "تم تسجيل الخروج مسبقًا."
+  ],
+  "Bitte zuerst einchecken.": [
+    "Please check in first.",
+    "Bitte zuerst einchecken.",
+    "يرجى تسجيل الدخول أولًا."
+  ],
+  "Buchung ist nicht aktiv.": [
+    "Booking is not active.",
+    "Buchung ist nicht aktiv.",
+    "الحجز غير نشط."
+  ],
+  "Fahrzeug eingecheckt": [
+    "Vehicle checked in",
+    "Fahrzeug eingecheckt",
+    "تم تسجيل دخول المركبة"
+  ],
+  "Fahrzeug ausgecheckt": [
+    "Vehicle checked out",
+    "Fahrzeug ausgecheckt",
+    "تم تسجيل خروج المركبة"
+  ],
+  "Anruf gespeichert": [
+    "Call saved",
+    "Anruf gespeichert",
+    "تم حفظ المكالمة"
+  ],
+  "Demo: gespeichert": [
+    "Demo: saved",
+    "Demo: gespeichert",
+    "تجريبي: تم الحفظ"
+  ],
+  "Parkplatz bitte über das Zahnrad unter Change location ändern.": [
+    "Please change the parking lot via the gear icon under Change location.",
+    "Parkplatz bitte über das Zahnrad unter Change location ändern.",
+    "يرجى تغيير موقف السيارات عبر أيقونة الترس ضمن Change location."
+  ],
+  "Gespeichert": [
+    "Saved",
+    "Gespeichert",
+    "تم الحفظ"
+  ],
+  "Veraltet, nicht live. Letzter Abruf ": [
+    "Outdated, not live. Last fetch ",
+    "Veraltet, nicht live. Letzter Abruf ",
+    "قديم، غير مباشر. آخر تحديث "
+  ],
+  "Live-Aktualisierung fehlgeschlagen: ": [
+    "Live update failed: ",
+    "Live-Aktualisierung fehlgeschlagen: ",
+    "فشل التحديث المباشر: "
+  ],
+  "Live-Daten nicht verfügbar: ": [
+    "Live data unavailable: ",
+    "Live-Daten nicht verfügbar: ",
+    "البيانات المباشرة غير متوفرة: "
+  ],
+  "Keine Live-Daten für diesen Flug": [
+    "No live data for this flight",
+    "Keine Live-Daten für diesen Flug",
+    "لا توجد بيانات مباشرة لهذه الرحلة"
+  ],
+  "Live-Daten werden geladen…": [
+    "Loading live data…",
+    "Live-Daten werden geladen…",
+    "جارٍ تحميل البيانات المباشرة…"
+  ],
+  "Keine Zeilen gefunden.": [
+    "No rows found.",
+    "Keine Zeilen gefunden.",
+    "لم يتم العثور على صفوف."
+  ],
+  "Pflichtfelder: customer_name, plate, arrival_at, departure_at, platform, external_id": [
+    "Required fields: customer_name, plate, arrival_at, departure_at, platform, external_id",
+    "Pflichtfelder: customer_name, plate, arrival_at, departure_at, platform, external_id",
+    "الحقول الإلزامية: customer_name, plate, arrival_at, departure_at, platform, external_id"
+  ],
+  "Datum bitte im ISO-Format mit Zeitzone.": [
+    "Date must be in ISO format with time zone.",
+    "Datum bitte im ISO-Format mit Zeitzone.",
+    "يرجى إدخال التاريخ بصيغة ISO مع المنطقة الزمنية."
+  ],
+  "Zeile ": [
+    "Row ",
+    "Zeile ",
+    "الصف "
+  ],
+  "My Work Schedule": [
+    "My Work Schedule",
+    "Mein Dienstplan",
+    "جدول عملي"
+  ],
+  "Time registration": [
+    "Time registration",
+    "Zeiterfassung",
+    "تسجيل الوقت"
+  ],
+  "Einstellungen": [
+    "Settings",
+    "Einstellungen",
+    "الإعدادات"
+  ],
+  "Suche & Kunden": [
+    "Search & Customers",
+    "Suche & Kunden",
+    "البحث والعملاء"
+  ],
+  "Offene Buchungen": [
+    "Open Bookings",
+    "Offene Buchungen",
+    "الحجوزات المفتوحة"
+  ],
+  "New Today": [
+    "New Today",
+    "Neu heute",
+    "جديد اليوم"
+  ],
+  "Verwaltung": [
+    "Administration",
+    "Verwaltung",
+    "الإدارة"
+  ],
+  "Importzentrale": [
+    "Import Center",
+    "Importzentrale",
+    "مركز الاستيراد"
+  ],
+  "Annahme": [
+    "Check-in",
+    "Annahme",
+    "الاستلام"
+  ],
+  "Rückgabe": [
+    "Return",
+    "Rückgabe",
+    "الإرجاع"
+  ],
+  "TRAVEL VALET PARKING": [
+    "TRAVEL VALET PARKING",
+    "TRAVEL VALET PARKING",
+    "TRAVEL VALET PARKING"
+  ],
+  "Sitzung wird wiederhergestellt …": [
+    "Restoring session …",
+    "Sitzung wird wiederhergestellt …",
+    "جارٍ استعادة الجلسة …"
+  ],
+  "tvp.": [
+    "tvp.",
+    "tvp.",
+    "tvp."
+  ],
+  "DÜSSELDORF AIRPORT · LEITSTELLE": [
+    "DÜSSELDORF AIRPORT · CONTROL CENTER",
+    "DÜSSELDORF AIRPORT · LEITSTELLE",
+    "مطار دوسلدورف · مركز التحكم"
+  ],
+  "Alles im Blick.": [
+    "Everything in view.",
+    "Alles im Blick.",
+    "كل شيء تحت السيطرة."
+  ],
+  "Jede Übergabe.": [
+    "Every handover.",
+    "Jede Übergabe.",
+    "كل تسليم."
+  ],
+  "Ein Arbeitsplatz für dein Team.": [
+    "One workspace for your team.",
+    "Ein Arbeitsplatz für dein Team.",
+    "مساحة عمل واحدة لفريقك."
+  ],
+  "Von der Annahme bis zur Rückgabe.": [
+    "From check-in to return.",
+    "Von der Annahme bis zur Rückgabe.",
+    "من الاستلام حتى الإرجاع."
+  ],
+  "DUS": [
+    "DUS",
+    "DUS",
+    "DUS"
+  ],
+  "06R / 24L": [
+    "06R / 24L",
+    "06R / 24L",
+    "06R / 24L"
+  ],
+  "TVP": [
+    "TVP",
+    "TVP",
+    "TVP"
+  ],
+  "WILLKOMMEN IM TEAM": [
+    "WELCOME TO THE TEAM",
+    "WILLKOMMEN IM TEAM",
+    "مرحبًا بك في الفريق"
+  ],
+  "Bereit für den Tag?": [
+    "Ready for the day?",
+    "Bereit für den Tag?",
+    "هل أنت مستعد لليوم؟"
+  ],
+  "Melde dich mit deinem Mitarbeiterkonto an.": [
+    "Sign in with your employee account.",
+    "Melde dich mit deinem Mitarbeiterkonto an.",
+    "سجّل الدخول بحساب الموظف الخاص بك."
+  ],
+  "E-Mail": [
+    "Email",
+    "E-Mail",
+    "البريد الإلكتروني"
+  ],
+  "Passwort": [
+    "Password",
+    "Passwort",
+    "كلمة المرور"
+  ],
+  "Anmelden": [
+    "Sign in",
+    "Anmelden",
+    "تسجيل الدخول"
+  ],
+  "Live-Betrieb wartet auf den Supabase-Zugang. Noch keine Mitarbeiterkonten eingerichtet.": [
+    "Live operation is waiting for Supabase access. No employee accounts set up yet.",
+    "Live-Betrieb wartet auf den Supabase-Zugang. Noch keine Mitarbeiterkonten eingerichtet.",
+    "التشغيل المباشر بانتظار الوصول إلى Supabase. لم يتم إنشاء حسابات موظفين بعد."
+  ],
+  "Interaktive Demo öffnen": [
+    "Open interactive demo",
+    "Interaktive Demo öffnen",
+    "فتح العرض التجريبي التفاعلي"
+  ],
+  "Nur Beispieldaten · keine echten Buchungen": [
+    "Sample data only · no real bookings",
+    "Nur Beispieldaten · keine echten Buchungen",
+    "بيانات تجريبية فقط · لا توجد حجوزات حقيقية"
+  ],
+  "Menü schließen": [
+    "Close menu",
+    "Menü schließen",
+    "إغلاق القائمة"
+  ],
+  "Menü": [
+    "Menu",
+    "Menü",
+    "القائمة"
+  ],
+  "Travel Valet Parking": [
+    "Travel Valet Parking",
+    "Travel Valet Parking",
+    "Travel Valet Parking"
+  ],
+  "Bookings": [
+    "Bookings",
+    "Buchungen",
+    "الحجوزات"
+  ],
+  "New bookings": [
+    "New bookings",
+    "Neue Buchungen",
+    "حجوزات جديدة"
+  ],
+  "nicht verfügbar": [
+    "not available",
+    "nicht verfügbar",
+    "غير متوفر"
+  ],
+  "Buchung erstellen": [
+    "Create booking",
+    "Buchung erstellen",
+    "إنشاء حجز"
+  ],
+  "CSV exportieren": [
+    "Export CSV",
+    "CSV exportieren",
+    "تصدير CSV"
+  ],
+  "Sign out": [
+    "Sign out",
+    "Abmelden",
+    "تسجيل الخروج"
+  ],
+  "Mitarbeiter": [
+    "Employees",
+    "Mitarbeiter",
+    "الموظفون"
+  ],
+  "Fahrdienst": [
+    "Driving service",
+    "Fahrdienst",
+    "خدمة التوصيل"
+  ],
+  "Filter": [
+    "Filter",
+    "Filter",
+    "تصفية"
+  ],
+  "DEMO · NICHT LIVE": [
+    "DEMO · NOT LIVE",
+    "DEMO · NICHT LIVE",
+    "تجريبي · ليس مباشرًا"
+  ],
+  "Fehler schließen": [
+    "Close error",
+    "Fehler schließen",
+    "إغلاق الخطأ"
+  ],
+  "Inbound": [
+    "Inbound",
+    "Eingehend",
+    "وارد"
+  ],
+  "Outbound": [
+    "Outbound",
+    "Ausgehend",
+    "صادر"
+  ],
+  "Now": [
+    "Now",
+    "Jetzt",
+    "الآن"
+  ],
+  "Suche": [
+    "Search",
+    "Suche",
+    "بحث"
+  ],
+  "Kennzeichen oder Name": [
+    "License plate or name",
+    "Kennzeichen oder Name",
+    "لوحة الترخيص أو الاسم"
+  ],
+  "Scannen: QR-Code oder Kennzeichen": [
+    "Scan: QR code or license plate",
+    "Scannen: QR-Code oder Kennzeichen",
+    "مسح: رمز QR أو لوحة الترخيص"
+  ],
+  "Heute": [
+    "Today",
+    "Heute",
+    "اليوم"
+  ],
+  "Aktualisieren": [
+    "Update",
+    "Aktualisieren",
+    "تحديث"
+  ],
+  "Demo ist aktuell": [
+    "Demo is up to date",
+    "Demo ist aktuell",
+    "النسخة التجريبية محدثة"
+  ],
+  "keine Flugdaten": [
+    "no flight data",
+    "keine Flugdaten",
+    "لا توجد بيانات رحلة"
+  ],
+  "Keine passenden offenen Fahrten für diese Auswahl.": [
+    "No matching open trips for this selection.",
+    "Keine passenden offenen Fahrten für diese Auswahl.",
+    "لا توجد رحلات مفتوحة مطابقة لهذا التحديد."
+  ],
+  "Lädt…": [
+    "Loading…",
+    "Lädt…",
+    "جار التحميل…"
+  ],
+  "Diese Funktion ist noch nicht implementiert. Es werden keine Zeiten oder Schichten angezeigt.": [
+    "This feature is not yet implemented. No times or shifts are displayed.",
+    "Diese Funktion ist noch nicht implementiert. Es werden keine Zeiten oder Schichten angezeigt.",
+    "هذه الخاصية غير مفعلة بعد. لن يتم عرض أي أوقات أو مناوبات."
+  ],
+  "Rolle:": [
+    "Role:",
+    "Rolle:",
+    "الدور:"
+  ],
+  "Listengröße": [
+    "List size",
+    "Listengröße",
+    "حجم القائمة"
+  ],
+  "Schrift und Zeilen der Buchungsliste. Die Vorschau ändert sich sofort.": [
+    "Font and lines of the booking list. The preview changes immediately.",
+    "Schrift und Zeilen der Buchungsliste. Die Vorschau ändert sich sofort.",
+    "خط وأسطر قائمة الحجوزات. تتغير المعاينة على الفور."
+  ],
+  "% · Zeile": [
+    "% · line",
+    "% · Zeile",
+    "% · سطر"
+  ],
+  "px · Zeitfeld": [
+    "px · time field",
+    "px · Zeitfeld",
+    "بكسل · حقل الوقت"
+  ],
+  "px": [
+    "px",
+    "px",
+    "بكسل"
+  ],
+  "Live-Vorschau der Buchungsliste": [
+    "Live preview of the booking list",
+    "Live-Vorschau der Buchungsliste",
+    "معاينة حية لقائمة الحجوزات"
+  ],
+  "Buchungen · Vorschau": [
+    "Bookings · Preview",
+    "Buchungen · Vorschau",
+    "الحجوزات · معاينة"
+  ],
+  "Die Vorschau erscheint, sobald Buchungen geladen sind.": [
+    "The preview appears as soon as bookings are loaded.",
+    "Die Vorschau erscheint, sobald Buchungen geladen sind.",
+    "ستظهر المعاينة بمجرد تحميل الحجوزات."
+  ],
+  "BUCHUNGEN ZENTRAL ERFASSEN": [
+    "RECORD BOOKINGS CENTRALLY",
+    "BUCHUNGEN ZENTRAL ERFASSEN",
+    "تسجيل الحجوزات مركزياً"
+  ],
+  "Ein Eingang. Alle Plattformen.": [
+    "One entrance. All platforms.",
+    "Ein Eingang. Alle Plattformen.",
+    "مدخل واحد. جميع المنصات."
+  ],
+  "JSON oder CSV importieren. Plattform + externe ID verhindern doppelte Buchungen.": [
+    "Import JSON or CSV. Platform + external ID prevent duplicate bookings.",
+    "JSON oder CSV importieren. Plattform + externe ID verhindern doppelte Buchungen.",
+    "استيراد JSON أو CSV. تمنع المنصة + المعرف الخارجي الحجوزات المكررة."
+  ],
+  "CSV / JSON auswählen": [
+    "Select CSV / JSON",
+    "CSV / JSON auswählen",
+    "تحديد CSV / JSON"
+  ],
+  "Importdaten": [
+    "Import data",
+    "Importdaten",
+    "بيانات الاستيراد"
+  ],
+  "Buchungen importieren": [
+    "Import bookings",
+    "Buchungen importieren",
+    "استيراد الحجوزات"
+  ],
+  "E-Mail-Erkennung und Partner-Anbindungen folgen in Phase 2. Dieser Import liest noch keine E-Mails.": [
+    "Email recognition and partner integrations follow in phase 2. This import does not yet read emails.",
+    "E-Mail-Erkennung und Partner-Anbindungen folgen in Phase 2. Dieser Import liest noch keine E-Mails.",
+    "سيتوفر التعرف على البريد الإلكتروني وربط الشركاء في المرحلة 2. هذا الاستيراد لا يقرأ رسائل البريد الإلكتروني بعد."
+  ],
+  "TVP LEITSTELLE": [
+    "TVP CONTROL CENTER",
+    "TVP LEITSTELLE",
+    "مركز تحكم TVP"
+  ],
+  "Europe/Berlin ·": [
+    "Europe/Berlin ·",
+    "Europe/Berlin ·",
+    "Europe/Berlin ·"
+  ],
+  "Demo ohne Speicherung": [
+    "Demo without saving",
+    "Demo ohne Speicherung",
+    "نسخة تجريبية بدون حفظ"
+  ],
+  "Sicherer Mitarbeiterzugang": [
+    "Secure employee access",
+    "Sicherer Mitarbeiterzugang",
+    "وصول آمن للموظفين"
+  ],
+  "Foto hinzufügen": [
+    "Add photo",
+    "Foto hinzufügen",
+    "إضافة صورة"
+  ],
+  "Buchung bearbeiten": [
+    "Edit booking",
+    "Buchung bearbeiten",
+    "تعديل الحجز"
+  ],
+  "Buchungsdetails": [
+    "Booking details",
+    "Buchungsdetails",
+    "تفاصيل الحجز"
+  ],
+  "Detailfehler schließen": [
+    "Close detail error",
+    "Detailfehler schließen",
+    "إغلاق خطأ التفاصيل"
+  ],
+  "Erneut angerufen": [
+    "Called again",
+    "Erneut angerufen",
+    "تم الاتصال مرة أخرى"
+  ],
+  "Has called": [
+    "Has called",
+    "Hat angerufen",
+    "اتصل"
+  ],
+  "Erneuten Anruf bestätigen": [
+    "Confirm callback",
+    "Erneuten Anruf bestätigen",
+    "تأكيد الاتصال مجدداً"
+  ],
+  "Es gibt schon einen Anruf (": [
+    "There is already a call (",
+    "Es gibt schon einen Anruf (",
+    "يوجد بالفعل اتصال ("
+  ],
+  "). Wirklich einen weiteren Anruf speichern?": [
+    "). Really save another call?",
+    "). Wirklich einen weiteren Anruf speichern?",
+    "). هل تريد حقاً حفظ مكالمة أخرى؟"
+  ],
+  "Ja, erneut speichern": [
+    "Yes, save again",
+    "Ja, erneut speichern",
+    "نعم، احفظ مرة أخرى"
+  ],
+  "BARGELD · VORSCHAU": [
+    "CASH · PREVIEW",
+    "BARGELD · VORSCHAU",
+    "نقد · معاينة"
+  ],
+  "Teamkasse": [
+    "Team cash register",
+    "Teamkasse",
+    "صندوق الفريق"
+  ],
+  "Vorschau, kein konsistenter Buchungs-/Zahlungsstand. Monat nach Anreisedatum.": [
+    "Preview, no consistent booking/payment status. Month according to arrival date.",
+    "Vorschau, kein konsistenter Buchungs-/Zahlungsstand. Monat nach Anreisedatum.",
+    "معاينة، لا توجد حالة حجز/دفع متسقة. الشهر حسب تاريخ الوصول."
+  ],
+  "Monat": [
+    "Month",
+    "Monat",
+    "الشهر"
+  ],
+  "Zahlungsbelege werden geladen …": [
+    "Payment receipts are loading …",
+    "Zahlungsbelege werden geladen …",
+    "جار تحميل إيصالات الدفع …"
+  ],
+  "Keine erfassten Beträge.": [
+    "No amounts recorded.",
+    "Keine erfassten Beträge.",
+    "لا توجد مبالغ مسجلة."
+  ],
+  "Nicht zugeordnet:": [
+    "Not assigned:",
+    "Nicht zugeordnet:",
+    "غير مخصص:"
+  ],
+  "Konflikte,": [
+    "Conflicts,",
+    "Konflikte,",
+    "نزاعات،"
+  ],
+  "unklare Vermerke. Keine Gesamtsumme verfügbar.": [
+    "unclear notes. No total available.",
+    "unklare Vermerke. Keine Gesamtsumme verfügbar.",
+    "ملاحظات غير واضحة. لا يوجد إجمالي متاح."
+  ],
+  "2 aufbewahrte QA-Testbuchungen sind aus Analytics, Bargeld und allen Geschäftszahlen ausgeschlossen.": [
+    "2 retained QA test bookings are excluded from analytics, cash and all business figures.",
+    "2 aufbewahrte QA-Testbuchungen sind aus Analytics, Bargeld und allen Geschäftszahlen ausgeschlossen.",
+    "يتم استبعاد حجزي اختبار ضمان الجودة المحتفظ بهما من التحليلات والنقد وجميع أرقام الأعمال."
+  ],
+  "Ohne Namen wird Wael zugeordnet. Manuelle Zusatzbeträge außerhalb des Systems sind nicht enthalten. Keine Buchhaltungsabrechnung.": [
+    "Without a name, Wael is assigned. Manual additional amounts outside the system are not included. No accounting settlement.",
+    "Ohne Namen wird Wael zugeordnet. Manuelle Zusatzbeträge außerhalb des Systems sind nicht enthalten. Keine Buchhaltungsabrechnung.",
+    "بدون اسم، يتم التعيين لـ Wael. المبالغ الإضافية اليدوية خارج النظام غير مدرجة. لا توجد تسوية محاسبية."
+  ],
+  "PREISRECHNER · STANDARDTARIF": [
+    "PRICE CALCULATOR · STANDARD RATE",
+    "PREISRECHNER · STANDARDTARIF",
+    "حاسبة الأسعار · السعر القياسي"
+  ],
+  "Klar kalkuliert.": [
+    "Clearly calculated.",
+    "Klar kalkuliert.",
+    "محسوبة بوضوح."
+  ],
+  "Parktage": [
+    "Parking days",
+    "Parktage",
+    "أيام ركن السيارات"
+  ],
+  "Überdacht (+10 €)": [
+    "Covered (+10 €)",
+    "Überdacht (+10 €)",
+    "مغطى (+10 €)"
+  ],
+  "Tag 1 ab 40 €. Jeder weitere Tag +10 €.": [
+    "Day 1 from 40 €. Each additional day +10 €.",
+    "Tag 1 ab 40 €. Jeder weitere Tag +10 €.",
+    "اليوم 1 من 40 €. كل يوم إضافي +10 €."
+  ],
+  "Der Rechner nutzt den Standardtarif. Eigene Produkt-Tarife unten gelten nur für TVP-Buchungen; Preise in Partner-Portalen (Allopark, ParkingList, AvioGo usw.) werden hier nicht synchronisiert.": [
+    "The calculator uses the standard rate. Custom product rates below only apply to TVP bookings; prices in partner portals (Allopark, ParkingList, AvioGo, etc.) are not synchronized here.",
+    "Der Rechner nutzt den Standardtarif. Eigene Produkt-Tarife unten gelten nur für TVP-Buchungen; Preise in Partner-Portalen (Allopark, ParkingList, AvioGo usw.) werden hier nicht synchronisiert.",
+    "تستخدم الحاسبة السعر القياسي. تنطبق أسعار المنتجات المخصصة أدناه فقط على حجوزات TVP؛ لا تتم مزامنة الأسعار في بوابات الشركاء (Allopark وParkingList وAvioGo وما إلى ذلك) هنا."
+  ],
+  "ZUGRIFF & VERANTWORTUNG": [
+    "ACCESS & RESPONSIBILITY",
+    "ZUGRIFF & VERANTWORTUNG",
+    "الوصول والمسؤولية"
+  ],
+  "Rolle ": [
+    "Role ",
+    "Rolle ",
+    "الدور "
+  ],
+  "Rolle aktualisiert": [
+    "Role updated",
+    "Rolle aktualisiert",
+    "تم تحديث الدور"
+  ],
+  "Admin": [
+    "Admin",
+    "Admin",
+    "المسؤول"
+  ],
+  "Fahrer": [
+    "Driver",
+    "Fahrer",
+    "السائق"
+  ],
+  "Neue Konten werden über das geschützte Admin-Skript angelegt. Keine öffentlichen Registrierungen.": [
+    "New accounts are created via the protected admin script. No public registrations.",
+    "Neue Konten werden über das geschützte Admin-Skript angelegt. Keine öffentlichen Registrierungen.",
+    "يتم إنشاء الحسابات الجديدة عبر سكربت الإدارة المحمي. لا يوجد تسجيل عام."
+  ],
+  "ALLE BUCHUNGEN DURCHSUCHEN": [
+    "SEARCH ALL BOOKINGS",
+    "ALLE BUCHUNGEN DURCHSUCHEN",
+    "البحث في جميع الحجوزات"
+  ],
+  "Alle Buchungen durchsuchen": [
+    "Search all bookings",
+    "Alle Buchungen durchsuchen",
+    "البحث في جميع الحجوزات"
+  ],
+  "Kennzeichen, Name, Telefon, E-Mail, Flug …": [
+    "License plate, name, phone, email, flight …",
+    "Kennzeichen, Name, Telefon, E-Mail, Flug …",
+    "رقم اللوحة، الاسم، الهاتف، البريد الإلكتروني، الرحلة …"
+  ],
+  "TREFFER": [
+    "RESULTS",
+    "TREFFER",
+    "النتائج"
+  ],
+  "KUNDEN (": [
+    "CUSTOMERS (",
+    "KUNDEN (",
+    "العملاء ("
+  ],
+  "CSV": [
+    "CSV",
+    "CSV",
+    "CSV"
+  ],
+  "× ·": [
+    "× ·",
+    "× ·",
+    "× ·"
+  ],
+  "Code und Bezeichnung fehlen.": [
+    "Code and name are missing.",
+    "Code und Bezeichnung fehlen.",
+    "الرمز والاسم مفقودان."
+  ],
+  "Demo: Produkt gespeichert": [
+    "Demo: product saved",
+    "Demo: Produkt gespeichert",
+    "تجريبي: تم حفظ المنتج"
+  ],
+  "Produkt gespeichert": [
+    "Product saved",
+    "Produkt gespeichert",
+    "تم حفظ المنتج"
+  ],
+  "Produkt ": [
+    "Product ",
+    "Produkt ",
+    "المنتج "
+  ],
+  "Produkt gelöscht": [
+    "Product deleted",
+    "Produkt gelöscht",
+    "تم حذف المنتج"
+  ],
+  "EIGENE PRODUKTE & TARIFE": [
+    "OWN PRODUCTS & RATES",
+    "EIGENE PRODUKTE & TARIFE",
+    "المنتجات والتعرفات الخاصة"
+  ],
+  "Preise pflegen": [
+    "Manage prices",
+    "Preise pflegen",
+    "إدارة الأسعار"
+  ],
+  "Gilt nur für eigene Produkte in TVP. Partner-Panels werden nicht automatisch aktualisiert.": [
+    "Applies only to own products in TVP. Partner panels are not updated automatically.",
+    "Gilt nur für eigene Produkte in TVP. Partner-Panels werden nicht automatisch aktualisiert.",
+    "ينطبق فقط على المنتجات الخاصة في TVP. لا يتم تحديث لوحات الشركاء تلقائيًا."
+  ],
+  "· Tag 1": [
+    "· Day 1",
+    "· Tag 1",
+    "· اليوم 1"
+  ],
+  "· +": [
+    "· +",
+    "· +",
+    "· +"
+  ],
+  "/Tag": [
+    "/day",
+    "/Tag",
+    "/يوم"
+  ],
+  "Löschen": [
+    "Delete",
+    "Löschen",
+    "حذف"
+  ],
+  "Noch keine Produkte.": [
+    "No products yet.",
+    "Noch keine Produkte.",
+    "لا توجد منتجات بعد."
+  ],
+  "Code": [
+    "Code",
+    "Code",
+    "الرمز"
+  ],
+  "Bezeichnung": [
+    "Name",
+    "Bezeichnung",
+    "الوصف"
+  ],
+  "Tag 1 €": [
+    "Day 1 €",
+    "Tag 1 €",
+    "اليوم 1 €"
+  ],
+  "Jeder weitere Tag €": [
+    "Each additional day €",
+    "Jeder weitere Tag €",
+    "كل يوم إضافي €"
+  ],
+  "Zuschlag überdacht €": [
+    "Covered surcharge €",
+    "Zuschlag überdacht €",
+    "رسوم إضافية للمسقوف €"
+  ],
+  "Überdacht": [
+    "Covered",
+    "Überdacht",
+    "مسقوف"
+  ],
+  "Produkt speichern": [
+    "Save product",
+    "Produkt speichern",
+    "حفظ المنتج"
+  ],
+  " person": [
+    " person",
+    " Person",
+    " شخص"
+  ],
+  " persons": [
+    " persons",
+    " Personen",
+    " أشخاص"
+  ],
+  " on ": [
+    " on ",
+    " am ",
+    " في "
+  ],
+  " Datum": [
+    " Date",
+    " Datum",
+    " التاريخ"
+  ],
+  " Uhrzeit": [
+    " Time",
+    " Uhrzeit",
+    " الوقت"
+  ],
+  " bearbeiten": [
+    " edit",
+    " bearbeiten",
+    " تعديل"
+  ],
+  " Heute": [
+    " Today",
+    " Heute",
+    " اليوم"
+  ],
+  "OPEN": [
+    "OPEN",
+    "OPEN",
+    "OPEN"
+  ],
+  "COVERED": [
+    "COVERED",
+    "COVERED",
+    "COVERED"
+  ],
+  "Checked-in:": [
+    "Checked-in:",
+    "Eingecheckt:",
+    "تم الاستلام:"
+  ],
+  "Checked-out:": [
+    "Checked-out:",
+    "Ausgecheckt:",
+    "تم التسليم:"
+  ],
+  "Check-in": [
+    "Check-in",
+    "Einchecken",
+    "استلام"
+  ],
+  "Check-out": [
+    "Check-out",
+    "Auschecken",
+    "تسليم"
+  ]
+}
