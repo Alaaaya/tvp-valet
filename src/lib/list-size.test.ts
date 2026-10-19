@@ -18,3 +18,8 @@ it('counter visual height is 41 with a 44px+ hit area and no min-height override
   expect(c).toContain('.counter{height:41px;min-height:41px;position:relative}');
   expect(c).toContain('.counter::after{content:"";position:absolute;inset:-2px 0}');
 });
+it('flight stays fully visible in time pane and placeholder is short', () => {
+  const c = readFileSync('src/reference-list.css', 'utf8');
+  expect(c).toContain('.blr-tf>span{overflow:visible;text-overflow:clip;white-space:nowrap');
+  expect(readFileSync('src/main.tsx', 'utf8')).toContain('placeholder="Kennzeichen oder Name"');
+});

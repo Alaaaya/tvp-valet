@@ -11,3 +11,9 @@
 .app.fixed-top .counters.counters{padding:6px 18px 5px;gap:22px;height:53px;box-sizing:border-box}
 .app.fixed-top .counters .counter{height:41px;min-height:41px;position:relative}
 .app.fixed-top .counters .counter::after{content:"";position:absolute;inset:-2px 0}
+/* flight must stay fully visible in the 51px content width of the time pane: icon above, number below, never clipped */
+.app.fixed-top .blr-tf{flex-direction:column;align-items:center;gap:1px;max-width:none;width:100%;font-size:10px;line-height:11px}
+.app.fixed-top .blr-tf>span{overflow:visible;text-overflow:clip;white-space:nowrap;display:flex;flex-direction:column;align-items:center}
+.app.fixed-top .blr-time strong{font-size:14px;font-weight:600}
+.app.fixed-top .blr-plate{font-size:14px;font-weight:900}
+.app.fixed-top .blr-badge{border-width:1.5px;font-weight:800}
