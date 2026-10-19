@@ -1,3 +1,4 @@
+import {t as tr} from './i18n';
 import React,{useEffect,useState} from 'react';
 import './../call-counter.css';
 
@@ -50,7 +51,7 @@ export function CallCounter({calledAt,checkedInAt,checkedOutAt,compact,now}:{cal
   if(handedOver||r.state==='none')return null;
   const cls='call-counter'+(compact?' call-counter--compact':'')+(r.state==='frozen'?' is-frozen':'');
   return <div className={cls} title={r.title} data-state={r.state}>
-    <span className="cc-main">Angerufen {r.time}</span>
+    <span className="cc-main">{tr("Angerufen")}{' '}{r.time}</span>
     <span className="cc-dur">{r.state==='frozen'?`Anruf→Übergabe ${r.minutes} Min`:`seit ${r.minutes} Min`}</span>
     {compact?null:<span className="cc-date">{r.date}</span>}
   </div>;
