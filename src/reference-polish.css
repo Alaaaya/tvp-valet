@@ -61,3 +61,28 @@ html .app.fixed-top .blr-tf>svg{width:14px;height:14px}
 html .app.fixed-top .blr-time>strong{font-weight:400;font-size:calc(15px * var(--list-scale,1))}
 html .app.fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale,1)) minmax(0,1fr) auto}
 html .app.fixed-top .blr-time{padding-left:3px}
+
+/* ---- IMG_0592 pass 2: proportions measured side by side ---- */
+html .blr-ico svg+svg{display:none}
+html .app.fixed-top .blr-ico{display:inline-flex;align-items:flex-end;gap:0}
+html .app.fixed-top .blr-ico svg.blr-ico-person{display:inline-block;fill:none;stroke-width:2.6;width:calc(12px * var(--list-scale,1));height:calc(14px * var(--list-scale,1));margin-left:-2px}
+/* today: no date bar, like the reference (date stays in filter; bar returns on other days) */
+html .app.fixed-top .date-strip[data-today]{display:none}
+/* header + counters lighter */
+html .app.fixed-top .topbar>strong{font-weight:500;font-size:17px}
+html .app.fixed-top .counters .counter span{font-size:12px;font-weight:400}
+html .app.fixed-top .counters .counter strong,html .app.fixed-top .counters .counter strong small{font-size:calc(15px * var(--list-scale,1));font-weight:500;letter-spacing:.5px}
+/* search: regular weight text, bold glass, filled camera */
+html .app.fixed-top .search input{font-weight:400;border-radius:8px}
+html .app.fixed-top .search input::placeholder{color:#9aa3a3;font-weight:400}
+html .app.fixed-top .search svg{stroke-width:3}
+/* rows */
+html .app.fixed-top .blr-plate{color:#1d5f57;font-size:calc(13px * var(--list-scale,1))}
+html .app.fixed-top .blr-code{color:#6d7878}
+html .app.fixed-top .blr-badge{padding:1px 6px}
+html .app.fixed-top .blr-pn{font-size:calc(13px * var(--list-scale,1));font-weight:700;color:#1fa38b;gap:2px}
+html .app.fixed-top .blr-pn svg{width:calc(18px * var(--list-scale,1));height:calc(18px * var(--list-scale,1));fill:currentColor}
+html .app.fixed-top .blr-pay{font-size:calc(10px * var(--list-scale,1));padding:1px 5px}
+html .app.fixed-top .blr-plate{font-size:calc(12px * var(--list-scale,1));font-weight:700}
+html .app.fixed-top .blr-pn{font-size:calc(12px * var(--list-scale,1))}
+html .app.fixed-top .blr-pn svg{width:calc(15px * var(--list-scale,1));height:calc(15px * var(--list-scale,1))}
