@@ -66,11 +66,13 @@ export function BookingDetailView(p:BookingDetailViewProps){
     {due>0&&<div className="pp-strip due bd-sticky" role="status"><Banknote size={16}/> {tr("Outstanding amount:")}{' '}{money(due)}</div>}
     <section className="bd-identity">
       <div><span className="bd-label">{tr("Name")}</span><strong>{b.customer_name}</strong>
+        {!b.phone&&<button type="button" className="pp-link bd-add-phone" onClick={p.onEdit}>{tr("Add phone number")}</button>}
         {b.phone&&<a href={'tel:'+b.phone}><bdi>{b.phone}</bdi></a>}
         {b.email&&<a href={'mailto:'+b.email}><bdi>{b.email}</bdi></a>}
         <button type="button" className="pp-link" onClick={p.onEdit}>{personsLabel(b.persons)}</button></div>
       <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
+        {c.vehicle&&<span className="bd-vehicle">{c.vehicle}</span>}
         <span className="bd-location"><bdi>{b.spot||c.location||"–"}</bdi><ParkingSquare size={16}/></span>
         <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>
         <button type="button" className="bd-outline" onClick={p.onEdit}><Plus size={15}/>{tr("+ KM and comment").replace(/^\+\s*/,"")}</button>
@@ -91,9 +93,9 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
     <section className="summary-cost"><h3><Calculator size={21}/>{tr("Cost overview")}</h3>
-      <p><span>{tr("Parking (")}{b.product||b.platform}{")"}<small className="bd-days">{parkingDays(b)} {tr("days")}</small></span><span>{money(b.total)}</span></p>
-      <p><span>{tr("Total amount")}</span><span>{money(b.total)}</span></p>
-      <p><span>{tr("Paid")}</span><span>{money(b.paid)}</span></p>
+      <p><span>{tr("Parking (")}{b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{money(b.total)}</span></p>
+      <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{money(b.total)}</span></p>
+      <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{money(b.paid)}</span></p>
       <p><strong>{tr("Total due payable")}</strong><strong>{money(due)}</strong></p>{p.paymentSlot}</section>
     <div className="summary-location bd-service"><Car size={18}/><span>{info.service&&<b>{tr("Valet")}</b>}<small>{tr(b.covered?"COVERED":"OPEN")}</small></span><span className="bd-product"><i className="bd-product-dot" aria-hidden="true"/>{info.product}</span>{info.location&&info.location!==info.product&&<span className="bd-loc">{info.location}</span>}</div>
     <section className="summary-media"><h3><Camera size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>

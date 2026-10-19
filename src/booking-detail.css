@@ -126,3 +126,37 @@
 .bd .summary-cost h3 svg{stroke-width:2.4}
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .bd .bd-identity a[href^="mailto"]{font-size:13px;overflow-wrap:break-word;word-break:normal;hyphens:none}
+
+/* IMG_0579 follow-up. Geometry normalized from 1290px to 390px; data stays real. */
+.bd .bd-label{font-size:14px;font-weight:400;color:#143b33}
+.bd .bd-identity{padding:10px 10px 12px;line-height:1.25}
+.bd .bd-identity>div{gap:5px}
+.bd .bd-identity strong{font-size:16px;font-weight:700}
+.bd .bd-identity a,.bd .pp-link{font-size:14px;font-weight:400;line-height:19px;min-height:22px}
+.bd .bd-identity a[href^="mailto"]{font-size:14px}
+.bd .bd-vehicle{font-weight:400;font-size:13px}
+.bd .bd-outline{font-size:12px;font-weight:400;min-height:24px;height:auto;padding:2px 6px;border-radius:5px;line-height:18px}
+.bd .bd-outline svg{width:14px;height:14px;stroke-width:2}
+.bd .odometer-capture{width:max-content;max-width:100%;justify-content:flex-start}
+.bd .odometer-note{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.bd .bd-key,.bd .bd-location{font-size:12px;font-weight:400}
+.bd .bd-location svg{width:14px;height:14px}
+.bd .split-handover h3{height:36px;font-size:13px}
+.bd .split-handover h3 svg{width:18px;height:18px}
+.bd .handover-date{height:121px;padding:10px;gap:3px;font-size:13px}
+.bd .handover-date>strong{font-size:16px;line-height:20px}
+.bd .handover-date>button{min-height:40px;font-size:14px;border-radius:6px;font-weight:600;gap:6px}
+.bd .handover-date>button svg{width:18px;height:18px;stroke-width:2}
+.bd .flight-panel{height:204px;min-height:204px;padding:10px}
+.bd .fp-head strong{font-size:14px;font-weight:400}
+.bd .fp-head>svg{width:20px;height:20px;stroke-width:2}
+.bd .flight-panel .op-btn{min-height:38px;font-size:13px;font-weight:600;border-radius:6px}
+.bd .flight-panel .op-btn>svg{width:16px;height:16px;stroke-width:2}
+.bd .summary-cost{padding:14px 10px}
+.bd .summary-cost h3{font-size:17px;margin-bottom:14px}
+.bd .summary-cost p{font-size:13px;align-items:baseline;gap:10px;margin:8px 0}
+.bd .summary-cost p>span:last-child,.bd .summary-cost p>strong:last-child{flex:none;white-space:nowrap;min-width:66px;text-align:end;font-variant-numeric:tabular-nums}
+.bd .bd-days{display:inline;color:#888;font-size:12px;white-space:nowrap}
+.bd .summary-cost .bd-cost-total{justify-content:flex-end}
+.bd .bd-cost-total>span:first-child{text-align:end}
+.bd .summary-cost p:first-of-type{padding-bottom:10px;margin-bottom:10px}
