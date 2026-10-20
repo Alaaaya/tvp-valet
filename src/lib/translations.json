@@ -3463,5 +3463,30 @@
     "Number of persons",
     "Anzahl Personen",
     "عدد الأشخاص"
+  ],
+  "Anruf löschen": [
+    "Delete call",
+    "Anruf löschen",
+    "حذف المكالمة"
+  ],
+  "Anruf gelöscht": [
+    "Call deleted",
+    "Anruf gelöscht",
+    "تم حذف المكالمة"
+  ],
+  "Anruf konnte nicht gelöscht werden": [
+    "Call could not be deleted",
+    "Anruf konnte nicht gelöscht werden",
+    "تعذر حذف المكالمة"
+  ],
+  "Kein Anruf zum Löschen vorhanden.": [
+    "No call to delete.",
+    "Kein Anruf zum Löschen vorhanden.",
+    "لا توجد مكالمة لحذفها."
+  ],
+  "Demo: Anruf nur lokal gelöscht": [
+    "Demo: call deleted locally only",
+    "Demo: Anruf nur lokal gelöscht",
+    "تجريبي: تم حذف المكالمة محليًا فقط"
   ]
 }

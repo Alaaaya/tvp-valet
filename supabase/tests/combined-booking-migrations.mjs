@@ -28,7 +28,8 @@ const migrationNames=[
  '20261017210100_booking_optional_details.sql',
  '20261017220000_booking_payments.sql',
  '20261017230000_booking_customer_calls.sql',
- '20261017240000_booking_safe_edit.sql'
+ '20261017240000_booking_safe_edit.sql',
+ '20261020070000_booking_customer_call_clear.sql'
 ];
 await db.exec("alter table storage.objects add column metadata jsonb");
 for(const name of migrationNames){
