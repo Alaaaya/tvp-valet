@@ -37,6 +37,8 @@ export interface BookingListRowProps{
  commentCount?:number;
  /** Compact call counter from the parent; omit when there are no calls. Freeze/unfreeze is the parent's job. */
  callCounterSlot?:React.ReactNode;
+ /** Small standalone delete-call button (sibling of the row button so it never opens the row). */
+ callUndoSlot?:React.ReactNode;
 }
 /** Counter helper: done/total for one direction over the (done-inclusive) population. */
 export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
@@ -45,7 +47,7 @@ export function directionCounts(events:readonly {kind:'in'|'out';completed?:bool
 export function rowComment(b:Pick<Booking,'comment'|'external_id'|'code'>){
  return omitExternalReference(displayComment(b.comment,true).text.trim(),b.external_id,b.code);
 }
-export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot}:BookingListRowProps){
+export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot,callUndoSlot}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b),pn=!!paymentInstruction(b);
  const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
  const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
@@ -66,5 +68,6 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
     {m.kind!=='none'&&<span className={'blr-pay '+m.kind} aria-label={m.text} title={m.text}>{money(m.kind==='due'?Math.max(0,(b.total||0)-(b.paid||0)):(b.paid||0))}</span>}
    </span>
   </button>
+  {callUndoSlot}
  </article>;
 }

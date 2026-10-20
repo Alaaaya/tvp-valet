@@ -1,4 +1,4 @@
-.blr{background:#fff;border-bottom:1px solid #b9d6d3}
+.blr{position:relative;background:#fff;border-bottom:1px solid #b9d6d3}
 .blr-main{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:6px;width:100%;min-height:158px;padding:0 8px 0 0;border:0;background:none;text-align:left;font:inherit;color:#17302f;cursor:pointer}
 .blr-time{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 2px;color:#12302f;min-height:100%;background:#cdeedd;border-left:8px solid #2e9e5b;position:relative}
 .blr.out .blr-time{background:#ffccd2;border-left-color:#d23b3b}
