@@ -3678,5 +3678,20 @@
     "Only admins can access this page.",
     "Nur Admins haben Zugriff auf diese Seite.",
     "هذه الصفحة للمسؤولين فقط."
+  ],
+  "Aufgezeichneter Anruf": [
+    "Recorded call",
+    "Aufgezeichneter Anruf",
+    "المكالمة المسجّلة"
+  ],
+  "Nur der irrtümlich erfasste aktuelle Anruf wird entfernt. Der Verlauf bleibt erhalten.": [
+    "Only the wrongly recorded current call is removed. History is kept.",
+    "Nur der irrtümlich erfasste aktuelle Anruf wird entfernt. Der Verlauf bleibt erhalten.",
+    "تتم إزالة المكالمة الحالية المسجّلة بالخطأ فقط. يبقى السجل محفوظًا."
+  ],
+  "Wird gelöscht …": [
+    "Deleting …",
+    "Wird gelöscht …",
+    "جارٍ الحذف …"
   ]
 }

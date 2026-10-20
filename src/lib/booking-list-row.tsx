@@ -38,6 +38,8 @@ export interface BookingListRowProps{
  /** Compact call counter from the parent; omit when there are no calls. Freeze/unfreeze is the parent's job. */
  callCounterSlot?:React.ReactNode;
  callClearSlot?:React.ReactNode;
+ /** Small standalone delete-call button (sibling of the row button so it never opens the row). */
+ callUndoSlot?:React.ReactNode;
 }
 /** Counter helper: done/total for one direction over the (done-inclusive) population. */
 export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
