@@ -12,7 +12,9 @@ if(!['127.0.0.1','localhost'].includes(u.hostname)||u.pathname!='/tvp_offline_te
 const sql=async query=>(await run('psql',[url,'-X','-q','-A','-t','-v','ON_ERROR_STOP=1','-c',query],{maxBuffer:1024*1024})).stdout.trim();
 const source=await readFile(new URL('./offline-sync.mjs',import.meta.url),'utf8');
 const setup=source.split('await db.exec(`')[1].split('`);')[0];
-await sql(setup);
+// Roles are cluster-wide and can remain after dropping the previous test DB.
+await sql(setup.replace(/create role (anon|authenticated|service_role) nologin( bypassrls)?;/g,
+ (_,name,bypass)=>`do $$ begin if not exists(select 1 from pg_roles where rolname='${name}') then create role ${name} nologin${bypass||''}; end if; end $$;`));
 const dir=new URL('../migrations/',import.meta.url);
 for(const name of (await readdir(dir)).filter(x=>x.endsWith('.sql')).sort()){
  if(name==='20261020070000_booking_customer_call_removals.sql'||name==='20261020120000_staff_accounts.sql')continue;
