@@ -90,10 +90,11 @@ it('clear retries with identical request context',async()=>{
 });
 it('repeat-call modal has a full-width third "Anruf löschen" button wired to clearCall (demo + live)',()=>{
  const m=readFileSync('src/main.tsx','utf8');
- const modal=m.slice(m.indexOf('className="call-confirm call-ask"'),m.indexOf('document.body)',m.indexOf('className="call-confirm call-ask"')));
+ const modal=readFileSync('src/lib/call-confirm.tsx','utf8');
  expect(modal).toContain('{tr("Abbrechen")}');expect(modal).toContain('{tr("Ja, erneut speichern")}');
- expect(modal).toContain('onClick={()=>void clearCall(selected)}');expect(modal).toContain('callMutation.stale?tr("Neu laden"):tr("Anruf löschen")');
+ expect(modal).toContain('onClick={onClear}');expect(m).toContain('onClear={()=>void clearCall(callSnapshot.current!)}');
  expect(modal.indexOf('Anruf löschen')).toBeLessThan(modal.indexOf('Ja, erneut speichern'));expect(modal.indexOf('Ja, erneut speichern')).toBeLessThan(modal.indexOf('Abbrechen'));
+ expect(m).toContain('onClick={()=>askCall(b)}');expect(m).not.toContain('void open(b);askCall(b)');
  const fn=m.slice(m.indexOf('async function clearCall('),m.indexOf('async function saveEdit('));
  expect(fn).toMatch(/if\(demo\)\{[^}]*customer_called_at:null/);
  expect(fn).toContain("await callMutation.run(callSnapshot.current||withCall(b),'clear')");
