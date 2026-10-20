@@ -153,5 +153,19 @@ const legacyID=randomUUID();
 await db.query("select public.record_booking_payment($1,$2,1000,'cash',0,10000)",[legacyID,b.id]);
 await reject(async()=>sync(b,'payment',{...payment,expected_paid_cents:1000},await version(b.id),legacyID),'23514');
 eq((await row(b.id)).paid,'10.00');
+// Explicit predecessor chains accept only their committed version, never an intervening writer.
+b=await fresh();await user(driver);
+const predecessor=await sync(b,'payment',payment);
+async function chained(id=randomUUID(),pred=predecessor.event_id,booking=b.id){
+ return (await db.query('select public.sync_booking_event($1,$2,0,$3,$4::jsonb,$5) r',
+ [id,booking,'payment',JSON.stringify({...payment,expected_paid_cents:1000}),pred])).rows[0].r;
+}
+const chainID=randomUUID(),chainResult=await chained(chainID);
+eq(chainResult.booking.paid,20);eq(await chained(chainID),chainResult);
+await reject(async()=>chained(),'PT409');
+await reject(async()=>chained(randomUUID(),randomUUID()),'PT409');
+await user(admin);await reject(async()=>chained(randomUUID()),'PT409');
+await user(driver);
+await reject(async()=>chained(chainID,null),'23514');
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveWrites:0,note:'PGlite single connection; real multi-session locking not exercised. Duplicate preexisting clear/removals migration omitted; staff pgcrypto unrelated omitted.'}));
 await db.close();

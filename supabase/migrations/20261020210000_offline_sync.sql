@@ -28,6 +28,7 @@ create table public.booking_sync_receipts(
  booking_id uuid not null references public.bookings(id) on delete restrict,
  actor_id uuid not null references public.profiles(id) on delete restrict,
  expected_version bigint not null check(expected_version>=0),
+ predecessor_id uuid references public.booking_sync_receipts(id) on delete restrict,
  action text not null,
  payload jsonb not null,
  response jsonb not null,
@@ -42,9 +43,9 @@ create trigger booking_sync_receipts_audit after insert on public.booking_sync_r
 for each row execute function private.audit_change();
 
 create function public.sync_booking_event(
- p_event_id uuid,p_booking_id uuid,p_expected_version bigint,p_action text,p_payload jsonb
+ p_event_id uuid,p_booking_id uuid,p_expected_version bigint,p_action text,p_payload jsonb,p_predecessor_id uuid default null
 ) returns jsonb language plpgsql security definer set search_path='' as $$
-declare b public.bookings;r public.booking_sync_receipts;allowed text[];
+declare b public.bookings;r public.booking_sync_receipts;pre public.booking_sync_receipts;allowed text[];baseline bigint;
  result jsonb;response jsonb;ops jsonb;rev bigint;lock_seed bigint;collision boolean;
 begin
  if auth.uid() is null or not private.is_staff() then
@@ -57,7 +58,7 @@ begin
  select * into r from public.booking_sync_receipts where id=p_event_id;
  if found then
   if r.actor_id<>auth.uid() or r.booking_id<>p_booking_id or r.expected_version<>p_expected_version
-   or r.action<>p_action or r.payload<>p_payload then
+   or r.action<>p_action or r.payload<>p_payload or r.predecessor_id is distinct from p_predecessor_id then
    raise exception 'Event identity/context mismatch' using errcode='23514'; end if;
   return r.response;
  end if;
@@ -95,7 +96,15 @@ begin
  if collision then raise exception 'Event ID already used outside sync' using errcode='23514'; end if;
  select * into b from public.bookings where id=p_booking_id for update;
  if not found then raise exception 'Booking not found' using errcode='P0002'; end if;
- if b.sync_version<>p_expected_version then
+ baseline:=p_expected_version;
+ if p_predecessor_id is not null then
+  select * into pre from public.booking_sync_receipts where id=p_predecessor_id;
+  if not found or pre.actor_id<>auth.uid() or pre.booking_id<>p_booking_id
+   or (p_expected_version<>pre.expected_version and p_expected_version<>(pre.response->>'version')::bigint) then
+   raise exception 'Invalid or unresolved predecessor' using errcode='PT409'; end if;
+  baseline:=(pre.response->>'version')::bigint;
+ end if;
+ if b.sync_version<>baseline then
   raise exception 'Booking changed; review before retry' using errcode='PT409'; end if;
  -- Call existing APIs with their own auth, lifecycle, field, money and media guards.
  case p_action
@@ -135,11 +144,11 @@ begin
  select count(*) into rev from public.booking_handover_undos where booking_id=p_booking_id;
  response:=jsonb_build_object('event_id',p_event_id,'booking_id',p_booking_id,
   'version',b.sync_version,'result',result,'booking',to_jsonb(b),'operations',ops,'lifecycle_revision',rev);
- insert into public.booking_sync_receipts(id,booking_id,actor_id,expected_version,action,payload,response)
- values(p_event_id,p_booking_id,auth.uid(),p_expected_version,p_action,p_payload,response);
+ insert into public.booking_sync_receipts(id,booking_id,actor_id,expected_version,predecessor_id,action,payload,response)
+ values(p_event_id,p_booking_id,auth.uid(),p_expected_version,p_predecessor_id,p_action,p_payload,response);
  return response;
 end $$;
-revoke all on function public.sync_booking_event(uuid,uuid,bigint,text,jsonb) from public,anon,authenticated,service_role;
-grant execute on function public.sync_booking_event(uuid,uuid,bigint,text,jsonb) to authenticated;
+revoke all on function public.sync_booking_event(uuid,uuid,bigint,text,jsonb,uuid) from public,anon,authenticated,service_role;
+grant execute on function public.sync_booking_event(uuid,uuid,bigint,text,jsonb,uuid) to authenticated;
 notify pgrst,'reload schema';
 commit;
