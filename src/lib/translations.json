@@ -4008,5 +4008,50 @@
     "Offline app is not installed. Cached data alone does not guarantee an offline restart.",
     "Offline-App nicht installiert. Gespeicherte Daten allein garantieren keinen Offline-Neustart.",
     "التطبيق غير مثبّت للعمل دون اتصال. البيانات المحفوظة وحدها لا تضمن فتحه دون إنترنت."
+  ],
+  "No cached bookings. Open the app online first.": [
+    "No cached bookings. Open the app online first.",
+    "Keine gespeicherten Buchungen. Bitte die App zuerst mit Internetverbindung öffnen.",
+    "لا توجد حجوزات محفوظة. افتح التطبيق أولاً مع اتصال بالإنترنت."
+  ],
+  "Offline sync is not available for this booking yet. Reload online first.": [
+    "Offline sync is not available for this booking yet. Reload online first.",
+    "Die Offline-Synchronisierung ist für diese Buchung noch nicht verfügbar. Bitte zuerst mit Internetverbindung neu laden.",
+    "المزامنة دون اتصال غير متاحة لهذا الحجز بعد. أعد تحميله أولاً مع اتصال بالإنترنت."
+  ],
+  "Offline request changed. Reopen the booking.": [
+    "Offline request changed. Reopen the booking.",
+    "Die Offline-Anfrage wurde geändert. Bitte die Buchung erneut öffnen.",
+    "تغيّر الطلب المحفوظ دون اتصال. افتح الحجز من جديد."
+  ],
+  "Review the blocked sync queue before saving more changes.": [
+    "Review the blocked sync queue before saving more changes.",
+    "Bitte zuerst die blockierte Synchronisierung prüfen, bevor weitere Änderungen gespeichert werden.",
+    "راجع التغييرات التي تعذّرت مزامنتها قبل حفظ تغييرات إضافية."
+  ],
+  "Invalid offline media path": [
+    "Invalid offline media path",
+    "Ungültiger Pfad für offline gespeicherte Medien",
+    "مسار الوسائط المحفوظة دون اتصال غير صالح"
+  ],
+  "Offline media missing": [
+    "Offline media missing",
+    "Offline gespeicherte Medien fehlen",
+    "الوسائط المحفوظة دون اتصال غير موجودة"
+  ],
+  "Invalid sync receipt": [
+    "Invalid sync receipt",
+    "Ungültige Synchronisierungsbestätigung",
+    "تأكيد المزامنة غير صالح"
+  ],
+  "Backend unavailable": [
+    "Backend unavailable",
+    "Server nicht erreichbar",
+    "الخادم غير متاح"
+  ],
+  "No offline account": [
+    "No offline account",
+    "Kein Konto für die Offline-Nutzung gespeichert",
+    "لا يوجد حساب محفوظ للاستخدام دون اتصال"
   ]
 }
