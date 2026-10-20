@@ -10,7 +10,7 @@ await db.exec(`create role anon nologin; create role authenticated nologin; crea
  create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
  grant usage on schema auth to anon,authenticated,service_role; grant execute on function auth.uid() to anon,authenticated,service_role;
  create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
- create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
+ create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text,owner_id text);
  alter table storage.objects enable row level security; grant usage on schema storage to anon,authenticated,service_role;
  grant all on storage.objects to anon,authenticated,service_role;`);
 const dir=new URL('../migrations/',import.meta.url);
@@ -218,5 +218,64 @@ const onlyCall=await sync(b,'customer_call',callPayload);
 await reject(async()=>dependent(b,onlyCall,'customer_call',callPayload),'23514');
 await reject(async()=>dependent(b,onlyCall,'safe_edit',{patch:{phone:'No admin'},
  expected:{...predictedSnapshot,edit_revision:999}}),'42501');
+// Standalone gallery photos preserve handover integrity and commit receipt atomically.
+b=await fresh();await user(driver);
+const galleryEvent=randomUUID(),galleryID=randomUUID();
+const galleryItem={id:galleryID,path:b.id+'/'+galleryEvent+'-'+galleryID+'.png',kind:'photo',
+ mime_type:'image/png',captured_at:'2026-10-01T00:00:00Z',size_bytes:20};
+const galleryPayload={media:[galleryItem]};
+await reject(async()=>sync(b,'media_append',galleryPayload,0,galleryEvent),'23514');
+eq(await version(b.id),0);
+await db.exec('reset role');
+await db.query("insert into storage.objects(bucket_id,name,metadata,owner_id) values('booking-media',$1,$2::jsonb,$3)",
+ [galleryItem.path,JSON.stringify({size:20,mimetype:'image/png'}),driver]);
+await user('','anon');await reject(async()=>sync(b,'media_append',galleryPayload,0,galleryEvent),'42501');
+await user(driver);
+// A valid canonical path belonging to somebody else's upload is not adoptable.
+await db.exec('reset role');
+await db.query('update storage.objects set owner_id=$1 where name=$2',[admin,galleryItem.path]);
+await user(driver);
+await reject(async()=>sync(b,'media_append',galleryPayload,0,galleryEvent),'23514');
+await db.exec('reset role');
+await db.query('update storage.objects set owner_id=$1 where name=$2',[driver,galleryItem.path]);
+await user(driver);
+for(const invalid of [
+ {media:[]},{media:Array(41).fill(galleryItem)},{media:[{...galleryItem,kind:'signature'}]},{media:[{...galleryItem,mime_type:'video/mp4'}]},
+ {media:[{...galleryItem,size_bytes:10485761}]},{media:[{...galleryItem,size_bytes:1.5}]},
+ {media:[{...galleryItem,path:other.id+'/'+galleryEvent+'-'+galleryID+'.png'}]},
+ {media:[{...galleryItem,path:b.id+'/'+randomUUID()+'-'+galleryID+'.png'}]},
+ {media:[{...galleryItem,captured_at:'2099-01-01T00:00:00Z'}]},
+ {media:[{...galleryItem,captured_at:'2026-10-01'}]},
+ {media:[{...galleryItem,actor_id:admin}]}
+])await reject(async()=>sync(b,'media_append',invalid,0,galleryEvent),'22023');
+await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,size_bytes:19}]},0,galleryEvent),'23514');
+// Batch second item missing: first insert and any audit rows must roll back.
+const missingItem={...galleryItem,id:randomUUID()};missingItem.path=b.id+'/'+galleryEvent+'-'+missingItem.id+'.png';
+await reject(async()=>sync(b,'media_append',{media:[galleryItem,missingItem]},0,galleryEvent),'23514');
+eq((await db.query('select count(*)::int n from public.booking_gallery_media')).rows[0].n,0);
+const gallery=await sync(b,'media_append',galleryPayload,0,galleryEvent);
+eq(gallery.booking.checked_in_at,null);eq(gallery.booking.checked_out_at,null);
+eq(gallery.result.media[0].actor_id,driver);eq(gallery.result.media[0].event_id,galleryEvent);
+eq(gallery.result.media[0].kind,'photo');assert.ok(gallery.version>0);checks++;
+eq(await sync(b,'media_append',galleryPayload,0,galleryEvent),gallery);
+eq((await db.query('select count(*)::int n from public.booking_gallery_media')).rows[0].n,1);
+await reject(async()=>sync(b,'media_append',galleryPayload,0),'PT409');
+await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,size_bytes:19}]},0,galleryEvent),'23514');
+await user(admin);await reject(async()=>sync(b,'media_append',galleryPayload,0,galleryEvent),'23514');
+await user(driver);
+await reject(async()=>db.query("insert into public.booking_gallery_media select * from public.booking_gallery_media"),'42501');
+await reject(async()=>db.query('delete from public.booking_gallery_media'),'42501');
+await db.exec('reset role');
+await reject(async()=>db.query("update public.booking_gallery_media set size_bytes=1"),'42501');
+eq((await db.query('select count(*)::int n from public.booking_handovers where booking_id=$1',[b.id])).rows[0].n,0);
+eq((await db.query('select count(*)::int n from public.booking_media where booking_id=$1',[b.id])).rows[0].n,0);
+await user('','anon');await reject(async()=>db.query('select * from public.booking_gallery_media'),'42501');
+await db.exec('reset role');await db.query('update public.profiles set active=false where id=$1',[driver]);
+await user(driver);eq((await db.query('select * from public.booking_gallery_media')).rows.length,0);
+await reject(async()=>sync(b,'media_append',galleryPayload,0,galleryEvent),'42501');
+await db.exec('reset role');await db.query('update public.profiles set active=true where id=$1',[driver]);
+await user(driver);
+const afterPhoto=await dependent(b,gallery,'safe_edit',{patch:{comment:'Photo then note'},expected:{...predictedSnapshot,edit_revision:999}});
+eq(afterPhoto.booking.comment,'Photo then note');
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveWrites:0,note:'PGlite single connection; real multi-session locking not exercised. Duplicate preexisting clear/removals migration omitted; staff pgcrypto unrelated omitted.'}));
 await db.close();
