@@ -50,3 +50,10 @@ it('passes canonical replay state through rather than assuming the current call 
  api.clear.mockResolvedValue(receipt);await mount();await act(async()=>h.run(booking,'clear'));
  expect(done).toHaveBeenCalledWith('clear',receipt);expect(api.clear).toHaveBeenCalledTimes(1);
 });
+
+it('same-user logout and login invalidates synchronously before any rerender',async()=>{
+ let finish!:(v:any)=>void;api.clear.mockImplementation(()=>new Promise(r=>finish=r));await mount();
+ await act(async()=>{void h.run(booking,'clear');h.invalidate()});
+ await act(async()=>finish({customer_called_at:null}));
+ expect(done).not.toHaveBeenCalled();expect(reload).not.toHaveBeenCalled();expect(h.busy).toBe(false);
+});
