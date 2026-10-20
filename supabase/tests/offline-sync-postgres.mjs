@@ -37,4 +37,23 @@ assert.equal(different.filter(x=>x.status==='fulfilled').length,1);
 assert.equal(different.filter(x=>x.status==='rejected'&&x.reason.stderr.includes('Booking changed; review before retry')).length,1);
 assert.equal(await sql(`select count(*) from public.booking_payments where booking_id='${c}'`),'1');
 assert.equal(await sql('select count(*) from public.booking_sync_receipts'),'2');
-console.log(JSON.stringify({status:'passed',checks:8,isolated:true,realMultiSession:true,liveWrites:0}));
+// Standalone photos use the same row lock and exact receipt replay domain.
+const photoBooking=randomUUID(),photoEvent=randomUUID(),photoID=randomUUID();
+const photoPath=photoBooking+'/'+photoEvent+'-'+photoID+'.png';
+await sql(`insert into public.bookings(id,customer_name,arrival_at,departure_at,total)
+ values('${photoBooking}','Photo race','2026-10-17','2026-10-30',100);
+ insert into storage.objects(bucket_id,name,owner_id,metadata) values('booking-media','${photoPath}','${driver}','{"size":20,"mimetype":"image/png"}')`);
+const payload=JSON.stringify({media:[{id:photoID,path:photoPath,kind:'photo',mime_type:'image/png',size_bytes:20,captured_at:'2026-10-01T00:00:00Z'}]});
+const photoQuery=`set role authenticated;set request.jwt.claim.sub='${driver}';
+ select public.sync_booking_event('${photoEvent}','${photoBooking}',0,'media_append','${payload}');`;
+const photoSame=await Promise.all([sql('begin;'+photoQuery+'select pg_sleep(0.4);commit;'),sql(photoQuery)]);
+assert.deepEqual(JSON.parse(photoSame[0].split('\n').find(x=>x.startsWith('{'))),JSON.parse(photoSame[1]));
+assert.equal(await sql(`select count(*) from public.booking_gallery_media where booking_id='${photoBooking}'`),'1');
+assert.equal(await sql(`select sync_version from public.bookings where id='${photoBooking}'`),'1');
+assert.equal(await sql(`select count(*) from public.booking_handovers where booking_id='${photoBooking}'`),'0');
+assert.equal(await sql(`select count(*) from public.booking_sync_receipts where booking_id='${photoBooking}'`),'1');
+// A legacy writer after a successful photo makes a new stale action conflict.
+await sql(`update public.bookings set comment='External' where id='${photoBooking}'`);
+await assert.rejects(()=>sql(query(photoBooking,randomUUID())),e=>e.stderr.includes('Booking changed; review before retry'));
+assert.deepEqual(JSON.parse(await sql(photoQuery)),JSON.parse(photoSame[1]));
+console.log(JSON.stringify({status:'passed',checks:15,isolated:true,realMultiSession:true,liveWrites:0}));
