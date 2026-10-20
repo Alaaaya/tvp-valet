@@ -1,12 +1,19 @@
 import {t as tr} from './i18n';
-import {saveBooking} from '../api';
+import {saveBooking,db} from '../api';
 import type {Booking} from '../model';
 import {bookingEditFields} from './booking-safe-edit';
 import {hasLegacyCashConflict,type PaymentInput} from './booking-payments';
 import {createPendingMedia,mediaPath,validateHandover,type HandoverSave} from './handover-api';
-import {canUndoHandover} from './handover-undo';
+import {canUndoHandover,undoHandover} from './handover-undo';
+import {recordBookingOperation} from './operations';
 import type {CustomerCallBooking,CustomerCallReceipt} from './customer-calls';
 import type {BookingOperations,BookingOperationAction} from './operations';
+import {routeWrite,durableBookingReady,isOnline,offlineWritesDisabledError} from './offline-capability';
+import {saveEditedBooking} from './booking-safe-edit';
+import {recordBookingPayment} from './booking-payments';
+import {changeBookingSpot,transitionBookingStatus} from './booking-actions';
+import {recordCustomerCall,clearCustomerCall} from './customer-calls';
+import {saveHandover,validateMedia} from './handover-api';
 import {enqueueOffline,cachedOfflineBooking,cachedOfflineOperations} from './offline-client';
 type EditBooking=Booking;
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,7 +40,7 @@ async function queue(booking:Booking,id:string,kind:string,payload:Record<string
  check(booking,id);
  return enqueueOffline({id,booking,kind,payload,projected:{...projected,offline_pending:true},projectedOps,blobs});
 }
-export async function saveOfflineEdit(original:Booking,edited:Booking,requestId:string):Promise<Booking>{
+async function durableEdit(original:Booking,edited:Booking,requestId:string):Promise<Booking>{
  const o=original as EditBooking;
  if(!uuid.test(requestId)||!uuid.test(o.id)||edited.id!==o.id)throw new Error(tr("Ungültige Anfrage-ID"));
  for(const r of [o.edit_revision,o.lifecycle_revision,o.detail_revision])
@@ -62,7 +69,7 @@ export async function saveOfflineEdit(original:Booking,edited:Booking,requestId:
 }
 type DetailInput={booking:Booking;requestId:string};
 function detailStand(b:Booking){for(const r of [b.lifecycle_revision,b.detail_revision])if(!Number.isSafeInteger(r)||(r??-1)<0)throw Error(tr("Ungültiger Buchungsstand. Bitte neu laden."))}
-export async function offlineChangeSpot({booking,requestId,spot}:DetailInput&{spot:string}):Promise<Booking>{
+async function durableSpot({booking,requestId,spot}:DetailInput&{spot:string}):Promise<Booking>{
  detailStand(booking);spot=spot.trim();
  if(!spot||spot.length>100)throw Error(tr("Bitte einen Stellplatz mit 1 bis 100 Zeichen angeben."));
  if(booking.status!=='confirmed'||booking.checked_out_at)throw Error(tr("Standortänderung nur für offene bestätigte Buchungen."));
@@ -70,7 +77,7 @@ export async function offlineChangeSpot({booking,requestId,spot}:DetailInput&{sp
  const {edit_revision:_,...exp}=expected(booking);
  return (await queue(booking,requestId,'detail',{action:'spot',target:spot,expected:exp},{...booking,spot,detail_revision:booking.detail_revision!+1})).booking;
 }
-export async function offlineTransitionStatus({booking,requestId,status}:DetailInput&{status:'no_show'|'cancelled'}):Promise<Booking>{
+async function durableStatus({booking,requestId,status}:DetailInput&{status:'no_show'|'cancelled'}):Promise<Booking>{
  detailStand(booking);
  if(!['no_show','cancelled'].includes(status))throw Error(tr("Ungültiger Status"));
  if(booking.checked_in_at||booking.checked_out_at)throw Error(tr("Bitte zuerst Check-out und Check-in ausdrücklich rückgängig machen."));
@@ -78,7 +85,7 @@ export async function offlineTransitionStatus({booking,requestId,status}:DetailI
  const {edit_revision:_,...exp}=expected(booking);
  return (await queue(booking,requestId,'detail',{action:'status',target:status,expected:exp},{...booking,status,detail_revision:booking.detail_revision!+1})).booking;
 }
-export async function offlineRecordPayment({booking,requestId,amountCents,method}:PaymentInput):Promise<Booking>{
+async function durablePayment({booking,requestId,amountCents,method}:PaymentInput):Promise<Booking>{
  validId(requestId);validId(booking.id);
  if(!['cash','card','bank_transfer'].includes(method))throw new Error(tr("Ungültige Zahlungsart"));
  if(!Number.isSafeInteger(amountCents)||amountCents<=0||amountCents>maxCents)throw new Error(tr("Bitte einen positiven Betrag in Cent angeben"));
@@ -90,7 +97,7 @@ export async function offlineRecordPayment({booking,requestId,amountCents,method
  return (await queue(booking,requestId,'payment',{amount_cents:amountCents,method,expected_paid_cents:paid,expected_total_cents:total},{...booking,paid:(paid+amountCents)/100})).booking;
 }
 type CallInput={booking:CustomerCallBooking;requestId:string;allowRepeat?:boolean};
-async function call({booking,requestId,allowRepeat=false}:CallInput,clear:boolean):Promise<CustomerCallReceipt&{offline_pending:true}>{
+async function call({booking,requestId,allowRepeat=false}:CallInput,clear:boolean):Promise<CustomerCallReceipt>{
  if(booking.customer_called_at===undefined||!Number.isSafeInteger(booking.lifecycle_revision)||(booking.lifecycle_revision??-1)<0)throw Error(tr("Ungültiger Buchungsstand. Bitte neu laden."));
  if(booking.status!=='confirmed'||booking.checked_out_at!==null)throw Error(tr("Anruf nur für offene bestätigte Buchungen."));
  if(clear&&(!booking.customer_called_at||!Number.isFinite(Date.parse(booking.customer_called_at))))throw Error(tr("Kein Anruf zum Löschen vorhanden."));
@@ -103,9 +110,9 @@ async function call({booking,requestId,allowRepeat=false}:CallInput,clear:boolea
  await queue(booking,requestId,clear?'clear_customer_call':'customer_call',payload,{...booking,customer_called_at:called} as Booking,ops);
  return {receipt_id:requestId,occurred_at:now,customer_called_at:called,lifecycle_revision:booking.lifecycle_revision!,offline_pending:true};
 }
-export const offlineRecordCustomerCall=(input:CallInput)=>call(input,false);
-export const offlineClearCustomerCall=(input:CallInput)=>call(input,true);
-export async function saveOfflineHandover({booking,requestId,action,details,media}:HandoverSave):Promise<Booking>{
+export const offlineRecordCustomerCall=(input:CallInput)=>routeWrite(input.booking,()=>call(input,false),()=>recordCustomerCall(input));
+export const offlineClearCustomerCall=(input:CallInput)=>routeWrite(input.booking,()=>call(input,true),()=>clearCustomerCall(input));
+async function durableHandover({booking,requestId,action,details,media}:HandoverSave):Promise<Booking>{
  if(!['in','out'].includes(action))throw Error(tr("Ungültige Übergabe."));
  validateHandover(details,media);
  if(booking.status!=='confirmed'||(action==='in'?(!!booking.checked_in_at||!!booking.checked_out_at):(!booking.checked_in_at||!!booking.checked_out_at)))throw Error(tr("Ungültige Übergabe."));
@@ -116,13 +123,13 @@ export async function saveOfflineHandover({booking,requestId,action,details,medi
  projected.edit_revision=(booking.edit_revision??0)+(bookingEditFields.some(k=>projected[k]!==booking[k])?1:0);
  return (await queue(booking,requestId,'handover',{action,details,media:metadata,expected_in:booking.checked_in_at,expected_out:booking.checked_out_at,expected_revision:booking.lifecycle_revision},projected,undefined,blobs)).booking;
 }
-export async function offlineUndoHandover({booking,requestId,action}:{booking:Booking;requestId:string;action:'in'|'out'}):Promise<Booking>{
+async function durableUndo({booking,requestId,action}:{booking:Booking;requestId:string;action:'in'|'out'}):Promise<Booking>{
  if(!['in','out'].includes(action)||!canUndoHandover(booking,action))throw Error(tr("Diese Übergabe kann nicht rückgängig gemacht werden."));
  const old=cachedOfflineOperations(booking.id);
  const ops=action==='in'&&old?{...old,taken_away_at:null,retrieved_at:null,customer_called_at:null,ride_started_at:null}:undefined;
  return (await queue(booking,requestId,'undo_handover',{action,expected_at:action==='in'?booking.checked_in_at:booking.checked_out_at},{...booking,[action==='in'?'checked_in_at':'checked_out_at']:null,lifecycle_revision:(booking.lifecycle_revision??0)+1},ops)).booking;
 }
-export async function offlineRecordOperation(bookingId:string,action:BookingOperationAction):Promise<BookingOperations>{
+async function durableOperation(bookingId:string,action:BookingOperationAction):Promise<BookingOperations>{
  const booking=cachedOfflineBooking(bookingId);
  if(!booking)throw Error(tr("Buchung nicht im Offline-Speicher."));
  if(!['taken_away','retrieved','ride_started'].includes(action))throw Error(tr("Ungültige Aktion."));
@@ -134,7 +141,7 @@ export async function offlineRecordOperation(bookingId:string,action:BookingOper
  const result=await queue(booking,crypto.randomUUID(),'operation',{action},booking,projected);
  return result.operations??projected;
 }
-export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
+async function durableBooking(b:Booking,admin:boolean):Promise<void>{
  const original=cachedOfflineBooking(b.id);
  if(!original){
   if(typeof navigator!=='undefined'&&navigator.onLine===false)throw Error(tr("Neue Buchungen benötigen eine Internetverbindung."));
@@ -150,9 +157,34 @@ export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
 }
 
 /** Stage gallery evidence durably; the sync runtime uploads only after enqueue succeeds. */
-export async function offlineAppendPhoto(booking:Booking,file:Blob):Promise<Booking>{
+async function durablePhoto(booking:Booking,file:Blob):Promise<Booking>{
  const item=createPendingMedia(file,'photo'),requestId=crypto.randomUUID();
  const path=mediaPath(booking.id,requestId,item);
  const metadata={id:item.id,path,kind:item.kind,mime_type:item.mime_type,captured_at:item.captured_at,size_bytes:item.blob.size};
  return (await queue(booking,requestId,'media_append',{media:[metadata]},booking,undefined,{[item.id]:item.blob})).booking;
 }
+
+export const saveOfflineEdit=(original:Booking,edited:Booking,requestId:string):Promise<Booking>=>
+ routeWrite(original,()=>durableEdit(original,edited,requestId),()=>saveEditedBooking(original,edited,requestId));
+export const offlineChangeSpot=(i:DetailInput&{spot:string}):Promise<Booking>=>routeWrite(i.booking,()=>durableSpot(i),()=>changeBookingSpot(i) as Promise<Booking>);
+export const offlineTransitionStatus=(i:DetailInput&{status:'no_show'|'cancelled'}):Promise<Booking>=>routeWrite(i.booking,()=>durableStatus(i),()=>transitionBookingStatus(i) as Promise<Booking>);
+export const offlineRecordPayment=(i:PaymentInput):Promise<Booking>=>routeWrite(i.booking,()=>durablePayment(i),async()=>{
+ await recordBookingPayment(i);
+ return {...i.booking,paid:(cents(i.booking.paid)+i.amountCents)/100};
+});
+export const saveOfflineHandover=(i:HandoverSave):Promise<Booking>=>routeWrite(i.booking,()=>durableHandover(i),()=>saveHandover(i));
+export const offlineUndoHandover=(i:{booking:Booking;requestId:string;action:'in'|'out'}):Promise<Booking>=>routeWrite(i.booking,()=>durableUndo(i),()=>undoHandover(i));
+export const offlineRecordOperation=(bookingId:string,action:BookingOperationAction):Promise<BookingOperations>=>
+ routeWrite(cachedOfflineBooking(bookingId),()=>durableOperation(bookingId,action),()=>recordBookingOperation(bookingId,action));
+export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
+ const original=cachedOfflineBooking(b.id);
+ if(durableBookingReady(original))return durableBooking(b,admin);
+ if(!isOnline())throw offlineWritesDisabledError();
+ await saveBooking(b,admin);
+}
+export const offlineAppendPhoto=(booking:Booking,file:Blob):Promise<Booking>=>routeWrite(booking,()=>durablePhoto(booking,file),async()=>{
+ if(!db)throw Error(tr('Backend nicht eingerichtet'));
+ const mime=validateMedia(file,'photo'),ext=mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg';
+ const {error}=await db.storage.from('booking-media').upload(booking.id+'/'+crypto.randomUUID()+'.'+ext,file,{contentType:mime});
+ if(error)throw error;return booking;
+});

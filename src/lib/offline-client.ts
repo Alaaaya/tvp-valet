@@ -6,6 +6,7 @@ import {openOfflineStore,requestOfflinePersistence,type OfflineScope,type Outbox
 import {OfflineSync,OfflineSyncError} from './offline-sync';
 import {registerOfflineShell} from './offline-shell';
 import {t as tr} from './i18n';
+import {durableOfflineEnabled,offlineWritesDisabledError} from './offline-capability';
 
 export interface OfflineStatus {
  online:boolean;pending:number;syncing:boolean;error:string;events:OutboxEvent[];cacheAt:number|null;cacheCount:number;
@@ -110,6 +111,7 @@ function classify(error:unknown){
 }
 async function execute(event:OutboxEvent,blobs:Record<string,Blob>,signal:AbortSignal){
  if(!db)throw new OfflineSyncError('auth',tr('Backend unavailable'));
+ if(!durableOfflineEnabled())throw new OfflineSyncError('uncertain',offlineWritesDisabledError().message);
  const s={userId:event.userId,role:event.role},gen=epoch;assertScope(s,gen);
  const base=event.baseline as Baseline,payload=event.payload as Record<string,unknown>;
  // Immutable storage object names are event-scoped, so replay never overwrites another capture.
@@ -133,7 +135,7 @@ async function execute(event:OutboxEvent,blobs:Record<string,Blob>,signal:AbortS
 }
 export async function retryOffline(manual=false):Promise<void>{
  if(running)return running;
- const s=scope,gen=epoch;if(!s||!state.ready||!state.online)return;
+ const s=scope,gen=epoch;if(!s||!state.ready||!state.online||!durableOfflineEnabled())return;
  running=(async()=>{
   try{
    const st=await store();assertScope(s,gen);emit({syncing:true,error:''});
@@ -162,6 +164,7 @@ export async function discardOfflineFrom(sequence:number,confirmed:boolean){
 }
 export interface EnqueueOfflineInput {id?:string;booking:Booking;kind:string;payload:Record<string,unknown>;projected:Booking;projectedOps?:BookingOperations;blobs?:Record<string,Blob>}
 export async function enqueueOffline(input:EnqueueOfflineInput){
+ if(!durableOfflineEnabled())throw offlineWritesDisabledError();
  const s=scope,gen=epoch;
  if(!s||!state.ready||!employee)throw Error(tr("Sitzung abgelaufen. Bitte erneut anmelden."));
  const st=await store();assertScope(s,gen);
@@ -203,3 +206,12 @@ export async function offlineLoad(signal?:AbortSignal):Promise<{rows:Booking[];s
  assertScope(s,gen);return {rows:snapshot.rows,staff:snapshot.staff};
 }
 export async function offlineLoadOperations(){return snapshot.operations}
+
+/** Explicit logout only (caller signs out first, then calls this before startOfflineAccount(null)). Never on restart/session expiry. */
+export async function purgeOfflineAccount(){
+ const s=scope,gen=epoch;if(!s)return;
+ sync?.stop();if(running)await running;assertScope(s,gen);
+ await (await store()).purgeAccount(s.userId);
+ snapshot={rows:[],staff:[],operations:[],at:0,complete:false};canonicalSnapshot=snapshot;
+ emit({events:[],pending:0,cacheAt:null,cacheCount:0,complete:false});
+}

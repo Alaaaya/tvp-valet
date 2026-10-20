@@ -180,6 +180,22 @@ export class OfflineStore {
    if(patch.state==='confirmed')await tx.objectStore('blobs').delete(id);await tx.done;this.emit();
   }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});throw e;}
  }
+ /** Explicit logout: remove this user's cached data, identity, receipts and counters. Refuses while changes are unsynced or sync is active. */
+ async purgeAccount(userId:string){
+  if(!userId)throw new Error('Account required');
+  const tx=this.db.transaction(['events','blobs','leases','snapshots','counters'],'readwrite',{durability:'strict'});void tx.done.catch(()=>{});
+  try{
+   const lease=await tx.objectStore('leases').get(userId);
+   if(lease&&lease.expiresAt>Date.now())throw new Error('Stop sync before purge');
+   const rows=await tx.objectStore('events').index('account').getAll(userId);
+   if(rows.some(e=>e.state!=='confirmed'))throw new Error('Unsynced changes remain');
+   for(const e of rows){await tx.objectStore('events').delete(e.id);await tx.objectStore('blobs').delete(e.id);}
+   const snaps=tx.objectStore('snapshots');
+   for(const k of await snaps.getAllKeys()){try{if(JSON.parse(String(k))[0]===userId)await snaps.delete(k);}catch{}}
+   await tx.objectStore('counters').delete(userId);await tx.objectStore('leases').delete(userId);
+   await tx.done;this.emit();
+  }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});throw e;}
+ }
  /** Cancel only with explicit confirmation, and discard the entire dependent tail. */
  async discardFrom(s:OfflineScope,seq:number,confirmed:boolean){
   valid(s);if(confirmed!==true)throw new Error('Explicit confirmation required');

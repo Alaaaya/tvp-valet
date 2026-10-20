@@ -40,6 +40,20 @@ beforeEach(async()=>{
 });
 afterEach(async()=>{await client?.startOfflineAccount(null);await client?.retryOffline();mock.store.close();vi.restoreAllMocks();vi.unstubAllGlobals()});
 describe('offline runtime with actual IndexedDB',()=>{
+ it('flag off: enqueue and retry are blocked, zero RPC, zero pending, cache reads still work',async()=>{
+  await seed();await boot(true);vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','false');
+  await expect(queue()).rejects.toThrow(/deaktiviert|disabled/i);
+  await client.retryOffline(true);
+  expect(mock.rpc).not.toHaveBeenCalled();expect(client.offlineSnapshot().pending).toBe(0);expect(await mock.store.list(scope,{includeConfirmed:true})).toEqual([]);
+  expect(client.cachedOfflineBookings()).toHaveLength(1);vi.unstubAllEnvs();
+ });
+ it('explicit purge removes this account cache only when nothing is pending; restart keeps it',async()=>{
+  await seed();await boot();await client.startOfflineAccount(null);await client.startOfflineAccount(alice);
+  expect(client.cachedOfflineBookings()).toHaveLength(1);
+  const r=await queue();await expect(client.purgeOfflineAccount()).rejects.toThrow(/Unsynced/);expect(client.cachedOfflineBookings()).toHaveLength(1);
+  await mock.store.discardFrom(scope,(await mock.store.list(scope))[0].seq,true);
+  await client.purgeOfflineAccount();expect(await mock.store.getSnapshot(scope,'data')).toBeUndefined();expect(client.cachedOfflineBookings()).toHaveLength(0);void r;
+ });
  it('starts from persisted account cache and never queries the backend offline',async()=>{
   await seed();await boot();expect(await client.offlineLoad()).toMatchObject({rows:[{customer_name:'Original'}]});expect(client.offlineSnapshot()).toMatchObject({ready:true,cacheAt:123,cacheCount:1,complete:true});expect(mock.queries).toEqual([]);
   expect(await client.offlineAccountFor('alice')).toEqual(alice);
