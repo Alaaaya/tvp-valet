@@ -44,3 +44,9 @@ it('guards row and detail availability on the exact same valid open snapshot',()
  for(const patch of [{checked_out_at:undefined},{checked_out_at:'2026-10-20T09:00:00Z'},{status:'cancelled'},{customer_called_at:null},{customer_called_at:'bad'},{lifecycle_revision:undefined},{lifecycle_revision:-1}])expect(canClearCall({...booking,...patch},true)).toBe(false);
  expect(canClearCall(booking,false)).toBe(false);
 });
+
+it('passes canonical replay state through rather than assuming the current call is null',async()=>{
+ const receipt={receipt_id:'r',occurred_at:'2026-10-20T08:00:00Z',customer_called_at:'2026-10-20T09:00:00Z',lifecycle_revision:4};
+ api.clear.mockResolvedValue(receipt);await mount();await act(async()=>h.run(booking,'clear'));
+ expect(done).toHaveBeenCalledWith('clear',receipt);expect(api.clear).toHaveBeenCalledTimes(1);
+});

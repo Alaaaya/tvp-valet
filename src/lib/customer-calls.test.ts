@@ -76,8 +76,8 @@ it.each(['PT409','40001','42501'])('clear shows actionable server rejection %s',
  mock.rpc.mockResolvedValue({error:{code}});
  await expect(clearCustomerCall({booking:calledBooking,requestId})).rejects.toThrow(code==='42501'?'Berechtigung':'neu laden');
 });
-it('clear rejects malformed server confirmation (must return null call time)',async()=>{
- for(const data of [null,{...clearReceipt,receipt_id:'other'},{...clearReceipt,customer_called_at:calledAt},{...clearReceipt,lifecycle_revision:-1},{...clearReceipt,occurred_at:'bad'}]){
+it('clear rejects malformed server confirmation',async()=>{
+ for(const data of [null,{...clearReceipt,receipt_id:'other'},{...clearReceipt,customer_called_at:'bad'},{...clearReceipt,customer_called_at:42},{...clearReceipt,customer_called_at:undefined},{...clearReceipt,lifecycle_revision:-1},{...clearReceipt,occurred_at:'bad'}]){
   mock.rpc.mockResolvedValue({data});
   await expect(clearCustomerCall({booking:calledBooking,requestId})).rejects.toThrow('Bestätigung');
  }
@@ -101,4 +101,11 @@ it('repeat-call modal has a full-width third "Anruf löschen" button wired to cl
  expect(css).toMatch(/\.call-ask button\.call-clear\{min-height:44px/);expect(css).toMatch(/\.call-ask button\.call-cancel\{grid-column:1\/-1\}/);
  const tj=JSON.parse(readFileSync('src/lib/translations.json','utf8'));
  for(const k of ['Anruf löschen','Anruf gelöscht','Anruf konnte nicht gelöscht werden','Kein Anruf zum Löschen vorhanden.','Demo: Anruf nur lokal gelöscht'])expect(tj[k]).toHaveLength(3);
+});
+
+it('clear replay accepts a newer canonical call without clearing it again',async()=>{
+ const replay={...clearReceipt,customer_called_at:'2026-10-20T10:00:00.000Z',lifecycle_revision:4};
+ mock.rpc.mockResolvedValue({data:replay});
+ expect(await clearCustomerCall({booking:calledBooking,requestId})).toEqual(replay);
+ expect(mock.rpc).toHaveBeenCalledTimes(1);
 });

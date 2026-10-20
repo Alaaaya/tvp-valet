@@ -67,7 +67,7 @@ export async function clearCustomerCall({booking,requestId}:{
   throw new Error(error.message||tr("Anruf konnte nicht gelöscht werden"));
  }
  if(!data||data.receipt_id!==requestId||!Number.isFinite(Date.parse(data.occurred_at))||
-  data.customer_called_at!==null||
+  (data.customer_called_at!==null&&(typeof data.customer_called_at!=='string'||!Number.isFinite(Date.parse(data.customer_called_at))))||
   !Number.isSafeInteger(data.lifecycle_revision)||data.lifecycle_revision<0)
   throw new Error(tr("Keine Bestätigung vom Server"));
  return data as CustomerCallReceipt;
