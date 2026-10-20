@@ -37,7 +37,7 @@ import {resolveScan,scanAfterJump,type ScanOutcome,type ScanQuery} from './lib/s
 import {ScanResult} from './lib/scan-result';
 import {nowTarget,scrollListToIndex} from './lib/now-scroll';
 import {GlobalSearchView,type GlobalSource} from './lib/global-search-view';
-import {offlineLoad,offlineLoadOperations,startOfflineAccount,offlineAccountFor,offlineSnapshot,subscribeOffline,cachedOfflineBooking} from './lib/offline-client';
+import {offlineLoad,offlineLoadOperations,startOfflineAccount,offlineAccountFor,offlineSnapshot,subscribeOffline,cachedOfflineBookings} from './lib/offline-client';
 import {OfflineStatusBanner} from './lib/offline-status';
 import {saveOfflineEdit as saveEditedBooking,offlineRecordPayment as recordBookingPayment,offlineChangeSpot as changeBookingSpot,offlineTransitionStatus as transitionBookingStatus,offlineRecordOperation as recordBookingOperation,saveOfflineBooking as saveBooking} from './lib/offline-actions';
 import {PrintSheetsButton} from './lib/print-sheets-button';
@@ -98,7 +98,7 @@ const d=await offlineLoad(c.signal);const list=await offlineLoadOperations();if(
 
 useEffect(()=>{if(!db)return;return observeSession(db.auth,s=>{const uid=s?.user.id||'';if(uid!==sessionUid.current){sessionUid.current=uid;resetSessionState();setAuthUid(uid)}setSession(!!s);setAuthReady(true);if(s)setTick(t=>t+1)},e=>{setError(e instanceof Error?e.message:String(e));setAuthReady(true)})},[]);
 useEffect(()=>{if(session&&!demo)void refresh().catch(e=>{if(mounted.current)setError(e.message)})},[session,authUid,demo]);
-useEffect(()=>{if(!session||demo||!offline.ready||offline.accountId!==authUid)return;let dead=false;void (async()=>{const list=await offlineLoadOperations();if(dead)return;setOps(Object.fromEntries(list.map(o=>[o.booking_id,o])));setRows(r=>r.map(b=>cachedOfflineBooking(b.id)??b))})();return()=>{dead=true}},[offline,session,demo,authUid]);
+useEffect(()=>{if(!session||demo||!offline.ready||offline.accountId!==authUid)return;let dead=false;void (async()=>{const list=await offlineLoadOperations();if(dead)return;setOps(Object.fromEntries(list.map(o=>[o.booking_id,o])));setRows(withoutQaFixtures(cachedOfflineBookings()))})();return()=>{dead=true}},[offline,session,demo,authUid]);
 
 async function run(fn:()=>Promise<void>){setError('');setBusy(true);try{await fn()}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}}
 async function login(e:React.FormEvent){e.preventDefault();await run(async()=>{if(!db)throw Error(tr("Supabase-Zugang fehlt noch."));const{error}=await db.auth.signInWithPassword({email:loginEmail(email),password});if(error)throw error;await refresh();setSession(true)})}
