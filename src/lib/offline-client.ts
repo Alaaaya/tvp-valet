@@ -109,14 +109,14 @@ function classify(error:unknown){
  return 'uncertain' as const;
 }
 async function execute(event:OutboxEvent,blobs:Record<string,Blob>,signal:AbortSignal){
- if(!db)throw new OfflineSyncError('auth','Backend unavailable');
+ if(!db)throw new OfflineSyncError('auth',tr('Backend unavailable'));
  const s={userId:event.userId,role:event.role},gen=epoch;assertScope(s,gen);
  const base=event.baseline as Baseline,payload=event.payload as Record<string,unknown>;
  // Immutable storage object names are event-scoped, so replay never overwrites another capture.
  const media=(payload.media??[]) as {id:string;path:string;mime_type:string;size_bytes:number}[];
  for(const m of media){
-  if(!m.path.startsWith(event.bookingId+'/'+event.id+'-'))throw new OfflineSyncError('permanent','Invalid offline media path');
-  const blob=blobs[m.path]??blobs[m.id];if(!blob)throw new OfflineSyncError('permanent','Offline media missing');
+  if(!m.path.startsWith(event.bookingId+'/'+event.id+'-'))throw new OfflineSyncError('permanent',tr('Invalid offline media path'));
+  const blob=blobs[m.path]??blobs[m.id];if(!blob)throw new OfflineSyncError('permanent',tr('Offline media missing'));
   assertScope(s,gen);if(signal.aborted)throw new DOMException('aborted','AbortError');
   const bucket=db.storage.from('booking-media'),r=await bucket.upload(m.path,blob,{contentType:m.mime_type,upsert:false,cacheControl:'0'});
   if(r.error){
@@ -128,7 +128,7 @@ async function execute(event:OutboxEvent,blobs:Record<string,Blob>,signal:AbortS
  assertScope(s,gen);if(signal.aborted)throw new DOMException('aborted','AbortError');
  const result=await db.rpc('sync_booking_event',{p_event_id:event.id,p_booking_id:event.bookingId,p_expected_version:base.version,p_action:event.kind,p_payload:payload,p_predecessor_id:base.predecessor}).abortSignal(signal);
  if(result.error)throw result.error;
- if(!result.data||result.data.event_id!==event.id||result.data.booking_id!==event.bookingId||!result.data.booking||!Number.isSafeInteger(result.data.version))throw new OfflineSyncError('uncertain','Invalid sync receipt');
+ if(!result.data||result.data.event_id!==event.id||result.data.booking_id!==event.bookingId||!result.data.booking||!Number.isSafeInteger(result.data.version))throw new OfflineSyncError('uncertain',tr('Invalid sync receipt'));
  return {...result.data,eventId:event.id};
 }
 export async function retryOffline(manual=false):Promise<void>{
@@ -154,7 +154,7 @@ export async function retryOffline(manual=false):Promise<void>{
  })();return running;
 }
 export async function discardOfflineFrom(sequence:number,confirmed:boolean){
- const s=scope,gen=epoch;if(!s)throw Error('No account');
+ const s=scope,gen=epoch;if(!s)throw Error(tr('No offline account'));
  sync?.stop();if(running)await running;assertScope(s,gen);
  const st=await store();await st.discardFrom(s,sequence,confirmed);assertScope(s,gen);
  snapshot=await st.getSnapshot<Snapshot>(s,'data')??{rows:[],staff:employee?[employee]:[],operations:[],at:0,complete:false};
@@ -165,23 +165,23 @@ export async function enqueueOffline(input:EnqueueOfflineInput){
  const s=scope,gen=epoch;
  if(!s||!state.ready||!employee)throw Error(tr("Sitzung abgelaufen. Bitte erneut anmelden."));
  const st=await store();assertScope(s,gen);
- if(!Number.isSafeInteger(input.booking.sync_version)||(input.booking.sync_version??-1)<0)throw Error('Offline sync is not available for this booking yet. Reload online first.');
+ if(!Number.isSafeInteger(input.booking.sync_version)||(input.booking.sync_version??-1)<0)throw Error(tr('Offline sync is not available for this booking yet. Reload online first.'));
  const events=await st.list(s,{includeConfirmed:true});assertScope(s,gen);
  const existing=input.id?events.find(e=>e.id===input.id):undefined;
  if(existing){
-  if(existing.kind!==input.kind||existing.bookingId!==input.booking.id||JSON.stringify(existing.payload)!==JSON.stringify(input.payload))throw Error('Offline request changed. Reopen the booking.');
+  if(existing.kind!==input.kind||existing.bookingId!==input.booking.id||JSON.stringify(existing.payload)!==JSON.stringify(input.payload))throw Error(tr('Offline request changed. Reopen the booking.'));
   await st.enqueue(s,{id:existing.id,bookingId:existing.bookingId,kind:existing.kind,payload:input.payload,baseline:existing.baseline},input.blobs??{});assertScope(s,gen);await hydrate(s,gen);void retryOffline();
   return {booking:cachedOfflineBooking(input.booking.id)??input.projected,operations:cachedOfflineOperations(input.booking.id),eventId:existing.id};
  }
  const previous=events.filter(e=>e.bookingId===input.booking.id).at(-1);
- if(events.some(e=>e.state==='conflict'||e.state==='failed'))throw Error('Review the blocked sync queue before saving more changes.');
+ if(events.some(e=>e.state==='conflict'||e.state==='failed'))throw Error(tr('Review the blocked sync queue before saving more changes.'));
  const projected={...input.projected,offline_pending:true};
  const event=await st.enqueue(s,{id:input.id,bookingId:input.booking.id,kind:input.kind,payload:input.payload,baseline:{version:input.booking.sync_version!,predecessor:previous?.id??null,projected,projectedOps:input.projectedOps} satisfies Baseline},input.blobs??{});
  assertScope(s,gen);await hydrate(s,gen);void retryOffline();
  return {booking:cachedOfflineBooking(input.booking.id)??projected,operations:input.projectedOps,eventId:event.id};
 }
 export async function offlineLoad(signal?:AbortSignal):Promise<{rows:Booking[];staff:Employee[]}>{
- const s=scope,gen=epoch;if(!s)throw Error('No offline account');
+ const s=scope,gen=epoch;if(!s)throw Error(tr('No offline account'));
  if(navigator.onLine&&db){
   try{
    const ctl=signal??new AbortController().signal;
@@ -199,7 +199,7 @@ export async function offlineLoad(signal?:AbortSignal):Promise<{rows:Booking[];s
    if(signal?.aborted)throw error;assertScope(s,gen);
    if(!snapshot.at)throw error;emit({error:error instanceof Error?error.message:String(error)});
   }
- }else if(!snapshot.at)throw Error('No cached bookings. Open the app online first.');
+ }else if(!snapshot.at)throw Error(tr('No cached bookings. Open the app online first.'));
  assertScope(s,gen);return {rows:snapshot.rows,staff:snapshot.staff};
 }
 export async function offlineLoadOperations(){return snapshot.operations}
