@@ -131,6 +131,23 @@ describe('durable outbox public contract',()=>{
   const notified=new Promise<void>(resolve=>b.subscribe(resolve));
   await a.enqueue(s,input());await notified;expect((await b.list(s)).length).toBe(1);a.close();b.close();
  });
+ it('same UUID identical immutable input returns existing even after confirmation',async()=>{
+  const db=await fresh(),data=input(),blobs={p:new Blob(['x'])},a=await db.enqueue(s,data,blobs);
+  expect((await db.enqueue(s,{...data,id:a.id},blobs)).seq).toBe(a.seq);
+  await db.lease(s,'owner',Date.now(),10000);
+  await db.confirmReceipt(s,a.id,{eventId:a.id},'owner',Date.now(),[{key:'canonical',value:{version:2}}]);
+  expect(await db.getSnapshot(s,'canonical')).toEqual({version:2});
+  expect(await db.getBlobs(s,a.id)).toEqual({});
+  expect((await db.enqueue(s,{...data,id:a.id},blobs)).state).toBe('confirmed');
+  await expect(db.enqueue(s,{...data,id:a.id},{p:new Blob(['y'])})).rejects.toThrow('immutable');
+  db.close();
+ });
+ it('canonical snapshot clone failure rolls back receipt confirmation and blob deletion',async()=>{
+  const db=await fresh(),a=await db.enqueue(s,input(),{p:new Blob(['x'])});
+  await db.lease(s,'owner',Date.now(),10000);
+  await expect(db.confirmReceipt(s,a.id,{eventId:a.id},'owner',Date.now(),[{key:'bad',value:()=>{}}])).rejects.toThrow();
+  expect((await db.getEvent(s,a.id))?.state).toBe('pending');expect((await db.getBlobs(s,a.id)).p).toBeDefined();db.close();
+ });
  it('expired leader cannot commit; new leader can recover',async()=>{
   const db=await fresh(),e=await db.enqueue(s,input());await db.lease(s,'old',0,10);
   expect(await db.lease(s,'new',11,100)).toBe(true);
