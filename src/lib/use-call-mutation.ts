@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
-import {clearCustomerCall,recordCustomerCall,CustomerCallConflictError,type CustomerCallBooking,type CustomerCallReceipt} from './customer-calls';
+import {CustomerCallConflictError,type CustomerCallBooking,type CustomerCallReceipt} from './customer-calls';
+import {offlineClearCustomerCall as clearCustomerCall,offlineRecordCustomerCall as recordCustomerCall} from './offline-actions';
 import {t as tr} from './i18n';
 export const canClearCall=(b:CustomerCallBooking,known:boolean)=>known&&b.status==='confirmed'&&b.checked_out_at===null&&Number.isSafeInteger(b.lifecycle_revision)&&(b.lifecycle_revision??-1)>=0&&!!b.customer_called_at&&Number.isFinite(Date.parse(b.customer_called_at));
 type Action='clear'|'record'|'repeat';

@@ -2,8 +2,9 @@ import {t as tr} from './i18n';
 import React,{useEffect,useRef,useState} from 'react';
 import {Undo2} from 'lucide-react';
 import type {Booking} from '../model';
-import {undoHandover,canUndoHandover} from './handover-undo';
+import {canUndoHandover} from './handover-undo';
 
+import {offlineUndoHandover as undoHandover} from './offline-actions';
 type Act='in'|'out';
 const NAME:Record<Act,string>={in:'Check-in',out:'Check-out'};
 export const expectedAt=(b:Booking,a:Act)=>(a==='in'?b.checked_in_at:b.checked_out_at)||'';
