@@ -167,5 +167,18 @@ await reject(async()=>chained(randomUUID(),randomUUID()),'PT409');
 await user(admin);await reject(async()=>chained(randomUUID()),'PT409');
 await user(driver);
 await reject(async()=>chained(chainID,null),'23514');
+// Chained calls/undo ignore predicted client clocks, bind immutable predecessor snapshot.
+b=await fresh();await user(driver);
+const cfirst=await sync(b,'customer_call',callPayload);
+const cid=randomUUID(),predictedClear={expected_called_at:'2099-01-01T00:00:00Z',expected_lifecycle_revision:999};
+const clearChain=(payload=predictedClear)=>(db.query('select public.sync_booking_event($1,$2,0,$3,$4::jsonb,$5) r',
+ [cid,b.id,'clear_customer_call',JSON.stringify(payload),cfirst.event_id])).then(r=>r.rows[0].r);
+const cclear=await clearChain();eq(cclear.operations.customer_called_at,null);
+eq(await clearChain(),cclear);
+await reject(async()=>clearChain({...predictedClear,expected_lifecycle_revision:998}),'23514');
+const hin=await sync(b,'handover',{action:'in',details:{},media:[],expected_in:null,expected_out:null,expected_revision:0},cclear.version);
+const ures=(await db.query('select public.sync_booking_event($1,$2,$3,$4,$5::jsonb,$6) r',
+ [randomUUID(),b.id,cclear.version,'undo_handover',JSON.stringify({action:'in',expected_at:'2099-01-01T00:00:00Z'}),hin.event_id])).rows[0].r;
+eq(ures.booking.checked_in_at,null);eq(ures.booking.lifecycle_revision,1);
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveWrites:0,note:'PGlite single connection; real multi-session locking not exercised. Duplicate preexisting clear/removals migration omitted; staff pgcrypto unrelated omitted.'}));
 await db.close();
