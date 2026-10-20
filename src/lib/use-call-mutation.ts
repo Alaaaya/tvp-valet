@@ -11,6 +11,7 @@ export function useCallMutation(session:string,{reload,done,onReloaded}:{reload:
  if(last.current!==session){last.current=session;epoch.current++;pending.current=null;blocked.current=false;saving.current=false}
  useEffect(()=>{setBusy(false);setError('');setRetry(false);setStale(false)},[session]);
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;epoch.current++}},[]);
+ const invalidate=()=>{epoch.current++;pending.current=null;blocked.current=false;saving.current=false;setBusy(false);setError('');setRetry(false);setStale(false)};
  const reset=()=>{if(saving.current)return;pending.current=null;blocked.current=false;setError('');setRetry(false);setStale(false)};
  async function run(booking:CustomerCallBooking,action:Action){
   if(saving.current)return;
@@ -35,5 +36,5 @@ export function useCallMutation(session:string,{reload,done,onReloaded}:{reload:
   }catch(e){if(valid()){setRetry(!!pending.current);setError(e instanceof Error?e.message:String(e))}}
   finally{if(valid()){saving.current=false;setBusy(false)}}
  }
- return {busy,error,stale,retry,run,reset};
+ return {busy,error,stale,retry,run,reset,invalidate};
 }
