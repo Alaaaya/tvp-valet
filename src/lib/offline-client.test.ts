@@ -2,11 +2,11 @@ import 'fake-indexeddb/auto';
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest';
 import {openOfflineStore,type OfflineStore} from './offline-store';
 import type {Booking,Employee} from '../model';
-const mock=vi.hoisted(()=>({store:null as unknown as OfflineStore,name:'',online:false,user:'alice',rows:[] as Booking[],ops:[] as unknown[],fail:false,queries:[] as {table:string;range?:number[];signal?:AbortSignal}[],rpc:vi.fn(),upload:vi.fn()}));
+const mock=vi.hoisted(()=>({store:null as unknown as OfflineStore,name:'',online:false,user:'alice',rows:[] as Booking[],ops:[] as unknown[],fail:false,queries:[] as {table:string;range?:number[];signal?:AbortSignal}[],rpc:vi.fn(),upload:vi.fn(),getUser:vi.fn()}));
 vi.mock('./offline-store',async original=>({...await original<typeof import('./offline-store')>(),openOfflineStore:async()=>mock.store}));
-vi.mock('./offline-shell',()=>({registerOfflineShell:vi.fn()}));
+vi.mock('./offline-shell',()=>({registerOfflineShell:vi.fn().mockResolvedValue(null)}));
 vi.mock('../api',()=>({db:{
- auth:{getUser:async()=>({data:{user:{id:mock.user}},error:null})},
+ auth:{getUser:()=>mock.getUser()},
  from:(table:string)=>{
   const entry:{table:string;range?:number[];signal?:AbortSignal}={table};mock.queries.push(entry);
   let identity=false;
@@ -35,7 +35,7 @@ async function boot(online=false){
 }
 beforeEach(async()=>{
  vi.resetModules();mock.name=crypto.randomUUID();mock.store=await (await vi.importActual<typeof import('./offline-store')>('./offline-store')).openOfflineStore(mock.name);mock.online=false;mock.user='alice';mock.rows=[];mock.ops=[];mock.fail=false;mock.queries=[];
- mock.rpc.mockReset();mock.upload.mockReset().mockResolvedValue({error:null});
+ mock.getUser.mockReset().mockImplementation(async()=>({data:{user:{id:mock.user}},error:null}));mock.rpc.mockReset();mock.upload.mockReset().mockResolvedValue({error:null});
  vi.stubGlobal('navigator',{get onLine(){return mock.online}});
 });
 afterEach(async()=>{await client?.startOfflineAccount(null);await client?.retryOffline();mock.store.close();vi.restoreAllMocks();vi.unstubAllGlobals()});
@@ -148,6 +148,51 @@ describe('offline runtime with actual IndexedDB',()=>{
   expect(mock.rpc).toHaveBeenCalledTimes(1);await client.retryOffline();expect(mock.rpc).toHaveBeenCalledTimes(1);
   mock.rpc.mockRejectedValue({code:'PT409'});await client.retryOffline(true);expect(mock.rpc).toHaveBeenCalledTimes(2);
   await client.retryOffline(true);expect(mock.rpc).toHaveBeenCalledTimes(2);expect((await mock.store.list(scope))[0]).toMatchObject({id:r.eventId,state:'conflict'});
+ });
+ it('a real reconnect event automatically drains after joining an older auth run',async()=>{
+  const win=new EventTarget();vi.stubGlobal('window',win);
+  vi.stubGlobal('document',{querySelector:()=>null,activeElement:null});
+  await seed();await boot(true);mock.online=false;win.dispatchEvent(new Event('offline'));const queued=await queue();
+  let release!:(value:unknown)=>void;
+  mock.getUser.mockImplementationOnce(()=>new Promise(resolve=>{release=resolve}));
+  mock.rpc.mockImplementation(async(_name,args)=>({error:null,data:{event_id:args.p_event_id,booking_id:args.p_booking_id,booking:booking({sync_version:2}),version:2}}));
+  mock.online=true;win.dispatchEvent(new Event('online'));
+  await vi.waitFor(()=>expect(release).toBeTypeOf('function'));
+  mock.online=false;win.dispatchEvent(new Event('offline'));
+  mock.online=true;win.dispatchEvent(new Event('online'));
+  release({data:{user:{id:'wrong-old-auth'}},error:null});
+  await vi.waitFor(()=>expect(client.offlineSnapshot().pending).toBe(0));
+  expect(mock.rpc).toHaveBeenCalledTimes(1);
+  expect((await mock.store.list(scope,{includeConfirmed:true}))[0]).toMatchObject({id:queued.eventId,state:'confirmed'});
+ });
+ it.each(['handover','media_append'])('pending %s media persists across restart, isolates accounts and clears after receipt',async kind=>{
+  await seed();await boot();
+  const id=crypto.randomUUID(),path=booking().id+'/'+id+'-photo.jpg';
+  const metadata={id:'photo',path,kind:'photo',mime_type:'image/jpeg',captured_at:'2026-10-20T12:00:00Z',size_bytes:5};
+  const queued=await queue({id,kind,payload:{action:'in',media:[metadata]},blobs:{photo:new Blob(['photo'],{type:'image/jpeg'})}});
+  expect(await client.pendingOfflineMedia(booking().id)).toHaveLength(1);
+  await client.startOfflineAccount(null);await client.startOfflineAccount(alice);
+  const persisted=await client.pendingOfflineMedia(booking().id);
+  expect(persisted[0].item).toEqual({...metadata,action:'in'});expect(await persisted[0].blob.text()).toBe('photo');
+  await client.startOfflineAccount(bob);expect(await client.pendingOfflineMedia(booking().id)).toEqual([]);
+  await client.startOfflineAccount(alice);
+  await mock.store.lease(scope,'media-receipt',Date.now(),10000);
+  await mock.store.confirmReceipt(scope,queued.eventId,{eventId:queued.eventId,booking:booking({sync_version:2})},'media-receipt');
+  await mock.store.release(scope,'media-receipt');
+  expect(await client.pendingOfflineMedia(booking().id)).toEqual([]);expect(await mock.store.getBlobs(scope,id)).toEqual({});
+ });
+ it('shell activation guard protects dialogs, all forms, focused drafts and pending changes',async()=>{
+  const win=new EventTarget();vi.stubGlobal('window',win);
+  let protectedNode=false,focused=false;const query=vi.fn((_selector:string)=>protectedNode?{}:null);
+  vi.stubGlobal('document',{querySelector:query,get activeElement(){return focused?{matches:()=>true}:null}});
+  await seed();await boot();
+  const {registerOfflineShell}=await import('./offline-shell');
+  const options=vi.mocked(registerOfflineShell).mock.calls.at(-1)![0];
+  expect(options.isBlocked()).toBe(false);
+  protectedNode=true;expect(options.isBlocked()).toBe(true);
+  expect(query.mock.calls.at(-1)![0]).toContain('form,[role="dialog"],[role="alertdialog"]');
+  protectedNode=false;focused=true;expect(options.isBlocked()).toBe(true);
+  focused=false;await queue();expect(options.isBlocked()).toBe(true);
  });
  it('a deferred RPC after account switch cannot acknowledge or leak the old account projection',async()=>{
   await seed();await boot(true);mock.online=false;const r=await queue();
