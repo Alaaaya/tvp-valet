@@ -12,3 +12,5 @@ describe('offline UI integration',()=>{
  it('review discard requires explicit confirmation and tail handling',()=>{const s=readFileSync('src/lib/offline-status.tsx','utf8');expect(s).toContain('window.confirm(');expect(s).toContain('discardOfflineFrom(sequence,true)');expect(s).toContain('event.createdAt');expect(s).toContain('event.error')});
  it('all date search uses cached fallback and preserves day counts',()=>{const s=readFileSync('src/main.tsx','utf8');expect(s).toContain("partial:cached");expect(s).toContain("source:cached?'cache':'online'");expect(s).toContain("mfUser,'',liveFor)")});
 });
+
+it('call, handover and undo callbacks distinguish local pending receipts',()=>{const s=readFileSync('src/main.tsx','utf8');expect(s).toContain('(receipt as typeof receipt & {offline_pending?:boolean}).offline_pending?');expect(s).toContain('nb.offline_pending?tr("Lokal gespeichert · wartet auf Synchronisierung"):flow.action');expect(s).toContain('nb.offline_pending?tr("Lokal gespeichert · wartet auf Synchronisierung"):tr("Rückgängig gemacht")');});
