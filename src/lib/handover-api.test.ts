@@ -90,9 +90,19 @@ describe('standalone media ledger and local blobs',()=>{
   mock.list.mockResolvedValue({data:[{id:'storage',name:'one.jpg',metadata:{mimetype:'image/jpeg',size:7}}]});
   const items=await listBookingMedia(bid);expect(items).toHaveLength(1);expect(items[0]).toMatchObject({id:'standalone',size_bytes:7,bucket:'booking-media'});
  });
- it('does not suppress missing ledger or permission errors',async()=>{
-  mock.gallery.mockResolvedValue({error:{code:'42P01',message:'missing table'}});
-  await expect(listBookingMedia(bid)).rejects.toMatchObject({code:'42P01'});
+ it('tolerates only a known-missing optional ledger and keeps legacy media',async()=>{
+  mock.metadata.mockResolvedValue({data:[{id:'m1',path:bid+'/a.jpg',kind:'photo',mime_type:'image/jpeg',captured_at:'2026-01-01',size_bytes:1,booking_handovers:{undone_at:null,undone_by:null}}],error:null});
+  mock.list.mockResolvedValue({data:[],error:null});
+  for(const code of ['42P01','PGRST205']){
+   mock.gallery.mockResolvedValue({error:{code,message:'missing table'}});
+   expect((await listBookingMedia(bid)).map(x=>x.id)).toEqual(['m1']);
+  }
+ });
+ it('still surfaces permission and other ledger errors',async()=>{
+  for(const code of ['42501','500','PGRST301']){
+   mock.gallery.mockResolvedValue({error:{code,message:'x'}});
+   await expect(listBookingMedia(bid)).rejects.toMatchObject({code});
+  }
  });
  it('local media access never contacts storage',async()=>{
   const blob=new Blob(['local'],{type:'image/jpeg'}),item={id:'local',path:'never',kind:'photo' as const,mime_type:'image/jpeg',captured_at:'',size_bytes:5,local_blob:blob};

@@ -39,8 +39,9 @@ export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  if(result.error)throw result.error;
  const items:MediaItem[]=(result.data||[]).map((row:MediaItem&{booking_handovers?:{undone_at:string|null;undone_by:string|null}|{undone_at:string|null;undone_by:string|null}[]})=>{const {booking_handovers,...item}=row;const history=Array.isArray(booking_handovers)?booking_handovers[0]:booking_handovers;return{...item,undone_at:history?.undone_at||null,undone_by:history?.undone_by||null}});
  const gallery=await d.from('booking_gallery_media').select('*').eq('booking_id',bookingId).order('captured_at');
- if(gallery.error)throw gallery.error;
- for(const row of gallery.data||[]){
+ // The gallery ledger is optional: tolerate only a known-missing schema, keep legacy data, surface every other error.
+ if(gallery.error&&!['PGRST205','42P01'].includes((gallery.error as {code?:string}).code||''))throw gallery.error;
+ for(const row of gallery.error?[]:gallery.data||[]){
   if(items.some(x=>x.id===row.id||x.path===row.path))continue;
   items.push({id:row.id,path:row.path,bucket:row.bucket||'booking-media',kind:row.kind,mime_type:row.mime_type,captured_at:row.captured_at,size_bytes:Number(row.size_bytes??row.bytes??0)});
  }

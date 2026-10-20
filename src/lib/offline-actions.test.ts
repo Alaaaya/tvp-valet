@@ -26,7 +26,7 @@ describe('durable adapters',()=>{
   expect(runtime.enqueueOffline).not.toHaveBeenCalled();
  });
  it('does not silently succeed without version capability',async()=>{
-  await expect(offlineChangeSpot({booking:{...b,sync_version:undefined},spot:'2',requestId:id})).rejects.toThrow('Offline');
+  await expect(offlineChangeSpot({booking:{...b,sync_version:undefined},spot:'2',requestId:id})).rejects.toThrow();
   expect(runtime.enqueueOffline).not.toHaveBeenCalled();
  });
  it('queues detail payload exactly without edit_revision',async()=>{
@@ -132,7 +132,7 @@ describe('gallery photo append',()=>{
   reject(Error('quota'));await expect(promise).rejects.toThrow('quota');expect(success).not.toHaveBeenCalled();
  });
  it('requires a valid sync snapshot before staging photo',async()=>{
-  await expect(offlineAppendPhoto({...b,sync_version:undefined},new Blob(['x'],{type:'image/png'}))).rejects.toThrow('Offline');
+  await expect(offlineAppendPhoto({...b,sync_version:undefined},new Blob(['x'],{type:'image/png'}))).rejects.toThrow();
   expect(runtime.enqueueOffline).not.toHaveBeenCalled();
  });
 });

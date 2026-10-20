@@ -4053,5 +4053,15 @@
     "No offline account",
     "Kein Konto für die Offline-Nutzung gespeichert",
     "لا يوجد حساب محفوظ للاستخدام دون اتصال"
+  ],
+  "Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.": [
+    "Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.",
+    "Offline changes are disabled. Please save while online.",
+    "التعديلات دون اتصال معطّلة. يرجى الحفظ أثناء الاتصال بالإنترنت."
+  ],
+  "Zahlung gespeichert": [
+    "Zahlung gespeichert",
+    "Payment saved",
+    "تم حفظ الدفعة"
   ]
 }
