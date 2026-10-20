@@ -142,7 +142,8 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
     };
     const onFresh = (id: unknown, el: EventTarget | null) => { sup.fresh(); ownerId = null; originEl = null; startId = id; startEl = el; };
     const onKey = () => sup.clear();
-    const inRoot = (t: EventTarget | null) => !!(t && ref.current && ref.current.contains(t as Node));
+    const inDrawer = (t: EventTarget | null) => t instanceof Element && !!t.closest('.sidebar');
+    const inRoot = (t: EventTarget | null) => !inDrawer(t) && !!(t && ref.current && ref.current.contains(t as Node));
     const onTouchStart = (ev: TouchEvent) => {
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
@@ -151,6 +152,7 @@ export function useEdgeBack(ref: RefObject<HTMLElement | null>, opts: EdgeBackOp
       ctl.start(t.identifier, t.clientX, t.clientY, ev.target as unknown as ElementLike, getOx);
     };
     const onTouchMove = (ev: TouchEvent) => {
+      if (inDrawer(ev.target)) { ctl.cancel(); return; }
       if (ev.touches.length > 1) { ctl.cancel(); return; }
       const t = ev.touches[0];
       if (lockMove(t.identifier, ctl.move(t.identifier, t.clientX, t.clientY)) && ev.cancelable) ev.preventDefault();

@@ -3703,5 +3703,55 @@
     "Print all bookings",
     "Alle Buchungen drucken",
     "طباعة كل الحجوزات"
+  ],
+  "Tag drucken": [
+    "Print day",
+    "Tag drucken",
+    "طباعة يوم"
+  ],
+  "Druckauswahl": [
+    "Print selection",
+    "Druckauswahl",
+    "اختيار الطباعة"
+  ],
+  "Ankünfte": [
+    "Arrivals",
+    "Ankünfte",
+    "الوصول"
+  ],
+  "Rückgaben": [
+    "Returns",
+    "Rückgaben",
+    "الإرجاع"
+  ],
+  "Druckdatum": [
+    "Print date",
+    "Druckdatum",
+    "تاريخ الطباعة"
+  ],
+  "Buchungen zum Drucken": [
+    "Bookings to print",
+    "Buchungen zum Drucken",
+    "حجوزات للطباعة"
+  ],
+  "Stornierte Buchungen werden nicht gedruckt.": [
+    "Cancelled bookings are not printed.",
+    "Stornierte Buchungen werden nicht gedruckt.",
+    "لا تُطبع الحجوزات الملغاة."
+  ],
+  "Keine Buchungen für diese Auswahl.": [
+    "No bookings for this selection.",
+    "Keine Buchungen für diese Auswahl.",
+    "لا توجد حجوزات لهذا الاختيار."
+  ],
+  "Bitte ein gültiges Datum wählen.": [
+    "Choose a valid date.",
+    "Bitte ein gültiges Datum wählen.",
+    "اختر تاريخاً صالحاً."
+  ],
+  "Buchungen werden geladen …": [
+    "Loading bookings …",
+    "Buchungen werden geladen …",
+    "جارٍ تحميل الحجوزات …"
   ]
 }

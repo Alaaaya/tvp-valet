@@ -1,0 +1,28 @@
+/* The fixed drawer itself scrolls, including its footer. Never shrink the navigation to fit. */
+.app > .sidebar{
+ height:100vh;height:100dvh;min-height:0;
+ overflow-y:auto;overflow-x:hidden;
+ -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y;
+ padding-bottom:calc(32px + env(safe-area-inset-bottom))!important;
+}
+.app > .sidebar > :not(.drawer-close){flex-shrink:0;min-width:0;max-width:100%}
+.app > .sidebar nav{min-height:0}
+.app > .sidebar nav button{min-width:0;max-width:100%;height:auto;text-align:start}
+.app > .sidebar nav button > span{min-width:0;overflow-wrap:anywhere}
+.app > .sidebar nav button svg{flex-shrink:0}
+.app > .sidebar .sidebar-bottom{flex-shrink:0;padding-top:16px}
+.app > .sidebar .drawer-user span{min-width:0;overflow-wrap:anywhere}
+.app > .sidebar .nav-soon{white-space:normal}
+.day-print-backdrop{position:fixed;inset:0;z-index:65;background:#20302db3;display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain}
+.day-print-dialog{width:100%;max-width:360px;max-height:calc(100dvh - 40px);min-height:0;overflow-y:auto;background:#fff;color:#243a3c;border-radius:14px;padding:22px;box-shadow:0 12px 40px #0003;outline:none}
+.day-print-dialog h2{font-size:21px;margin:0 0 18px}
+.day-print-dialog label{font-size:14px}
+.day-print-dialog input[type=date]{min-width:0;font-size:16px}
+.day-print-types{display:flex;gap:16px;border:0;padding:0;margin:0 0 20px}
+.day-print-types legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.day-print-types label{flex-direction:row;align-items:center;gap:7px}
+.day-print-types input{width:18px;height:18px;min-height:18px;padding:0;accent-color:#0c5746}
+.day-print-count{display:flex;justify-content:space-between;margin:20px 0 8px}
+.day-print-dialog small{display:block;line-height:1.5}
+.day-print-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+.day-print-dialog .error{display:block;margin-top:12px}

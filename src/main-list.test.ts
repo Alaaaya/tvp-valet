@@ -5,7 +5,7 @@ it('main list is compact and ParkingPro-like',()=>{
  expect(s).not.toContain('className="filter chosen');
  expect(s).toMatch(/className="cam-search"/);expect(s).toContain('setScanOpen(true)');expect(s).toContain('<BookingScanSheet onLookup={onScan}');expect(s).not.toContain('Kennzeichenerkennung noch nicht verfügbar');
  expect(s).toMatch(/date\.split\('-'\)\.reverse\(\)\.join\('\.'\)/);expect(s).toMatch(/date!==day\(\)&&<button className="today-btn"/);
- expect(s).toContain('<PrintSheetsButton items={bookingsForPrintDay(rows,date)} date={date}');expect(s).not.toMatch(/CSV exportieren/);
+ expect(s).toContain('<DayPrintDialog');expect(s).toContain('setPrintOpen(true)');expect(s).not.toContain('bookingsForPrintDay(rows,date)');expect(s).not.toMatch(/CSV exportieren/);
  expect((s.match(/aria-label=\{tr\("Filter"\)\}/g)||[]).length).toBe(1);
  expect(s.indexOf('className="counters"')).toBeLessThan(s.indexOf('className="search-row"'));
  expect(s.indexOf('className="search-row"')).toBeLessThan(s.indexOf('className="date-strip"'));
