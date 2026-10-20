@@ -3,7 +3,7 @@ import {describe,it,expect,vi} from 'vitest';
 import {openDB} from 'idb';
 import {openOfflineStore, type OfflineStore, type OfflineScope} from './offline-store';
 import {OfflineSync,OfflineSyncError} from './offline-sync';
-const s={accountId:'alice',role:'admin'},other={accountId:'bob',role:'admin'};
+const s={userId:'alice',role:'admin'},other={userId:'bob',role:'admin'};
 const input=()=>({bookingId:'booking',kind:'edit',payload:{name:'A'},baseline:{version:1}});
 const fresh=()=>openOfflineStore(crypto.randomUUID());
 function sync(store:OfflineStore,execute:any,extra:any={}){
@@ -41,7 +41,7 @@ describe('durable outbox public contract',()=>{
  });
  it('upgrades v1 without losing snapshots',async()=>{
   const name=crypto.randomUUID(),legacy=await openDB(name,1,{upgrade(db){
-   db.createObjectStore('snapshots');db.createObjectStore('events',{keyPath:'id'}).createIndex('account','accountId');
+   db.createObjectStore('snapshots');db.createObjectStore('events',{keyPath:'id'}).createIndex('account','userId');
    db.createObjectStore('blobs',{keyPath:'id'});db.createObjectStore('counters');
   }});
   await legacy.put('snapshots',[9],JSON.stringify(['alice','admin','day']));legacy.close();
@@ -109,6 +109,27 @@ describe('durable outbox public contract',()=>{
   expect(await engine.run()).toMatchObject({nextAttempt:11000});time=11000;
   expect(await engine.run()).toMatchObject({nextAttempt:13000});
   expect((await db.list(s))[0]).toMatchObject({id:e.id,attempts:2,state:'pending'});db.close();
+ });
+ it('retry preserves exact ID and payload and cannot reorder a tail event',async()=>{
+  const db=await fresh(),a=await db.enqueue(s,input()),b=await db.enqueue(s,input());
+  await expect(db.retry(s,b.id)).rejects.toThrow('head');
+  expect(await db.retry(s,a.id)).toMatchObject({id:a.id,payload:a.payload,baseline:a.baseline,schemaVersion:1});db.close();
+ });
+ it('subscription fires only after durable local commit and unsubscribe works',async()=>{
+  const db=await fresh(),fn=vi.fn(),off=db.subscribe(fn);
+  await db.enqueue(s,input());expect(fn).toHaveBeenCalledTimes(1);
+  off();await db.enqueue(s,input());expect(fn).toHaveBeenCalledTimes(1);db.close();
+ });
+ it('Web Locks busy response avoids any execution',async()=>{
+  const db=await fresh();await db.enqueue(s,input());const execute=vi.fn();
+  vi.stubGlobal('navigator',{locks:{request:vi.fn(async(_n:any,_o:any,fn:any)=>fn(null))}});
+  try{expect(await sync(db,execute).run()).toEqual({reason:'busy'});expect(execute).not.toHaveBeenCalled();}
+  finally{vi.unstubAllGlobals();db.close();}
+ });
+ it('cross-tab subscription receives committed updates',async()=>{
+  const name=crypto.randomUUID(),a=await openOfflineStore(name),b=await openOfflineStore(name);
+  const notified=new Promise<void>(resolve=>b.subscribe(resolve));
+  await a.enqueue(s,input());await notified;expect((await b.list(s)).length).toBe(1);a.close();b.close();
  });
  it('expired leader cannot commit; new leader can recover',async()=>{
   const db=await fresh(),e=await db.enqueue(s,input());await db.lease(s,'old',0,10);
