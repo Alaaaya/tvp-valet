@@ -4,7 +4,7 @@ import {displayComment} from './comments';
 
 /** One printable A4 booking sheet. Every field is plain text; empty string means "leave the line blank". */
 export type SheetData={
- code:string;title:string;daysPersons:string;
+ code:string;title:string;daysPersons:string;days:string;
  name:string;email:string;phone:string;source:string;
  brand:string;model:string;plate:string;color:string;
  dropoff:string;dropoffFlight:string;pickup:string;pickupFlight:string;
@@ -38,9 +38,7 @@ export function vehicleFields(b:Pick<Booking,'comment'|'car_description'>):{bran
  const raw=b.comment||'';
  const pick=(key:string)=>{const m=raw.match(new RegExp('"'+key+'"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));if(!m)return '';try{return String(JSON.parse('"'+m[1]+'"')).trim()}catch{return m[1].trim()}};
  const brand=pick('brand'),model=pick('type'),color=pick('color');
- const desc=(b.car_description||'').trim()||pick('description');
- if(brand||model||color)return{brand:brand||desc,model,color};
- return{brand:desc,model:'',color:''};
+ return{brand,model,color};
 }
 export function sheetTitle(b:Pick<Booking,'product'|'covered'>):string{
  const valet=/-V-/i.test(b.product||'');
@@ -49,7 +47,7 @@ export function sheetTitle(b:Pick<Booking,'product'|'covered'>):string{
 }
 function moneyBlock(b:Pick<Booking,'total'|'paid'>){
  const total=Number(b.total),paid=Number(b.paid);
- if(!Number.isFinite(total)||total<=0){
+ if(!Number.isFinite(total)||total<0){
   const p=Number.isFinite(paid)&&paid>0?euro(paid):'';
   return{paid:p,due:'',net:'',subtotal:'',vat:'',total:'',paidAmount:p,cashOnSite:''};
  }
@@ -62,7 +60,7 @@ export function sheetData(b:Booking):SheetData{
  const v=vehicleFields(b);
  const name=(b.customer_name||'').trim()||[b.first_name,b.last_name].filter(Boolean).join(' ').trim();
  return{
-  code:b.code||b.external_id||'',title:sheetTitle(b),daysPersons:sheetDays(b)+' / '+(b.persons>0?b.persons:1),
+  code:b.code||b.external_id||'',title:sheetTitle(b),days:String(sheetDays(b)),daysPersons:sheetDays(b)+' / '+(b.persons>0?b.persons:''),
   name,email:(b.email||'').trim(),phone:(b.phone||'').trim(),source:(b.platform||'').trim(),
   brand:v.brand,model:v.model,plate:(b.plate||'').trim(),color:v.color,
   dropoff:sheetStamp(b.arrival_at),dropoffFlight:(b.flight_in||'').trim(),
@@ -76,4 +74,14 @@ export function sheetsFor(items:readonly {b:Booking}[]):SheetData[]{
  const seen=new Set<string>(),out:SheetData[]=[];
  for(const {b} of items){if(seen.has(b.id))continue;seen.add(b.id);out.push(sheetData(b))}
  return out;
+}
+
+/** All scheduled arrivals and departures for the selected Berlin calendar day, not the filtered list. */
+export function bookingsForPrintDay(rows:readonly Booking[],date:string):{b:Booking}[]{
+ const seen=new Set<string>();
+ return rows.filter(b=>{
+  if(b.status==='cancelled'||seen.has(b.id))return false;
+  const matches=[b.arrival_at,b.departure_at].some(iso=>iso&&Number.isFinite(Date.parse(iso))&&formatInTimeZone(iso,TZ,'yyyy-MM-dd')===date);
+  if(matches)seen.add(b.id);return matches;
+ }).map(b=>({b}));
 }

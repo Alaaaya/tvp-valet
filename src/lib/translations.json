@@ -3658,5 +3658,15 @@
     "Could not create PDF",
     "PDF konnte nicht erstellt werden",
     "تعذّر إنشاء ملف PDF"
+  ],
+  "Drucken": [
+    "Print",
+    "Drucken",
+    "طباعة"
+  ],
+  "Alle Buchungen drucken": [
+    "Print all bookings",
+    "Alle Buchungen drucken",
+    "طباعة كل الحجوزات"
   ]
 }
