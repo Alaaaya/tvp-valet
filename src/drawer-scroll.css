@@ -6,7 +6,8 @@
  padding-bottom:calc(32px + env(safe-area-inset-bottom))!important;
 }
 .app > .sidebar > :not(.drawer-close){flex-shrink:0;min-width:0;max-width:100%}
-.app > .sidebar nav{min-height:0}
+/* Override the old mobile bottom-nav space-around alignment, not its working scroll. */
+.app > .sidebar nav{min-height:0;width:100%;grid-template-columns:minmax(0,1fr);justify-content:stretch}
 .app > .sidebar nav button{min-width:0;max-width:100%;height:auto;text-align:start}
 .app > .sidebar nav button > span{min-width:0;overflow-wrap:anywhere}
 .app > .sidebar nav button svg{flex-shrink:0}
