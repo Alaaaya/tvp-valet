@@ -25,3 +25,4 @@
 .staff-add label{gap:5px;font-size:12px}
 .staff-add input,.staff-add select{min-height:40px;padding:8px 10px}
 .staff-add .primary{min-height:42px}
+.staff-email{flex-basis:100%;font-size:12px;color:var(--muted,#708078);overflow-wrap:anywhere;min-width:0}

@@ -72,3 +72,30 @@ export async function clearCustomerCall({booking,requestId}:{
   throw new Error(tr("Keine Bestätigung vom Server"));
  return data as CustomerCallReceipt;
 }
+/** Remove only the displayed current call. Retain this snapshot and UUID for retries. */
+export async function removeCustomerCall({booking,requestId}:{
+ booking:CustomerCallBooking;requestId:string;
+}):Promise<CustomerCallReceipt>{
+ if(!uuid.test(requestId)||!uuid.test(booking.id))throw new Error(tr("Ungültige Anfrage-ID"));
+ if(!booking.customer_called_at||!Number.isFinite(Date.parse(booking.customer_called_at))||
+  booking.lifecycle_revision===undefined||!Number.isSafeInteger(booking.lifecycle_revision)||booking.lifecycle_revision<0||
+  booking.checked_out_at===undefined||
+  (booking.checked_out_at!==null&&!Number.isFinite(Date.parse(booking.checked_out_at))))
+  throw new Error(tr("Ungültiger Buchungsstand. Bitte neu laden."));
+ if(booking.status!=='confirmed'||booking.checked_out_at!==null)throw new Error(tr("Anruf nur für offene bestätigte Buchungen."));
+ if(!db)throw new Error(tr("Backend nicht eingerichtet"));
+ const {data,error}=await db.rpc('clear_booking_customer_call',{
+  p_request_id:requestId,p_booking_id:booking.id,p_expected_called_at:booking.customer_called_at,
+  p_expected_lifecycle_revision:booking.lifecycle_revision
+ });
+ if(error){
+  if(error.code==='PT409'||error.code==='40001')throw new CustomerCallConflictError();
+  if(error.code==='42501')throw new Error(tr("Keine Berechtigung für diese Aktion."));
+  throw new Error(error.message||tr("Anruf konnte nicht gespeichert werden"));
+ }
+ if(!data||data.receipt_id!==requestId||!Number.isFinite(Date.parse(data.occurred_at))||
+  (data.customer_called_at!==null&&!Number.isFinite(Date.parse(data.customer_called_at)))||
+  !Number.isSafeInteger(data.lifecycle_revision)||data.lifecycle_revision<0)
+  throw new Error(tr("Keine Bestätigung vom Server"));
+ return data as CustomerCallReceipt;
+}
