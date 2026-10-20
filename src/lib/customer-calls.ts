@@ -4,6 +4,10 @@ import type {Booking} from '../model';
 
 export type CustomerCallBooking=Booking&{customer_called_at?:string|null;lifecycle_revision?:number};
 export type CustomerCallReceipt={receipt_id:string;occurred_at:string;customer_called_at:string|null;lifecycle_revision:number};
+export class CustomerCallConflictError extends Error {
+ readonly code='PT409';
+ constructor(){super(tr("Die Buchung wurde inzwischen geändert. Bitte neu laden."));this.name='CustomerCallConflictError';}
+}
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** Persist a confirmed call, not a phone-link click. Repeat needs an explicit UI confirmation.
  * Keep requestId AND original booking snapshot on network retry; reload booking after success.
@@ -15,7 +19,7 @@ export async function recordCustomerCall({booking,requestId,allowRepeat=false}:{
  if(booking.customer_called_at===undefined||booking.lifecycle_revision===undefined||
   !Number.isSafeInteger(booking.lifecycle_revision)||booking.lifecycle_revision<0)
   throw new Error(tr("Ungültiger Buchungsstand. Bitte neu laden."));
- if(booking.status!=='confirmed'||booking.checked_out_at)
+ if(booking.status!=='confirmed'||booking.checked_out_at!==null)
   throw new Error(tr("Anruf nur für offene bestätigte Buchungen."));
  if(booking.customer_called_at&&!allowRepeat)throw new Error(tr("Erneuten Anruf bitte ausdrücklich bestätigen."));
  if(!db)throw new Error(tr("Backend nicht eingerichtet"));
@@ -26,7 +30,7 @@ export async function recordCustomerCall({booking,requestId,allowRepeat=false}:{
   p_expected_lifecycle_revision:booking.lifecycle_revision,p_allow_repeat:allowRepeat
  });
  if(error){
-  if((error.code==='PT409'||error.code==='40001'))throw new Error(tr("Die Buchung wurde inzwischen geändert. Bitte neu laden."));
+  if((error.code==='PT409'||error.code==='40001'))throw new CustomerCallConflictError();
   if(error.code==='42501')throw new Error(tr("Keine Berechtigung für diese Aktion."));
   throw new Error(error.message||tr("Anruf konnte nicht gespeichert werden"));
  }
@@ -47,7 +51,7 @@ export async function clearCustomerCall({booking,requestId}:{
  if(booking.customer_called_at===undefined||booking.lifecycle_revision===undefined||
   !Number.isSafeInteger(booking.lifecycle_revision)||booking.lifecycle_revision<0)
   throw new Error(tr("Ungültiger Buchungsstand. Bitte neu laden."));
- if(booking.status!=='confirmed'||booking.checked_out_at)
+ if(booking.status!=='confirmed'||booking.checked_out_at!==null)
   throw new Error(tr("Anruf nur für offene bestätigte Buchungen."));
  if(!booking.customer_called_at||!Number.isFinite(Date.parse(booking.customer_called_at)))
   throw new Error(tr("Kein Anruf zum Löschen vorhanden."));
@@ -58,7 +62,7 @@ export async function clearCustomerCall({booking,requestId}:{
   p_expected_lifecycle_revision:booking.lifecycle_revision
  });
  if(error){
-  if((error.code==='PT409'||error.code==='40001'))throw new Error(tr("Die Buchung wurde inzwischen geändert. Bitte neu laden."));
+  if((error.code==='PT409'||error.code==='40001'))throw new CustomerCallConflictError();
   if(error.code==='42501')throw new Error(tr("Keine Berechtigung für diese Aktion."));
   throw new Error(error.message||tr("Anruf konnte nicht gelöscht werden"));
  }
