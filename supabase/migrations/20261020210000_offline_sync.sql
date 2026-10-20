@@ -42,11 +42,35 @@ for each row execute function private.immutable_booking_detail_receipt();
 create trigger booking_sync_receipts_audit after insert on public.booking_sync_receipts
 for each row execute function private.audit_change();
 
+-- Standalone photos are not handovers. Deferred FK commits links and receipt atomically.
+create table public.booking_gallery_media(
+ id uuid primary key,
+ event_id uuid not null references public.booking_sync_receipts(id) on delete restrict deferrable initially deferred,
+ booking_id uuid not null references public.bookings(id) on delete restrict,
+ actor_id uuid not null references public.profiles(id) on delete restrict,
+ path text not null unique,
+ kind text not null default 'photo' check(kind='photo'),
+ mime_type text not null check(mime_type in ('image/jpeg','image/png','image/webp')),
+ size_bytes bigint not null check(size_bytes between 1 and 10485760),
+ captured_at timestamptz not null,
+ created_at timestamptz not null default clock_timestamp()
+);
+create index booking_gallery_media_booking_idx on public.booking_gallery_media(booking_id,created_at);
+alter table public.booking_gallery_media enable row level security;
+revoke all on public.booking_gallery_media from public,anon,authenticated,service_role;
+grant select on public.booking_gallery_media to authenticated;
+create policy booking_gallery_media_staff_read on public.booking_gallery_media for select to authenticated
+ using((select private.is_staff()) and exists(select 1 from public.bookings b where b.id=booking_id));
+create trigger booking_gallery_media_immutable before update or delete on public.booking_gallery_media
+for each row execute function private.immutable_booking_detail_receipt();
+create trigger booking_gallery_media_audit after insert on public.booking_gallery_media
+for each row execute function private.audit_change();
+
 create function public.sync_booking_event(
  p_event_id uuid,p_booking_id uuid,p_expected_version bigint,p_action text,p_payload jsonb,p_predecessor_id uuid default null
 ) returns jsonb language plpgsql security definer set search_path='' as $$
 declare b public.bookings;r public.booking_sync_receipts;pre public.booking_sync_receipts;allowed text[];baseline bigint;
- result jsonb;response jsonb;ops jsonb;rev bigint;lock_seed bigint;collision boolean;effective jsonb;snapshot jsonb;canonical jsonb;
+ result jsonb;response jsonb;ops jsonb;rev bigint;lock_seed bigint;collision boolean;effective jsonb;snapshot jsonb;canonical jsonb;item jsonb;metadata jsonb;photo_id uuid;photo_path text;photo_mime text;photo_size bigint;photo_at timestamptz;
 begin
  if auth.uid() is null or not private.is_staff() then
   raise exception 'Active staff required' using errcode='42501'; end if;
@@ -74,6 +98,7 @@ begin
   when 'safe_edit' then array['patch','expected']
   when 'operation' then array['action']
   when 'update_ops' then array['patch']
+  when 'media_append' then array['media']
   else null end;
  if allowed is null or not(p_payload ?& allowed)
  or exists(select 1 from jsonb_object_keys(p_payload) k where not(k=any(allowed))) then
@@ -167,6 +192,45 @@ begin
   if effective->>'action' is null or effective->>'action' not in ('taken_away','retrieved','ride_started') then
    raise exception 'Use dedicated customer_call event' using errcode='22023'; end if;
   result:=to_jsonb(public.record_booking_operation(p_booking_id,effective->>'action'));
+ when 'media_append' then
+  if jsonb_typeof(effective->'media') is distinct from 'array'
+   or jsonb_array_length(effective->'media') not between 1 and 40 then
+   raise exception 'Expected 1 to 40 gallery photos' using errcode='22023'; end if;
+  for item in select value from jsonb_array_elements(effective->'media') loop
+   if jsonb_typeof(item)<>'object' then raise exception 'Invalid photo' using errcode='22023'; end if;
+   if not(item ?& array['id','path','kind','mime_type','captured_at','size_bytes'])
+    or exists(select 1 from jsonb_object_keys(item) k where k not in
+     ('id','path','kind','mime_type','captured_at','size_bytes'))
+    or exists(select 1 from jsonb_each(item) e where
+     (e.key='size_bytes' and jsonb_typeof(e.value)<>'number')
+     or (e.key<>'size_bytes' and jsonb_typeof(e.value)<>'string')) then
+    raise exception 'Invalid gallery photo fields' using errcode='22023'; end if;
+   photo_id:=(item->>'id')::uuid;photo_path:=item->>'path';photo_mime:=item->>'mime_type';
+   if item->>'kind'<>'photo' or photo_mime not in ('image/jpeg','image/png','image/webp')
+    or photo_path !~ ('^'||p_booking_id::text||'/'||p_event_id::text||'-'||photo_id::text||'[.][A-Za-z0-9]{1,10}$')
+    or (item->>'size_bytes')::numeric<>trunc((item->>'size_bytes')::numeric)
+    or (item->>'size_bytes')::numeric not between 1 and 10485760 then
+    raise exception 'Invalid gallery MIME, path or size' using errcode='22023'; end if;
+   photo_size:=(item->>'size_bytes')::bigint;
+   if item->>'captured_at' !~ '^\d{4}-\d{2}-\d{2}T.+(Z|[+-]\d{2}:\d{2})$' then
+    raise exception 'Photo timestamp requires timezone' using errcode='22023'; end if;
+   photo_at:=(item->>'captured_at')::timestamptz;
+   if not isfinite(photo_at) or photo_at>clock_timestamp()+interval '5 minutes' then
+    raise exception 'Invalid photo timestamp' using errcode='22023'; end if;
+   select o.metadata into metadata from storage.objects o
+    where o.bucket_id='booking-media' and o.name=photo_path
+     and o.owner_id=auth.uid()::text for share;
+   if not found then raise exception 'Uploaded photo missing' using errcode='23514'; end if;
+   if metadata->>'size' is null or metadata->>'mimetype' is null
+    or (metadata->>'size')::numeric<>photo_size
+    or lower(trim(split_part(metadata->>'mimetype',';',1)))<>photo_mime then
+    raise exception 'Uploaded photo metadata mismatch' using errcode='23514'; end if;
+   insert into public.booking_gallery_media(id,event_id,booking_id,actor_id,path,mime_type,size_bytes,captured_at)
+    values(photo_id,p_event_id,p_booking_id,auth.uid(),photo_path,photo_mime,photo_size,photo_at);
+  end loop;
+  update public.bookings set sync_version=sync_version where id=p_booking_id;
+  select jsonb_build_object('media',jsonb_agg(to_jsonb(g) order by g.id)) into result
+   from public.booking_gallery_media g where event_id=p_event_id;
  when 'update_ops' then
   result:=to_jsonb(public.update_booking_ops(p_booking_id,effective->'patch'));
  end case;
