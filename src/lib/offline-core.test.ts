@@ -148,6 +148,13 @@ describe('durable outbox public contract',()=>{
   await expect(db.confirmReceipt(s,a.id,{eventId:a.id},'owner',Date.now(),[{key:'bad',value:()=>{}}])).rejects.toThrow();
   expect((await db.getEvent(s,a.id))?.state).toBe('pending');expect((await db.getBlobs(s,a.id)).p).toBeDefined();db.close();
  });
+ it('concurrent duplicate UUID across connections returns the same durable event',async()=>{
+  const name=crypto.randomUUID(),a=await openOfflineStore(name),b=await openOfflineStore(name);
+  const id=crypto.randomUUID(),data={...input(),id},blobs={p:new Blob(['same'])};
+  const [one,two]=await Promise.all([a.enqueue(s,data,blobs),b.enqueue(s,data,blobs)]);
+  expect(one.id).toBe(two.id);expect(one.seq).toBe(two.seq);expect(await a.list(s)).toHaveLength(1);
+  a.close();b.close();
+ });
  it('expired leader cannot commit; new leader can recover',async()=>{
   const db=await fresh(),e=await db.enqueue(s,input());await db.lease(s,'old',0,10);
   expect(await db.lease(s,'new',11,100)).toBe(true);
