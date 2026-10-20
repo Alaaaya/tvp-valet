@@ -3638,5 +3638,25 @@
     "by ",
     "von ",
     "بواسطة "
+  ],
+  "Buchungsblätter drucken (PDF)": [
+    "Print booking sheets (PDF)",
+    "Buchungsblätter drucken (PDF)",
+    "طباعة أوراق الحجوزات (PDF)"
+  ],
+  "PDF wird erstellt …": [
+    "Creating PDF …",
+    "PDF wird erstellt …",
+    "جارٍ إنشاء ملف PDF …"
+  ],
+  "PDF öffnen": [
+    "Open PDF",
+    "PDF öffnen",
+    "فتح ملف PDF"
+  ],
+  "PDF konnte nicht erstellt werden": [
+    "Could not create PDF",
+    "PDF konnte nicht erstellt werden",
+    "تعذّر إنشاء ملف PDF"
   ]
 }
