@@ -280,5 +280,20 @@ await db.exec('reset role');await db.query('update public.profiles set active=tr
 await user(driver);
 const afterPhoto=await dependent(b,gallery,'safe_edit',{patch:{comment:'Photo then note'},expected:{...predictedSnapshot,edit_revision:999}});
 eq(afterPhoto.booking.comment,'Photo then note');
+// Storage trigger protects linked bytes even against table-owner/admin bypass of RLS.
+await db.exec('reset role');
+await reject(async()=>db.query("delete from storage.objects where bucket_id='booking-media' and name=$1",[galleryItem.path]),'42501');
+await reject(async()=>db.query("update storage.objects set metadata=$2::jsonb where bucket_id='booking-media' and name=$1",
+ [galleryItem.path,JSON.stringify({size:1,mimetype:'image/png'})]),'42501');
+await reject(async()=>db.query("update storage.objects set name=name||'.moved' where bucket_id='booking-media' and name=$1",[galleryItem.path]),'42501');
+eq((await db.query("select metadata->>'size' as size from storage.objects where bucket_id='booking-media' and name=$1",[galleryItem.path])).rows[0].size,'20');
+const tempPath=b.id+'/'+randomUUID()+'-'+randomUUID()+'.png';
+await db.query("insert into storage.objects(bucket_id,name,metadata) values('booking-media',$1,$2::jsonb)",
+ [tempPath,JSON.stringify({size:20,mimetype:'image/png'})]);
+await db.query("update storage.objects set metadata=$2::jsonb where bucket_id='booking-media' and name=$1",
+ [tempPath,JSON.stringify({size:21,mimetype:'image/png'})]);
+eq((await db.query("select metadata->>'size' as size from storage.objects where name=$1",[tempPath])).rows[0].size,'21');
+await db.query("delete from storage.objects where bucket_id='booking-media' and name=$1",[tempPath]);
+eq((await db.query("select count(*)::int n from storage.objects where name=$1",[tempPath])).rows[0].n,0);
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveWrites:0,note:'PGlite single connection; real multi-session locking not exercised. Duplicate preexisting clear/removals migration omitted; staff pgcrypto unrelated omitted.'}));
 await db.close();

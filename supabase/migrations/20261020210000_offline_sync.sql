@@ -66,6 +66,21 @@ for each row execute function private.immutable_booking_detail_receipt();
 create trigger booking_gallery_media_audit after insert on public.booking_gallery_media
 for each row execute function private.audit_change();
 
+-- Gallery evidence bytes/metadata remain immutable even to storage admin policies.
+-- Unlinked staging objects and legacy/handover-only objects retain existing behavior.
+create function private.protect_linked_gallery_storage() returns trigger
+language plpgsql security definer set search_path='' as $$
+begin
+ if old.bucket_id='booking-media' and exists(
+  select 1 from public.booking_gallery_media g where g.path=old.name) then
+  raise exception 'Linked gallery evidence is immutable' using errcode='42501';
+ end if;
+ return case when tg_op='DELETE' then old else new end;
+end $$;
+revoke all on function private.protect_linked_gallery_storage() from public,anon,authenticated,service_role;
+create trigger protect_linked_gallery_storage before update or delete on storage.objects
+for each row execute function private.protect_linked_gallery_storage();
+
 create function public.sync_booking_event(
  p_event_id uuid,p_booking_id uuid,p_expected_version bigint,p_action text,p_payload jsonb,p_predecessor_id uuid default null
 ) returns jsonb language plpgsql security definer set search_path='' as $$
