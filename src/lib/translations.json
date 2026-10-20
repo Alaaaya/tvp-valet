@@ -3968,5 +3968,20 @@
     "Failed",
     "Fehlgeschlagen",
     "فشل"
+  ],
+  "Zahlungsstand lokal vorgemerkt · noch nicht serverbestätigt.": [
+    "Payment balance recorded locally · not yet server-confirmed.",
+    "Zahlungsstand lokal vorgemerkt · noch nicht serverbestätigt.",
+    "حالة الدفع محفوظة محلياً · لم يؤكدها الخادم بعد."
+  ],
+  "Lokal vorgemerkt": [
+    "Recorded locally",
+    "Lokal vorgemerkt",
+    "مسجّل محلياً"
+  ],
+  "Restbetrag nach Vormerkung": [
+    "Balance after local entry",
+    "Restbetrag nach Vormerkung",
+    "المتبقي بعد التسجيل المحلي"
   ]
 }

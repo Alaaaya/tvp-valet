@@ -117,8 +117,8 @@ export function BookingDetailView(p:BookingDetailViewProps){
     <section className="summary-cost"><h3><ReferenceIcon name="calculator" size={14}/>{tr("Cost overview")}</h3>
       <p><span>{getLanguage()==='ar'?tr("Parking ("):"Parken ("}{p.productLabel||b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>
-      <p className="bd-cost-total"><span>{tr("Paid")}</span><span>{detailMoney(b.paid)}</span></p>
-      <p className={"bd-due"+(due>0?" is-due":"")}><strong>{tr("Total due payable")}</strong><strong>{detailMoney(due)}</strong></p>{p.paymentSlot}</section>
+      <p className="bd-cost-total"><span>{b.offline_pending?tr("Lokal vorgemerkt"):tr("Paid")}</span><span>{detailMoney(b.paid)}</span></p>
+      <p className={"bd-due"+(due>0?" is-due":"")}><strong>{b.offline_pending?tr("Restbetrag nach Vormerkung"):tr("Total due payable")}</strong><strong>{detailMoney(due)}</strong></p>{p.paymentSlot}</section>
     <div className="summary-location bd-service pp-svc"><span className="bd-svc-cell"><span className="bd-svc-line"><span className="bd-svc-ico"><Fa name="car-side" size={18}/><Fa name="person" size={14}/></span>{info.service&&<b>{tr("Valet")}</b>}</span><small>{tr(b.covered?"COVERED":"OPEN")}</small></span><span className="bd-product"><i className={'bd-product-dot pp-dot-'+(partnerBadge(b)?.cls||'none')} aria-hidden="true"/><span>{p.productLabel||info.product}</span></span><span className="bd-loc">{info.location&&info.location!==info.product?info.location:''}</span></div>
     <section className="summary-media"><h3><Fa name="camera" size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
     <section className="summary-media bd-comments"><h3><Fa name="comment" size={18}/>  {tr("Comments")}</h3>

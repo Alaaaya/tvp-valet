@@ -92,7 +92,8 @@ export function BookingPayment({booking,onPaid,disabled,recordPayment,initialOpe
  };
  return <section className="bpay" aria-label={tr("Zahlung")}>
   {!hideSummary&&<h3 className="bpay-h">{tr("Kostenübersicht")}</h3>}
-  {!hideSummary&&<dl className="bpay-sum"><div><dt>{tr("Gesamt")}</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>{tr("Bezahlt")}</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':'ok'}><dt>{tr("Offen")}</dt><dd>{fmtEur(due)}</dd></div></dl>}
+  {booking.offline_pending&&<p className="bpay-note" role="status">{tr("Zahlungsstand lokal vorgemerkt · noch nicht serverbestätigt.")}</p>}
+  {!hideSummary&&<dl className="bpay-sum"><div><dt>{tr("Gesamt")}</dt><dd>{fmtEur(toCents(booking.total))}</dd></div><div><dt>{booking.offline_pending?tr("Lokal vorgemerkt"):tr("Bezahlt")}</dt><dd>{fmtEur(toCents(booking.paid))}</dd></div><div className={due>0?'due':booking.offline_pending?'pending':'ok'}><dt>{booking.offline_pending?tr("Restbetrag nach Vormerkung"):tr("Offen")}</dt><dd>{fmtEur(due)}</dd></div></dl>}
   {due>0&&<button type="button" className="bpay-main" disabled={!canPay} onClick={e=>{openerRef.current=e.currentTarget;setOpen(true);}}><Fa name="money-bill-1-regular" size={17}/>{tr("Als bezahlt markieren")}</button>}
   {due>0&&!canPay&&<p className="bpay-note">{booking.status!=='confirmed'?tr("Zahlung nur für bestätigte Buchungen."):tr("Zahlung nur für Admin/Mitarbeiter verfügbar.")}</p>}
   {due>0&&<div className="bpay-soon">{([[tr("Zahlungslink per E-Mail"),'envelope'],[tr("Rechnung per E-Mail"),'file-lines'],[tr("QR-Zahlung"),'qrcode']] as const).map(([t,i])=><button key={t} type="button" disabled aria-disabled="true">{t}<Fa name={i} size={15}/> <em>{tr("bald")}</em></button>)}</div>}
