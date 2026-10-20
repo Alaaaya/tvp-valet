@@ -1,5 +1,5 @@
 import {useEffect,useLayoutEffect,useRef} from 'react';
-import {startBuildUpdates} from './build-update';
+import {startBuildUpdates,offlineShellAllowsBuildReplace} from './build-update';
 
 // Conservative by design: even read-only booking details can contain payment,
 // media and confirmation controls owned by nested components.
@@ -12,7 +12,7 @@ export function useBuildUpdates(blocked:boolean){
  const blockedRef=useRef(blocked),coordinator=useRef<ReturnType<typeof startBuildUpdates>|null>(null);
  useLayoutEffect(()=>{blockedRef.current=blocked;coordinator.current?.flush()},[blocked]);
  useEffect(()=>{
-  const updater=startBuildUpdates({isBlocked:()=>blockedRef.current||protectedUpdateUi(document)});
+  const updater=startBuildUpdates({isBlocked:()=>blockedRef.current||protectedUpdateUi(document),beforeReplace:()=>offlineShellAllowsBuildReplace()});
   coordinator.current=updater;
   // Child-owned payment/camera/dialog flows and focus changes also release a queue.
   // Observer runs after DOM removal, never before React commits a closing action.
