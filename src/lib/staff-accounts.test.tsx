@@ -4,7 +4,7 @@ import {createRoot} from 'react-dom/client';
 import {renderToStaticMarkup as r} from 'react-dom/server';
 import {readFileSync} from 'node:fs';
 import {afterEach,describe,expect,it,vi} from 'vitest';
-import {loginEmail,staffUsername,validateStaffDraft,staffError,STAFF_DOMAIN} from './staff-accounts';
+import {validatePassword,loginEmail,staffUsername,validateStaffDraft,staffError,STAFF_DOMAIN} from './staff-accounts';
 import {StaffSettings,demoStaffApi,type StaffApi} from './staff-settings';
 import {deriveAttribution} from './attribution';
 import {BookingDetailView} from './booking-detail-view';
@@ -61,7 +61,7 @@ describe('staff settings',()=>{
   const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:false}];
   it('lists name, username, role and active state',async()=>{
     await mount(demoStaffApi(seed));const t=host.textContent||'';
-    expect(t).toContain('Alaa');expect(t).toContain('alaa@gmail.com');expect(t).toContain('wael');expect(t).not.toContain('wael@staff');expect(t).toContain('Inaktiv');
+    expect(t).toContain('Alaa');expect(t).toContain('alaa@gmail.com');expect(t).toContain('wael');expect(t).toContain('wael@staff.tvp-valet.de');expect(t).toContain('Inaktiv');
   });
   it('validates before calling the backend, then creates and refreshes',async()=>{
     const api=demoStaffApi(seed),create=vi.spyOn(api,'create');await mount(api);
@@ -85,7 +85,35 @@ describe('staff settings',()=>{
     const row=host.querySelectorAll('.staff-list>li')[1];await act(async()=>(row.querySelectorAll('button')[0] as HTMLButtonElement).click());
     const input=row.querySelector('.staff-pw input') as HTMLInputElement,save=row.querySelector('.staff-pw button') as HTMLButtonElement;
     await act(async()=>{type(input,'123');});await act(async()=>save.click());expect(setPw).not.toHaveBeenCalled();
-    await act(async()=>{type(input,'neuesPass1');});await act(async()=>save.click());expect(setPw).toHaveBeenCalledWith('d1','neuesPass1');
+    const cf=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValue(true);
+    await act(async()=>{type(input,'neuesPass1');});await act(async()=>save.click());expect(setPw).not.toHaveBeenCalled();expect(cf.mock.calls[0][0]).toContain('Wael');
+    await act(async()=>save.click());expect(setPw).toHaveBeenCalledWith('d1','neuesPass1');expect((host.querySelector('.staff-pw input') as HTMLInputElement|null)?.value||'').toBe('');
+    cf.mockRestore();
+  });
+  it('rejects passwords over 72 UTF-8 bytes',()=>{
+    const ok={full_name:'W',username:'wael',role:'driver' as const};
+    expect(validateStaffDraft({...ok,password:'a'.repeat(72)}).password).toBeUndefined();
+    expect(validateStaffDraft({...ok,password:'a'.repeat(73)}).password).toMatch(/72/);
+    expect(validateStaffDraft({...ok,password:'ä'.repeat(37)}).password).toMatch(/72/);
+  });
+  it('blocks double submit and mutation when session changed',async()=>{
+    const api=demoStaffApi(seed);let n=0;api.create=async d=>{n++;await new Promise(r=>setTimeout(r,20));return {id:'x',full_name:d.full_name,email:'s@x',role:'driver',active:true}};
+    host=document.createElement('div');document.body.append(host);root=createRoot(host);const cs=vi.fn().mockResolvedValueOnce(true).mockResolvedValue(false);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1" checkSession={cs}/>));await act(async()=>{});
+    const form=host.querySelector('form.staff-add') as HTMLFormElement,inputs=form.querySelectorAll('input');
+    await act(async()=>{type(inputs[0],'Saleh');type(inputs[1],'saleh');type(inputs[2],'geheim123')});
+    await act(async()=>{form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));await new Promise(r=>setTimeout(r,40))});
+    expect(n).toBe(1);
+    await act(async()=>{type(inputs[0],'Omar');type(inputs[1],'omar');type(inputs[2],'geheim123')});
+    await act(async()=>{form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))});
+    expect(n).toBe(1);expect(host.querySelector('.staff-err')?.textContent).toMatch(/Sitzung/);
+  });
+  it('clears inputs and reloads on account change',async()=>{
+    const api=demoStaffApi(seed);host=document.createElement('div');document.body.append(host);root=createRoot(host);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1"/>));await act(async()=>{});
+    await act(async()=>type(host.querySelectorAll('form.staff-add input')[2] as HTMLInputElement,'geheim123'));
+    await act(async()=>root!.render(<StaffSettings api={api} meId="b2"/>));await act(async()=>{});
+    expect((host.querySelectorAll('form.staff-add input')[2] as HTMLInputElement).value).toBe('');
   });
 });
 
@@ -111,5 +139,59 @@ describe('attribution',()=>{
     expect(h).toMatch(/class="op-by">[^<]*<bdi>Wael<\/bdi>/);expect(h).toMatch(/class="op-at">[^<]*<span class="op-by inline">/);expect(h).toContain('<bdi>Saleh</bdi>');expect(h).toContain('has-by');
     const none=r(<BookingDetailView booking={{...b,checked_in_at:null}} known flightIn={null} flightOut={null} onBack={()=>{}} onEdit={()=>{}} onStartCheck={()=>{}} onAction={()=>{}} actors={{in:'Wael'}}/>);
     expect(none).not.toContain('op-by');
+  });
+});
+
+describe('role change with async checkSession',()=>{
+  it('promotes a driver to admin even when checkSession resolves later',async()=>{
+    const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:true}];
+    const base=demoStaffApi(seed),update=vi.fn(base.update);const api:StaffApi={...base,update};
+    const cs=vi.fn(async()=>{await new Promise(r=>setTimeout(r,5));return true});
+    host=document.createElement('div');document.body.append(host);root=createRoot(host);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1" checkSession={cs}/>));await act(async()=>{});
+    const sel=host.querySelector('select[aria-label="Rolle Wael"]') as HTMLSelectElement;
+    await act(async()=>{type(sel,'admin')});
+    await act(async()=>{await new Promise(r=>setTimeout(r,30))});await act(async()=>{});
+    expect(cs).toHaveBeenCalled();
+    expect(update).toHaveBeenCalledTimes(1);expect(update.mock.calls[0][1]).toEqual({role:'admin'});
+    expect((host.querySelector('select[aria-label="Rolle Wael"]') as HTMLSelectElement).value).toBe('admin');
+  });
+});
+
+describe('late results and codepoint limits',()=>{
+  const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:false}];
+  it('late create from old account does not wipe the new account draft',async()=>{
+    let resolve!:(v:any)=>void;const base=demoStaffApi(seed);
+    const api:StaffApi={...base,create:()=>new Promise(res=>{resolve=res})};
+    await mount(api);
+    const form=()=>host.querySelector('form.staff-add') as HTMLFormElement;const ins=()=>form().querySelectorAll('input');
+    await act(async()=>{type(ins()[0],'Saleh');type(ins()[1],'saleh');type(ins()[2],'geheim123')});
+    await act(async()=>form().dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+    await act(async()=>root!.render(<StaffSettings api={api} meId="b2"/>));await act(async()=>{});
+    await act(async()=>{type(ins()[0],'Neu');type(ins()[1],'neu');type(ins()[2],'neues-pass1')});
+    await act(async()=>{resolve({id:'x',full_name:'Saleh',email:'saleh@staff.tvp-valet.de',role:'driver',active:true})});await act(async()=>{});
+    expect(ins()[0].value).toBe('Neu');expect(ins()[1].value).toBe('neu');expect(ins()[2].value).toBe('neues-pass1');
+  });
+  it('late password reset from old account does not wipe the new password input',async()=>{
+    let resolve!:(v?:any)=>void;const base=demoStaffApi(seed);
+    const api:StaffApi={...base,setPassword:()=>new Promise<void>(res=>{resolve=res})};
+    vi.spyOn(window,'confirm').mockReturnValue(true);
+    await mount(api);
+    const open=()=>[...host.querySelectorAll('button')].find(b=>b.textContent==='Neues Passwort') as HTMLButtonElement;
+    await act(async()=>open().click());
+    const pwIn=()=>host.querySelector('.staff-pw input') as HTMLInputElement;
+    await act(async()=>type(pwIn(),'altespass1'));
+    await act(async()=>(host.querySelector('.staff-pw .primary') as HTMLButtonElement).click());
+    await act(async()=>root!.render(<StaffSettings api={api} meId="b2"/>));await act(async()=>{});
+    await act(async()=>open().click());await act(async()=>type(pwIn(),'neuespass2'));
+    await act(async()=>{resolve()});await act(async()=>{});
+    expect(pwIn().value).toBe('neuespass2');
+  });
+  it('counts code points: 4 emoji rejected, 7 rejected, 8 accepted (32 bytes)',()=>{
+    expect(validatePassword('😀'.repeat(4))).toBeTruthy();expect(validatePassword('😀'.repeat(7))).toBeTruthy();expect(validatePassword('😀'.repeat(8))).toBeUndefined();
+  });
+  it('72 bytes accepted, 73 rejected',()=>{
+    expect(validatePassword('a'.repeat(72))).toBeUndefined();expect(validatePassword('a'.repeat(73))).toBeTruthy();
+    expect(validatePassword('😀'.repeat(18))).toBeUndefined();expect(validatePassword('😀'.repeat(19))).toBeTruthy();
   });
 });
