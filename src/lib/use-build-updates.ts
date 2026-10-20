@@ -4,7 +4,7 @@ import {startBuildUpdates,offlineShellAllowsBuildReplace} from './build-update';
 // Conservative by design: even read-only booking details can contain payment,
 // media and confirmation controls owned by nested components.
 export function protectedUpdateUi(doc: Pick<Document,'querySelector'|'activeElement'>): boolean {
- if(doc.querySelector('form, [role="dialog"]:not([hidden]), [role="alertdialog"]:not([hidden]), .modal-backdrop, video, canvas, input[type="file"]'))return true;
+ if(doc.querySelector('form, [role="dialog"]:not([hidden]), [role="alertdialog"]:not([hidden]), .modal-backdrop, .ho-flow, .camera-screen, .sign-screen, video, canvas, input[type="file"]'))return true;
  const active=doc.activeElement;
  return !!active&&(active.matches('input, textarea, select, [contenteditable="true"]')||!!active.closest('[contenteditable="true"]'));
 }

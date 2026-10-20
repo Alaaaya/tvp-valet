@@ -5,6 +5,7 @@ import {fetchAllPages} from './global-search';
 import {openOfflineStore,requestOfflinePersistence,type OfflineScope,type OutboxEvent,type OfflineStore} from './offline-store';
 import {OfflineSync,OfflineSyncError} from './offline-sync';
 import {registerOfflineShell} from './offline-shell';
+import {protectedUpdateUi} from './use-build-updates';
 import {t as tr} from './i18n';
 import {durableOfflineEnabled,offlineWritesDisabledError} from './offline-capability';
 
@@ -93,7 +94,7 @@ function setup(){
  window.addEventListener('online',changed);window.addEventListener('offline',changed);
  window.addEventListener('focus',()=>{if(navigator.onLine)void retryOffline()});
  // Any open form blocks version activation, not only a form that has reached the outbox.
- void registerOfflineShell({isBlocked:()=>state.pending>0||state.syncing||!!document.querySelector('form,[role="dialog"],[role="alertdialog"],.modal-backdrop,.ho-flow,.camera-screen,.sign-screen,video,canvas,input[type="file"]')||!!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]'),onState:s=>emit({shell:s})}).then(control=>{shellControl=control});
+ void registerOfflineShell({isBlocked:()=>state.pending>0||state.syncing||protectedUpdateUi(document),onState:s=>emit({shell:s})}).then(control=>{shellControl=control});
 }
 async function onlineIdentity(s:OfflineScope,signal:AbortSignal){
  if(!db||!navigator.onLine)return false;
