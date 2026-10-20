@@ -78,3 +78,12 @@ it('uses Berlin today even when the device day is different and handles DST',()=
  expect(printToday(new Date('2026-12-31T23:30:00Z'))).toBe('2027-01-01');
  expect(bookingsForPrintDay([base({arrival_at:'2026-10-24T22:30:00Z'})],'2026-10-25','in')).toHaveLength(1);
 });
+
+it('silently filters unsupported dynamic characters in all fields, preserving NFC Latin and source data',async()=>{
+ for(const name of ['آية محمد عبدالله','Alaa علاء 123 😀 Äöüß € –','Mu\u0308ller 😀','اسم😀'.repeat(300)+'Müller']){
+  const s=sheetData(base({customer_name:name,plate:'D علاء Ä 12 😀',email:'اسم mail@example.de 😀',phone:'+49 😀 123',platform:'اسم Website 😀',flight_in:'😀 EW اسم 123',flight_out:'EW 456 😀',comment:'اسم Notiz 😀 Äöüß €'}));
+  s.brand='اسم VW 😀';s.model='Golf اسم 😀';s.color='blau اسم 😀';s.code='CODE اسم 😀';
+  const before=JSON.stringify(s),doc=await buildSheetsPdf([s],assets,async code=>{expect(code).toBe(s.code);return (await import('./print-sheets')).defaultQr(code)});
+  expect((await doc.save()).length).toBeGreaterThan(1000);expect(JSON.stringify(s)).toBe(before);
+ }
+});

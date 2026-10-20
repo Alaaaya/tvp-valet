@@ -24,9 +24,9 @@ it('two real bookings per A4, odd final half blank, deduplication and no data mu
  expect((await buildShortPdf([{b:row()},{b:row()}])).getPageCount()).toBe(1);
  await expect(buildShortPdf([])).rejects.toThrow('Keine Buchungen');
 });
-it('uses PDF text rather than HTML, preserves German characters, rejects unsupported fonts visibly',async()=>{
+it('uses PDF text rather than HTML, preserves German characters and silently drops unsupported code points',async()=>{
  await expect(buildShortPdf([{b:row({customer_name:'<script> & ÄÖÜ äöü ß Hüseyin'})}])).resolves.toBeTruthy();
- await expect(buildShortPdf([{b:row({customer_name:'علاء'})}])).rejects.toThrow('Zeichen');
+ await expect(buildShortPdf([{b:row({customer_name:'علاء'})}])).resolves.toBeTruthy();
 });
 it('renders the exact approved sample data for pixel comparison',async()=>{
  const values=[
@@ -39,4 +39,14 @@ it('renders the exact approved sample data for pixel comparison',async()=>{
  const items=values.map(([plate,a,d,at,dt,flight_out,customer_name],i)=>({b:row({id:String(i),spot:String(i+1),plate,flight_out,customer_name,arrival_at:utc(`2026-10-${a}T${at}`),departure_at:utc(`2026-10-${d}T${dt}`)})}));
  const doc=await buildShortPdf(items);expect(doc.getPageCount()).toBe(6);
  if(process.env.SHORT_PROOF)fs.writeFileSync(process.env.SHORT_PROOF,await doc.save());
+});
+
+it('prints Arabic-only, mixed, emoji, NFC and long mixed fields without mutating bookings',async()=>{
+ const fallback={regular:new Uint8Array(fs.readFileSync('public/print/LiberationSans-Regular.ttf')),bold:new Uint8Array(fs.readFileSync('public/print/LiberationSans-Bold.ttf'))};
+ for(const customer_name of ['آية محمد عبدالله','Alaa علاء 123 😀 Äöüß € –','Mu\u0308ller 😀','اسم😀'.repeat(300)+'Müller']){
+  const items=[{b:row({customer_name,flight_out:'علاء EW 123 😀',plate:'D علاء Ä 12 😀'})}];
+  const before=JSON.stringify(items);for(const fonts of [undefined,fallback]){
+   const doc=await buildShortPdf(items,fonts);expect((await doc.save()).length).toBeGreaterThan(1000);
+  }expect(JSON.stringify(items)).toBe(before);
+ }
 });

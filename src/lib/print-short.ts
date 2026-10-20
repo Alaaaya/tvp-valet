@@ -3,6 +3,7 @@ import {PDFDocument,StandardFonts,rgb,type PDFFont,type PDFPage} from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type {Booking} from '../model';
 import {COMPANY,sheetStamp} from './print-sheets-data';
+import {printableText} from './print-text';
 
 export type ShortSheet={number:string;plate:string;arrivalDate:string;arrivalTime:string;returnDate:string;returnTime:string;flight:string;name:string};
 const clean=(value:string|null|undefined)=>(value||'').replace(/[\u0000-\u001f\u007f]/g,' ').trim();
@@ -24,19 +25,21 @@ export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regu
  let extra:Promise<{regular:PDFFont;bold:PDFFont}>|undefined;
  const fontFor=async(text:string,isBold:boolean)=>{
   const f=isBold?bold:regular;
-  try{f.encodeText(text);return f}catch{
-   if(!fallback)throw new Error('Zeichen werden von der Druckschrift nicht unterstützt.');
-   doc.registerFontkit(fontkit);
-   extra??=Promise.all([doc.embedFont(fallback.regular,{subset:true}),doc.embedFont(fallback.bold,{subset:true})]).then(([regular,bold])=>({regular,bold}));
-   const fonts=await extra,ff=isBold?fonts.bold:fonts.regular,supported=new Set(ff.getCharacterSet());
-   if(Array.from(text).some(c=>!supported.has(c.codePointAt(0)!)))throw new Error('Zeichen werden von der Druckschrift nicht unterstützt.');
-   return ff;
-  }
+  // Keep Helvetica for values whose remaining characters fit it, so mixed
+  // unsupported names do not change the approved Latin metrics.
+  const normalized=text.normalize('NFC'),standard=printableText(normalized,f);
+  if(standard===normalized||!fallback)return f;
+  doc.registerFontkit(fontkit);
+  extra??=Promise.all([doc.embedFont(fallback.regular,{subset:true}),doc.embedFont(fallback.bold,{subset:true})]).then(([regular,bold])=>({regular,bold}));
+  const fonts=await extra,ff=isBold?fonts.bold:fonts.regular;
+  return Array.from(printableText(normalized,ff)).length>Array.from(standard).length?ff:f;
  };
  const text=async(page:PDFPage,value:string,x:number,y:number,size:number,isBold=false,center=false,maxWidth=SHORT_PAGE.width-100)=>{
   if(!value)return;
-  if(value.length>6000)throw new Error('Text zu lang für ein Kurz-Blatt.');
   const font=await fontFor(value,isBold);
+  value=printableText(value,font);
+  if(!value)return;
+  if(value.length>6000)throw new Error('Text zu lang für ein Kurz-Blatt.');
   // ReportLab drawCentredString uses unkerned Helvetica advances; pdf-lib's width helper
   // includes kerning even though drawText emits a plain Tj. Sum advances to match gut.py.
   const measure=(n:number)=>font===regular||font===bold?Array.from(value).reduce((w,c)=>w+font.widthOfTextAtSize(c,n),0):font.widthOfTextAtSize(value,n);

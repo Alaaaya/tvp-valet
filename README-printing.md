@@ -34,3 +34,12 @@ If async preparation expires iOS user activation, a second explicit
 `PDF öffnen` tap opens the share sheet. Cancelling sharing does not download an
 unwanted file. No browser popup is required. Physical iPhone/printer output
 requires device verification; browser emulation is not a device test.
+
+Both Normal and Kurz PDFs always use the approved German wording and Berlin
+German date formatting, independently of the app language. The app UI remains
+available in German, English and Arabic. Before measuring or drawing any dynamic
+PDF value, text is normalized to NFC and unsupported Unicode code points are
+silently omitted according to the selected font's actual coverage and encoding.
+Arabic-only names therefore leave the Name line blank; mixed names retain the
+supported characters. No transliteration, replacement boxes, new font assets,
+booking edits or QR payload changes are made by this filtering.

@@ -4,6 +4,7 @@ import fontkit from '@pdf-lib/fontkit';
 import QRCode from 'qrcode';
 import {COMPANY,sheetsFor,type SheetData} from './print-sheets-data';
 import type {Booking} from '../model';
+import {printableText} from './print-text';
 
 export type SheetAssets={template:Uint8Array;regular:Uint8Array;bold:Uint8Array};
 type QrFn=(text:string)=>Promise<string>;
@@ -64,8 +65,9 @@ export function fitText(text:string,font:PDFFont,box:TextBox):{lines:string[];si
  throw new Error('Text zu lang für ein A4-Blatt. Bitte Bemerkungen oder Stammdaten kürzen.');
 }
 function put(page:PDFPage,text:string,box:TextBox,font:PDFFont){
+ text=printableText(text,font);
  if(!text)return;
- const fit=fitText(text.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,''),font,box);
+ const fit=fitText(text,font,box);
  fit.lines.forEach((line,i)=>{if(line)page.drawText(line,{x:box.x*SX,y:page.getHeight()-(box.y+fit.size*.8+i*fit.size*1.15)*SY,size:fit.size*SX,font,color:INK})});
 }
 const amount=(v:string)=>v.replace(/\s*€$/,'');
