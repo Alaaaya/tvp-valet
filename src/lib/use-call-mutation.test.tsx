@@ -3,7 +3,7 @@ import React,{act} from 'react';
 import {createRoot} from 'react-dom/client';
 import {afterEach,expect,it,vi} from 'vitest';
 const api=vi.hoisted(()=>({clear:vi.fn(),record:vi.fn()}));
-vi.mock('./customer-calls',async orig=>({...await orig<typeof import('./customer-calls')>(),clearCustomerCall:api.clear,recordCustomerCall:api.record}));
+vi.mock('./offline-actions',()=>({offlineClearCustomerCall:api.clear,offlineRecordCustomerCall:api.record}));
 import {useCallMutation,canClearCall} from './use-call-mutation';
 import {CustomerCallConflictError} from './customer-calls';
 (globalThis as any).IS_REACT_ACT_ENVIRONMENT=true;

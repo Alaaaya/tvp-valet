@@ -1,7 +1,8 @@
 import React from 'react';
 import {renderToStaticMarkup as r} from 'react-dom/server';
 import {describe,expect,it,vi} from 'vitest';
-vi.mock('./handover-undo',()=>({undoHandover:vi.fn(),canUndoHandover:(b:any,a:string)=>a==='out'?!!b.checked_out_at:!!b.checked_in_at&&!b.checked_out_at}));
+vi.mock('./offline-actions',()=>({offlineUndoHandover:vi.fn()}));
+vi.mock('./handover-undo',()=>({canUndoHandover:(b:any,a:string)=>a==='out'?!!b.checked_out_at:!!b.checked_in_at&&!b.checked_out_at}));
 import {UndoControls,undoRequestKey,undoCopy,trapTab} from './undo-controls';
 const b:any={id:'b1',status:'confirmed',checked_in_at:'2026-10-17T08:00:00Z',checked_out_at:null};
 describe('undo controls',()=>{
