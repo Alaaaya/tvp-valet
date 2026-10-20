@@ -3,7 +3,7 @@ import {db} from '../api';
 import type {Booking} from '../model';
 
 export type CustomerCallBooking=Booking&{customer_called_at?:string|null;lifecycle_revision?:number};
-export type CustomerCallReceipt={receipt_id:string;occurred_at:string;customer_called_at:string|null;lifecycle_revision:number};
+export type CustomerCallReceipt={offline_pending?:true;receipt_id:string;occurred_at:string;customer_called_at:string|null;lifecycle_revision:number};
 export class CustomerCallConflictError extends Error {
  readonly code='PT409';
  constructor(){super(tr("Die Buchung wurde inzwischen geändert. Bitte neu laden."));this.name='CustomerCallConflictError';}
