@@ -4063,5 +4063,15 @@
     "Zahlung gespeichert",
     "Payment saved",
     "تم حفظ الدفعة"
+  ],
+  "Nur gespeicherte Buchungen verfügbar. Zum Speichern ist eine Internetverbindung erforderlich.": [
+    "Only cached bookings are available. An internet connection is required to save.",
+    "Nur gespeicherte Buchungen verfügbar. Zum Speichern ist eine Internetverbindung erforderlich.",
+    "الحجوزات المحفوظة فقط متاحة. يلزم اتصال بالإنترنت لحفظ التغييرات."
+  ],
+  "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.": [
+    "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.",
+    "Only saved bookings are available. Offline changes are disabled.",
+    "الحجوزات المحفوظة فقط متاحة. التعديلات دون اتصال معطّلة."
   ]
 }

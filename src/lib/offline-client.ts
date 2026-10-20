@@ -208,10 +208,13 @@ export async function offlineLoad(signal?:AbortSignal):Promise<{rows:Booking[];s
 export async function offlineLoadOperations(){return snapshot.operations}
 
 /** Explicit logout only (caller signs out first, then calls this before startOfflineAccount(null)). Never on restart/session expiry. */
-export async function purgeOfflineAccount(){
- const s=scope,gen=epoch;if(!s)return;
- sync?.stop();if(running)await running;assertScope(s,gen);
- await (await store()).purgeAccount(s.userId);
+export async function purgeOfflineAccount(userId=scope?.userId){
+ if(!userId)return;
+ const s=scope,gen=epoch;
+ if(s?.userId===userId){sync?.stop();if(running)await running;}
+ await (await store()).purgeAccount(userId);
+ // Auth callbacks may already have cleared or replaced the current account.
+ if(!s||s.userId!==userId||epoch!==gen)return;
  snapshot={rows:[],staff:[],operations:[],at:0,complete:false};canonicalSnapshot=snapshot;
  emit({events:[],pending:0,cacheAt:null,cacheCount:0,complete:false});
 }
