@@ -61,7 +61,7 @@ describe('staff settings',()=>{
   const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:false}];
   it('lists name, username, role and active state',async()=>{
     await mount(demoStaffApi(seed));const t=host.textContent||'';
-    expect(t).toContain('Alaa');expect(t).toContain('alaa@gmail.com');expect(t).toContain('wael');expect(t).not.toContain('wael@staff');expect(t).toContain('Inaktiv');
+    expect(t).toContain('Alaa');expect(t).toContain('alaa@gmail.com');expect(t).toContain('wael');expect(t).toContain('wael@staff.tvp-valet.de');expect(t).toContain('Inaktiv');
   });
   it('validates before calling the backend, then creates and refreshes',async()=>{
     const api=demoStaffApi(seed),create=vi.spyOn(api,'create');await mount(api);
@@ -85,7 +85,35 @@ describe('staff settings',()=>{
     const row=host.querySelectorAll('.staff-list>li')[1];await act(async()=>(row.querySelectorAll('button')[0] as HTMLButtonElement).click());
     const input=row.querySelector('.staff-pw input') as HTMLInputElement,save=row.querySelector('.staff-pw button') as HTMLButtonElement;
     await act(async()=>{type(input,'123');});await act(async()=>save.click());expect(setPw).not.toHaveBeenCalled();
-    await act(async()=>{type(input,'neuesPass1');});await act(async()=>save.click());expect(setPw).toHaveBeenCalledWith('d1','neuesPass1');
+    const cf=vi.spyOn(window,'confirm').mockReturnValueOnce(false).mockReturnValue(true);
+    await act(async()=>{type(input,'neuesPass1');});await act(async()=>save.click());expect(setPw).not.toHaveBeenCalled();expect(cf.mock.calls[0][0]).toContain('Wael');
+    await act(async()=>save.click());expect(setPw).toHaveBeenCalledWith('d1','neuesPass1');expect((host.querySelector('.staff-pw input') as HTMLInputElement|null)?.value||'').toBe('');
+    cf.mockRestore();
+  });
+  it('rejects passwords over 72 UTF-8 bytes',()=>{
+    const ok={full_name:'W',username:'wael',role:'driver' as const};
+    expect(validateStaffDraft({...ok,password:'a'.repeat(72)}).password).toBeUndefined();
+    expect(validateStaffDraft({...ok,password:'a'.repeat(73)}).password).toMatch(/72/);
+    expect(validateStaffDraft({...ok,password:'ä'.repeat(37)}).password).toMatch(/72/);
+  });
+  it('blocks double submit and mutation when session changed',async()=>{
+    const api=demoStaffApi(seed);let n=0;api.create=async d=>{n++;await new Promise(r=>setTimeout(r,20));return {id:'x',full_name:d.full_name,email:'s@x',role:'driver',active:true}};
+    host=document.createElement('div');document.body.append(host);root=createRoot(host);const cs=vi.fn().mockResolvedValueOnce(true).mockResolvedValue(false);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1" checkSession={cs}/>));await act(async()=>{});
+    const form=host.querySelector('form.staff-add') as HTMLFormElement,inputs=form.querySelectorAll('input');
+    await act(async()=>{type(inputs[0],'Saleh');type(inputs[1],'saleh');type(inputs[2],'geheim123')});
+    await act(async()=>{form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));await new Promise(r=>setTimeout(r,40))});
+    expect(n).toBe(1);
+    await act(async()=>{type(inputs[0],'Omar');type(inputs[1],'omar');type(inputs[2],'geheim123')});
+    await act(async()=>{form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))});
+    expect(n).toBe(1);expect(host.querySelector('.staff-err')?.textContent).toMatch(/Sitzung/);
+  });
+  it('clears inputs and reloads on account change',async()=>{
+    const api=demoStaffApi(seed);host=document.createElement('div');document.body.append(host);root=createRoot(host);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1"/>));await act(async()=>{});
+    await act(async()=>type(host.querySelectorAll('form.staff-add input')[2] as HTMLInputElement,'geheim123'));
+    await act(async()=>root!.render(<StaffSettings api={api} meId="b2"/>));await act(async()=>{});
+    expect((host.querySelectorAll('form.staff-add input')[2] as HTMLInputElement).value).toBe('');
   });
 });
 

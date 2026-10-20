@@ -19,7 +19,13 @@ export function staffUsername(email:string|null|undefined):string{
 export interface StaffDraft{full_name:string;username:string;password:string;role:StaffRole}
 export type StaffDraftErrors=Partial<Record<keyof StaffDraft,string>>;
 export const USERNAME_RE=/^[a-z0-9._-]{3,32}$/;
-export function validatePassword(p:string):string|undefined{return p.length<8?tr("Passwort: mindestens 8 Zeichen."):undefined}
+export const PASSWORD_MAX_BYTES=72;
+export const passwordBytes=(p:string)=>new TextEncoder().encode(p).length;
+export function validatePassword(p:string):string|undefined{
+  if(p.length<8)return tr("Passwort: mindestens 8 Zeichen.");
+  if(passwordBytes(p)>PASSWORD_MAX_BYTES)return tr("Passwort: höchstens 72 Bytes (Sonderzeichen zählen mehrfach).");
+  return undefined;
+}
 export function validateStaffDraft(d:StaffDraft,existing:Pick<StaffAccount,'email'>[]=[]):StaffDraftErrors{
   const e:StaffDraftErrors={},name=d.full_name.trim(),user=d.username.trim().toLowerCase();
   if(name.length<1||name.length>120)e.full_name=tr("Name: 1 bis 120 Zeichen.");
@@ -36,6 +42,7 @@ export function staffError(e:unknown):string{
   if(/last active admin/i.test(m))return tr("Der letzte aktive Admin kann nicht deaktiviert oder herabgestuft werden.");
   if(/Admin access required/i.test(m))return tr("Nur Admins dürfen Mitarbeiter verwalten.");
   if(/Could not find the function|schema cache|PGRST202/i.test(m))return tr("Mitarbeiterkonten sind im Backend noch nicht eingerichtet (SQL ausführen).");
+  if(/72/.test(m)&&/byte|octet/i.test(m))return tr("Passwort: höchstens 72 Bytes (Sonderzeichen zählen mehrfach).");
   if(/at least 8/i.test(m))return tr("Passwort: mindestens 8 Zeichen.");
   return m;
 }

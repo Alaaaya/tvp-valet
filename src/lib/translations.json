@@ -3658,5 +3658,25 @@
     "Could not create PDF",
     "PDF konnte nicht erstellt werden",
     "تعذّر إنشاء ملف PDF"
+  ],
+  "Passwort: höchstens 72 Bytes (Sonderzeichen zählen mehrfach).": [
+    "Password: at most 72 bytes (special characters count more than once).",
+    "Passwort: höchstens 72 Bytes (Sonderzeichen zählen mehrfach).",
+    "كلمة المرور: 72 بايت كحد أقصى (الرموز الخاصة تُحسب أكثر من مرة)."
+  ],
+  "Sitzung abgelaufen. Bitte neu anmelden.": [
+    "Session expired. Please sign in again.",
+    "Sitzung abgelaufen. Bitte neu anmelden.",
+    "انتهت الجلسة. يرجى تسجيل الدخول من جديد."
+  ],
+  "Passwort ändern für ": [
+    "Change password for ",
+    "Passwort ändern für ",
+    "تغيير كلمة المرور لـ "
+  ],
+  "Nur Admins haben Zugriff auf diese Seite.": [
+    "Only admins can access this page.",
+    "Nur Admins haben Zugriff auf diese Seite.",
+    "هذه الصفحة للمسؤولين فقط."
   ]
 }
