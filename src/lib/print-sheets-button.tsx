@@ -36,5 +36,5 @@ export function PrintSheetsButton({items,date,onDone,onError,detail=false}:{item
  };
  const count=new Set(items.map(i=>i.b.id)).size;
  const label=detail?tr("Drucken"):tr("Alle Buchungen drucken")+' · '+date.split('-').reverse().join('.')+' ('+count+')';
- return <button type="button" className={detail?'bd-outline':'drawer-action'} disabled={!items.length||busy} aria-busy={busy} onClick={click}><Printer size={detail?16:20}/><span>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):label}</span></button>;
+ return <button type="button" className={detail?'bd-outline':'drawer-action'} disabled={!items.length||busy} aria-busy={busy} onClick={click}><Printer size={detail?16:20}/><span>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):label}{!detail&&<><br/><small lang="de">Stornierte Buchungen werden nicht gedruckt.</small></>}</span></button>;
 }
