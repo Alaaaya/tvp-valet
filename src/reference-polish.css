@@ -422,3 +422,5 @@ html body .bd .fp-actions .op-btn .op-at{flex-basis:100%;text-align:center;font-
 /* Oct 20 2026: iOS double-tap zoom on the Eingehend/Ausgehend counters shrank the list with white side margins. */
 html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 button,a,label,input,select{touch-action:manipulation}
+/* Oct 20 2026: .page inherits margin:auto; inside the flex-column workspace that shrink-wrapped and centered the list when few rows were shown (Eingehend filter), leaving white side margins. */
+.app.fixed-top .page{margin:0;width:100%;max-width:none;align-self:stretch}

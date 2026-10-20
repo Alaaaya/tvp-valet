@@ -42,6 +42,8 @@ export interface BookingDetailViewProps{
   mediaAdd?:React.ReactNode;
   /** Has called button + live counter supplied by the caller (audited customer_called_at; repeat needs confirmation). Rendered full width under the columns. */
   calledSlot?:React.ReactNode;
+  /** Return-phase call button (calls recorded after check-in), shown in the red column. */
+  calledOutSlot?:React.ReactNode;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -95,7 +97,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :<>{p.calledSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
+        :<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}
