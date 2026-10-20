@@ -2,7 +2,7 @@
 import {readFileSync} from 'node:fs';
 import {expect,it} from 'vitest';
 import {demoSeed,type Booking} from '../model';
-import {sheetData,sheetsFor,bookingsForPrintDay,vehicleFields,sheetTitle,sheetDays,euro} from './print-sheets-data';
+import {sheetData,sheetsFor,bookingsForPrintDay,printToday,vehicleFields,sheetTitle,sheetDays,euro} from './print-sheets-data';
 import {buildSheetsPdf} from './print-sheets';
 
 const base=(o:Partial<Booking>={}):Booking=>({...demoSeed()[0],id:'a',code:'FEF3Y',customer_name:'Petra Jansen',email:'p@x.de',phone:'0163',platform:'Website',product:'Web-V-F',covered:false,
@@ -42,9 +42,9 @@ it('builds A4 pages from the actual approved template, one per unique booking',a
 });
 it('selects both scheduled arrival and departure day, ignores status cancellation and deduplicates',()=>{
  const a=base(),b=base({id:'b',arrival_at:'2026-10-01T09:00Z'}),c=base({id:'c',status:'cancelled'});
- expect(bookingsForPrintDay([a,b,c,a],'2026-10-18').map(x=>x.b.id)).toEqual(['a','b']);
- expect(bookingsForPrintDay([a,b,c],'2026-10-16').map(x=>x.b.id)).toEqual(['a']);
- expect(bookingsForPrintDay([a],'2026-10-17')).toEqual([]);
+ expect(bookingsForPrintDay([a,b,c,a],'2026-10-18','out').map(x=>x.b.id)).toEqual(['a','b']);
+ expect(bookingsForPrintDay([a,b,c],'2026-10-16','in').map(x=>x.b.id)).toEqual(['a']);
+ expect(bookingsForPrintDay([a],'2026-10-17','in')).toEqual([]);
 });
 it('preserves authoritative paid without adding legacy key cash',()=>{
  expect(sheetData(base({total:100,paid:40,key_cash:'40€ Wael'}))).toMatchObject({paid:'40,00 €',due:'60,00 €'});
@@ -59,4 +59,22 @@ it('rejects empty batch rather than producing an empty page',async()=>{
 
 it('never substitutes parking descriptions or notes for a missing vehicle brand',()=>{
  expect(vehicleFields({comment:'Fahrzeug: {"brand":null,"type":null,"color":null,"description":"p4🅿️"}',car_description:null})).toEqual({brand:'',model:'',color:''});
+});
+
+it('prints only the selected direction, deduplicates same-day bookings and excludes cancelled',async()=>{
+ const same=base({id:'same',arrival_at:'2026-10-18T10:00Z',departure_at:'2026-10-18T18:00Z'}),arrival=base({id:'arrival',arrival_at:'2026-10-18T10:00Z',departure_at:'2026-10-21T10:00Z'}),returning=base({id:'return',arrival_at:'2026-10-16T10:00Z',departure_at:'2026-10-18T10:00Z'}),cancelled=base({id:'cancel',status:'cancelled',arrival_at:'2026-10-18T10:00Z'});
+ const rows=[same,arrival,returning,cancelled,same];
+ const inbound=bookingsForPrintDay(rows,'2026-10-18','in'),outbound=bookingsForPrintDay(rows,'2026-10-18','out');
+ expect(inbound.map(x=>x.b.id).sort()).toEqual(['arrival','same']);
+ expect(outbound.map(x=>x.b.id).sort()).toEqual(['return','same']);
+ expect((await buildSheetsPdf(sheetsFor(inbound),assets)).getPageCount()).toBe(inbound.length);
+ expect((await buildSheetsPdf(sheetsFor(outbound),assets)).getPageCount()).toBe(outbound.length);
+ expect(bookingsForPrintDay(rows,'2026-02-30','in')).toEqual([]);
+ expect(bookingsForPrintDay(rows,'','out')).toEqual([]);
+ expect(bookingsForPrintDay(rows,'2030-01-01','out')).toEqual([]);
+});
+it('uses Berlin today even when the device day is different and handles DST',()=>{
+ expect(printToday(new Date('2026-10-19T22:30:00Z'))).toBe('2026-10-20');
+ expect(printToday(new Date('2026-12-31T23:30:00Z'))).toBe('2027-01-01');
+ expect(bookingsForPrintDay([base({arrival_at:'2026-10-24T22:30:00Z'})],'2026-10-25','in')).toHaveLength(1);
 });

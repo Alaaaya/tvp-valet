@@ -1,6 +1,7 @@
 import {formatInTimeZone} from 'date-fns-tz';
 import type {Booking} from '../model';
 import {displayComment} from './comments';
+import {validDay} from './date-persist';
 
 /** One printable A4 booking sheet. Every field is plain text; empty string means "leave the line blank". */
 export type SheetData={
@@ -76,12 +77,16 @@ export function sheetsFor(items:readonly {b:Booking}[]):SheetData[]{
  return out;
 }
 
-/** All scheduled arrivals and departures for the selected Berlin calendar day, not the filtered list. */
-export function bookingsForPrintDay(rows:readonly Booking[],date:string):{b:Booking}[]{
- const seen=new Set<string>();
+/** Scheduled calendar dates only. Actual check-in/out and flight changes never alter this selection. */
+export type PrintDirection='in'|'out';
+export const printToday=(now:Date=new Date())=>formatInTimeZone(now,TZ,'yyyy-MM-dd');
+export function bookingsForPrintDay(rows:readonly Booking[],date:string,direction:PrintDirection):{b:Booking}[]{
+ if(!validDay(date)||!['in','out'].includes(direction))return [];
+ const seen=new Set<string>(),field=direction==='in'?'arrival_at':'departure_at';
  return rows.filter(b=>{
   if(b.status==='cancelled'||seen.has(b.id))return false;
-  const matches=[b.arrival_at,b.departure_at].some(iso=>iso&&Number.isFinite(Date.parse(iso))&&formatInTimeZone(iso,TZ,'yyyy-MM-dd')===date);
+  const iso=b[field];
+  const matches=!!iso&&Number.isFinite(Date.parse(iso))&&formatInTimeZone(iso,TZ,'yyyy-MM-dd')===date;
   if(matches)seen.add(b.id);return matches;
- }).map(b=>({b}));
+ }).map(b=>({b})).sort((a,b)=>Date.parse(a.b[field])-Date.parse(b.b[field]));
 }
