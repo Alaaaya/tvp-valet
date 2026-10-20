@@ -54,7 +54,7 @@ export function StaffSettings({api,meId,onChanged,onDirtyChange,checkSession}:{a
       <div className="staff-head"><strong>{s.full_name}{me&&<small> {tr("(du)")}</small>}</strong><span className="staff-user"><bdi>{staffUsername(s.email)||'–'}</bdi></span><span className="staff-email"><bdi>{s.email||'–'}</bdi></span>
         <span className={'staff-badge '+(s.active?'on':'off')}>{s.active?tr("Aktiv"):tr("Inaktiv")}</span></div>
       <div className="staff-actions">
-        <select aria-label={tr("Rolle ")+s.full_name} value={s.role} disabled={!!busy} onChange={e=>void act('role:'+s.id,()=>api.update(s,{role:e.target.value as StaffRole}),tr("Rolle geändert."))}><option value="driver">{tr("Fahrer")}</option><option value="admin">{tr("Admin")}</option></select>
+        <select aria-label={tr("Rolle ")+s.full_name} value={s.role} disabled={!!busy} onChange={e=>{const role=e.currentTarget.value as StaffRole;void act('role:'+s.id,()=>api.update(s,{role}),tr("Rolle geändert."))}}><option value="driver">{tr("Fahrer")}</option><option value="admin">{tr("Admin")}</option></select>
         <button type="button" className="outline" disabled={!!busy} onClick={()=>{setPwFor(pwFor===s.id?'':s.id);setPw('');setPwErr('')}}>{tr("Neues Passwort")}</button>
         <button type="button" className="outline" disabled={!!busy||(me&&s.active)} onClick={()=>void act('act:'+s.id,()=>api.update(s,{active:!s.active}),s.active?tr("Mitarbeiter deaktiviert."):tr("Mitarbeiter aktiviert."))}>{s.active?tr("Deaktivieren"):tr("Aktivieren")}</button>
       </div>

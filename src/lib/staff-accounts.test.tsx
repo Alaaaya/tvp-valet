@@ -142,6 +142,22 @@ describe('attribution',()=>{
   });
 });
 
+describe('role change with async checkSession',()=>{
+  it('promotes a driver to admin even when checkSession resolves later',async()=>{
+    const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:true}];
+    const base=demoStaffApi(seed),update=vi.fn(base.update);const api:StaffApi={...base,update};
+    const cs=vi.fn(async()=>{await new Promise(r=>setTimeout(r,5));return true});
+    host=document.createElement('div');document.body.append(host);root=createRoot(host);
+    await act(async()=>root!.render(<StaffSettings api={api} meId="a1" checkSession={cs}/>));await act(async()=>{});
+    const sel=host.querySelector('select[aria-label="Rolle Wael"]') as HTMLSelectElement;
+    await act(async()=>{type(sel,'admin')});
+    await act(async()=>{await new Promise(r=>setTimeout(r,30))});await act(async()=>{});
+    expect(cs).toHaveBeenCalled();
+    expect(update).toHaveBeenCalledTimes(1);expect(update.mock.calls[0][1]).toEqual({role:'admin'});
+    expect((host.querySelector('select[aria-label="Rolle Wael"]') as HTMLSelectElement).value).toBe('admin');
+  });
+});
+
 describe('late results and codepoint limits',()=>{
   const seed=[{id:'a1',full_name:'Alaa',email:'alaa@gmail.com',role:'admin' as const,active:true},{id:'d1',full_name:'Wael',email:'wael@staff.tvp-valet.de',role:'driver' as const,active:false}];
   it('late create from old account does not wipe the new account draft',async()=>{
