@@ -180,5 +180,43 @@ const hin=await sync(b,'handover',{action:'in',details:{},media:[],expected_in:n
 const ures=(await db.query('select public.sync_booking_event($1,$2,$3,$4,$5::jsonb,$6) r',
  [randomUUID(),b.id,cclear.version,'undo_handover',JSON.stringify({action:'in',expected_at:'2099-01-01T00:00:00Z'}),hin.event_id])).rows[0].r;
 eq(ures.booking.checked_in_at,null);eq(ures.booking.lifecycle_revision,1);
+// All dependent actions use predecessor snapshots, not predicted local values.
+async function dependent(booking,previous,action,payload,baseline=0,id=randomUUID()){
+ return (await db.query('select public.sync_booking_event($1,$2,$3,$4,$5::jsonb,$6) r',
+ [id,booking.id,baseline,action,JSON.stringify(payload),previous.event_id])).rows[0].r;
+}
+b=await fresh();await user(driver);
+const inbound=await sync(b,'handover',{action:'in',details:{},media:[],expected_in:null,expected_out:null,expected_revision:0});
+const outbound=await dependent(b,inbound,'handover',{action:'out',details:{},media:[],
+ expected_in:'2099-01-01T00:00:00Z',expected_out:null,expected_revision:999});
+assert.ok(outbound.booking.checked_out_at);checks++;
+eq(outbound.booking.checked_in_at,inbound.booking.checked_in_at);
+const undoOut=await dependent(b,outbound,'undo_handover',{action:'out',expected_at:'2099-01-01T00:00:00Z'});
+eq(undoOut.booking.checked_out_at,null);eq(undoOut.lifecycle_revision,1);
+const recalled=await dependent(b,undoOut,'customer_call',{...callPayload,expected_checked_out_at:'2099-01-01T00:00:00Z',expected_lifecycle_revision:999});
+assert.ok(recalled.operations.customer_called_at);checks++;
+const predictedSnapshot={status:'no_show',checked_in_at:null,checked_out_at:'2099-01-01T00:00:00Z',
+ spot:'LOCAL',lifecycle_revision:999,detail_revision:999};
+const located=await dependent(b,recalled,'detail',{action:'spot',target:'CHAIN-1',expected:predictedSnapshot});
+eq(located.booking.spot,'CHAIN-1');
+const edited=await dependent(b,located,'safe_edit',{patch:{comment:'Canonical chain'},
+ expected:{...predictedSnapshot,edit_revision:999}});
+eq(edited.booking.comment,'Canonical chain');eq(edited.booking.spot,'CHAIN-1');
+const paidChain=await dependent(b,edited,'payment',{...payment,expected_paid_cents:9999,expected_total_cents:9999});
+eq(paidChain.booking.paid,10);
+await db.exec('reset role');
+await db.query("update public.bookings set comment='External writer' where id=$1",[b.id]);
+await user(driver);
+await reject(async()=>dependent(b,paidChain,'safe_edit',{patch:{comment:'Must not overwrite'},
+ expected:{...predictedSnapshot,edit_revision:999}}),'PT409');
+eq((await row(b.id)).comment,'External writer');
+// Chaining does not grant admin edit authority or remove explicit repeat intent.
+await reject(async()=>dependent(b,paidChain,'safe_edit',{patch:{phone:'No admin'},
+ expected:{...predictedSnapshot,edit_revision:999}}),'PT409');
+b=await fresh();await user(driver);
+const onlyCall=await sync(b,'customer_call',callPayload);
+await reject(async()=>dependent(b,onlyCall,'customer_call',callPayload),'23514');
+await reject(async()=>dependent(b,onlyCall,'safe_edit',{patch:{phone:'No admin'},
+ expected:{...predictedSnapshot,edit_revision:999}}),'42501');
 console.log(JSON.stringify({status:'passed',checks,isolated:true,liveWrites:0,note:'PGlite single connection; real multi-session locking not exercised. Duplicate preexisting clear/removals migration omitted; staff pgcrypto unrelated omitted.'}));
 await db.close();
