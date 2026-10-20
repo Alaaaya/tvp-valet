@@ -1,5 +1,7 @@
 import {t as tr,getLanguage} from './i18n';
-import React from 'react';
+import React,{useState} from 'react';
+import {PrintSheetsButton} from './print-sheets-button';
+import {day} from '../model';
 import {ReferenceIcon} from './reference-icon';
 import {OdometerCapture} from './odometer-capture';
 import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ParkingSquare} from 'lucide-react';
@@ -72,6 +74,7 @@ export function detailMoney(n:number){
 const dateLong=(v:string)=>new Date(v).toLocaleDateString(getLanguage()==='ar'?'ar-EG':getLanguage()==='de'?'de-DE':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Berlin'}).replace(',','');
 
 export function BookingDetailView(p:BookingDetailViewProps){
+  const[printError,setPrintError]=useState('');
   const b=p.booking,o=p.ops,due=Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100,c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
     const key=b.id+':'+a;
@@ -110,6 +113,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.opsLoadErr&&!p.demo&&<small role="status">{tr("Ablauf konnte nicht geladen werden:")}{p.opsLoadErr}</small>}
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
+    <div className="bd-print"><PrintSheetsButton items={[{b}]} date={day(b.arrival_at)} detail onDone={()=>setPrintError('')} onError={setPrintError}/>{printError&&<p role="alert" className="error">{printError}</p>}</div>
     <section className="summary-cost"><h3><ReferenceIcon name="calculator" size={14}/>{tr("Cost overview")}</h3>
       <p><span>{getLanguage()==='ar'?tr("Parking ("):"Parken ("}{p.productLabel||b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>

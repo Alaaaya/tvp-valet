@@ -1,17 +1,16 @@
-import {useState} from 'react';
-import {FileText} from 'lucide-react';
+import {useEffect,useState} from 'react';
+import {Printer} from 'lucide-react';
 import {t as tr} from './i18n';
 import type {Booking} from '../model';
 
 type ShareNav=Navigator&{canShare?:(d:{files:File[]})=>boolean};
 type Outcome='done'|'needs-tap';
-
 function download(file:File){
- const url=URL.createObjectURL(file);const a=document.createElement('a');
+ const url=URL.createObjectURL(file),a=document.createElement('a');
  a.href=url;a.download=file.name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
-/** iOS/Android: the share sheet offers Print / Save to Files. Desktop: plain download. */
+/** Native iOS share sheet includes Print/Save. Retry is an explicit fresh gesture, never a popup. */
 export async function deliverPdf(file:File,nav:ShareNav=navigator,touch=typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches):Promise<Outcome>{
  if(touch&&typeof nav.share==='function'&&nav.canShare?.({files:[file]})){
   try{await nav.share({files:[file],title:file.name});return 'done'}
@@ -19,19 +18,23 @@ export async function deliverPdf(file:File,nav:ShareNav=navigator,touch=typeof m
  }
  download(file);return 'done';
 }
-
-/** Drawer button: builds one A4 sheet per booking of the visible day list. The PDF module loads on click. */
-export function PrintSheetsButton({items,date,onDone,onError}:{items:readonly {b:Booking}[];date:string;onDone:()=>void;onError:(m:string)=>void}){
+export function PrintSheetsButton({items,date,onDone,onError,detail=false}:{items:readonly {b:Booking}[];date:string;onDone:()=>void;onError:(m:string)=>void;detail?:boolean}){
  const[busy,setBusy]=useState(false),[ready,setReady]=useState<File|null>(null);
+ // A ready PDF must never leak from an old date/filter or a different booking after navigation.
+ const identity=date+'|'+items.map(({b})=>JSON.stringify(b)).join('|');
+ useEffect(()=>{setReady(null)},[identity]);
  const finish=(o:Outcome,f:File)=>{if(o==='needs-tap')setReady(f);else{setReady(null);onDone()}};
  const click=async()=>{
   if(busy)return;
-  // Second tap keeps the user gesture for the share sheet when the first one timed out.
-  if(ready){const f=ready;finish(await deliverPdf(f),f);return}
   setBusy(true);
-  try{const m=await import('./print-sheets');const f=await m.sheetsPdfFile(items,date);finish(await deliverPdf(f),f)}
-  catch(e){onError(tr("PDF konnte nicht erstellt werden")+(e instanceof Error&&e.message?': '+e.message:''))}
+  try{
+   if(ready){finish(await deliverPdf(ready),ready);return}
+   const m=await import('./print-sheets'),f=await m.sheetsPdfFile(items,date);
+   finish(await deliverPdf(f),f);
+  }catch(e){onError(tr("PDF konnte nicht erstellt werden")+(e instanceof Error&&e.message?': '+e.message:''))}
   finally{setBusy(false)}
  };
- return <button className="drawer-action" disabled={!items.length||busy} aria-busy={busy} onClick={click}><FileText size={20}/><span>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):tr("Buchungsblätter drucken (PDF)")}</span></button>;
+ const count=new Set(items.map(i=>i.b.id)).size;
+ const label=detail?tr("Drucken"):tr("Alle Buchungen drucken")+' · '+date.split('-').reverse().join('.')+' ('+count+')';
+ return <button type="button" className={detail?'bd-outline':'drawer-action'} disabled={!items.length||busy} aria-busy={busy} onClick={click}><Printer size={detail?16:20}/><span>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):label}</span></button>;
 }
