@@ -49,5 +49,6 @@
 .blr-l2 .blr-key,.blr-l2 .blr-code{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .blr-l2 .blr-key{flex-shrink:2}
 
-.blr{position:relative}
-.blr>.row-call-clear{position:absolute;inset-inline-end:min(94px,24vw);bottom:1px;z-index:1;display:flex;align-items:center;gap:2px;min-height:24px;padding:2px 4px;font-size:14px;color:#c9302c;background:#fff;border:1px solid #d9534f;border-radius:4px}
+/* Sibling action occupies its own strip: never covers plate, counter, or payment. */
+.blr>.row-call-clear{display:flex;align-items:center;justify-content:center;gap:3px;margin:0 6px 3px auto;min-width:32px;min-height:24px;padding:2px 6px;font-size:14px;color:#c9302c;background:#fff;border:1px solid #d9534f;border-radius:4px}
+[dir=rtl] .blr>.row-call-clear{margin-left:6px;margin-right:auto}
