@@ -25,6 +25,8 @@ begin
     raise exception 'Invalid name (1-120 characters)' using errcode = '22023'; end if;
   if p_password is null or length(p_password) < 8 then
     raise exception 'Password must have at least 8 characters' using errcode = '22023'; end if;
+  if octet_length(p_password) > 72 then
+    raise exception 'Password must not exceed 72 bytes' using errcode = '22023'; end if;
   if v_role not in ('admin','driver') then
     raise exception 'Invalid employee role' using errcode = '22023'; end if;
   v_email := v_username || '@staff.tvp-valet.de';
@@ -64,6 +66,8 @@ begin
   if not private.is_admin() then raise exception 'Admin access required' using errcode = '42501'; end if;
   if p_password is null or length(p_password) < 8 then
     raise exception 'Password must have at least 8 characters' using errcode = '22023'; end if;
+  if octet_length(p_password) > 72 then
+    raise exception 'Password must not exceed 72 bytes' using errcode = '22023'; end if;
   if not exists(select 1 from public.profiles where id = p_user_id) then
     raise exception 'Employee not found' using errcode = 'P0002'; end if;
   update auth.users set encrypted_password = extensions.crypt(p_password, extensions.gen_salt('bf')),
