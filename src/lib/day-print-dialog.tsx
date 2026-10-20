@@ -1,7 +1,7 @@
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import type {Booking} from '../model';
-import {t as tr} from './i18n';
+import {t as tr,useLanguage} from './i18n';
 import {validDay} from './date-persist';
 import {bookingsForPrintDay,printToday,type PrintDirection} from './print-sheets-data';
 import {deliverPdf} from './print-sheets-button';
@@ -9,10 +9,12 @@ import {useEdgeBackBlock} from './use-edge-back';
 
 /** No query or mutation: count and PDF share the exact same scheduled-date snapshot. */
 export function DayPrintDialog({rows,loading=false,loadError='',onClose}:{rows:readonly Booking[];loading?:boolean;loadError?:string;onClose:()=>void}){
+ const language=useLanguage();
+ const[format,setFormat]=useState<'normal'|'short'>('normal');
  const[date,setDate]=useState(()=>printToday()),[direction,setDirection]=useState<PrintDirection>('in');
  const[busy,setBusy]=useState(false),[error,setError]=useState(''),[ready,setReady]=useState<File|null>(null);
  const valid=validDay(date),items=useMemo(()=>bookingsForPrintDay(rows,date,direction),[rows,date,direction]);
- const identity=JSON.stringify([date,direction,items,loading,loadError]),current=useRef(identity),alive=useRef(true),locked=useRef(false);
+ const identity=JSON.stringify([date,direction,format,items,loading,loadError]),current=useRef(identity),alive=useRef(true),locked=useRef(false);
  const root=useRef<HTMLElement>(null);
  current.current=identity;
  useEdgeBackBlock(true,100);
@@ -31,7 +33,10 @@ export function DayPrintDialog({rows,loading=false,loadError='',onClose}:{rows:r
   const fresh=()=>alive.current&&current.current===selection;
   try{
    let file=ready;
-   if(!file){const m=await import('./print-sheets');if(!fresh())return;file=await m.sheetsPdfFile(snapshot,date)}
+   if(!file){
+    const generate=format==='short'?(await import('./print-short')).shortPdfFile:(await import('./print-sheets')).sheetsPdfFile;
+    if(!fresh())return;file=await generate(snapshot,date);
+   }
    if(!fresh())return;
    const outcome=await deliverPdf(file);
    if(!fresh())return;
@@ -53,7 +58,13 @@ export function DayPrintDialog({rows,loading=false,loadError='',onClose}:{rows:r
    <fieldset disabled={busy||loading} className="day-print-types"><legend>{tr("Druckauswahl")}</legend>
     {(['in','out'] as const).map(k=><label key={k}><input type="radio" name="print-direction" value={k} checked={direction===k} onChange={()=>setDirection(k)}/>{k==='in'?tr("Ankünfte"):tr("Rückgaben")}</label>)}
    </fieldset>
-   <label>{tr("Druckdatum")}<input aria-label={tr("Druckdatum")} type="date" value={date} disabled={busy||loading} onChange={e=>setDate(e.target.value)}/></label>
+   <fieldset disabled={busy||loading} className="day-print-types day-print-formats"><legend>{tr("Druckformat")}</legend>
+    {(['normal','short'] as const).map(k=><label key={k}><input type="radio" name="print-format" value={k} checked={format===k} onChange={()=>setFormat(k)}/>{k==='normal'?tr("Normal"):tr("Kurz")}</label>)}
+   </fieldset>
+   <label className="day-print-date">{tr("Druckdatum")}<span className="day-print-date-control">
+    <span aria-hidden="true" className="day-print-date-text">{valid?new Intl.DateTimeFormat(language==='de'?'de-DE':language==='ar'?'ar-DE':'en-GB',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z')):tr("Bitte ein gültiges Datum wählen.")}</span>
+    <input aria-label={tr("Druckdatum")} lang={language==='de'?'de-DE':language} type="date" value={date} disabled={busy||loading} onChange={e=>setDate(e.target.value)}/>
+   </span></label>
    <p className="day-print-count" aria-live="polite">{tr("Buchungen zum Drucken")} <strong>{items.length}</strong></p>
    <small>{tr("Stornierte Buchungen werden nicht gedruckt.")}</small>
    {loadError&&<p role="alert" className="error">{loadError}</p>}

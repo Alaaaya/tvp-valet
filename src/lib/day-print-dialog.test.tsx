@@ -3,7 +3,8 @@ import React,{act,StrictMode} from 'react';
 import {createRoot,type Root} from 'react-dom/client';
 import {afterEach,beforeEach,expect,it,vi} from 'vitest';
 import {demoSeed,type Booking} from '../model';
-const mocks=vi.hoisted(()=>({pdf:vi.fn(),deliver:vi.fn()}));
+const mocks=vi.hoisted(()=>({pdf:vi.fn(),short:vi.fn(),deliver:vi.fn()}));
+vi.mock('./print-short',()=>({shortPdfFile:mocks.short}));
 vi.mock('./print-sheets',()=>({sheetsPdfFile:mocks.pdf}));
 vi.mock('./print-sheets-button',()=>({deliverPdf:mocks.deliver}));
 vi.mock('./use-edge-back',()=>({useEdgeBackBlock:()=>{}}));
@@ -15,7 +16,7 @@ const rows=[base(),base({id:'out',arrival_at:'2026-10-18T09:00Z',departure_at:'2
 const button=()=>document.querySelector<HTMLButtonElement>('.day-print-actions .primary')!;
 const date=()=>document.querySelector<HTMLInputElement>('input[type=date]')!;
 const input=(el:HTMLInputElement,v:string)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value')!.set!.call(el,v);el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}))};
-beforeEach(()=>{Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-19T22:30Z'));setLanguage('de');mocks.pdf.mockReset();mocks.deliver.mockReset();mocks.pdf.mockResolvedValue(new File(['PDF'],'test.pdf'));mocks.deliver.mockResolvedValue('done');host=document.createElement('div');document.body.append(host);root=createRoot(host)});
+beforeEach(()=>{Object.assign(globalThis,{IS_REACT_ACT_ENVIRONMENT:true});vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-19T22:30Z'));setLanguage('de');mocks.short.mockReset();mocks.short.mockResolvedValue(new File(['PDF'],'short.pdf'));mocks.pdf.mockReset();mocks.deliver.mockReset();mocks.pdf.mockResolvedValue(new File(['PDF'],'test.pdf'));mocks.deliver.mockResolvedValue('done');host=document.createElement('div');document.body.append(host);root=createRoot(host)});
 afterEach(async()=>{await act(async()=>root.unmount());host.remove();vi.useRealTimers()});
 it('defaults each opening to Berlin today, counts exact direction, controls zero and arbitrary dates',async()=>{
  await act(async()=>root.render(<DayPrintDialog rows={rows} onClose={()=>{}}/>));
@@ -55,4 +56,22 @@ it('handles fresh-gesture retry without regenerating and does not reuse it after
  await act(async()=>root.render(<DayPrintDialog rows={rows} onClose={()=>{}}/>));await act(async()=>button().click());expect(button().textContent).toBe('PDF öffnen');
  await act(async()=>button().click());expect(mocks.pdf).toHaveBeenCalledOnce();expect(mocks.deliver).toHaveBeenCalledTimes(2);
  await act(async()=>document.querySelector<HTMLInputElement>('input[value=out]')!.click());await act(async()=>button().click());expect(mocks.pdf).toHaveBeenCalledTimes(2);
+});
+it('defaults to Normal, dispatches Kurz for either direction without changing booking counts',async()=>{
+ await act(async()=>root.render(<DayPrintDialog rows={rows} onClose={()=>{}}/>));
+ expect(document.querySelector<HTMLInputElement>('input[value=normal]')!.checked).toBe(true);
+ expect(document.querySelector('.day-print-date-text')!.textContent).toBe('20.10.2026');
+ await act(async()=>document.querySelector<HTMLInputElement>('input[value=short]')!.click());
+ expect(document.querySelector('.day-print-count strong')!.textContent).toBe('2');
+ await act(async()=>button().click());expect(mocks.short).toHaveBeenCalledOnce();expect(mocks.pdf).not.toHaveBeenCalled();
+ await act(async()=>document.querySelector<HTMLInputElement>('input[value=out]')!.click());
+ await act(async()=>button().click());expect(mocks.short).toHaveBeenCalledTimes(2);
+ expect(mocks.short.mock.calls[1][0].map((x:{b:Booking})=>x.b.id).sort()).toEqual(['out','same']);
+});
+it('format change invalidates a cached ready-to-deliver file',async()=>{
+ mocks.deliver.mockResolvedValue('needs-tap');
+ await act(async()=>root.render(<DayPrintDialog rows={rows} onClose={()=>{}}/>));await act(async()=>button().click());
+ expect(button().textContent).toBe('PDF öffnen');
+ await act(async()=>document.querySelector<HTMLInputElement>('input[value=short]')!.click());
+ expect(button().textContent).toBe('Drucken');await act(async()=>button().click());expect(mocks.short).toHaveBeenCalledOnce();
 });
