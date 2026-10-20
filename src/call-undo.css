@@ -1,0 +1,11 @@
+.call-undo-btn{display:inline-flex;align-items:center;gap:4px;min-height:24px;padding:2px 8px;border:1px solid #c9ced6;border-radius:12px;background:#fff;color:#8a2a2a;font-size:11px;line-height:1.2;cursor:pointer}
+.call-undo-btn:disabled{opacity:.5}
+.call-undo-row{position:absolute;inset-inline-end:6px;bottom:4px;z-index:2}
+.call-undo-detail{margin-inline-start:8px;vertical-align:middle}
+.call-undo-scrim{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:16px}
+.call-undo-dlg{background:#fff;border-radius:12px;padding:16px;max-width:340px;width:100%;box-sizing:border-box;display:grid;gap:10px}
+.call-undo-dlg h3{margin:0;font-size:17px}.call-undo-dlg p{margin:0;font-size:14px;line-height:1.5}
+.call-undo-err{color:#b00020;font-size:13px}
+.call-undo-cancel,.call-undo-ok{min-height:44px;border-radius:10px;border:1px solid #c9ced6;background:#fff;font-size:15px}
+.call-undo-ok{background:#b3261e;border-color:#b3261e;color:#fff}
+.call-undo-ok:disabled,.call-undo-cancel:disabled{opacity:.6}
