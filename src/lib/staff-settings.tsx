@@ -34,16 +34,16 @@ export function StaffSettings({api,meId,onChanged,onDirtyChange,checkSession}:{a
   useEffect(()=>()=>onDirtyChange?.(false),[onDirtyChange]);
   const reload=useCallback(async()=>{const g=gen.current;try{const l=await api.list();if(g===gen.current)setList(l)}catch(e){if(g===gen.current)setErr(staffError(e))}},[api]);
   useEffect(()=>{void reload()},[reload,meId]);
-  async function act(key:string,fn:()=>Promise<unknown>,done:string){
+  async function act(key:string,fn:()=>Promise<unknown>,done:string,onSuccess?:()=>void){
     if(lock.current)return;lock.current=true;const g=gen.current;setBusy(key);setErr('');setOk('');
     try{
       if(checkSession&&!(await checkSession()))throw Error(tr("Sitzung abgelaufen. Bitte neu anmelden."));
-      if(g!==gen.current)return;await fn();if(g!==gen.current)return;setOk(done);await reload();if(g===gen.current)onChanged?.()
+      if(g!==gen.current)return;await fn();if(g!==gen.current)return;onSuccess?.();setOk(done);await reload();if(g===gen.current)onChanged?.()
     }catch(e){if(g===gen.current)setErr(staffError(e))}finally{if(g===gen.current){lock.current=false;setBusy('')}}
   }
   async function add(e:React.FormEvent){e.preventDefault();if(lock.current)return;const v=validateStaffDraft(draft,list||[]);setErrs(v);if(Object.keys(v).length)return;
-    await act('add',async()=>{await api.create(draft);setDraft(EMPTY)},tr("Mitarbeiter angelegt."))}
-  async function savePw(s:StaffAccount){const v=validatePassword(pw);setPwErr(v||'');if(v||lock.current)return;if(!window.confirm(tr("Passwort ändern für ")+s.full_name+"?"))return;await act('pw:'+s.id,async()=>{await api.setPassword(s.id,pw);setPwFor('');setPw('')},tr("Passwort geändert."))}
+    await act('add',async()=>{await api.create(draft)},tr("Mitarbeiter angelegt."),()=>setDraft(EMPTY))}
+  async function savePw(s:StaffAccount){const v=validatePassword(pw);setPwErr(v||'');if(v||lock.current)return;if(!window.confirm(tr("Passwort ändern für ")+s.full_name+"?"))return;await act('pw:'+s.id,async()=>{await api.setPassword(s.id,pw)},tr("Passwort geändert."),()=>{setPwFor('');setPw('')})}
   const field=(k:keyof StaffDraft)=>errs[k]?<small className="staff-field-err" role="alert">{errs[k]}</small>:null;
   return <section className="staff-settings" aria-label={tr("Mitarbeiter")}>
     <h3>{tr("Mitarbeiter")}</h3>
