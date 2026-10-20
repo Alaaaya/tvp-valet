@@ -1,0 +1,27 @@
+.staff-settings{margin-top:22px;padding-top:18px;border-top:1px solid var(--line,#dce3dc);min-width:0;max-width:100%}
+.staff-settings h3{margin:0 0 6px}
+.staff-settings h4{margin:0 0 10px;font-size:14px;font-family:Manrope,sans-serif}
+.staff-settings>.muted{font-size:12px;line-height:1.5;margin:0 0 12px}
+.staff-settings .staff-ok{font-size:12px;background:#e2ebdc;color:#446448;border-radius:7px;padding:9px 12px;margin:0 0 12px}
+.staff-settings .staff-err{margin:0 0 12px}
+.staff-list{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.staff-list>li{border:1px solid var(--line,#dce3dc);border-radius:9px;padding:10px 12px;background:#fff;min-width:0}
+.staff-list>li.inactive{background:#f4f5f2}
+.staff-list>li.inactive .staff-head strong{color:#7b8a83}
+.staff-head{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;min-width:0}
+.staff-head strong{font-size:14px;overflow-wrap:anywhere}
+.staff-user{font-size:12px;color:var(--muted,#708078);overflow-wrap:anywhere;min-width:0}
+.staff-badge{margin-inline-start:auto;font-size:10px;font-weight:700;border-radius:4px;padding:3px 6px;letter-spacing:.3px}
+.staff-badge.on{background:#dcebdc;color:#0c5746}
+.staff-badge.off{background:#eee5e2;color:#93453a}
+.staff-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.staff-actions select{width:auto;flex:1 1 92px;min-height:38px;padding:6px 8px;font-size:12px}
+.staff-actions .outline{flex:1 1 auto;min-height:38px;padding:6px 10px;font-size:12px;border-radius:7px}
+.staff-pw{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.staff-pw input{flex:1 1 160px;min-height:38px;padding:8px 10px;font-size:13px;min-width:0}
+.staff-pw .primary{min-height:38px;padding:6px 14px;font-size:12px}
+.staff-field-err{color:#97402c;font-weight:500;font-size:11px;line-height:1.4;flex-basis:100%}
+.staff-add{display:grid;gap:10px;border:1px dashed #b9cabd;border-radius:9px;padding:12px}
+.staff-add label{gap:5px;font-size:12px}
+.staff-add input,.staff-add select{min-height:40px;padding:8px 10px}
+.staff-add .primary{min-height:42px}

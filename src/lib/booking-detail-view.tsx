@@ -11,6 +11,10 @@ import type {BookingOperations,BookingOperationAction} from './operations';
 import '../booking-detail.css';
 import {Fa} from './fa-icons';
 import {partnerBadge} from './booking-list-row';
+import type {Attribution} from './attribution';
+
+/** Small second line naming the staff member who did a step. */
+export function ByLine({name,inline}:{name?:string;inline?:boolean}){return !name?null:inline?<span className="op-by inline">{" · "}{tr("von ")}<bdi>{name}</bdi></span>:<small className="op-by">{tr("von ")}<bdi>{name}</bdi></small>}
 
 export interface BookingDetailViewProps{
   booking:Booking;
@@ -48,6 +52,8 @@ export interface BookingDetailViewProps{
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
   admin?:boolean;
+  /** names of staff who did each completed step (from stored actor ids) */
+  actors?:Attribution;
 }
 
 export const NO_COMMENTS="There are no comments";
@@ -69,7 +75,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
   const b=p.booking,o=p.ops,due=Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100,c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
     const key=b.id+':'+a;
-    return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> <span>{label}</span><small className="op-at">{stamp(at)}</small></>:p.opsBusy===key?tr("Wird gespeichert …"):label}</button>;
+    return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> <span>{label}</span><small className="op-at">{stamp(at)}<ByLine inline name={a==='taken_away'||a==='retrieved'?p.actors?.[a]:undefined}/></small></>:p.opsBusy===key?tr("Wird gespeichert …"):label}</button>;
   };
   return <div className="bd">
     <header className="bd-head"><button type="button" aria-label={tr("Schließen")} className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>{tr("Booking #")}<bdi>{b.code}</bdi></h2><button type="button" aria-label={tr("Bearbeiten")} className="bd-round" onClick={p.onEdit}><svg className="reference-gear" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M9.5 1.5h5l.7 3a8 8 0 0 1 1.4.8l3-.9 2.5 4.3-2.3 2.1a8 8 0 0 1 0 1.6l2.3 2.1-2.5 4.3-3-.9a8 8 0 0 1-1.4.8l-.7 3h-5l-.7-3a8 8 0 0 1-1.4-.8l-3 .9-2.5-4.3 2.3-2.1a8 8 0 0 1 0-1.6L1.9 8.7l2.5-4.3 3 .9a8 8 0 0 1 1.4-.8l.7-3ZM12 7.8a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4Z"/></svg></button></header>
@@ -93,7 +99,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
     <div className="split-handover">{(['in','out'] as const).map(k=>{const at=k==='in'?b.checked_in_at:b.checked_out_at,when=k==='in'?b.arrival_at:b.departure_at;return <section className={k} key={k}>
       <h3><ReferenceIcon name="car" size={18}/>{k==='in'?tr("PARKING DATE"):tr("RETURN DATE")}</h3>
       <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>{tr("Mileage:")}{' '}{b.km==null?"–":b.km}</span>
-        <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:<>{<ReferenceIcon name={k==='in'?'checkin':'checkout'} size={15}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
+        <button type="button" className={at&&p.actors?.[k]?'has-by':undefined} disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}<ByLine name={p.actors?.[k]}/></>:<>{<ReferenceIcon name={k==='in'?'checkin':'checkout'} size={15}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
