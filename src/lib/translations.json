@@ -3753,5 +3753,20 @@
     "Loading bookings …",
     "Buchungen werden geladen …",
     "جارٍ تحميل الحجوزات …"
+  ],
+  "Druckformat": [
+    "Print format",
+    "Druckformat",
+    "تنسيق الطباعة"
+  ],
+  "Normal": [
+    "Normal",
+    "Normal",
+    "عادي"
+  ],
+  "Kurz": [
+    "Short",
+    "Kurz",
+    "مختصر"
   ]
 }

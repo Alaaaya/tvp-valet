@@ -14,8 +14,8 @@
 .app > .sidebar .sidebar-bottom{flex-shrink:0;padding-top:16px}
 .app > .sidebar .drawer-user span{min-width:0;overflow-wrap:anywhere}
 .app > .sidebar .nav-soon{white-space:normal}
-.day-print-backdrop{position:fixed;inset:0;z-index:65;background:#20302db3;display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain}
-.day-print-dialog{width:100%;max-width:360px;max-height:calc(100dvh - 40px);min-height:0;overflow-y:auto;background:#fff;color:#243a3c;border-radius:14px;padding:22px;box-shadow:0 12px 40px #0003;outline:none}
+.day-print-backdrop{box-sizing:border-box;position:fixed;inset:0;z-index:65;background:#20302db3;display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:max(20px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain}
+.day-print-dialog{box-sizing:border-box;min-width:0;width:100%;max-width:360px;max-height:calc(100dvh - 40px);min-height:0;overflow-y:auto;background:#fff;color:#243a3c;border-radius:14px;padding:22px;box-shadow:0 12px 40px #0003;outline:none}
 .day-print-dialog h2{font-size:21px;margin:0 0 18px}
 .day-print-dialog label{font-size:14px}
 .day-print-dialog input[type=date]{min-width:0;font-size:16px}
@@ -27,3 +27,15 @@
 .day-print-dialog small{display:block;line-height:1.5}
 .day-print-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
 .day-print-dialog .error{display:block;margin-top:12px}
+
+/* Keep the native accessible date picker, but localize its visible value independently of iOS's system locale. */
+.day-print-date{display:grid;grid-template-columns:minmax(0,1fr);min-width:0}
+.day-print-date-control{position:relative;display:block;min-width:0;width:100%;box-sizing:border-box;border:1px solid #d5dfdc;border-radius:8px;background:#fff}
+.day-print-date-text{display:block;box-sizing:border-box;min-height:44px;padding:11px 12px;line-height:22px;font-size:16px;overflow-wrap:anywhere}
+.day-print-date-control input[type=date]{position:absolute;inset:0;opacity:0;min-width:0;width:100%;max-width:100%;height:100%;margin:0;box-sizing:border-box;cursor:pointer}
+.day-print-date-control:focus-within{outline:2px solid #0c5746;outline-offset:2px}
+.day-print-date-control:has(input:disabled){opacity:.6}
+.day-print-types{min-width:0;flex-wrap:wrap}
+.day-print-formats{padding-top:4px}
+.day-print-formats legend{position:static;width:auto;height:auto;clip-path:none;margin-bottom:10px;font-weight:600}
+.day-print-types label{min-width:0;min-height:32px}
