@@ -93,9 +93,9 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className="handover-date"><strong>{dateLong(when)}</strong><strong>{clock(when)}</strong><span>{tr("Mileage:")}{' '}{b.km==null?"–":b.km}</span>
         <button type="button" disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}</>:<>{<ReferenceIcon name={k==='in'?'checkin':'checkout'} size={15}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
-        <div className="fp-actions">{k==='in'?<>{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}
+        <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :<>{p.calledSlot}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
+        :<>{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}
