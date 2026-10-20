@@ -1,0 +1,12 @@
+.gs{padding:6px 12px 90px}
+.gs-note{margin:8px 4px;font-size:13px;opacity:.75}
+.gs-err{color:#ff6b6b;opacity:1}
+.gs-empty{text-align:center;padding:28px 8px;opacity:.7}
+.gs-list{display:flex;flex-direction:column;gap:6px}
+.gs-row{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;text-align:start;width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(128,128,128,.25);background:transparent;color:inherit;font:inherit;min-height:44px}
+.gs-plate{font-size:17px;letter-spacing:.02em}
+.gs-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-dates{grid-column:1/-1;font-size:13px;opacity:.85}
+.gs-meta{grid-column:1/-1;font-size:12px;opacity:.65;display:flex;gap:8px}
+.gs-meta em{font-style:normal;color:#ff9f43}
+.gs-row.st-cancelled .gs-plate,.gs-row.st-no_show .gs-plate{text-decoration:line-through}

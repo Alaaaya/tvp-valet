@@ -2407,7 +2407,7 @@
   "Übergabe rückgängig": [
     "Undo handover",
     "Übergabe rückgängig",
-    "التراجع عن التسليم"
+    "تراجع عن التسليم"
   ],
   "rückgängig": [
     "undo",
@@ -3768,5 +3768,205 @@
     "Short",
     "Kurz",
     "مختصر"
+  ],
+  "Suche in allen Tagen": [
+    "Search all days",
+    "Suche in allen Tagen",
+    "البحث في كل الأيام"
+  ],
+  "Suche in allen Tagen …": [
+    "Searching all days …",
+    "Suche in allen Tagen …",
+    "جارٍ البحث في كل الأيام …"
+  ],
+  "Suche fehlgeschlagen": [
+    "Search failed",
+    "Suche fehlgeschlagen",
+    "فشل البحث"
+  ],
+  "Treffer in allen Tagen": [
+    "matches across all days",
+    "Treffer in allen Tagen",
+    "نتيجة في كل الأيام"
+  ],
+  "Keine Buchung gefunden.": [
+    "No booking found.",
+    "Keine Buchung gefunden.",
+    "لم يتم العثور على حجز."
+  ],
+  "Keine Treffer im gespeicherten Zeitraum.": [
+    "No matches in the saved period.",
+    "Keine Treffer im gespeicherten Zeitraum.",
+    "لا نتائج في الفترة المحفوظة."
+  ],
+  "Nur gespeicherter Zeitraum": [
+    "Saved period only",
+    "Nur gespeicherter Zeitraum",
+    "الفترة المحفوظة فقط"
+  ],
+  "Zwischengespeichert: alle verfügbaren Buchungen": [
+    "Cached: all available bookings",
+    "Zwischengespeichert: alle verfügbaren Buchungen",
+    "محفوظ: كل الحجوزات المتاحة"
+  ],
+  "storniert": [
+    "cancelled",
+    "storniert",
+    "ملغى"
+  ],
+  "No-Show": [
+    "No-show",
+    "No-Show",
+    "لم يحضر"
+  ],
+  "Keine gespeicherte Anmeldung. Bitte zuerst online anmelden.": [
+    "No cached identity. Sign in online first.",
+    "Keine gespeicherte Anmeldung. Bitte zuerst online anmelden.",
+    "لا يوجد تسجيل دخول محفوظ. سجّل الدخول مع الإنترنت أولاً."
+  ],
+  "Vor dem Abmelden ausstehende Änderungen synchronisieren oder prüfen.": [
+    "Sync or review pending changes before signing out.",
+    "Vor dem Abmelden ausstehende Änderungen synchronisieren oder prüfen.",
+    "زامن التغييرات المعلّقة أو راجعها قبل تسجيل الخروج."
+  ],
+  "Lokal gespeichert · wartet auf Synchronisierung": [
+    "Saved locally · waiting to sync",
+    "Lokal gespeichert · wartet auf Synchronisierung",
+    "تم الحفظ على الجهاز · بانتظار المزامنة"
+  ],
+  "Offline & Synchronisierung": [
+    "Offline & sync",
+    "Offline & Synchronisierung",
+    "دون اتصال والمزامنة"
+  ],
+  "Online": [
+    "Online",
+    "Online",
+    "متصل"
+  ],
+  "Offline": [
+    "Offline",
+    "Offline",
+    "دون اتصال"
+  ],
+  "Synchronisierung läuft …": [
+    "Syncing …",
+    "Synchronisierung läuft …",
+    "جارٍ المزامنة …"
+  ],
+  "ausstehend": [
+    "pending",
+    "ausstehend",
+    "معلّق"
+  ],
+  "Keine ausstehenden Änderungen": [
+    "No pending changes",
+    "Keine ausstehenden Änderungen",
+    "لا توجد تغييرات معلّقة"
+  ],
+  "Konflikte / Fehler": [
+    "Conflicts / errors",
+    "Konflikte / Fehler",
+    "تعارضات / أخطاء"
+  ],
+  "Erneut synchronisieren": [
+    "Retry sync",
+    "Erneut synchronisieren",
+    "إعادة المزامنة"
+  ],
+  "Prüfen": [
+    "Review",
+    "Prüfen",
+    "مراجعة"
+  ],
+  "Nur gespeicherte Buchungen verfügbar. Änderungen bleiben lokal bis zur Synchronisierung.": [
+    "Only cached bookings are available. Changes stay local until synced.",
+    "Nur gespeicherte Buchungen verfügbar. Änderungen bleiben lokal bis zur Synchronisierung.",
+    "الحجوزات المحفوظة فقط متاحة. تبقى التغييرات على الجهاز حتى المزامنة."
+  ],
+  "Nicht synchronisierte Zahlungen sind noch nicht serverbestätigt.": [
+    "Pending payments are not yet confirmed by the server.",
+    "Nicht synchronisierte Zahlungen sind noch nicht serverbestätigt.",
+    "الدفعات المعلّقة لم يؤكدها الخادم بعد."
+  ],
+  "Gerätespeicher nicht dauerhaft zugesichert. Browserdaten nicht löschen.": [
+    "Persistent storage is not guaranteed. Do not clear browser data.",
+    "Gerätespeicher nicht dauerhaft zugesichert. Browserdaten nicht löschen.",
+    "التخزين الدائم غير مضمون. لا تمسح بيانات المتصفح."
+  ],
+  "Diese Änderung und alle nachfolgenden abhängigen Änderungen endgültig verwerfen? Nicht synchronisierte Zahlungen werden nicht als bestätigt gespeichert.": [
+    "Permanently discard this change and all subsequent dependent changes? Unsynced payments will not be recorded as confirmed.",
+    "Diese Änderung und alle nachfolgenden abhängigen Änderungen endgültig verwerfen? Nicht synchronisierte Zahlungen werden nicht als bestätigt gespeichert.",
+    "حذف هذا التغيير وجميع التغييرات التابعة اللاحقة نهائياً؟ لن تُسجّل الدفعات غير المتزامنة كمؤكدة."
+  ],
+  "Buchungsaktion": [
+    "Booking action",
+    "Buchungsaktion",
+    "إجراء حجز"
+  ],
+  "Anruf speichern": [
+    "Save call",
+    "Anruf speichern",
+    "حفظ الاتصال"
+  ],
+  "Fahrzeugaktion": [
+    "Vehicle action",
+    "Fahrzeugaktion",
+    "إجراء مركبة"
+  ],
+  "Buchungsdaten": [
+    "Booking data",
+    "Buchungsdaten",
+    "بيانات الحجز"
+  ],
+  "Konflikt": [
+    "Conflict",
+    "Konflikt",
+    "تعارض"
+  ],
+  "Wird synchronisiert": [
+    "Syncing",
+    "Wird synchronisiert",
+    "جارٍ المزامنة"
+  ],
+  "Ausstehend": [
+    "Pending",
+    "Ausstehend",
+    "معلّق"
+  ],
+  "Ab hier verwerfen …": [
+    "Discard from here …",
+    "Ab hier verwerfen …",
+    "حذف من هنا …"
+  ],
+  "Offline-Speicherung für diese Buchung noch nicht verfügbar. Bitte online neu laden.": [
+    "Offline saving is not available for this booking yet. Reload online first.",
+    "Offline-Speicherung für diese Buchung noch nicht verfügbar. Bitte online neu laden.",
+    "الحفظ دون اتصال غير متاح لهذا الحجز بعد. أعد التحميل مع الإنترنت."
+  ],
+  "Buchung nicht im Offline-Speicher.": [
+    "Booking is not cached.",
+    "Buchung nicht im Offline-Speicher.",
+    "الحجز غير محفوظ على الجهاز."
+  ],
+  "Ungültige Aktion.": [
+    "Invalid action.",
+    "Ungültige Aktion.",
+    "إجراء غير صالح."
+  ],
+  "Neue Buchungen benötigen eine Internetverbindung.": [
+    "New bookings require an internet connection.",
+    "Neue Buchungen benötigen eine Internetverbindung.",
+    "الحجوزات الجديدة تتطلب اتصالاً بالإنترنت."
+  ],
+  "Übergabe": [
+    "Handover",
+    "Übergabe",
+    "تسليم"
+  ],
+  "Fehlgeschlagen": [
+    "Failed",
+    "Fehlgeschlagen",
+    "فشل"
   ]
 }

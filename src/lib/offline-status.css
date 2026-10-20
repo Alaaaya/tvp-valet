@@ -1,0 +1,12 @@
+.offline-status{margin:6px 12px;padding:8px 10px;background:var(--surface,#f0f3f6);color:var(--text,#1d2938);border-radius:8px;font-size:12px;overflow-wrap:anywhere}
+.offline-status-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.offline-status-line>span{flex:1 1 140px}
+.offline-status button{font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px;padding:6px 8px;min-height:34px;cursor:pointer}
+.offline-status button:disabled{opacity:.5;cursor:default}
+.offline-status p{margin:6px 0}
+.offline-status-error{color:#a52b19}
+.offline-review{max-height:40vh;overflow:auto;overscroll-behavior:contain}
+.offline-event{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:10px 0}
+.offline-event+ .offline-event{border-top:1px solid #aaa5}
+.offline-event small{max-width:100%;overflow-wrap:anywhere}
+.offline-status button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
