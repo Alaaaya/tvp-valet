@@ -1,5 +1,5 @@
 import {t as tr} from './i18n';
-/** No storage or service-worker changes: deployment checks are read-only. */
+/** Deployment checks never bypass a pending offline-shell update. */
 export interface BuildUpdateEnvironment {
   fetch: (url: string, options: RequestInit) => Promise<Pick<Response, 'ok' | 'text'>>;
   visible: () => boolean;
@@ -15,6 +15,8 @@ export interface BuildUpdateEnvironment {
 }
 export interface BuildUpdateOptions {
   isBlocked: () => boolean;
+  /** False defers navigation, e.g. until a waiting offline worker is explicitly applied. */
+  beforeReplace?: () => Promise<boolean>;
   currentHash?: string;
   baseUrl?: string;
   timeoutMs?: number;
@@ -42,14 +44,29 @@ export function startBuildUpdates(options: BuildUpdateOptions) {
   let pending: string | null = null;
   let inFlight: Promise<void> | null = null;
   let cancelRequest: (() => void) | null = null;
+  let preparing = false;
   function flush(): void {
     if (disposed || replaced || !pending || !env.visible() || options.isBlocked()) return;
     const destination = new URL(env.href());
     // The deployment may still serve an old HTML document. Never loop on its v URL.
     if (destination.searchParams.get('v') === pending) return;
-    destination.searchParams.set('v', pending);
-    replaced = true;
-    env.replace(destination.href);
+    const hash = pending;
+    const replace = () => {
+      // Forms, outbox, visibility, and the server version can change during SW lookup.
+      if (disposed || replaced || pending !== hash || !env.visible() || options.isBlocked()) return;
+      const latest = new URL(env.href());
+      if (latest.searchParams.get('v') === hash) return;
+      latest.searchParams.set('v', hash);
+      replaced = true;
+      env.replace(latest.href);
+    };
+    if (!options.beforeReplace) { replace(); return; }
+    if (preparing) return;
+    preparing = true;
+    void Promise.resolve().then(() => options.beforeReplace!()).then(ready => {
+      if (ready) replace();
+    }).catch(() => { /* Cannot confirm the offline worker is safe: retry on the next wake. */ })
+      .finally(() => { preparing = false; });
   }
   function check(): Promise<void> {
     if (disposed || replaced || !env.visible()) return Promise.resolve();
@@ -100,4 +117,21 @@ export function startBuildUpdates(options: BuildUpdateOptions) {
     env.documentEvents.removeEventListener('visibilitychange', wake);
     cancelRequest?.();
   }};
+}
+
+/** Refresh the registration before navigating so new HTML cannot outrun its offline cache.
+ * Waiting/installing workers are applied only through the existing guarded update UI.
+ * Lookup/update failures defer, rather than risk retaining an obsolete offline shell.
+ */
+export async function offlineShellAllowsBuildReplace(
+  container: Pick<ServiceWorkerContainer, 'getRegistration'> | undefined = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker,
+  baseUrl = import.meta.env.BASE_URL,
+  href = typeof location === 'undefined' ? 'http://localhost/' : location.href,
+): Promise<boolean> {
+  if (!container) return true;
+  const registration = await container.getRegistration(new URL(baseUrl, href).href);
+  if (!registration) return true;
+  if (registration.waiting || registration.installing) return false;
+  await registration.update();
+  return !registration.waiting && !registration.installing;
 }

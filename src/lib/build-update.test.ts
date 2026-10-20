@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {startBuildUpdates, type BuildUpdateEnvironment} from './build-update';
+import {startBuildUpdates, offlineShellAllowsBuildReplace, type BuildUpdateEnvironment} from './build-update';
 const OLD = 'a'.repeat(64), NEW = 'b'.repeat(64);
 function setup() {
   let visible = true, blocked = false;
@@ -129,5 +129,64 @@ describe('deployment update coordinator', () => {
   it('does not poll hidden startup, then checks when visible', async () => {
     const s = setup(); s.visible(false); const coordinator = s.start(); await settle(); expect(s.fetch).not.toHaveBeenCalled();
     s.visible(true); s.documentEvents.dispatchEvent(new Event('visibilitychange')); await settle(); expect(s.fetch).toHaveBeenCalledTimes(1); coordinator.dispose();
+  });
+});
+
+describe('offline shell / build navigation coordination', () => {
+  it('never replaces new HTML while the old worker controls a waiting or installing update', async () => {
+    const s = setup();
+    const reg = {active: {old: true}, waiting: {postMessage: vi.fn()}, installing: null as unknown, update: vi.fn(async () => {})};
+    const container = {getRegistration: vi.fn(async () => reg)} as unknown as ServiceWorkerContainer;
+    s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: NEW})});
+    const coordinator = startBuildUpdates({env: s.env, currentHash: OLD, isBlocked: () => false,
+      beforeReplace: () => offlineShellAllowsBuildReplace(container, '/tvp-valet/', s.env.href())});
+    await settle();
+    expect(container.getRegistration).toHaveBeenCalledWith('https://example.com/tvp-valet/');
+    expect(reg.waiting.postMessage).not.toHaveBeenCalled(); // explicit guarded UI owns activation
+    expect(s.replace).not.toHaveBeenCalled();
+    reg.waiting = null as any; reg.installing = {};
+    coordinator.flush(); await settle(); expect(s.replace).not.toHaveBeenCalled();
+    reg.installing = null; // after the safe activation path, no stale waiting worker remains
+    coordinator.flush(); await settle(); expect(s.replace).toHaveBeenCalledTimes(1);
+    expect(reg.update).toHaveBeenCalledTimes(1); coordinator.dispose();
+  });
+  it('detects a worker discovered by update, rather than racing navigation against installation', async () => {
+    const reg = {waiting: null as unknown, installing: null, update: vi.fn(async () => {reg.waiting = {};})};
+    const c = {getRegistration: vi.fn(async () => reg)} as unknown as ServiceWorkerContainer;
+    expect(await offlineShellAllowsBuildReplace(c, '/', 'https://x.test/')).toBe(false);
+    expect(reg.update).toHaveBeenCalledOnce();
+  });
+  it('coalesces preparation and rechecks forms/outbox after the async worker lookup', async () => {
+    const s = setup(); let blocked = true, release!: (ready: boolean) => void;
+    const beforeReplace = vi.fn(() => new Promise<boolean>(resolve => {release = resolve}));
+    s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: NEW})});
+    const coordinator = startBuildUpdates({env: s.env, currentHash: OLD, isBlocked: () => blocked, beforeReplace});
+    await settle(); expect(beforeReplace).not.toHaveBeenCalled();
+    blocked = false; coordinator.flush(); coordinator.flush(); await settle(); expect(beforeReplace).toHaveBeenCalledOnce();
+    blocked = true; release(true); await settle(); expect(s.replace).not.toHaveBeenCalled();
+    blocked = false; coordinator.flush(); await settle(); release(true); await settle();
+    expect(s.replace).toHaveBeenCalledOnce(); coordinator.dispose();
+  });
+  it.each(['disposed', 'hidden', 'version-cleared'])('does not navigate after preparation becomes %s', async reason => {
+    const s = setup(); let release!: (ready: boolean) => void;
+    s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: NEW})});
+    const coordinator = startBuildUpdates({env: s.env, currentHash: OLD, isBlocked: () => false,
+      beforeReplace: () => new Promise<boolean>(resolve => {release = resolve})});
+    await settle();
+    if (reason === 'disposed') coordinator.dispose();
+    if (reason === 'hidden') s.visible(false);
+    if (reason === 'version-cleared') {s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: OLD})}); await coordinator.check();}
+    release(true); await settle(); expect(s.replace).not.toHaveBeenCalled(); coordinator.dispose();
+  });
+  it('fails closed on worker update errors then retries on a later flush', async () => {
+    const s = setup(), beforeReplace = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(true);
+    s.fetch.mockResolvedValue({ok: true, text: async () => JSON.stringify({hash: NEW})});
+    const coordinator = startBuildUpdates({env: s.env, currentHash: OLD, isBlocked: () => false, beforeReplace});
+    await settle(); expect(s.replace).not.toHaveBeenCalled();
+    coordinator.flush(); await settle(); expect(s.replace).toHaveBeenCalledOnce(); coordinator.dispose();
+  });
+  it('allows normal navigation if no registration exists', async () => {
+    const c = {getRegistration: vi.fn(async () => undefined)} as unknown as ServiceWorkerContainer;
+    expect(await offlineShellAllowsBuildReplace(c, '/', 'https://x.test/')).toBe(true);
   });
 });
