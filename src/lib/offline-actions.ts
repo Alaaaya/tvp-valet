@@ -3,7 +3,7 @@ import {saveBooking} from '../api';
 import type {Booking} from '../model';
 import {bookingEditFields} from './booking-safe-edit';
 import {hasLegacyCashConflict,type PaymentInput} from './booking-payments';
-import {mediaPath,validateHandover,type HandoverSave} from './handover-api';
+import {createPendingMedia,mediaPath,validateHandover,type HandoverSave} from './handover-api';
 import {canUndoHandover} from './handover-undo';
 import type {CustomerCallBooking,CustomerCallReceipt} from './customer-calls';
 import type {BookingOperations,BookingOperationAction} from './operations';
@@ -147,4 +147,12 @@ export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
  const changedEdit=bookingEditFields.some(k=>k in patch&&patch[k as keyof typeof patch]!==original[k]);
  const changedSpot=patch.spot!==original.spot;
  await queue(original,crypto.randomUUID(),'update_ops',{patch},{...original,...patch,edit_revision:(original.edit_revision??0)+(changedEdit?1:0),detail_revision:(original.detail_revision??0)+(changedSpot?1:0)});
+}
+
+/** Stage gallery evidence durably; the sync runtime uploads only after enqueue succeeds. */
+export async function offlineAppendPhoto(booking:Booking,file:Blob):Promise<Booking>{
+ const item=createPendingMedia(file,'photo'),requestId=crypto.randomUUID();
+ const path=mediaPath(booking.id,requestId,item);
+ const metadata={id:item.id,path,kind:item.kind,mime_type:item.mime_type,captured_at:item.captured_at,size_bytes:item.blob.size};
+ return (await queue(booking,requestId,'media_append',{media:[metadata]},booking,undefined,{[item.id]:item.blob})).booking;
 }

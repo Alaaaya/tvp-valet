@@ -4,7 +4,7 @@ const runtime=vi.hoisted(()=>({enqueueOffline:vi.fn(),cachedOfflineBooking:vi.fn
 vi.mock('./offline-client',()=>runtime);
 vi.mock('../api',()=>({db:null,saveBooking:vi.fn()}));
 import {saveBooking} from '../api';
-import {saveOfflineEdit,offlineChangeSpot,offlineTransitionStatus,offlineRecordPayment,offlineRecordCustomerCall,offlineClearCustomerCall,saveOfflineHandover,offlineUndoHandover,offlineRecordOperation,saveOfflineBooking} from './offline-actions';
+import {offlineAppendPhoto,saveOfflineEdit,offlineChangeSpot,offlineTransitionStatus,offlineRecordPayment,offlineRecordCustomerCall,offlineClearCustomerCall,saveOfflineHandover,offlineUndoHandover,offlineRecordOperation,saveOfflineBooking} from './offline-actions';
 const id='12345678-1234-4234-8234-123456789012';
 let b:Booking;
 beforeEach(()=>{
@@ -105,5 +105,34 @@ describe('durable adapters',()=>{
   await saveOfflineBooking({...b,comment:'new',paid:40},true);
   expect(runtime.enqueueOffline.mock.calls[0][0]).toMatchObject({kind:'update_ops',payload:{patch:{comment:'new'}}});
   expect(runtime.enqueueOffline.mock.calls[0][0].projected.paid).toBe(0);expect(runtime.enqueueOffline.mock.calls[0][0].projected.edit_revision).toBe(1);
+ });
+});
+
+describe('gallery photo append',()=>{
+ it('atomically stages blob with event-scoped metadata and unchanged pending booking',async()=>{
+  const file=new Blob(['photo'],{type:'image/jpeg'});
+  const result=await offlineAppendPhoto(b,file);
+  expect(result).toEqual({...b,offline_pending:true});
+  const x=runtime.enqueueOffline.mock.calls[0][0],m=x.payload.media[0];
+  expect(x.kind).toBe('media_append');expect(Object.keys(x.payload)).toEqual(['media']);
+  expect(m).toMatchObject({kind:'photo',mime_type:'image/jpeg',size_bytes:5});
+  expect(m.path).toBe(b.id+'/'+x.id+'-'+m.id+'.jpg');
+  expect(x.blobs).toEqual({[m.id]:file});
+ });
+ it('rejects empty, oversized or unsupported evidence before enqueue',async()=>{
+  for(const blob of [new Blob([],{type:'image/png'}),new Blob(['x'],{type:'text/html'}),new Blob([new Uint8Array(10*1024*1024+1)],{type:'image/jpeg'})])
+   await expect(offlineAppendPhoto(b,blob)).rejects.toThrow();
+  expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+ });
+ it('awaits durable photo storage and propagates failure rather than claiming success',async()=>{
+  let reject!:(e:Error)=>void;
+  runtime.enqueueOffline.mockImplementation(()=>new Promise((_resolve,r)=>reject=r));
+  const success=vi.fn(),promise=offlineAppendPhoto(b,new Blob(['x'],{type:'image/png'})).then(success);
+  expect(success).not.toHaveBeenCalled();
+  reject(Error('quota'));await expect(promise).rejects.toThrow('quota');expect(success).not.toHaveBeenCalled();
+ });
+ it('requires a valid sync snapshot before staging photo',async()=>{
+  await expect(offlineAppendPhoto({...b,sync_version:undefined},new Blob(['x'],{type:'image/png'}))).rejects.toThrow('Offline');
+  expect(runtime.enqueueOffline).not.toHaveBeenCalled();
  });
 });
