@@ -1,12 +1,19 @@
-.offline-status{margin:6px 12px;padding:8px 10px;background:var(--surface,#f0f3f6);color:var(--text,#1d2938);border-radius:8px;font-size:12px;overflow-wrap:anywhere}
-.offline-status-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.offline-status-line>span{flex:1 1 140px}
-.offline-status button{font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px;padding:6px 8px;min-height:34px;cursor:pointer}
+.topbar:has(.offline-indicator){grid-template-columns:44px minmax(0,1fr) 88px}
+.topbar>.header-actions{display:flex;align-items:center;flex-wrap:nowrap;gap:0}
+.topbar:has(.offline-indicator)>strong{white-space:nowrap}
+.topbar .offline-indicator{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;min-height:44px;padding:0;color:#fff}
+.offline-ring{display:block;width:17px;height:17px;border:2px solid #ff4545;border-radius:50%;background:transparent}
+.offline-count{position:absolute;inset-block-start:3px;inset-inline-end:0;min-width:16px;padding:1px 3px;border-radius:10px;background:#b62020;color:#fff;font-size:10px;font-weight:700;line-height:14px;letter-spacing:0}
+.offline-status-backdrop{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;background:#0006}
+.offline-status{width:350px;max-width:100%;max-height:80dvh;overflow:auto;padding:14px 16px;background:#fff;color:#17372f;border-radius:10px;font-size:13px;line-height:1.5;overflow-wrap:anywhere;letter-spacing:0;text-align:start}
+.offline-status header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.offline-status header button{font-size:24px;width:44px;flex-shrink:0}
+.offline-status button{font:inherit;color:inherit;min-height:44px;cursor:pointer}
 .offline-status button:disabled{opacity:.5;cursor:default}
-.offline-status p{margin:6px 0}
+.offline-status p{margin:8px 0}
 .offline-status-error{color:#a52b19}
 .offline-review{max-height:40vh;overflow:auto;overscroll-behavior:contain}
 .offline-event{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:10px 0}
 .offline-event+ .offline-event{border-top:1px solid #aaa5}
 .offline-event small{max-width:100%;overflow-wrap:anywhere}
-.offline-status button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.offline-status button:focus-visible,.offline-indicator:focus-visible{outline:2px solid currentColor;outline-offset:2px}

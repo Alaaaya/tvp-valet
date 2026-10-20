@@ -1,5 +1,6 @@
-import React,{useState,useSyncExternalStore} from 'react';
-import {offlineSnapshot,subscribeOffline,retryOffline,discardOfflineFrom,applyOfflineUpdate} from './offline-client';
+import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
+import {offlineSnapshot,subscribeOffline,discardOfflineFrom} from './offline-client';
+import {createPortal} from 'react-dom';
 import {t as tr} from './i18n';
 import {useLanguage} from './i18n';
 import './offline-status.css';
@@ -8,8 +9,21 @@ import {durableOfflineEnabled} from './offline-capability';
 export function OfflineStatusBanner(){
  useLanguage();
  const state=useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
+ const [open,setOpen]=useState(false);
+ const dialog=useRef<HTMLDivElement>(null);
+ useEffect(()=>{if(state.online)setOpen(false)},[state.online]);
+ useEffect(()=>{
+  if(!open||state.online)return;
+  const previous=document.activeElement as HTMLElement|null;
+  dialog.current?.querySelector<HTMLButtonElement>('button')?.focus();
+  const key=(e:KeyboardEvent)=>{
+   if(e.key==='Escape'){e.preventDefault();setOpen(false)}
+   if(e.key==='Tab'){const items=Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),[tabindex="0"]')??[]);const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}}
+  };
+  document.addEventListener('keydown',key);return()=>{document.removeEventListener('keydown',key);if(previous?.isConnected)previous.focus()};
+ },[open,state.online]);
  const [review,setReview]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false);
- if(!state.ready)return null;
+ if(!state.ready||state.online)return null;
 
  const writes=durableOfflineEnabled();
  const blocked=state.events.filter(e=>e.state==='conflict'||e.state==='failed').length;
@@ -18,20 +32,15 @@ export function OfflineStatusBanner(){
   setBusy(true);setError('');
   try{await discardOfflineFrom(sequence,true)}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}
  };
- const update=()=>{
-  if(state.pending||state.syncing||document.querySelector('form,[role="dialog"]:not([hidden]),.ho-flow,.camera-screen,.sign-screen')||!applyOfflineUpdate())setError(tr("Aktualisierung wartet. Bitte zuerst Änderungen synchronisieren und offene Eingaben schließen."));
- };
  const action=(kind:string)=>tr(({payment:'Zahlung',safe_edit:'Buchung bearbeiten',detail:'Buchungsaktion',handover:'Übergabe',undo_handover:'Übergabe rückgängig',customer_call:'Anruf speichern',clear_customer_call:'Anruf löschen',operation:'Fahrzeugaktion',update_ops:'Buchungsdaten'} as const)[kind]??'Buchungsaktion');
- return <aside className="offline-status" aria-label={tr("Offline & Synchronisierung")}>
-  <div className="offline-status-line" role="status" aria-live="polite">
-   <span>{state.online?tr("Online"):tr("Offline")} · {state.syncing?tr("Synchronisierung läuft …"):state.pending?state.pending+' '+tr("ausstehend"):tr("Keine ausstehenden Änderungen")}{blocked?' · '+blocked+' '+tr("Konflikte / Fehler"):''}</span>
-   {writes&&<button type="button" disabled={busy||state.syncing||!state.online} onClick={()=>void retryOffline(true)}>{tr("Erneut synchronisieren")}</button>}
-   {writes&&<button type="button" aria-expanded={review} onClick={()=>setReview(v=>!v)}>{review?tr("Schließen"):tr("Prüfen")}</button>}
-  </div>
-  {state.shell==='waiting'&&<button type="button" disabled={busy||state.pending>0||state.syncing} onClick={update}>{tr("Neue Version laden")}</button>}
-  <p>{tr(state.shell==='ready'||state.shell==='waiting'?"Offline-App installiert":state.shell==='installing'?"Offline-App wird vorbereitet …":"Offline-App nicht installiert. Gespeicherte Daten allein garantieren keinen Offline-Neustart.")}</p>
-  {!writes&&<p>{tr("Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.")}</p>}
-  {!state.online&&<p>{tr(writes?"Nur gespeicherte Buchungen verfügbar. Änderungen bleiben lokal bis zur Synchronisierung.":"Nur gespeicherte Buchungen verfügbar. Zum Speichern ist eine Internetverbindung erforderlich.")}</p>}
+ return <><button type="button" className="offline-indicator" aria-label={tr("Offline & Synchronisierung")+(state.pending?' · '+state.pending+' '+tr("ausstehend"):'')} aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)}>
+  <span className="offline-ring" aria-hidden="true"/>{state.pending>0&&<span className="offline-count" aria-hidden="true">{state.pending}</span>}
+ </button>{open&&createPortal(<div className="offline-status-backdrop" onClick={e=>{if(e.target===e.currentTarget)setOpen(false)}}>
+ <div ref={dialog} className="offline-status" role="dialog" aria-modal="true" aria-label={tr("Offline & Synchronisierung")}>
+  <header><strong>{tr("Offline")}{state.pending?' · '+state.pending+' '+tr("ausstehend"):''}</strong><button type="button" onClick={()=>setOpen(false)} aria-label={tr("Schließen")}>×</button></header>
+  <p>{tr(writes?"Nur gespeicherte Buchungen verfügbar. Änderungen bleiben lokal bis zur Synchronisierung.":"Nur gespeicherte Buchungen verfügbar. Zum Speichern ist eine Internetverbindung erforderlich.")}</p>
+  {blocked>0&&<p role="alert">{blocked+' '+tr("Konflikte / Fehler")}</p>}
+  {writes&&state.pending>0&&<button type="button" aria-expanded={review} onClick={()=>setReview(v=>!v)}>{review?tr("Schließen"):tr("Prüfen")}</button>}
   {(state.error||error)&&<p role="alert" className="offline-status-error">{error||state.error}</p>}
   {review&&<div className="offline-review">
    <p>{tr("Nicht synchronisierte Zahlungen sind noch nicht serverbestätigt.")}</p>
@@ -45,5 +54,5 @@ export function OfflineStatusBanner(){
     <button type="button" disabled={busy||state.syncing} onClick={()=>void discard(event.seq)}>{tr("Ab hier verwerfen …")}</button>
    </div>)}
   </div>}
- </aside>
+ </div></div>,document.body)}</>
 }
