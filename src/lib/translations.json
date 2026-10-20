@@ -3983,5 +3983,30 @@
     "Balance after local entry",
     "Restbetrag nach Vormerkung",
     "المتبقي بعد التسجيل المحلي"
+  ],
+  "Aktualisierung wartet. Bitte zuerst Änderungen synchronisieren und offene Eingaben schließen.": [
+    "Update waiting. Sync changes and close open forms first.",
+    "Aktualisierung wartet. Bitte zuerst Änderungen synchronisieren und offene Eingaben schließen.",
+    "التحديث ينتظر. زامن التغييرات وأغلق النماذج المفتوحة أولاً."
+  ],
+  "Neue Version laden": [
+    "Load new version",
+    "Neue Version laden",
+    "تحميل الإصدار الجديد"
+  ],
+  "Offline-App installiert": [
+    "Offline app installed",
+    "Offline-App installiert",
+    "تم تثبيت التطبيق للاستخدام دون اتصال"
+  ],
+  "Offline-App wird vorbereitet …": [
+    "Preparing offline app …",
+    "Offline-App wird vorbereitet …",
+    "جارٍ تجهيز التطبيق للعمل دون اتصال …"
+  ],
+  "Offline-App nicht installiert. Gespeicherte Daten allein garantieren keinen Offline-Neustart.": [
+    "Offline app is not installed. Cached data alone does not guarantee an offline restart.",
+    "Offline-App nicht installiert. Gespeicherte Daten allein garantieren keinen Offline-Neustart.",
+    "التطبيق غير مثبّت للعمل دون اتصال. البيانات المحفوظة وحدها لا تضمن فتحه دون إنترنت."
   ]
 }

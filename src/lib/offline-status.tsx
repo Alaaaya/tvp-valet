@@ -1,5 +1,5 @@
 import React,{useState,useSyncExternalStore} from 'react';
-import {offlineSnapshot,subscribeOffline,retryOffline,discardOfflineFrom} from './offline-client';
+import {offlineSnapshot,subscribeOffline,retryOffline,discardOfflineFrom,applyOfflineUpdate} from './offline-client';
 import {t as tr} from './i18n';
 import {useLanguage} from './i18n';
 import './offline-status.css';
@@ -15,13 +15,18 @@ export function OfflineStatusBanner(){
   setBusy(true);setError('');
   try{await discardOfflineFrom(sequence,true)}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}
  };
+ const update=()=>{
+  if(state.pending||state.syncing||document.querySelector('form,[role="dialog"]:not([hidden]),.ho-flow,.camera-screen,.sign-screen')||!applyOfflineUpdate())setError(tr("Aktualisierung wartet. Bitte zuerst Änderungen synchronisieren und offene Eingaben schließen."));
+ };
  const action=(kind:string)=>tr(({payment:'Zahlung',safe_edit:'Buchung bearbeiten',detail:'Buchungsaktion',handover:'Übergabe',undo_handover:'Übergabe rückgängig',customer_call:'Anruf speichern',clear_customer_call:'Anruf löschen',operation:'Fahrzeugaktion',update_ops:'Buchungsdaten'} as const)[kind]??'Buchungsaktion');
  return <aside className="offline-status" aria-label={tr("Offline & Synchronisierung")}>
   <div className="offline-status-line" role="status" aria-live="polite">
    <span>{state.online?tr("Online"):tr("Offline")} · {state.syncing?tr("Synchronisierung läuft …"):state.pending?state.pending+' '+tr("ausstehend"):tr("Keine ausstehenden Änderungen")}{blocked?' · '+blocked+' '+tr("Konflikte / Fehler"):''}</span>
-   <button type="button" disabled={busy||state.syncing||!state.online} onClick={()=>void retryOffline()}>{tr("Erneut synchronisieren")}</button>
+   <button type="button" disabled={busy||state.syncing||!state.online} onClick={()=>void retryOffline(true)}>{tr("Erneut synchronisieren")}</button>
    <button type="button" aria-expanded={review} onClick={()=>setReview(v=>!v)}>{review?tr("Schließen"):tr("Prüfen")}</button>
   </div>
+  {state.shell==='waiting'&&<button type="button" disabled={busy||state.pending>0||state.syncing} onClick={update}>{tr("Neue Version laden")}</button>}
+  <p>{tr(state.shell==='ready'||state.shell==='waiting'?"Offline-App installiert":state.shell==='installing'?"Offline-App wird vorbereitet …":"Offline-App nicht installiert. Gespeicherte Daten allein garantieren keinen Offline-Neustart.")}</p>
   {!state.online&&<p>{tr("Nur gespeicherte Buchungen verfügbar. Änderungen bleiben lokal bis zur Synchronisierung.")}</p>}
   {(state.error||error)&&<p role="alert" className="offline-status-error">{error||state.error}</p>}
   {review&&<div className="offline-review">
