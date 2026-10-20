@@ -241,7 +241,7 @@ await db.query('update storage.objects set owner_id=$1 where name=$2',[driver,ga
 await user(driver);
 for(const invalid of [
  {media:[]},{media:Array(41).fill(galleryItem)},{media:[{...galleryItem,kind:'signature'}]},{media:[{...galleryItem,mime_type:'video/mp4'}]},
- {media:[{...galleryItem,size_bytes:10485761}]},{media:[{...galleryItem,size_bytes:1.5}]},
+ {media:[{...galleryItem,size_bytes:10485761}]},{media:[{...galleryItem,size_bytes:0}]},{media:[{...galleryItem,size_bytes:1.5}]},
  {media:[{...galleryItem,path:other.id+'/'+galleryEvent+'-'+galleryID+'.png'}]},
  {media:[{...galleryItem,path:b.id+'/'+randomUUID()+'-'+galleryID+'.png'}]},
  {media:[{...galleryItem,captured_at:'2099-01-01T00:00:00Z'}]},
@@ -249,6 +249,9 @@ for(const invalid of [
  {media:[{...galleryItem,actor_id:admin}]}
 ])await reject(async()=>sync(b,'media_append',invalid,0,galleryEvent),'22023');
 await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,size_bytes:19}]},0,galleryEvent),'23514');
+await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,mime_type:'image/jpeg'}]},0,galleryEvent),'23514');
+await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,id:'not-a-uuid'}]},0,galleryEvent),'22P02');
+await reject(async()=>sync(b,'media_append',{media:[{...galleryItem,captured_at:null}]},0,galleryEvent),'22023');
 // Batch second item missing: first insert and any audit rows must roll back.
 const missingItem={...galleryItem,id:randomUUID()};missingItem.path=b.id+'/'+galleryEvent+'-'+missingItem.id+'.png';
 await reject(async()=>sync(b,'media_append',{media:[galleryItem,missingItem]},0,galleryEvent),'23514');
