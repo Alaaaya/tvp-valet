@@ -2,7 +2,7 @@ import type {Booking} from '../model';
 export const normalizePlate=(s:string)=>s.normalize('NFKD').toLowerCase().replace(/[^a-z0-9äöüß]/g,'');
 export const normalizeText=(s:string)=>s.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
 export type SearchHit=Pick<Booking,'id'|'plate'|'code'|'customer_name'|'arrival_at'|'departure_at'|'status'>&Partial<Booking>;
-export const foldName=(s:string)=>s.toLowerCase().replace(/ß/g,'ss').replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/æ/g,'a').replace(/ø/g,'o').replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u').replace(/[^a-z0-9]+/g,' ').trim();
+export const foldName=(s:string)=>s.toLowerCase().replace(/ß/g,'ss').replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/æ/g,'a').replace(/ø/g,'o').replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
 export type Phone={de:string|null;intl:string;digits:string};
 // Country aware: only +49 / 0049 / single leading 0 are German. Other country codes are never stripped.
 export function parsePhone(raw:string):Phone{

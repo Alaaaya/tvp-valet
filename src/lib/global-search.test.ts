@@ -30,3 +30,10 @@ describe('phone/name/code',()=>{
  it('reset during load discards result',async()=>{vi.useFakeTimers();const out:any[]=[];let rel:()=>void=()=>{};const s=createGlobalSearch({load:()=>new Promise<any[]>(r=>{rel=()=>r([b('1','AB-1','2026-10-01T00:00:00Z')])}),onResult:r=>out.push(r),delay:10});
   s.set('ab1');await vi.advanceTimersByTimeAsync(20);s.reset();rel();await vi.advanceTimersByTimeAsync(5);expect(out.filter(Boolean)).toHaveLength(0);vi.useRealTimers()});
 });
+
+describe('Unicode name search',()=>{
+ it('preserves Arabic names and matches partial names',()=>{const row=b('ar','','2026-10-01T00:00:00Z','علاء ناصر');expect(foldName('علاء ناصر')).toBe('علاء ناصر');for(const q of ['علاء','ناصر','لاء نا'])expect(matchesBooking(row,q),q).toBe(true);expect(matchesBooking(row,'أحمد')).toBe(false)});
+ it('matches case-insensitive Unicode names and non-Latin partials',()=>{for(const [name,q] of [['Ирина Петрова','ИРИНА'],['Ирина Петрова','петр'],['山田太郎','田太'],['Αλέξανδρος','ΑΛΕΞ']])expect(matchesBooking(b('unicode','','2026-10-01T00:00:00Z',name),q),q).toBe(true);expect(foldName('李１２')).toBe('李１２')});
+ it('keeps German umlaut and transliteration matching',()=>{const row=b('de','','2026-10-01T00:00:00Z','Jörg Müller Straße');for(const q of ['JÖRG','joerg','muel','MÜLLER','strasse'])expect(matchesBooking(row,q),q).toBe(true)});
+ it('never treats Austrian +43 numbers as German local numbers',()=>{expect(matchesPhone('+43 172123456','+43 172123')).toBe(true);expect(matchesPhone('+43 172123456','0043 172123')).toBe(true);expect(matchesPhone('+43 172123456','0172123')).toBe(false);expect(matchesPhone('+43 172123456','+49 172123')).toBe(false)});
+});
