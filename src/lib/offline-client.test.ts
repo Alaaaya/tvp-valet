@@ -54,6 +54,12 @@ describe('offline runtime with actual IndexedDB',()=>{
   await mock.store.discardFrom(scope,(await mock.store.list(scope))[0].seq,true);
   await client.purgeOfflineAccount();expect(await mock.store.getSnapshot(scope,'data')).toBeUndefined();expect(client.cachedOfflineBookings()).toHaveLength(0);void r;
  });
+ it('purges explicit signed-out user even after the auth callback cleared scope',async()=>{
+  await seed();await boot();await client.startOfflineAccount(null);
+  await client.purgeOfflineAccount('alice');
+  expect(await mock.store.getSnapshot(scope,'data')).toBeUndefined();
+  expect(await client.offlineAccountFor('alice')).toBeNull();
+ });
  it('starts from persisted account cache and never queries the backend offline',async()=>{
   await seed();await boot();expect(await client.offlineLoad()).toMatchObject({rows:[{customer_name:'Original'}]});expect(client.offlineSnapshot()).toMatchObject({ready:true,cacheAt:123,cacheCount:1,complete:true});expect(mock.queries).toEqual([]);
   expect(await client.offlineAccountFor('alice')).toEqual(alice);
