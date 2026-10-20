@@ -46,7 +46,7 @@ create function public.sync_booking_event(
  p_event_id uuid,p_booking_id uuid,p_expected_version bigint,p_action text,p_payload jsonb,p_predecessor_id uuid default null
 ) returns jsonb language plpgsql security definer set search_path='' as $$
 declare b public.bookings;r public.booking_sync_receipts;pre public.booking_sync_receipts;allowed text[];baseline bigint;
- result jsonb;response jsonb;ops jsonb;rev bigint;lock_seed bigint;collision boolean;
+ result jsonb;response jsonb;ops jsonb;rev bigint;lock_seed bigint;collision boolean;effective jsonb;snapshot jsonb;canonical jsonb;
 begin
  if auth.uid() is null or not private.is_staff() then
   raise exception 'Active staff required' using errcode='42501'; end if;
@@ -106,44 +106,76 @@ begin
  end if;
  if b.sync_version<>baseline then
   raise exception 'Booking changed; review before retry' using errcode='PT409'; end if;
+ -- Preserve ORIGINAL payload in receipt identity, but derive expected fields only
+ -- from the immutable predecessor canonical response after its version matches.
+ effective:=p_payload;
+ if p_predecessor_id is not null then
+  canonical:=pre.response->'booking';
+  snapshot:=jsonb_build_object('status',canonical->'status',
+   'checked_in_at',canonical->'checked_in_at','checked_out_at',canonical->'checked_out_at',
+   'spot',coalesce(canonical->>'spot',''),'detail_revision',canonical->'detail_revision',
+   'lifecycle_revision',pre.response->'lifecycle_revision');
+  case p_action
+  when 'payment' then effective:=effective||jsonb_build_object(
+   'expected_paid_cents',((canonical->>'paid')::numeric*100),
+   'expected_total_cents',((canonical->>'total')::numeric*100));
+  when 'customer_call' then effective:=effective||jsonb_build_object(
+   'expected_called_at',pre.response#>'{operations,customer_called_at}',
+   'expected_checked_out_at',canonical->'checked_out_at',
+   'expected_lifecycle_revision',pre.response->'lifecycle_revision');
+  when 'clear_customer_call' then effective:=effective||jsonb_build_object(
+   'expected_called_at',pre.response#>'{operations,customer_called_at}',
+   'expected_lifecycle_revision',pre.response->'lifecycle_revision');
+  when 'handover' then effective:=effective||jsonb_build_object(
+   'expected_in',canonical->'checked_in_at','expected_out',canonical->'checked_out_at',
+   'expected_revision',pre.response->'lifecycle_revision');
+  when 'undo_handover' then effective:=effective||jsonb_build_object(
+   'expected_at',case when p_payload->>'action'='in' then canonical->'checked_in_at'
+    else canonical->'checked_out_at' end);
+  when 'detail' then effective:=effective||jsonb_build_object('expected',snapshot);
+  when 'safe_edit' then effective:=effective||jsonb_build_object('expected',
+   snapshot||jsonb_build_object('edit_revision',canonical->'edit_revision'));
+  else null;
+  end case;
+ end if;
  -- Call existing APIs with their own auth, lifecycle, field, money and media guards.
  case p_action
  when 'payment' then
   result:=to_jsonb(public.record_booking_payment(p_event_id,p_booking_id,
-   (p_payload->>'amount_cents')::numeric,p_payload->>'method',
-   (p_payload->>'expected_paid_cents')::numeric,(p_payload->>'expected_total_cents')::numeric));
+   (effective->>'amount_cents')::numeric,effective->>'method',
+   (effective->>'expected_paid_cents')::numeric,(effective->>'expected_total_cents')::numeric));
  when 'customer_call' then
   result:=public.record_booking_customer_call(p_event_id,p_booking_id,
-   (p_payload->>'expected_called_at')::timestamptz,(p_payload->>'expected_checked_out_at')::timestamptz,
-   (p_payload->>'expected_lifecycle_revision')::bigint,(p_payload->>'allow_repeat')::boolean);
+   (effective->>'expected_called_at')::timestamptz,(effective->>'expected_checked_out_at')::timestamptz,
+   (effective->>'expected_lifecycle_revision')::bigint,(effective->>'allow_repeat')::boolean);
  when 'clear_customer_call' then
   result:=public.clear_booking_customer_call(p_event_id,p_booking_id,
-   (p_payload->>'expected_called_at')::timestamptz,(p_payload->>'expected_lifecycle_revision')::bigint);
+   (effective->>'expected_called_at')::timestamptz,(effective->>'expected_lifecycle_revision')::bigint);
  when 'handover' then
-  result:=to_jsonb(public.complete_booking_handover(p_event_id,p_booking_id,p_payload->>'action',
-   p_payload->'details',p_payload->'media',(p_payload->>'expected_in')::timestamptz,
-   (p_payload->>'expected_out')::timestamptz,(p_payload->>'expected_revision')::bigint));
+  result:=to_jsonb(public.complete_booking_handover(p_event_id,p_booking_id,effective->>'action',
+   effective->'details',effective->'media',(effective->>'expected_in')::timestamptz,
+   (effective->>'expected_out')::timestamptz,(effective->>'expected_revision')::bigint));
  when 'undo_handover' then
-  result:=to_jsonb(public.undo_booking_handover(p_event_id,p_booking_id,p_payload->>'action',
-   (p_payload->>'expected_at')::timestamptz));
+  result:=to_jsonb(public.undo_booking_handover(p_event_id,p_booking_id,effective->>'action',
+   (effective->>'expected_at')::timestamptz));
  when 'detail' then
-  result:=to_jsonb(public.apply_booking_detail_action(p_event_id,p_booking_id,p_payload->>'action',
-   p_payload->>'target',p_payload->'expected'));
+  result:=to_jsonb(public.apply_booking_detail_action(p_event_id,p_booking_id,effective->>'action',
+   effective->>'target',effective->'expected'));
  when 'safe_edit' then
-  result:=public.apply_booking_safe_edit(p_event_id,p_booking_id,p_payload->'patch',p_payload->'expected');
+  result:=public.apply_booking_safe_edit(p_event_id,p_booking_id,effective->'patch',effective->'expected');
  when 'operation' then
-  if p_payload->>'action' is null or p_payload->>'action' not in ('taken_away','retrieved','ride_started') then
+  if effective->>'action' is null or effective->>'action' not in ('taken_away','retrieved','ride_started') then
    raise exception 'Use dedicated customer_call event' using errcode='22023'; end if;
-  result:=to_jsonb(public.record_booking_operation(p_booking_id,p_payload->>'action'));
+  result:=to_jsonb(public.record_booking_operation(p_booking_id,effective->>'action'));
  when 'update_ops' then
-  result:=to_jsonb(public.update_booking_ops(p_booking_id,p_payload->'patch'));
+  result:=to_jsonb(public.update_booking_ops(p_booking_id,effective->'patch'));
  end case;
  -- Reload after triggers. Result returned by an existing RPC may predate nested triggers.
  select * into b from public.bookings where id=p_booking_id;
  select to_jsonb(o) into ops from public.booking_operations o where booking_id=p_booking_id;
  select count(*) into rev from public.booking_handover_undos where booking_id=p_booking_id;
  response:=jsonb_build_object('event_id',p_event_id,'booking_id',p_booking_id,
-  'version',b.sync_version,'result',result,'booking',to_jsonb(b),'operations',ops,'lifecycle_revision',rev);
+  'version',b.sync_version,'result',result,'booking',to_jsonb(b)||jsonb_build_object('lifecycle_revision',rev),'operations',ops,'lifecycle_revision',rev);
  insert into public.booking_sync_receipts(id,booking_id,actor_id,expected_version,predecessor_id,action,payload,response)
  values(p_event_id,p_booking_id,auth.uid(),p_expected_version,p_predecessor_id,p_action,p_payload,response);
  return response;
