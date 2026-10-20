@@ -413,3 +413,12 @@ html body .call-ask button.primary{background:#2f8f83;border:0;color:#fff}
 html body .call-ask button.call-clear{min-height:44px;background:#fff;border:1px solid #d9534f;color:#c9302c}
 html body .call-ask button.call-clear:disabled{opacity:.5}
 html body .call-ask button.call-cancel{grid-column:1/-1}
+/* Oct 20 2026: return column also carries the call button; done actions show their time on a second line instead of overflowing. */
+html body .bd .flight-panel{height:auto}
+html body .bd .flight-panel.out .fp-actions{height:auto}
+html body .bd .flight-panel.out .fp-actions .op-btn+.op-btn{height:38px;min-height:38px}
+html body .bd .fp-actions .op-btn:has(.op-at){height:auto;min-height:38px;flex-wrap:wrap;gap:0 5px;padding-block:3px}
+html body .bd .fp-actions .op-btn .op-at{flex-basis:100%;text-align:center;font-size:10px;line-height:13px;color:inherit;font-weight:400}
+/* Oct 20 2026: iOS double-tap zoom on the Eingehend/Ausgehend counters shrank the list with white side margins. */
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,a,label,input,select{touch-action:manipulation}
