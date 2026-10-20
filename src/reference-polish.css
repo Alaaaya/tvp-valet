@@ -424,3 +424,9 @@ html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adju
 button,a,label,input,select{touch-action:manipulation}
 /* Oct 20 2026: .page inherits margin:auto; inside the flex-column workspace that shrink-wrapped and centered the list when few rows were shown (Eingehend filter), leaving white side margins. */
 .app.fixed-top .page{margin:0;width:100%;max-width:none;align-self:stretch}
+/* Staff attribution ("von <Name>") as a small second line inside done buttons */
+html body .bd .op-by{display:block;flex-basis:100%;max-width:100%;text-align:center;font-size:10px;line-height:12px;font-weight:400;color:inherit;opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .bd .fp-actions .op-btn:has(.op-by){height:auto;min-height:38px;flex-wrap:wrap;gap:0 5px;padding-block:3px}
+html body .bd .handover-date>button.has-by{height:auto;min-height:40px;flex-wrap:wrap;gap:0 4px;padding-block:3px;line-height:16px}
+html body .bd .fp-actions .op-btn .op-at .op-by.inline{display:inline;flex-basis:auto;font-size:10px;line-height:13px;font-weight:400;opacity:1;color:inherit}
+html body .bd .fp-actions .op-btn .op-at:has(.op-by){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}

@@ -3498,5 +3498,145 @@
     "Please try again.",
     "Bitte erneut versuchen.",
     "حاول مرة أخرى."
+  ],
+  "(du)": [
+    "(you)",
+    "(du)",
+    "(أنت)"
+  ],
+  "Aktiv": [
+    "Active",
+    "Aktiv",
+    "نشط"
+  ],
+  "Aktivieren": [
+    "Activate",
+    "Aktivieren",
+    "تفعيل"
+  ],
+  "Benutzername": [
+    "Username",
+    "Benutzername",
+    "اسم المستخدم"
+  ],
+  "Benutzername ist bereits vergeben.": [
+    "Username is already taken.",
+    "Benutzername ist bereits vergeben.",
+    "اسم المستخدم مستخدم بالفعل."
+  ],
+  "Benutzername oder E-Mail": [
+    "Username or email",
+    "Benutzername oder E-Mail",
+    "اسم المستخدم أو البريد الإلكتروني"
+  ],
+  "Benutzername: 3–32 Zeichen, nur a–z, 0–9, Punkt, Unterstrich, Bindestrich.": [
+    "Username: 3–32 characters, only a–z, 0–9, dot, underscore, hyphen.",
+    "Benutzername: 3–32 Zeichen, nur a–z, 0–9, Punkt, Unterstrich, Bindestrich.",
+    "اسم المستخدم: من 3 إلى 32 حرفًا، فقط a–z و0–9 والنقطة والشرطة السفلية والشرطة."
+  ],
+  "Deaktivieren": [
+    "Deactivate",
+    "Deaktivieren",
+    "إيقاف"
+  ],
+  "Der letzte aktive Admin kann nicht deaktiviert oder herabgestuft werden.": [
+    "The last active admin cannot be deactivated or demoted.",
+    "Der letzte aktive Admin kann nicht deaktiviert oder herabgestuft werden.",
+    "لا يمكن إيقاف آخر مسؤول نشط أو تخفيض دوره."
+  ],
+  "Inaktiv": [
+    "Inactive",
+    "Inaktiv",
+    "غير نشط"
+  ],
+  "Jeder Mitarbeiter meldet sich mit eigenem Benutzernamen und Passwort an. Check-in, Check-out, Abholen, Zurückbringen und Anrufe werden unter seinem Namen gespeichert.": [
+    "Each employee signs in with their own username and password. Check-in, check-out, taking away, returning and calls are recorded under their name.",
+    "Jeder Mitarbeiter meldet sich mit eigenem Benutzernamen und Passwort an. Check-in, Check-out, Abholen, Zurückbringen und Anrufe werden unter seinem Namen gespeichert.",
+    "يسجّل كل موظف دخوله باسم مستخدم وكلمة مرور خاصين به. يتم تسجيل الاستلام والتسليم وأخذ السيارة وإرجاعها والمكالمات باسمه."
+  ],
+  "Mitarbeiter aktiviert.": [
+    "Employee activated.",
+    "Mitarbeiter aktiviert.",
+    "تم تفعيل الموظف."
+  ],
+  "Mitarbeiter angelegt.": [
+    "Employee created.",
+    "Mitarbeiter angelegt.",
+    "تم إنشاء الموظف."
+  ],
+  "Mitarbeiter anlegen": [
+    "Create employee",
+    "Mitarbeiter anlegen",
+    "إنشاء موظف"
+  ],
+  "Mitarbeiter deaktiviert.": [
+    "Employee deactivated.",
+    "Mitarbeiter deaktiviert.",
+    "تم إيقاف الموظف."
+  ],
+  "Mitarbeiter hinzufügen": [
+    "Add employee",
+    "Mitarbeiter hinzufügen",
+    "إضافة موظف"
+  ],
+  "Mitarbeiterkonten sind im Backend noch nicht eingerichtet (SQL ausführen).": [
+    "Employee accounts are not set up in the backend yet (run the SQL).",
+    "Mitarbeiterkonten sind im Backend noch nicht eingerichtet (SQL ausführen).",
+    "حسابات الموظفين غير مُعدّة في الخادم بعد (شغّل ملف SQL)."
+  ],
+  "Name: 1 bis 120 Zeichen.": [
+    "Name: 1 to 120 characters.",
+    "Name: 1 bis 120 Zeichen.",
+    "الاسم: من 1 إلى 120 حرفًا."
+  ],
+  "Neues Passwort": [
+    "New password",
+    "Neues Passwort",
+    "كلمة مرور جديدة"
+  ],
+  "Neues Passwort (min. 8 Zeichen)": [
+    "New password (min. 8 characters)",
+    "Neues Passwort (min. 8 Zeichen)",
+    "كلمة مرور جديدة (8 أحرف على الأقل)"
+  ],
+  "Neues Passwort für ": [
+    "New password for ",
+    "Neues Passwort für ",
+    "كلمة مرور جديدة لـ "
+  ],
+  "Nur Admins dürfen Mitarbeiter verwalten.": [
+    "Only admins can manage employees.",
+    "Nur Admins dürfen Mitarbeiter verwalten.",
+    "يمكن للمسؤولين فقط إدارة الموظفين."
+  ],
+  "Passwort geändert.": [
+    "Password changed.",
+    "Passwort geändert.",
+    "تم تغيير كلمة المرور."
+  ],
+  "Passwort: mindestens 8 Zeichen.": [
+    "Password: at least 8 characters.",
+    "Passwort: mindestens 8 Zeichen.",
+    "كلمة المرور: 8 أحرف على الأقل."
+  ],
+  "Rolle": [
+    "Role",
+    "Rolle",
+    "الدور"
+  ],
+  "Rolle geändert.": [
+    "Role changed.",
+    "Rolle geändert.",
+    "تم تغيير الدور."
+  ],
+  "Ungültige Rolle.": [
+    "Invalid role.",
+    "Ungültige Rolle.",
+    "دور غير صالح."
+  ],
+  "von ": [
+    "by ",
+    "von ",
+    "بواسطة "
   ]
 }
