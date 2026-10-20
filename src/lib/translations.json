@@ -4055,13 +4055,13 @@
     "لا يوجد حساب محفوظ للاستخدام دون اتصال"
   ],
   "Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.": [
-    "Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.",
     "Offline changes are disabled. Please save while online.",
+    "Offline-Änderungen sind deaktiviert. Bitte mit Internetverbindung speichern.",
     "التعديلات دون اتصال معطّلة. يرجى الحفظ أثناء الاتصال بالإنترنت."
   ],
   "Zahlung gespeichert": [
-    "Zahlung gespeichert",
     "Payment saved",
+    "Zahlung gespeichert",
     "تم حفظ الدفعة"
   ],
   "Nur gespeicherte Buchungen verfügbar. Zum Speichern ist eine Internetverbindung erforderlich.": [
@@ -4070,8 +4070,8 @@
     "الحجوزات المحفوظة فقط متاحة. يلزم اتصال بالإنترنت لحفظ التغييرات."
   ],
   "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.": [
-    "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.",
     "Only saved bookings are available. Offline changes are disabled.",
+    "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.",
     "الحجوزات المحفوظة فقط متاحة. التعديلات دون اتصال معطّلة."
   ]
 }
