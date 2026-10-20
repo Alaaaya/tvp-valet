@@ -56,7 +56,7 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
    <span className="blr-body">
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
     <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><Fa name="key" size={13}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
-    <span className="blr-line blr-l3">{b.phone&&<Fa name="phone" size={14} aria-label={tr("Telefon")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
+    <span className="blr-line blr-l3">{callCounterSlot&&<Fa name="phone" size={14} aria-label={tr("Kundenanruf")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
     {c&&<span className="blr-comment" title={c}>{c}</span>}
     {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
