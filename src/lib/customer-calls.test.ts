@@ -93,12 +93,12 @@ it('repeat-call modal has a full-width third "Anruf löschen" button wired to cl
  const modal=m.slice(m.indexOf('className="call-confirm call-ask"'),m.indexOf('document.body)',m.indexOf('className="call-confirm call-ask"')));
  expect(modal).toContain('{tr("Abbrechen")}');expect(modal).toContain('{tr("Ja, erneut speichern")}');
  expect(modal).toMatch(/className="call-clear"[^>]*onClick=\{\(\)=>void clearCall\(selected\)\}>\{tr\("Anruf löschen"\)\}/);
- expect(modal.indexOf('Ja, erneut speichern')).toBeLessThan(modal.indexOf('Anruf löschen'));
+ expect(modal.indexOf('Anruf löschen')).toBeLessThan(modal.indexOf('Ja, erneut speichern'));expect(modal.indexOf('Ja, erneut speichern')).toBeLessThan(modal.indexOf('Abbrechen'));
  const fn=m.slice(m.indexOf('async function clearCall('),m.indexOf('async function saveEdit('));
  expect(fn).toMatch(/if\(demo\)\{[^}]*customer_called_at:null/);
  expect(fn).toContain('await clearCustomerCall({booking:bk');expect(fn).toContain('setCallAsk(false);await refresh();setNotice(tr("Anruf gelöscht"))');
  const css=readFileSync('src/reference-polish.css','utf8');
- expect(css).toMatch(/\.call-ask button\.call-clear\{grid-column:1\/-1;min-height:44px/);
+ expect(css).toMatch(/\.call-ask button\.call-clear\{min-height:44px/);expect(css).toMatch(/\.call-ask button\.call-cancel\{grid-column:1\/-1\}/);
  const tj=JSON.parse(readFileSync('src/lib/translations.json','utf8'));
  for(const k of ['Anruf löschen','Anruf gelöscht','Anruf konnte nicht gelöscht werden','Kein Anruf zum Löschen vorhanden.','Demo: Anruf nur lokal gelöscht'])expect(tj[k]).toHaveLength(3);
 });
