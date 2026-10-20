@@ -3488,5 +3488,15 @@
     "Demo: call deleted locally only",
     "Demo: Anruf nur lokal gelöscht",
     "تجريبي: تم حذف المكالمة محليًا فقط"
+  ],
+  "Neu laden": [
+    "Reload",
+    "Neu laden",
+    "إعادة التحميل"
+  ],
+  "Bitte erneut versuchen.": [
+    "Please try again.",
+    "Bitte erneut versuchen.",
+    "حاول مرة أخرى."
   ]
 }
