@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
-import {offlineSnapshot,subscribeOffline,discardOfflineFrom} from './offline-client';
+import {offlineSnapshot,subscribeOffline,discardOfflineFrom,applyOfflineUpdate} from './offline-client';
 import {createPortal} from 'react-dom';
 import {t as tr} from './i18n';
 import {useLanguage} from './i18n';
@@ -55,4 +55,13 @@ export function OfflineStatusBanner(){
    </div>)}
   </div>}
  </div></div>,document.body)}</>
+}
+
+// Keep explicit, guarded worker activation available without an online status box.
+export function OfflineUpdateControl(){
+ useLanguage();
+ const state=useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
+ const [error,setError]=useState('');
+ if(!state.ready||state.shell!=='waiting')return null;
+ return <div className="offline-update-control"><button type="button" disabled={state.pending>0||state.syncing||!state.online} onClick={()=>{if(!applyOfflineUpdate())setError(tr("Aktualisierung wartet. Bitte zuerst Änderungen synchronisieren und offene Eingaben schließen."))}}>{tr("Neue Version laden")}</button>{error&&<p role="alert">{error}</p>}</div>
 }
