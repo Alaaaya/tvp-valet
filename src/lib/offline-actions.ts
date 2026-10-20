@@ -99,7 +99,7 @@ async function call({booking,requestId,allowRepeat=false}:CallInput,clear:boolea
  const payload:Record<string,unknown>={expected_called_at:booking.customer_called_at,expected_lifecycle_revision:booking.lifecycle_revision};
  if(!clear)Object.assign(payload,{expected_checked_out_at:booking.checked_out_at,allow_repeat:allowRepeat});
  const old=cachedOfflineOperations(booking.id);
- const ops=old?{...old,customer_called_at:called,updated_at:now}:undefined;
+ const ops:BookingOperations={booking_id:booking.id,taken_away_at:null,retrieved_at:null,ride_started_at:null,performed_by:'',...old,customer_called_at:called,updated_at:now};
  await queue(booking,requestId,clear?'clear_customer_call':'customer_call',payload,{...booking,customer_called_at:called} as Booking,ops);
  return {receipt_id:requestId,occurred_at:now,customer_called_at:called,lifecycle_revision:booking.lifecycle_revision!,offline_pending:true};
 }
@@ -111,8 +111,9 @@ export async function saveOfflineHandover({booking,requestId,action,details,medi
  if(booking.status!=='confirmed'||(action==='in'?(!!booking.checked_in_at||!!booking.checked_out_at):(!booking.checked_in_at||!!booking.checked_out_at)))throw Error(tr("Ungültige Übergabe."));
  if(!Number.isSafeInteger(booking.lifecycle_revision)||(booking.lifecycle_revision??-1)<0)throw Error(tr("Ungültiger Buchungsstand. Bitte neu laden."));
  const blobs:Record<string,Blob>={};
- const metadata=media.map(item=>{const path=mediaPath(booking.id,requestId,item);blobs[path]=item.blob;return{id:item.id,path,kind:item.kind,mime_type:item.mime_type,captured_at:item.captured_at,size_bytes:item.blob.size}});
+ const metadata=media.map(item=>{const path=mediaPath(booking.id,requestId,item);blobs[item.id]=item.blob;return{id:item.id,path,kind:item.kind,mime_type:item.mime_type,captured_at:item.captured_at,size_bytes:item.blob.size}});
  const projected={...booking,km:details.km,key_cash:details.key_cash,[action==='in'?'flight_in':'flight_out']:details.flight_number,comment:details.comment.trim()?[booking.comment,details.comment].filter(Boolean).join('\n'):booking.comment,[action==='in'?'checked_in_at':'checked_out_at']:new Date().toISOString()};
+ projected.edit_revision=(booking.edit_revision??0)+(bookingEditFields.some(k=>projected[k]!==booking[k])?1:0);
  return (await queue(booking,requestId,'handover',{action,details,media:metadata,expected_in:booking.checked_in_at,expected_out:booking.checked_out_at,expected_revision:booking.lifecycle_revision},projected,undefined,blobs)).booking;
 }
 export async function offlineUndoHandover({booking,requestId,action}:{booking:Booking;requestId:string;action:'in'|'out'}):Promise<Booking>{
@@ -143,5 +144,7 @@ export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
  const patch={key_cash:b.key_cash,spot:b.spot,km:b.km,comment:b.comment,driver_id:b.driver_id};
  if(patch.km!==null&&(!Number.isInteger(patch.km)||patch.km<0||patch.km>2147483647))throw Error(tr("Kilometerstand ungültig"));
  if(typeof patch.key_cash!=='string'||patch.key_cash.length>200||typeof patch.spot!=='string'||patch.spot.length>100||typeof patch.comment!=='string'||patch.comment.length>10000)throw Error(tr("Ein Eingabefeld ist zu lang."));
- await queue(original,crypto.randomUUID(),'update_ops',{patch},{...original,...patch});
+ const changedEdit=bookingEditFields.some(k=>k in patch&&patch[k as keyof typeof patch]!==original[k]);
+ const changedSpot=patch.spot!==original.spot;
+ await queue(original,crypto.randomUUID(),'update_ops',{patch},{...original,...patch,edit_revision:(original.edit_revision??0)+(changedEdit?1:0),detail_revision:(original.detail_revision??0)+(changedSpot?1:0)});
 }

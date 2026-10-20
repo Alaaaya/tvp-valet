@@ -59,7 +59,7 @@ describe('durable adapters',()=>{
  it('call projection records and clears only explicit valid state',async()=>{
   const booking={...b,customer_called_at:null};
   const receipt=await offlineRecordCustomerCall({booking,requestId:id});
-  expect(receipt.offline_pending).toBe(true);
+  expect(receipt.offline_pending).toBe(true);expect(runtime.enqueueOffline.mock.calls[0][0].projectedOps.customer_called_at).toBe(receipt.customer_called_at);
   await expect(offlineRecordCustomerCall({booking:{...booking,customer_called_at:receipt.customer_called_at},requestId:id})).rejects.toThrow();
   await offlineClearCustomerCall({booking:{...booking,customer_called_at:receipt.customer_called_at},requestId:id});
   expect(runtime.enqueueOffline.mock.calls[1][0]).toMatchObject({kind:'clear_customer_call',projected:{customer_called_at:null}});
@@ -70,7 +70,7 @@ describe('durable adapters',()=>{
   const result=await saveOfflineHandover(input);
   expect(result.checked_in_at).toBeTruthy();expect(result.comment).toBe('note');
   const x=runtime.enqueueOffline.mock.calls[0][0],path=id+'/'+id+'-'+id+'.png';
-  expect(x.blobs[path]).toBe(blob);expect(x.payload.media[0]).toMatchObject({path,size_bytes:5});
+  expect(result.edit_revision).toBe(1);expect(x.blobs[id]).toBe(blob);expect(x.payload.media[0]).toMatchObject({path,size_bytes:5});
   await saveOfflineHandover(input);expect(runtime.enqueueOffline.mock.calls[1][0].payload).toEqual(x.payload);
  });
  it('rejects media and out without checkin before persistence',async()=>{
@@ -104,6 +104,6 @@ describe('durable adapters',()=>{
  it('existing booking operational save queues allowlisted patch',async()=>{
   await saveOfflineBooking({...b,comment:'new',paid:40},true);
   expect(runtime.enqueueOffline.mock.calls[0][0]).toMatchObject({kind:'update_ops',payload:{patch:{comment:'new'}}});
-  expect(runtime.enqueueOffline.mock.calls[0][0].projected.paid).toBe(0);
+  expect(runtime.enqueueOffline.mock.calls[0][0].projected.paid).toBe(0);expect(runtime.enqueueOffline.mock.calls[0][0].projected.edit_revision).toBe(1);
  });
 });
