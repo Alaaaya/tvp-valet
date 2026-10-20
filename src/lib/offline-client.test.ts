@@ -210,7 +210,7 @@ describe('offline runtime with actual IndexedDB',()=>{
   const options=vi.mocked(registerOfflineShell).mock.calls.at(-1)![0];
   expect(options.isBlocked()).toBe(false);
   protectedNode=true;expect(options.isBlocked()).toBe(true);
-  expect(query.mock.calls.at(-1)![0]).toContain('form,[role="dialog"],[role="alertdialog"]');
+  expect(query.mock.calls.at(-1)![0]).toContain('[role="dialog"]:not([hidden])');
   protectedNode=false;focused=true;expect(options.isBlocked()).toBe(true);
   focused=false;await queue();expect(options.isBlocked()).toBe(true);
  });
