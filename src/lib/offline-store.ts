@@ -5,7 +5,7 @@ export interface OfflineReceipt { eventId: string; [key: string]: unknown }
 export interface OutboxEvent extends OfflineScope {
  schemaVersion:1; id:string; bookingId:string; kind:string; payload:unknown; baseline:unknown;
  createdAt:number; seq:number; attempts:number; nextAttempt:number; state:OutboxState;
- error?:string; receipt?:OfflineReceipt;
+ blobFingerprints?:Record<string,string>; error?:string; receipt?:OfflineReceipt;
 }
 export type EventInput = Pick<OutboxEvent,'bookingId'|'kind'|'payload'|'baseline'> & {id?:string};
 interface Lease { userId:string; owner:string; expiresAt:number }
@@ -15,6 +15,27 @@ interface Schema extends DBSchema {
  blobs:{key:string;value:{id:string;blobs:Record<string,Blob>}};
  counters:{key:string;value:number};
  leases:{key:string;value:Lease};
+}
+export interface SnapshotWrite {key:string;value:unknown}
+function canonical(value:unknown):string {
+ if(value===null||typeof value!=='object')return JSON.stringify(value)??String(value);
+ if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';
+ return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical((value as Record<string,unknown>)[k])).join(',')+'}';
+}
+async function fingerprintBlobs(blobs:Record<string,Blob>){
+ const result:Record<string,string>={};
+ for(const [k,b] of Object.entries(blobs)){
+  const digest=await crypto.subtle.digest('SHA-256',await b.arrayBuffer());
+  result[k]=b.type+':'+b.size+':'+Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');
+ }return result;
+}
+async function sameBlobs(a:Record<string,Blob>,b:Record<string,Blob>){
+ const keys=Object.keys(a).sort();if(canonical(keys)!==canonical(Object.keys(b).sort()))return false;
+ for(const k of keys){
+  if(a[k].type!==b[k].type||a[k].size!==b[k].size)return false;
+  const x=new Uint8Array(await a[k].arrayBuffer()),y=new Uint8Array(await b[k].arrayBuffer());
+  if(x.some((v,i)=>v!==y[i]))return false;
+ }return true;
 }
 export const sameOfflineScope=(a:OfflineScope|null,b:OfflineScope)=>!!a&&a.userId===b.userId&&a.role===b.role;
 function valid(s:OfflineScope){if(!s.userId||!s.role)throw new Error('Account and role required');}
@@ -72,15 +93,36 @@ export class OfflineStore {
  async enqueue(s:OfflineScope,input:EventInput,blobs:Record<string,Blob>={}){
   valid(s);const id=input.id??crypto.randomUUID();
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw new Error('UUID required');
+  const blobFingerprints=await fingerprintBlobs(blobs);
+  const existing=await this.getEvent(s,id);
+  if(existing)return this.matchExisting(s,existing,input,blobs);
   const tx=this.db.transaction(['events','blobs','counters'],'readwrite',{durability:'strict'});
   void tx.done.catch(()=>{});
   try{
    const seq=((await tx.objectStore('counters').get(s.userId))??0)+1;
-   const e:OutboxEvent={...input,...s,schemaVersion:1,id,seq,createdAt:Date.now(),attempts:0,nextAttempt:0,state:'pending'};
+   const e:OutboxEvent={...input,...s,schemaVersion:1,blobFingerprints,id,seq,createdAt:Date.now(),attempts:0,nextAttempt:0,state:'pending'};
    await tx.objectStore('events').add(e);
    await tx.objectStore('blobs').add({id,blobs});
    await tx.objectStore('counters').put(seq,s.userId);await tx.done;this.emit();return e;
-  }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});throw e;}
+  }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});
+   if(e instanceof DOMException&&e.name==='ConstraintError'){
+    const row=await this.getEvent(s,id);if(row)return this.matchExisting(s,row,input,blobs);
+   }throw e;}
+ }
+ async getEvent(s:OfflineScope,id:string){
+  valid(s);const e=await this.db.get('events',id);
+  if(e&&!sameOfflineScope(e,s))throw new Error('Scope mismatch');return e;
+ }
+ private async matchExisting(s:OfflineScope,e:OutboxEvent,input:EventInput,blobs:Record<string,Blob>){
+  if(e.bookingId!==input.bookingId||e.kind!==input.kind||canonical(e.payload)!==canonical(input.payload)||
+    canonical(e.baseline)!==canonical(input.baseline))throw new Error('UUID immutable input mismatch');
+  if(e.blobFingerprints){
+   if(canonical(e.blobFingerprints)!==canonical(await fingerprintBlobs(blobs)))throw new Error('UUID immutable blobs mismatch');
+   return e;
+  }
+  const stored=await this.getBlobs(s,e.id);
+  if(!await sameBlobs(stored,blobs))throw new Error('UUID immutable blobs mismatch');
+  return e;
  }
  async list(s:OfflineScope,options:{includeConfirmed?:boolean}={}){
   valid(s);return (await this.db.getAllFromIndex('events','account',s.userId))
@@ -104,8 +146,8 @@ export class OfflineStore {
   const tx=this.db.transaction('leases','readwrite');
   if((await tx.store.get(s.userId))?.owner===owner)await tx.store.delete(s.userId);await tx.done;
  }
- async confirmReceipt(s:OfflineScope,id:string,receipt:OfflineReceipt,owner:string,now=Date.now()){
-  return this.transition(s,id,owner,now,{state:'confirmed',receipt,error:undefined});
+ async confirmReceipt(s:OfflineScope,id:string,receipt:OfflineReceipt,owner:string,now=Date.now(),snapshots:SnapshotWrite[]=[]){
+  return this.transition(s,id,owner,now,{state:'confirmed',receipt,error:undefined},snapshots);
  }
  /** Retry exact head UUID; caller must stop sync first. Never rewrites payload/baseline. */
  async retry(s:OfflineScope,id:string){
@@ -124,14 +166,16 @@ export class OfflineStore {
   }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});throw e;}
  }
  async transition(s:OfflineScope,id:string,owner:string,now:number,
- patch:Partial<Pick<OutboxEvent,'state'|'attempts'|'nextAttempt'|'error'|'receipt'>>){
-  const tx=this.db.transaction(['events','blobs','leases'],'readwrite',{durability:'strict'});void tx.done.catch(()=>{});
+ patch:Partial<Pick<OutboxEvent,'state'|'attempts'|'nextAttempt'|'error'|'receipt'>>,snapshots:SnapshotWrite[]=[]){
+  const tx=this.db.transaction(['events','blobs','leases','snapshots'],'readwrite',{durability:'strict'});void tx.done.catch(()=>{});
   try{
    const lease=await tx.objectStore('leases').get(s.userId),e=await tx.objectStore('events').get(id);
    if(!lease||lease.owner!==owner||lease.expiresAt<=now)throw new Error('Lease lost');
    if(!e||!sameOfflineScope(e,s))throw new Error('Scope mismatch');
    if(e.state==='confirmed')throw new Error('Already confirmed');
    if(patch.state==='confirmed'&&patch.receipt?.eventId!==id)throw new Error('Receipt mismatch');
+   if(snapshots.length&&patch.state!=='confirmed')throw new Error('Snapshots require confirmed receipt');
+   for(const snapshot of snapshots)await tx.objectStore('snapshots').put(snapshot.value,key(s,snapshot.key));
    await tx.objectStore('events').put({...e,...patch});
    if(patch.state==='confirmed')await tx.objectStore('blobs').delete(id);await tx.done;this.emit();
   }catch(e){try{tx.abort();}catch{}await tx.done.catch(()=>{});throw e;}

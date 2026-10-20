@@ -1,4 +1,4 @@
-import { type OfflineStore, type OfflineScope, type OutboxEvent, type OfflineReceipt, sameOfflineScope } from './offline-store';
+import { type OfflineStore, type OfflineScope, type OutboxEvent, type OfflineReceipt, sameOfflineScope, type SnapshotWrite } from './offline-store';
 export type SyncFailure='conflict'|'permanent'|'auth'|'network'|'uncertain';
 export class OfflineSyncError extends Error {
  constructor(public category:SyncFailure,message:string){super(message);}
@@ -10,6 +10,7 @@ export interface OfflineSyncOptions {
  validateAuth:(scope:OfflineScope,signal:AbortSignal)=>Promise<boolean>;
  /** Server must dedupe event.id. A lease cannot prevent overlap during suspended tabs/network partitions. */
  execute:(event:OutboxEvent,blobs:Record<string,Blob>,signal:AbortSignal)=>Promise<OfflineReceipt>;
+ canonicalSnapshots?:(event:OutboxEvent,receipt:OfflineReceipt)=>SnapshotWrite[];
  classify?:(error:unknown)=>SyncFailure;
  now?:()=>number;
  leaseTtl?:number;
@@ -62,7 +63,7 @@ export class OfflineSync {
      // Never acknowledge locally after account switching; retry same UUID next session.
      if(!active())return {reason:'stopped'};
      if(receipt.eventId!==event.id)throw new OfflineSyncError('uncertain','Receipt mismatch');
-     await this.store.confirmReceipt(s,event.id,receipt,this.owner,now());
+     await this.store.confirmReceipt(s,event.id,receipt,this.owner,now(),o.canonicalSnapshots?.(event,receipt)??[]);
     }catch(error){
      if(!active())return {reason:'stopped'};
      const category=o.classify?.(error)??(error instanceof OfflineSyncError?error.category:'uncertain');
