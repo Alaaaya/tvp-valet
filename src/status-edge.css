@@ -1,0 +1,17 @@
+/* iOS 26/27 home-screen app: the system draws a "scroll edge effect" (Liquid Glass
+   blur/fog) over the status-bar band and ~20px below it, unless WebKit finds a
+   position:fixed/sticky element with an opaque background-color at the top edge.
+   Then it tints the band with that colour instead of fogging it.
+   The bookings view had its topbar in normal flow (position:relative), so the title
+   and the top of the header were fogged; every other view uses a sticky topbar and
+   stayed crisp. Pin the real bookings topbar (not the Settings preview) to the top. */
+.app.fixed-top>.workspace{
+ --tvp-topbar-h:calc(max(44px,44px * var(--list-scale,1)) + env(safe-area-inset-top));
+ padding-top:var(--tvp-topbar-h);
+}
+.app.fixed-top>.workspace>.topbar{
+ position:fixed;top:0;left:0;right:0;margin-inline:auto;z-index:8;
+ height:var(--tvp-topbar-h)!important;
+ background-color:#0d6b6b!important;opacity:1;
+ transform:none;filter:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+}
