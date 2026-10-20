@@ -3,7 +3,7 @@ import {db} from '../api';
 import type {Booking} from '../model';
 export type MediaKind='photo'|'video'|'signature';
 export type PendingMedia={id:string;blob:Blob;kind:MediaKind;mime_type:string;captured_at:string;name:string};
-export type MediaItem={id:string;path:string;kind:MediaKind;mime_type:string;captured_at:string;size_bytes:number;action?:'in'|'out';undone_at?:string|null;undone_by?:string|null};
+export type MediaItem={id:string;path:string;kind:MediaKind;mime_type:string;captured_at:string;size_bytes:number;bucket?:string;local_blob?:Blob;offline_pending?:boolean;action?:'in'|'out';undone_at?:string|null;undone_by?:string|null};
 export type HandoverDetails={km:number|null;key_cash:string;flight_number:string;comment:string;poor_visibility:boolean};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const imageTypes=new Set(['image/jpeg','image/png','image/webp']),videoTypes=new Set(['video/mp4','video/webm','video/quicktime']);
@@ -38,6 +38,12 @@ export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  const d=client(),result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action,booking_handovers!inner(undone_at,undone_by)').eq('booking_id',bookingId).order('captured_at');
  if(result.error)throw result.error;
  const items:MediaItem[]=(result.data||[]).map((row:MediaItem&{booking_handovers?:{undone_at:string|null;undone_by:string|null}|{undone_at:string|null;undone_by:string|null}[]})=>{const {booking_handovers,...item}=row;const history=Array.isArray(booking_handovers)?booking_handovers[0]:booking_handovers;return{...item,undone_at:history?.undone_at||null,undone_by:history?.undone_by||null}});
+ const gallery=await d.from('booking_gallery_media').select('*').eq('booking_id',bookingId).order('captured_at');
+ if(gallery.error)throw gallery.error;
+ for(const row of gallery.data||[]){
+  if(items.some(x=>x.id===row.id||x.path===row.path))continue;
+  items.push({id:row.id,path:row.path,bucket:row.bucket||'booking-media',kind:row.kind,mime_type:row.mime_type,captured_at:row.captured_at,size_bytes:Number(row.size_bytes??row.bytes??0)});
+ }
  // Preserve pre-existing photos, but do not publish abandoned partial uploads as completed evidence.
  for(let offset=0;;offset+=100){
   const r=await d.storage.from('booking-media').list(bookingId,{limit:100,offset,sortBy:{column:'created_at',order:'asc'}});
@@ -52,12 +58,14 @@ export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  return items.sort((a,b)=>a.captured_at.localeCompare(b.captured_at));
 }
 export async function signedMediaUrl(item:MediaItem):Promise<string>{
- const r=await client().storage.from('booking-media').createSignedUrl(item.path,300);
+ if(item.local_blob)return URL.createObjectURL(item.local_blob);
+ const r=await client().storage.from(item.bucket||'booking-media').createSignedUrl(item.path,300);
  if(r.error||!r.data?.signedUrl)throw r.error||Error(tr("Medienlink konnte nicht erstellt werden."));
  return r.data.signedUrl;
 }
 export async function mediaBlob(item:MediaItem):Promise<Blob>{
- const r=await client().storage.from('booking-media').download(item.path);
+ if(item.local_blob)return item.local_blob;
+ const r=await client().storage.from(item.bucket||'booking-media').download(item.path);
  if(r.error||!r.data)throw r.error||Error(tr("Download fehlgeschlagen."));
  return r.data;
 }

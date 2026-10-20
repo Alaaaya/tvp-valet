@@ -1,48 +1,63 @@
 import {t as tr} from './i18n';
-import React,{useCallback,useEffect,useRef,useState} from 'react';
+import React,{useCallback,useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {ChevronLeft,ChevronRight,Maximize2,Minimize2,Download,Share2,Camera,Video as VideoIcon,PenLine,Calendar,AlertTriangle} from 'lucide-react';
 import {listBookingMedia,signedMediaUrl,mediaBlob,type MediaItem} from './handover-api';
+import {pendingOfflineMedia,subscribeOffline,offlineSnapshot} from './offline-client';
 import {useEdgeBack} from './use-edge-back';
 
 const RENEW_MS=240000;
-type U={url:string;at:number};
+type U={url:string;at:number;blob?:Blob};
 const kindLabel=(k:MediaItem['kind'])=>k==='photo'?tr("Photo"):k==='video'?tr("Video"):tr("Signature");
 const fmt=(iso:string)=>{try{return new Date(iso).toLocaleString('de-DE',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'})}catch{return iso}};
 const ext=(m:MediaItem)=>{const t=m.mime_type||'';return t.includes('png')?'png':t.includes('mp4')?'mp4':t.includes('webm')?'webm':t.includes('quicktime')?'mov':t.startsWith('video')?'mp4':'jpg'};
 
 export function useSignedUrls(){
-  const[map,setMap]=useState<Record<string,U>>({}),[errs,setErrs]=useState<Record<string,string>>({}),inflight=useRef(new Map<string,Promise<void>>()),mapRef=useRef(map),forced=useRef(new Set<string>());mapRef.current=map;const dead=useRef(false);
-  useEffect(()=>{dead.current=false;return()=>{dead.current=true}},[]);
+  const[map,setMap]=useState<Record<string,U>>({}),[errs,setErrs]=useState<Record<string,string>>({}),inflight=useRef(new Map<string,Promise<void>>()),mapRef=useRef(map),forced=useRef(new Set<string>());mapRef.current=map;const dead=useRef(false),owned=useRef(new Map<string,string>());
+  useEffect(()=>{dead.current=false;return()=>{dead.current=true;for(const url of owned.current.values())URL.revokeObjectURL(url);owned.current.clear()}},[]);
   const setErr=(id:string,v:string|null)=>{if(!dead.current)setErrs(x=>{if(v===null){if(!(id in x))return x;const{[id]:_,...r}=x;return r}return{...x,[id]:v}})};
   const ensure=useCallback((m:MediaItem,force=false)=>{
-    const c=mapRef.current[m.id];if(!force&&c&&Date.now()-c.at<RENEW_MS)return Promise.resolve();
+    const c=mapRef.current[m.id];if(!force&&c&&c.blob===m.local_blob&&Date.now()-c.at<RENEW_MS)return Promise.resolve();
     const f=inflight.current.get(m.id);if(f)return f;
-    const p=signedMediaUrl(m).then(url=>{if(!url)throw Error(tr("Keine Medien-URL erhalten."));if(!dead.current)setMap(x=>({...x,[m.id]:{url,at:Date.now()}}));setErr(m.id,null)}).catch(e=>{setErr(m.id,e instanceof Error?e.message:String(e))}).finally(()=>{inflight.current.delete(m.id)});
+    const p=signedMediaUrl(m).then(url=>{if(!url)throw Error(tr("Keine Medien-URL erhalten."));if(dead.current){if(m.local_blob)URL.revokeObjectURL(url);return}const old=owned.current.get(m.id);if(old)URL.revokeObjectURL(old);owned.current.delete(m.id);if(m.local_blob)owned.current.set(m.id,url);setMap(x=>({...x,[m.id]:{url,at:Date.now(),blob:m.local_blob}}));setErr(m.id,null)}).catch(e=>{setErr(m.id,e instanceof Error?e.message:String(e))}).finally(()=>{inflight.current.delete(m.id)});
     inflight.current.set(m.id,p);return p},[]);
   // image/video element failed: renew the signed URL once, then show an error instead of looping
   const bad=useCallback((m:MediaItem)=>{if(forced.current.has(m.id)){setErr(m.id,tr("Medium konnte nicht geladen werden."));return}forced.current.add(m.id);void ensure(m,true)},[ensure]);
   const good=useCallback((m:MediaItem)=>{forced.current.delete(m.id);setErr(m.id,null)},[]);
   const retry=useCallback((m:MediaItem)=>{forced.current.delete(m.id);setErr(m.id,null);return ensure(m,true)},[ensure]);
-  return{map,errs,ensure,bad,good,retry};
+  const prune=useCallback((items:MediaItem[])=>{for(const [id,url] of owned.current){const item=items.find(x=>x.id===id);if(!item?.local_blob){URL.revokeObjectURL(url);owned.current.delete(id);setMap(x=>{const{[id]:_,...rest}=x;return rest})}}},[]);
+  return{map,errs,ensure,bad,good,retry,prune};
 }
 
 type Undo={undone_at?:string|null;undone_by?:string|null};const undone=(m:MediaItem)=>(m as MediaItem&Undo).undone_at||null;
 type GalleryProps={bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];addTile?:React.ReactNode};
 /** Keyed by booking: items, open viewer, signed-URL cache and errors can never carry over to another booking, even if the parent forgets a key. */
-export function MediaGallery(p:GalleryProps){return <MediaGalleryInner key={p.bookingId} {...p}/>}
+export function MediaGallery(p:GalleryProps){const account=useSyncExternalStore(subscribeOffline,()=>String(offlineSnapshot().accountId||'')+':'+String(offlineSnapshot().ready),()=>':false');return <MediaGalleryInner key={account+':'+p.bookingId} {...p}/>}
 function MediaGalleryInner({bookingId,demo,refreshKey,local,addTile}:GalleryProps){
   const[items,setItems]=useState<MediaItem[]>([]),[err,setErr]=useState(''),[open,setOpen]=useState<number|null>(null),[loading,setLoading]=useState(false);
-  const{map,errs,ensure,bad,good,retry}=useSignedUrls();const[reload,setReload]=useState(0);
+  const{map,errs,ensure,bad,good,retry,prune}=useSignedUrls();const[reload,setReload]=useState(0);
+  const offline=useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
+  const[serverItems,setServerItems]=useState<MediaItem[]>([]),[pending,setPending]=useState<MediaItem[]>([]);
+  useEffect(()=>{if(demo)return;let dead=false;
+    pendingOfflineMedia(bookingId).then(rows=>{if(!dead)setPending(rows.map(({item,blob})=>({...item,local_blob:blob,offline_pending:true})))})
+      .catch(e=>{if(!dead)setErr(e instanceof Error?e.message:String(e))});
+    return()=>{dead=true};
+  },[bookingId,demo,refreshKey,offline]);
   useEffect(()=>{if(demo)return;let dead=false;setLoading(true);setErr('');
-    listBookingMedia(bookingId).then(l=>{if(dead)return;const s=[...l].sort((a,b)=>a.captured_at.localeCompare(b.captured_at));setItems(s);s.filter(i=>i.kind!=='video').forEach(i=>ensure(i))}).catch(e=>{if(!dead)setErr(e instanceof Error?e.message:String(e))}).finally(()=>{if(!dead)setLoading(false)});
-    return()=>{dead=true}},[bookingId,refreshKey,reload,demo,ensure]);
+    listBookingMedia(bookingId).then(l=>{if(!dead)setServerItems(l)}).catch(e=>{if(!dead)setErr(e instanceof Error?e.message:String(e))}).finally(()=>{if(!dead)setLoading(false)});
+    return()=>{dead=true}},[bookingId,refreshKey,reload,demo,offline.pending,offline.online]);
+  useEffect(()=>{
+    const merged=new Map(serverItems.map(m=>[m.id,m]));
+    for(const m of pending)if(!merged.has(m.id))merged.set(m.id,m);
+    const s=[...merged.values()].sort((a,b)=>a.captured_at.localeCompare(b.captured_at));
+    setItems(s);prune(s);s.filter(i=>i.kind!=='video').forEach(i=>void ensure(i));
+  },[serverItems,pending,ensure,prune]);
   if(demo)return <div className="mg-grid">{addTile}{local.map(p=><a key={p.name} href={p.url} target="_blank" rel="noreferrer"><img src={p.url} alt={tr("Fahrzeugdokumentation")}/></a>)}</div>;
   return <div className="mg">
     {err&&<p className="mg-err" role="alert">{tr("Medien konnten nicht geladen werden:")}{err} <button type="button" className="mg-retry" onClick={()=>setReload(x=>x+1)}>{tr("Erneut versuchen")}</button></p>}
     {loading&&!items.length&&<p className="mg-note" role="status">{tr("Medien werden geladen …")}</p>}
     {!loading&&!err&&!items.length&&<p className="mg-note">{tr("Noch keine Medien.")}</p>}
     <div className="mg-grid">{addTile}{items.map((m,i)=><button type="button" key={m.id} className={'mg-tile'+(undone(m)?' undone':'')} aria-label={tr("Medium ")+(i+1)+' öffnen, '+kindLabel(m.kind)+(undone(m)?tr(", rückgängig gemacht"):'')} onClick={()=>setOpen(i)}>
-      {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b>{undone(m)&&<span className="mg-undone">{tr("Rückgängig gemacht")}</span>}</button>)}</div>
+      {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b>{m.offline_pending&&<span className="mg-undone">{tr("Ausstehend")}</span>}{undone(m)&&<span className="mg-undone">{tr("Rückgängig gemacht")}</span>}</button>)}</div>
     {open!==null&&items[open]&&<Viewer items={items} index={open} setIndex={setOpen} onClose={()=>setOpen(null)} map={map} errs={errs} ensure={ensure} bad={bad} good={good} retry={retry}/>}
   </div>;
 }
@@ -72,7 +87,7 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
       <button type="button" className="gv-fs" aria-label={full?tr("Vollbild beenden"):tr("Vollbild")} onClick={toggleFull}>{full?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button>
       {items.length>1&&<><button type="button" className="gv-nav l" aria-label={tr("Zurück")} onClick={()=>go(-1)}><ChevronLeft size={22}/></button><button type="button" className="gv-nav r" aria-label={tr("Weiter")} onClick={()=>go(1)}><ChevronRight size={22}/></button></>}
     </div>
-    <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.action&&<span>{m.action==='in'?tr("Check-in"):tr("Check-out")}</span>}{undone(m)&&<span>{tr("Rückgängig gemacht ·")}{fmt(undone(m)!)}</span>}</div>
+    <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.offline_pending&&<span>{tr("Ausstehend")}</span>}{m.action&&<span>{m.action==='in'?tr("Check-in"):tr("Check-out")}</span>}{undone(m)&&<span>{tr("Rückgängig gemacht ·")}{fmt(undone(m)!)}</span>}</div>
       <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label={tr("Teilen")} disabled={!!busy} onClick={share}><Share2 size={18}/></button>}<button type="button" className="gv-round" aria-label={tr("Herunterladen")} disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
     {msg&&<p className="gv-msg" role="alert">{msg}</p>}
     <h3 className="gv-title">{tr("Media (")}{items.filter(i=>i.kind==='photo').length} {tr("photos")}{items.some(i=>i.kind==='video')?', '+items.filter(i=>i.kind==='video').length+' videos':''}{")"}</h3>

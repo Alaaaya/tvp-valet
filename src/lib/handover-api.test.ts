@@ -1,10 +1,10 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
-const mock=vi.hoisted(()=>({upload:vi.fn(),list:vi.fn(),rpc:vi.fn(),receipt:vi.fn(),booking:vi.fn(),metadata:vi.fn(),signed:vi.fn(),download:vi.fn()}));
+const mock=vi.hoisted(()=>({upload:vi.fn(),list:vi.fn(),rpc:vi.fn(),receipt:vi.fn(),booking:vi.fn(),metadata:vi.fn(),signed:vi.fn(),download:vi.fn(),gallery:vi.fn()}));
 vi.mock('../api',()=>({db:{
  storage:{from:()=>({upload:mock.upload,list:mock.list,createSignedUrl:mock.signed,download:mock.download})},
  rpc:mock.rpc,
  from:(table:string)=>({select:()=>({eq:()=>({
- maybeSingle:mock.receipt,single:mock.booking,order:mock.metadata
+ maybeSingle:mock.receipt,single:mock.booking,order:table==='booking_gallery_media'?mock.gallery:mock.metadata
  })})})
 }}));
 import {blank} from '../model';
@@ -13,7 +13,7 @@ const bid='11111111-1111-4111-8111-111111111111',requestId='22222222-2222-4222-8
 const photo=()=>createPendingMedia(new Blob(['photo'],{type:'image/jpeg'}),'photo');
 const details={km:123,key_cash:'10€ Wael',flight_number:'AA123',comment:'New comment',poor_visibility:false};
 const booking={...blank(),id:bid};
-beforeEach(()=>{vi.clearAllMocks();mock.receipt.mockResolvedValue({data:null,error:null});mock.upload.mockResolvedValue({data:{},error:null});mock.rpc.mockResolvedValue({data:{...booking,checked_in_at:'2026-10-17T14:00:00Z'},error:null});mock.list.mockResolvedValue({data:[],error:null});mock.metadata.mockResolvedValue({data:[],error:null})});
+beforeEach(()=>{vi.clearAllMocks();mock.receipt.mockResolvedValue({data:null,error:null});mock.upload.mockResolvedValue({data:{},error:null});mock.rpc.mockResolvedValue({data:{...booking,checked_in_at:'2026-10-17T14:00:00Z'},error:null});mock.list.mockResolvedValue({data:[],error:null});mock.metadata.mockResolvedValue({data:[],error:null});mock.gallery.mockResolvedValue({data:[],error:null})});
 describe('media validation',()=>{
  it('normalizes Safari codecs',()=>expect(baseMime('video/mp4;codecs=avc1')).toBe('video/mp4'));
  it('accepts Safari MP4 and browser WebM',()=>{for(const type of ['video/mp4;codecs=avc1','video/webm','video/quicktime'])expect(validateMedia(new Blob(['ok'],{type}),'video')).toBe(baseMime(type))});
@@ -82,4 +82,22 @@ describe('gallery private access',()=>{
   expect((await listBookingMedia(bid))[0].undone_at).toBeNull();
  });
  it('metadata errors do not silently show empty gallery',async()=>{mock.metadata.mockResolvedValue({error:Error('Forbidden')});await expect(listBookingMedia(bid)).rejects.toThrow('Forbidden')});
+});
+
+describe('standalone media ledger and local blobs',()=>{
+ it('merges standalone ledger with handover/legacy evidence without duplicate storage paths',async()=>{
+  mock.gallery.mockResolvedValue({data:[{id:'standalone',booking_id:bid,actor_id:requestId,path:bid+'/one.jpg',bucket:'booking-media',kind:'photo',mime_type:'image/jpeg',captured_at:'2026-10-20',bytes:7}]});
+  mock.list.mockResolvedValue({data:[{id:'storage',name:'one.jpg',metadata:{mimetype:'image/jpeg',size:7}}]});
+  const items=await listBookingMedia(bid);expect(items).toHaveLength(1);expect(items[0]).toMatchObject({id:'standalone',size_bytes:7,bucket:'booking-media'});
+ });
+ it('does not suppress missing ledger or permission errors',async()=>{
+  mock.gallery.mockResolvedValue({error:{code:'42P01',message:'missing table'}});
+  await expect(listBookingMedia(bid)).rejects.toMatchObject({code:'42P01'});
+ });
+ it('local media access never contacts storage',async()=>{
+  const blob=new Blob(['local'],{type:'image/jpeg'}),item={id:'local',path:'never',kind:'photo' as const,mime_type:'image/jpeg',captured_at:'',size_bytes:5,local_blob:blob};
+  const create=vi.spyOn(URL,'createObjectURL').mockReturnValue('blob:local');
+  expect(await signedMediaUrl(item)).toBe('blob:local');expect(await mediaBlob(item)).toBe(blob);
+  expect(mock.signed).not.toHaveBeenCalled();expect(mock.download).not.toHaveBeenCalled();create.mockRestore();
+ });
 });
