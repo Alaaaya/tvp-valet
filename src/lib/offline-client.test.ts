@@ -120,6 +120,35 @@ describe('offline runtime with actual IndexedDB',()=>{
   await client.startOfflineAccount(null);vi.resetModules();client=await import('./offline-client');await client.startOfflineAccount(alice);await client.retryOffline();
   expect(calls).toHaveLength(2);expect(calls[1]).toEqual(calls[0]);expect(client.offlineSnapshot().pending).toBe(0);
  });
+ it('canonical receipt persistence preserves unrelated rows and never commits other pending projections',async()=>{
+  const a=booking(),b=booking({id:'20000000-0000-0000-0000-000000000002',customer_name:'Other original'}),c=booking({id:'30000000-0000-0000-0000-000000000003',customer_name:'Untouched'});
+  await seed([a,b,c]);await boot(true);mock.online=false;
+  const first=await queue();
+  await queue({booking:b,projected:{...b,customer_name:'Other pending'},payload:{patch:{customer_name:'Other pending'}}});
+  mock.rpc.mockImplementation(async(_name,args)=>{
+   if(args.p_event_id!==first.eventId)throw {code:'PT409',message:'Blocked second'};
+   return {error:null,data:{event_id:first.eventId,booking_id:a.id,booking:{...a,customer_name:'Canonical first',sync_version:2},version:2}};
+  });
+  mock.online=true;await client.retryOffline();await client.retryOffline();
+  expect((await mock.store.list(scope,{includeConfirmed:true}))[0]).toMatchObject({state:'confirmed'});
+  const persisted=await mock.store.getSnapshot<{rows:Booking[]}>(scope,'data');
+  expect(persisted!.rows).toHaveLength(3);
+  expect(persisted!.rows.find(r=>r.id===a.id)).toMatchObject({customer_name:'Canonical first',sync_version:2});
+  expect(persisted!.rows.find(r=>r.id===b.id)).toMatchObject({customer_name:'Other original'});
+  expect(persisted!.rows.some(r=>r.offline_pending)).toBe(false);
+  expect(client.cachedOfflineBookings().find(r=>r.id===b.id)).toMatchObject({customer_name:'Other pending',offline_pending:true});
+  mock.online=false;await client.startOfflineAccount(null);await client.startOfflineAccount(alice);
+  expect(client.cachedOfflineBookings()).toHaveLength(3);expect(client.cachedOfflineBookings().find(r=>r.id===b.id)?.customer_name).toBe('Other pending');
+  await client.discardOfflineFrom(2,true);
+  expect(client.cachedOfflineBookings().find(r=>r.id===b.id)?.customer_name).toBe('Other original');
+ });
+ it('manual retry resets backoff but keeps exact UUID and never retries conflicts',async()=>{
+  await seed();await boot(true);mock.online=false;const r=await queue();
+  mock.rpc.mockRejectedValue(new TypeError('Temporary'));mock.online=true;await client.retryOffline();
+  expect(mock.rpc).toHaveBeenCalledTimes(1);await client.retryOffline();expect(mock.rpc).toHaveBeenCalledTimes(1);
+  mock.rpc.mockRejectedValue({code:'PT409'});await client.retryOffline(true);expect(mock.rpc).toHaveBeenCalledTimes(2);
+  await client.retryOffline(true);expect(mock.rpc).toHaveBeenCalledTimes(2);expect((await mock.store.list(scope))[0]).toMatchObject({id:r.eventId,state:'conflict'});
+ });
  it('a deferred RPC after account switch cannot acknowledge or leak the old account projection',async()=>{
   await seed();await boot(true);mock.online=false;const r=await queue();
   let resolve!:(v:unknown)=>void;mock.rpc.mockImplementation(()=>new Promise(r=>{resolve=r}));mock.online=true;const syncing=client.retryOffline();
