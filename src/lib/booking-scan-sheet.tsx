@@ -4,6 +4,7 @@ import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
 import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} from './booking-scan-parse';
 import {createQrDecoder,decodeQrFromFile,validateImageFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
+import {acquireCamera,releaseCamera} from './camera-stream';
 import {useEdgeBack} from './use-edge-back';
 import '../booking-scan.css';
 
@@ -72,7 +73,7 @@ function useMounted(){const m=useRef(true);useEffect(()=>{m.current=true;return(
 function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   const video=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),gen=useRef(0),mounted=useMounted(),file=useRef<HTMLInputElement>(null),dec=useRef<QrDecoder|null>(null),fileJob=useRef(0);
   const[state,setState]=useState<'starting'|'live'|'nocam'>('starting');const[err,setErr]=useState('');const[manual,setManual]=useState('');
-  const stop=useCallback(()=>{gen.current++;fileJob.current++;stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(video.current)video.current.srcObject=null},[]);
+  const stop=useCallback(()=>{gen.current++;fileJob.current++;if(video.current){try{video.current.pause()}catch{}video.current.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}},[]);
   const handle=useCallback((raw:string):boolean=>{
     const r=parseQrPayload(raw,{expectedHosts:hosts});
     if(!r.ok){setErr(r.reason);return false}
@@ -83,10 +84,10 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
     (async()=>{
       if(!navigator.mediaDevices?.getUserMedia){setState('nocam');return}
       let s:MediaStream;
-      try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false})}
+      try{s=await acquireCamera()}
       catch(e){if(my!==gen.current||!mounted.current)return;setState('nocam');setErr((e as DOMException)?.name==='NotAllowedError'?tr("Kamerazugriff wurde nicht erlaubt. Foto oder manuelle Eingabe nutzen."):tr("Keine Kamera verfügbar. Foto oder manuelle Eingabe nutzen."));return}
-      if(my!==gen.current||!mounted.current){s.getTracks().forEach(t=>t.stop());return}
-      stream.current=s;const v=video.current;if(!v){s.getTracks().forEach(t=>t.stop());return}
+      if(my!==gen.current||!mounted.current){releaseCamera();return}
+      stream.current=s;const v=video.current;if(!v){stream.current=null;releaseCamera();return}
       v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;
       try{await v.play()}catch{/* autoplay quirks; frames still decode once playing */}
       if(my!==gen.current||!mounted.current)return;

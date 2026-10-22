@@ -1,16 +1,18 @@
 /* handover: camera, details, signature, gallery */
 .ho{position:fixed;inset:0;z-index:80;background:#000;color:#fff;overscroll-behavior:contain}
-.cam{position:absolute;inset:0;background:#000;overflow:hidden;font-family:inherit}
-.cam-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.cam{position:absolute;inset:0;background:#000;overflow:hidden;font-family:inherit;display:flex;flex-direction:column}
+/* live preview fills everything between the top bar and the bottom controls */
+.cam-stage{order:1;position:relative;flex:1 1 auto;min-height:0;width:100%;overflow:hidden;background:#000}
+.cam-video{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;background:#000;display:block}
 .cam-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.cam-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(14px,env(safe-area-inset-top)) 14px 10px;background:#000}
+.cam-top{order:0;position:relative;flex:none;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(14px,env(safe-area-inset-top)) 14px 10px;background:#000}
 .cam-title{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cam-round{width:44px;height:44px;border-radius:50%;background:#1c2330;color:#fff;flex-shrink:0;padding:0}
 .cam-round:disabled{opacity:.4}
-.cam-rec{position:absolute;top:max(70px,calc(env(safe-area-inset-top) + 56px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:#000;padding:5px 12px;border-radius:20px;font-variant-numeric:tabular-nums;font-size:14px}
+.cam-rec{position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:#000;padding:5px 12px;border-radius:20px;font-variant-numeric:tabular-nums;font-size:14px}
 .cam-rec i{width:10px;height:10px;border-radius:50%;background:#ff3b30;animation:camblink 1s infinite}
 @keyframes camblink{50%{opacity:.25}}
-.cam-bottom{position:absolute;left:0;right:0;bottom:0;padding:12px 16px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;align-items:center;background:#000}
+.cam-bottom{order:2;position:relative;flex:none;z-index:1;padding:12px 16px max(16px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;align-items:center;background:#000}
 .cam-zoom{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;background:#1c2330;border-radius:30px;padding:6px 10px;max-width:100%}
 .cam-zoom span{font-size:13px;min-width:36px;font-variant-numeric:tabular-nums}
 .cam-zoom button{width:44px;height:44px;min-height:44px;border-radius:50%;background:#3a4252;color:#fff;padding:0}

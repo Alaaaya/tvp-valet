@@ -2,6 +2,7 @@ import {t as tr} from './i18n';
 import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
+import {acquireCamera,releaseCamera} from './camera-stream';
 
 import {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES,validateVideoSize,validateFallbackVideo} from './camera-validation';
 export {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES} from './camera-validation';
@@ -25,11 +26,20 @@ export function useObjectUrls(media:PendingMedia[]){
 export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
   const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
   const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false);
-  const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;if(stream.current&&v&&v.videoWidth>0)setReady(true)};
+  const stageEl=useRef<HTMLDivElement>(null);
+  // Size the preview to cover the stage with the frame's own aspect ratio (iOS can render a
+  // rotated camera stream letterboxed/small when relying on object-fit alone).
+  const fit=useCallback(()=>{const v=videoEl.current,st=stageEl.current;if(!v||!st)return;const W=st.clientWidth,H=st.clientHeight,vw=v.videoWidth,vh=v.videoHeight;
+    if(!W||!H||!vw||!vh){v.style.width='';v.style.height='';return}const k=Math.max(W/vw,H/vh);v.style.width=Math.ceil(vw*k)+'px';v.style.height=Math.ceil(vh*k)+'px'},[]);
+  useEffect(()=>{const st=stageEl.current;window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);let ro:ResizeObserver|undefined;
+    if(st&&typeof ResizeObserver!=='undefined'){ro=new ResizeObserver(fit);ro.observe(st)}
+    return()=>{window.removeEventListener('resize',fit);window.removeEventListener('orientationchange',fit);ro?.disconnect()}},[fit]);
+  const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;fit();if(stream.current&&v&&v.videoWidth>0)setReady(true)};
   const full=media.length>=MAX_MEDIA;
   const canRecord=typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
-  const stopStream=useCallback(()=>{stream.current?.getTracks().forEach(t=>t.stop());stream.current=null;if(videoEl.current)videoEl.current.srcObject=null;setReady(false)},[]);
+  // Detach only: the shared stream stays alive so reopening the camera does not re-prompt (camera-stream.ts).
+  const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false)},[]);
   const stopRecorder=useCallback((drop:boolean)=>{
     window.clearInterval(timer.current);const r=rec.current;
     if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}
@@ -39,27 +49,27 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     }
   },[]);
 
-  const start=useCallback(async(wantAudio:boolean)=>{
+  const start=useCallback(async()=>{
     const my=++gen.current;
     if(!navigator.mediaDevices?.getUserMedia){setFallback(true);setErr(tr("Live-Kamera wird von diesem Browser nicht unterstützt. Aufnahme über die Kamera-App."));return}
     stopStream();
-    let s:MediaStream|null=null,audio=false;
-    const base:MediaTrackConstraints={facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}};
-    try{
-      if(wantAudio){try{s=await navigator.mediaDevices.getUserMedia({video:base,audio:true});audio=true}catch{/* no microphone: record video without sound */}}
-      if(!s){if(my!==gen.current||!mounted.current)return;s=await navigator.mediaDevices.getUserMedia({video:base,audio:false})}
-    }catch(e){if(my!==gen.current||!mounted.current)return;setFallback(true);const n=(e as DOMException)?.name;setErr(n==='NotAllowedError'||n==='SecurityError'?tr("Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App."):tr("Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App."));return}
-    if(my!==gen.current||!mounted.current){s.getTracks().forEach(t=>t.stop());return}
-    stream.current=s;setHasAudio(audio);setFallback(false);setErr('');
+    let s:MediaStream;
+    try{s=await acquireCamera()}
+    catch(e){if(my!==gen.current||!mounted.current)return;setFallback(true);const n=(e as DOMException)?.name;setErr(n==='NotAllowedError'||n==='SecurityError'?tr("Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App."):tr("Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App."));return}
+    if(my!==gen.current||!mounted.current){releaseCamera();return}
+    stream.current=s;setHasAudio(s.getAudioTracks().length>0);setFallback(false);setErr('');
     const track=s.getVideoTracks()[0];let c:Caps={};
     try{const raw=(track.getCapabilities?.()||{}) as any;if(raw.zoom&&raw.zoom.max>raw.zoom.min)c.zoom={min:raw.zoom.min,max:raw.zoom.max,step:raw.zoom.step};if(raw.torch)c.torch=true}catch{}
     setCaps(c);setZoom(c.zoom?Math.max(c.zoom.min,1):1);setTorch(false);
     const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
     if(my===gen.current&&v&&v.videoWidth>0&&v.readyState>=2)setReady(true);
+    fit();
   },[stopStream]);
 
-  useEffect(()=>{mounted.current=true;start(false);
-    const vis=()=>{if(document.visibilityState==='hidden'){gen.current++;stopRecorder(false);stopStream()}else if(!stream.current&&!fallbackRef.current)start(false)};
+  useEffect(()=>{mounted.current=true;start();
+    // Hidden: finish a running recording but keep the stream (stopping it makes iOS ask again).
+    // Visible: resume the preview, or re-acquire only if iOS ended the track meanwhile.
+    const vis=()=>{if(document.visibilityState==='hidden'){stopRecorder(false)}else if(!fallbackRef.current){const s=stream.current;if(!s||!s.getVideoTracks().some(t=>t.readyState==='live'))start();else{const v=videoEl.current;if(v&&v.paused)v.play().catch(()=>{})}}};
     document.addEventListener('visibilitychange',vis);
     return()=>{mounted.current=false;gen.current++;document.removeEventListener('visibilitychange',vis);stopRecorder(true);stopStream()}},[]);
   const fallbackRef=useRef(false);fallbackRef.current=fallback;
@@ -100,7 +110,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     if(recording||finalizingRef.current||m===mode)return;setMode(m);setNote('');
     if(fallback)return;
     if(m==='video'&&!canRecord){setNote(tr("Videoaufnahme wird in diesem Browser nicht unterstützt."));return}
-    await start(m==='video');
+    // Same stream for photo and video: no new getUserMedia, no new permission prompt.
   }
 
   async function onFiles(e:React.ChangeEvent<HTMLInputElement>){
@@ -111,12 +121,12 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   }
   const zs=caps.zoom;
   return <div className="cam" role="dialog" aria-modal="true" aria-label={title}>
-    <video ref={videoEl} className="cam-video" playsInline muted autoPlay onLoadedMetadata={markReady} onPlaying={markReady}/>
+    <div className="cam-stage" ref={stageEl}><video ref={videoEl} className="cam-video" playsInline muted autoPlay onLoadedMetadata={markReady} onPlaying={markReady} onResize={fit}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>{tr("Foto / Video aufnehmen")}</button></div>}
+    {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}</div>
     <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>
     <div className="cam-top"><button type="button" className="cam-round" aria-label={tr("Zurück")} disabled={recording||finalizing} onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
       <button type="button" className="cam-round" aria-label={caps.torch?(torch?tr("Blitz aus"):tr("Blitz an")):tr("Blitz nicht verfügbar")} aria-pressed={torch} disabled={!caps.torch} onClick={toggleTorch}>{caps.torch&&torch?<Zap size={20}/>:<ZapOff size={20}/>}</button></div>
-    {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}
     <div className="cam-bottom">
       <div className={'cam-zoom'+(zs?'':' off')} aria-label={tr("Zoom")}><span>{zs?zoom.toFixed(1)+'x':'1.0x'}</span>
         <button type="button" aria-label={tr("Verkleinern")} disabled={!zs} onClick={()=>applyZoom(zoom-(zs?.step||.5))}><Minus size={16}/></button>

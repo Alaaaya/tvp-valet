@@ -12,8 +12,8 @@ describe('BookingScanSheet',()=>{
   });
   it('is opaque with no blur',()=>{expect(css).not.toMatch(/blur|backdrop-filter|filter:/);expect(css).toMatch(/\.bsc\{[^}]*background:#fff/)});
   it('never navigates or evals',()=>{expect(src).not.toMatch(/location\.|window\.open|eval\(|new Function|dangerouslySetInnerHTML|href=/)});
-  it('stops camera tracks on unmount and guards stale starts',()=>{
-    expect(src).toMatch(/getTracks\(\)\.forEach\(t=>t\.stop\(\)\)/);expect(src).toMatch(/my!==gen\.current\|\|!mounted\.current\)\{s\.getTracks/);
+  it('releases the shared camera on unmount and guards stale starts',()=>{
+    expect(src).toContain('await acquireCamera()');expect(src).not.toContain('getUserMedia(');expect(src).toMatch(/my!==gen\.current\|\|!mounted\.current\)\{releaseCamera\(\);return\}/);
     expect(src).toMatch(/return\(\)=>\{document\.removeEventListener\('visibilitychange',vis\);cancelAnimationFrame\(raf\);clearTimeout\(timer\);stop\(\)\}/);
   });
   it('revokes object URLs, aborts and disposes OCR on unmount',()=>{
