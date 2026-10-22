@@ -123,7 +123,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
     <section className="summary-media"><h3><Fa name="camera" size={18}/>  {tr("Media")}</h3><div className="detail-media bd-media">{p.mediaGallery??p.mediaAdd}</div></section>
     <section className="summary-media bd-comments"><h3><Fa name="comment" size={18}/>  {tr("Comments")}</h3>
       <button type="button" className="add-comment" aria-label={tr("Kommentar hinzufügen")} onClick={p.onEdit}><Fa name="plus" size={26}/></button>
-      <p>{c.text||tr("There are no comments")}</p>
+      <p className={c.text?undefined:"bd-no-comments"}>{c.text||tr("There are no comments")}</p>
       {p.admin&&c.imported&&<details className="provenance"><summary>{tr("Importquelle")}</summary><p>{tr("ParkingPro-Import")}</p>{c.vehicle&&<p>{tr("Fahrzeug ·")}{c.vehicle}</p>}{c.location&&<p>{tr("Standort ·")}{c.location}</p>}</details>}</section>
   </div>;
 }

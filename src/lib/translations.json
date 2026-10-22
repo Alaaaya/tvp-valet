@@ -441,7 +441,7 @@
   ],
   "There are no comments": [
     "There are no comments",
-    "Keine Kommentare vorhanden",
+    "keine Bemerkungen",
     "لا توجد تعليقات"
   ],
   "Odometer scan is not available yet (no OCR).": [
@@ -476,7 +476,7 @@
   ],
   "Car": [
     "Car",
-    "Fahrzeug",
+    "Auto",
     "السيارة"
   ],
   "Eingecheckt": [
@@ -491,7 +491,7 @@
   ],
   "Scan odometer": [
     "Scan odometer",
-    "KM scannen",
+    "Kilometerstand scannen",
     "مسح عداد المسافات"
   ],
   "PARKING DATE": [
@@ -501,12 +501,12 @@
   ],
   "RETURN DATE": [
     "RETURN DATE",
-    "RÜCKGABEDATUM",
+    "DATUM RETOUR",
     "تاريخ الاستلام"
   ],
   "Mileage:": [
     "Mileage:",
-    "Kilometerstand:",
+    "Km-Stand:",
     "المسافة المقطوعة:"
   ],
   "Mark as taken away": [
@@ -556,7 +556,7 @@
   ],
   "Total amount": [
     "Total amount",
-    "Gesamtbetrag",
+    "Gesamt",
     "المبلغ الإجمالي"
   ],
   "Paid": [
@@ -566,7 +566,7 @@
   ],
   "Total due payable": [
     "Total due payable",
-    "Gesamt fällig",
+    "Gesamtbetrag fällig",
     "إجمالي المستحق للدفع"
   ],
   "Media": [
@@ -576,7 +576,7 @@
   ],
   "Comments": [
     "Comments",
-    "Kommentare",
+    "Bemerkungen",
     "التعليقات"
   ],
   "Kommentar hinzufügen": [
@@ -926,7 +926,7 @@
   ],
   "Als bezahlt markieren": [
     "Mark as paid",
-    "Als bezahlt markieren",
+    "Markieren als bezahlt",
     "وضع علامة كمدفوع"
   ],
   "Zahlung nur für bestätigte Buchungen.": [
@@ -941,12 +941,12 @@
   ],
   "Zahlungslink per E-Mail": [
     "Payment link by email",
-    "Zahlungslink per E-Mail",
+    "E-Mail-Zahlungslink",
     "رابط الدفع عبر البريد الإلكتروني"
   ],
   "Rechnung per E-Mail": [
     "Invoice by email",
-    "Rechnung per E-Mail",
+    "E-Mail-Rechnung",
     "الفاتورة عبر البريد الإلكتروني"
   ],
   "bald": [
@@ -3371,7 +3371,7 @@
   ],
   "QR-Zahlung": [
     "QR payment",
-    "QR-Zahlung",
+    "QR-Code zum Bezahlen anzeigen",
     "الدفع برمز QR"
   ],
   "No-Shows": [
