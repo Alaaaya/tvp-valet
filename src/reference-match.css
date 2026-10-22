@@ -1,0 +1,28 @@
+/* Exact colours sampled from the ParkingPro reference home list (IMG_0655, iPhone 3x). Colours only: no layout, size or text changes. */
+html body .app.fixed-top .topbar,html body .topbar{background:#0d6b6b!important}
+html body .app.fixed-top .counters,html body .app.fixed-top .topbar::after{background:#1fb19c!important}
+html body .app.fixed-top .counter.incoming{background:#38a169!important}
+html body .app.fixed-top .counter.outgoing{background:#e53e3e!important}
+html body .app.fixed-top .search-row{background:#146a5d!important}
+html body .app.fixed-top .now-button:before{background:#0e5046}
+html body .app.fixed-top .cam-search svg{color:#146a5d;stroke:#146a5d}
+html body .app.fixed-top .search input::placeholder{color:#909090}
+/* rows */
+html body .app.fixed-top .blr{border-bottom-color:#add8ce}
+html body .app.fixed-top .blr.out .blr-time{background:#ffd7d7!important;border-left-color:#e53e3e}
+html body .app.fixed-top .blr-plate,html body .app.fixed-top .blr.pay-note .blr-plate{color:#0d453a}
+html body .app.fixed-top .blr-code,html body .app.fixed-top .blr-name,html body .app.fixed-top .blr-l3,html body .app.fixed-top .blr-comment{color:#787878}
+html body .app.fixed-top .blr-key,html body .app.fixed-top .blr-key svg,html body .app.fixed-top .blr-keycode{color:#0f4239;fill:#0f4239}
+html body .app.fixed-top .blr-time>strong,html body .app.fixed-top .blr-tf>span,html body .app.fixed-top .blr-tf{color:#173f33}
+html body .app.fixed-top .blr-ico{color:#134639}
+html body .app.fixed-top .blr-tf svg{fill:#2f82d1;color:#2f82d1}
+html body .app.fixed-top .blr-pn,html body .app.fixed-top .blr-pn svg{color:#1fa88d;fill:#1fa88d}
+html body .app.fixed-top .blr-cc{color:#1fa88d}html body .app.fixed-top .blr-cc svg{color:#10463c;fill:#10463c}
+html body .app.fixed-top .blr-pay{border-color:#38a169;color:#38a169}
+html body .app.fixed-top .blr-pay.due{border-color:#e53e3e;color:#e53e3e}
+html body .app.fixed-top .blr-cover{border-color:#000;color:#000;background:#fff}
+/* provider badges */
+html body .app.fixed-top .blr-badge.ag{border-color:#ee55aa;color:#f054ab;background:#ffd4ef}
+html body .app.fixed-top .blr-badge.pl{border-color:#ee0956;color:#da0e53;background:#ffc2d7}
+html body .app.fixed-top .blr-badge.ap{border-color:#2f5ca1;color:#2f5894;background:#c9d8ef}
+html body .app.fixed-top .blr-badge.fsp{border-color:#0e453b;color:#0e453b;background:#eaf9f6}
