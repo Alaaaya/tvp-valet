@@ -12,6 +12,6 @@
 .app.fixed-top>.workspace>.topbar{
  position:fixed;top:0;left:0;right:0;margin-inline:auto;z-index:8;
  height:var(--tvp-topbar-h)!important;
- background-color:#0d6b6b!important;opacity:1;
+ background-color:#00756f!important;opacity:1;
  transform:none;filter:none;-webkit-backdrop-filter:none;backdrop-filter:none;
 }
