@@ -1,0 +1,18 @@
+/* Called row: same structure/height as every other row.
+   "seit N Min" sits inline after the name on the name line; the undo-call button lives
+   inside the row at its right edge (reserved gutter), never as a strip below. Loaded last. */
+html body .blr.has-call-clear{position:relative}
+html body .blr .blr-main{align-items:stretch}
+html body .blr .blr-time{align-self:stretch;height:auto;min-height:100%}
+html body .blr .blr-l3{display:flex;align-items:center;flex-wrap:nowrap;overflow:hidden;white-space:nowrap;min-width:0}
+html body .blr .blr-l3>.blr-name{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .blr .blr-l3>.blr-calls,html body .app.fixed-top .blr .blr-l3>.blr-calls{flex:0 0 auto;display:inline-flex;align-items:center;height:auto;min-height:0;max-height:none;margin:0;white-space:nowrap;overflow:visible;line-height:inherit}
+html body .blr .blr-l3>.blr-calls .call-counter,html body .app.fixed-top .blr .blr-l3>.blr-calls .call-counter{display:inline-flex;flex-wrap:nowrap;white-space:nowrap;max-height:none;line-height:inherit;overflow:visible}
+html body .blr .blr-l3>.blr-calls .call-counter *,html body .app.fixed-top .blr .blr-l3>.blr-calls .call-counter *{line-height:inherit;max-height:none}
+html body .blr .blr-l3>.blr-calls .cc-dur{color:#1fa37a;font-weight:600}
+html body .blr .blr-l3>.blr-calls .cc-dur::before{content:"·";margin-inline:2px 3px;color:#787878;font-weight:400}
+/* Gutter for the in-row undo button: the side column (cover/persons/price) moves in by 36px. */
+html body .blr.has-call-clear .blr-side,html body .app.fixed-top .blr.has-call-clear .blr-side{padding-inline-end:36px}
+html body .blr>.row-call-clear,html body .app.fixed-top .blr>.row-call-clear{position:absolute;top:50%;inset-inline-end:4px;transform:translateY(-50%);z-index:2;margin:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:0;box-sizing:border-box;width:32px;min-width:32px;height:40px;min-height:32px;padding:0;font-size:13px;line-height:1;color:#e53e3e;background:#fff;border:1px solid #e53e3e;border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+html body .blr>.row-call-clear span{font-size:13px;font-weight:700;line-height:1}
+html body .blr>.row-call-clear:disabled{opacity:.5}

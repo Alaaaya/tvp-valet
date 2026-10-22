@@ -90,3 +90,17 @@ it('hides exact compound partner external references without changing stored pro
  expect(h).toContain('#AF-1');
  expect(JSON.stringify(row)).toBe(before);
 });
+
+it('called row: "seit N Min" sits inline on the name line and the undo button lives inside the row',()=>{
+ const h=r(<BookingListRow {...P({callCounterSlot:<i id="cc"/>,callClearSlot:<button type="button" className="row-call-clear">x</button>})}/>);
+ expect(h).toMatch(/blr-line blr-l3">[^]*blr-name[^]*<span class="blr-calls"><i id="cc"><\/i><\/span><\/span>/);
+ expect(h).toContain('blr out called has-call-clear');
+ expect(r(<BookingListRow {...P()}/>)).not.toMatch(/called|has-call-clear/);
+ const c=readFileSync('src/row-call.css','utf8'),base=readFileSync('src/booking-list-row.css','utf8');
+ expect(base).not.toMatch(/own strip|margin:0 6px 3px auto/);
+ expect(c).toMatch(/\.blr>\.row-call-clear[^{]*\{position:absolute;top:50%;inset-inline-end:4px;[^}]*width:32px;min-width:32px;[^}]*min-height:32px/);
+ expect(c).toMatch(/\.blr\.has-call-clear \.blr-side[^{]*\{padding-inline-end:36px\}/);
+ expect(c).toMatch(/\.blr-l3>\.blr-calls[^{]*\{flex:0 0 auto/);
+ expect(c).toContain('.blr .blr-main{align-items:stretch}');
+ expect(readFileSync('src/main.tsx','utf8')).toMatch(/reference-match-detail-style\.css';import '\.\/row-call\.css'/);
+});

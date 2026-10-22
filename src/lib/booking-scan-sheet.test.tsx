@@ -30,5 +30,10 @@ describe('BookingScanSheet',()=>{
     expect(src).toContain("isValidBookingCode(v.trim())");
     expect(src.indexOf('validateImageFile(f)}catch')).toBeGreaterThan(0);expect(src.indexOf('validateImageFile(f)}catch')).toBeLessThan(src.indexOf('URL.createObjectURL(f)'));
   });
+  it('scanner preview is full-size by CSS from the start and hidden until the first frame',()=>{
+    expect(css).toMatch(/\.bsc-view video\{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0/);
+    expect(css).toContain('.bsc-view video.is-shown{opacity:1}');expect(css).not.toMatch(/\.bsc-view video\{[^}]*display:none/);
+    expect(src).toMatch(/onPlaying=\{\(\)=>\{if\(stream\.current\)setShown\(true\)\}\}/);expect(src).toContain('requestVideoFrameCallback');expect(src).toMatch(/stop=useCallback\(\(\)=>\{setShown\(false\)/);
+  });
   it('file input uses environment capture',()=>{expect(src.match(/capture="environment"/g)?.length).toBe(2)});
 });
