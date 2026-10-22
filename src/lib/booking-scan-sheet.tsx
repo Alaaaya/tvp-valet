@@ -5,6 +5,7 @@ import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} fr
 import {createQrDecoder,decodeQrFromFile,validateImageFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
 import {acquireCamera,releaseCamera} from './camera-stream';
+import {watchPreviewReveal} from './preview-reveal';
 import {useEdgeBack} from './use-edge-back';
 import '../booking-scan.css';
 
@@ -73,7 +74,8 @@ function useMounted(){const m=useRef(true);useEffect(()=>{m.current=true;return(
 function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   const video=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),gen=useRef(0),mounted=useMounted(),file=useRef<HTMLInputElement>(null),dec=useRef<QrDecoder|null>(null),fileJob=useRef(0);
   const[state,setState]=useState<'starting'|'live'|'nocam'>('starting');const[shown,setShown]=useState(false);const[err,setErr]=useState('');const[manual,setManual]=useState('');
-  const stop=useCallback(()=>{setShown(false);gen.current++;fileJob.current++;if(video.current){try{video.current.pause()}catch{}video.current.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}},[]);
+  const unwatch=useRef<(()=>void)|null>(null);
+  const stop=useCallback(()=>{setShown(false);unwatch.current?.();unwatch.current=null;gen.current++;fileJob.current++;if(video.current){try{video.current.pause()}catch{}video.current.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}},[]);
   const handle=useCallback((raw:string):boolean=>{
     const r=parseQrPayload(raw,{expectedHosts:hosts});
     if(!r.ok){setErr(r.reason);return false}
@@ -88,7 +90,9 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
       catch(e){if(my!==gen.current||!mounted.current)return;setState('nocam');setErr((e as DOMException)?.name==='NotAllowedError'?tr("Kamerazugriff wurde nicht erlaubt. Foto oder manuelle Eingabe nutzen."):tr("Keine Kamera verfügbar. Foto oder manuelle Eingabe nutzen."));return}
       if(my!==gen.current||!mounted.current){releaseCamera();return}
       stream.current=s;const v=video.current;if(!v){stream.current=null;releaseCamera();return}
-      v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>{if(my===gen.current&&mounted.current)setShown(true)})}catch{/* events still reveal */}}}
+      v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;
+      // Reveal only after iOS settles the stream orientation/dims (not on the first frame); see preview-reveal.ts.
+      unwatch.current?.();unwatch.current=watchPreviewReveal(v,{isLive:()=>my===gen.current&&mounted.current&&!!stream.current,onShow:()=>setShown(true)});
       try{await v.play()}catch{/* autoplay quirks; frames still decode once playing */}
       if(my!==gen.current||!mounted.current)return;
       setState('live');dec.current=await createQrDecoder();
@@ -117,7 +121,7 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   };
   return <div className="bsc-body">
     <div className={'bsc-view'+(state==='live'?' live':'')}>
-      <video ref={video} className={shown?'is-shown':undefined} playsInline muted aria-label={tr("Kamera")} onLoadedData={()=>{if(stream.current)setShown(true)}} onPlaying={()=>{if(stream.current)setShown(true)}}/>
+      <video ref={video} className={shown?'is-shown':undefined} playsInline muted aria-label={tr("Kamera")}/>
       {state==='live'&&<div className="bsc-frame" aria-hidden="true"/>}
       {state==='starting'&&<p className="bsc-view-msg">{tr("Kamera wird gestartet…")}</p>}
       {state==='nocam'&&<p className="bsc-view-msg">{tr("Keine Live-Kamera")}</p>}

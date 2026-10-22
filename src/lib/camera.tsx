@@ -3,6 +3,7 @@ import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 import {acquireCamera,releaseCamera} from './camera-stream';
+import {watchPreviewReveal,coverSize,repaintFit} from './preview-reveal';
 
 import {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES,validateVideoSize,validateFallbackVideo} from './camera-validation';
 export {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES} from './camera-validation';
@@ -30,20 +31,21 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   // Size the preview to cover the stage with the frame's own aspect ratio (iOS can render a
   // rotated camera stream letterboxed/small when relying on object-fit alone).
   const fit=useCallback(()=>{const v=videoEl.current,st=stageEl.current;if(!v||!st)return;const W=st.clientWidth,H=st.clientHeight,vw=v.videoWidth,vh=v.videoHeight;
-    if(!W||!H||!vw||!vh){v.style.width='';v.style.height='';return}const k=Math.max(W/vw,H/vh);v.style.width=Math.ceil(vw*k)+'px';v.style.height=Math.ceil(vh*k)+'px'},[]);
-  useEffect(()=>{const st=stageEl.current;window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);let ro:ResizeObserver|undefined;
-    if(st&&typeof ResizeObserver!=='undefined'){ro=new ResizeObserver(fit);ro.observe(st)}
-    return()=>{window.removeEventListener('resize',fit);window.removeEventListener('orientationchange',fit);ro?.disconnect()}},[fit]);
+    const c=coverSize(W,H,vw,vh);if(!c){v.style.width='';v.style.height='';return}v.style.width=c.w+'px';v.style.height=c.h+'px'},[]);
+  const refit=useCallback(()=>{fit();const v=videoEl.current;if(v)repaintFit(v)},[fit]);
+  useEffect(()=>{const st=stageEl.current;window.addEventListener('resize',refit);window.addEventListener('orientationchange',refit);let ro:ResizeObserver|undefined;
+    if(st&&typeof ResizeObserver!=='undefined'){ro=new ResizeObserver(refit);ro.observe(st)}
+    return()=>{window.removeEventListener('resize',refit);window.removeEventListener('orientationchange',refit);ro?.disconnect()}},[refit]);
   const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;fit();if(stream.current&&v&&v.videoWidth>0)setReady(true)};
-  // Full-size by CSS from the start; stays invisible (black stage) until the first real frame, so the
-  // user never sees an intrinsic-size/small preview box.
-  const reveal=()=>{const v=videoEl.current;if(!stream.current||!v)return;markReady();setShown(true)};
-  const watchFirstFrame=(v:HTMLVideoElement)=>{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>reveal())}catch{/* events still reveal */}}};
+  // Full-size by CSS from the start; stays invisible (black stage) until iOS has settled the stream's
+  // orientation/dims (not on the first frame: iOS paints it small/contain-fitted), see preview-reveal.ts.
+  const unwatch=useRef<(()=>void)|null>(null);
+  const watchReveal=(v:HTMLVideoElement,my:number)=>{unwatch.current?.();unwatch.current=watchPreviewReveal(v,{fit,isLive:()=>my===gen.current&&mounted.current&&!!stream.current,onShow:()=>{markReady();setShown(true)}})};
   const full=media.length>=MAX_MEDIA;
   const canRecord=typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
   // Detach and release: the last release stops all tracks immediately (camera-stream.ts).
-  const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
+  const stopStream=useCallback(()=>{unwatch.current?.();unwatch.current=null;const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
   const stopRecorder=useCallback((drop:boolean)=>{
     window.clearInterval(timer.current);const r=rec.current;
     if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}
@@ -65,7 +67,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     const track=s.getVideoTracks()[0];let c:Caps={};
     try{const raw=(track.getCapabilities?.()||{}) as any;if(raw.zoom&&raw.zoom.max>raw.zoom.min)c.zoom={min:raw.zoom.min,max:raw.zoom.max,step:raw.zoom.step};if(raw.torch)c.torch=true}catch{}
     setCaps(c);setZoom(c.zoom?Math.max(c.zoom.min,1):1);setTorch(false);
-    const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;watchFirstFrame(v);try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
+    const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;watchReveal(v,my);try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
     if(my===gen.current&&v&&v.videoWidth>0&&v.readyState>=2)setReady(true);
     fit();
   },[stopStream]);
@@ -125,7 +127,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   }
   const zs=caps.zoom;
   return <div className="cam" role="dialog" aria-modal="true" aria-label={title}>
-    <div className="cam-stage" ref={stageEl}><video ref={videoEl} className={'cam-video'+(shown?' is-shown':'')} playsInline muted autoPlay onLoadedMetadata={markReady} onLoadedData={reveal} onPlaying={reveal} onResize={fit}/>
+    <div className="cam-stage" ref={stageEl}><video ref={videoEl} className={'cam-video'+(shown?' is-shown':'')} playsInline muted autoPlay onLoadedMetadata={markReady}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>{tr("Foto / Video aufnehmen")}</button></div>}
     {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}</div>
     <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>

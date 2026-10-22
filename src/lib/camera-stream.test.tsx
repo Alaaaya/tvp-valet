@@ -71,14 +71,30 @@ describe('CameraScreen uses the shared stream',()=>{
   it('preview sits in a stage between top bar and controls',async()=>{
     const m=await mount();expect(m.host.querySelector('.cam-stage .cam-video')).toBeTruthy();await m.unmount();
   });
-  it('preview is full-size via CSS and hidden until the first frame, then shown',async()=>{
+  it('preview stays hidden on first frame/playing with landscape dims; shows only after portrait resize settles',async()=>{
     const css=(await import('node:fs')).readFileSync('src/handover.css','utf8');
     expect(css).toMatch(/\.cam-video\{position:absolute;inset:0;[^}]*width:100%;height:100%;min-width:100%;min-height:100%;[^}]*object-fit:cover;[^}]*opacity:0\}/);
     expect(css).toContain('.cam-video.is-shown{opacity:1}');
+    Object.defineProperty(window,'innerWidth',{configurable:true,value:390});Object.defineProperty(window,'innerHeight',{configurable:true,value:844});
     const m=await mount();const v=m.host.querySelector('.cam-video') as HTMLVideoElement;
+    vi.useFakeTimers();
+    let dims=[1920,1080];Object.defineProperty(v,'videoWidth',{configurable:true,get:()=>dims[0]});Object.defineProperty(v,'videoHeight',{configurable:true,get:()=>dims[1]});
+    await act(async()=>{v.dispatchEvent(new Event('loadeddata'));v.dispatchEvent(new Event('playing'))});
+    await act(async()=>{vi.advanceTimersByTime(300)});
     expect(v.classList.contains('is-shown')).toBe(false);
-    await act(async()=>{v.dispatchEvent(new Event('playing'))});
-    expect(v.classList.contains('is-shown')).toBe(true);
-    await m.unmount();
+    dims=[1080,1920];await act(async()=>{v.dispatchEvent(new Event('resize'))});
+    expect(v.classList.contains('is-shown')).toBe(false);
+    await act(async()=>{vi.advanceTimersByTime(350)});
+    expect(v.classList.contains('is-shown')).toBe(true);expect(v.style.objectFit).toBe('cover');
+    vi.useRealTimers();await m.unmount();
+  });
+  it('hard cap reveals ~700ms after playing even if dims never settle',async()=>{
+    Object.defineProperty(window,'innerWidth',{configurable:true,value:390});Object.defineProperty(window,'innerHeight',{configurable:true,value:844});
+    const m=await mount();const v=m.host.querySelector('.cam-video') as HTMLVideoElement;vi.useFakeTimers();
+    Object.defineProperty(v,'videoWidth',{configurable:true,get:()=>1920});Object.defineProperty(v,'videoHeight',{configurable:true,get:()=>1080});
+    await act(async()=>{v.dispatchEvent(new Event('playing'))});await act(async()=>{vi.advanceTimersByTime(650)});
+    expect(v.classList.contains('is-shown')).toBe(false);
+    await act(async()=>{vi.advanceTimersByTime(100)});expect(v.classList.contains('is-shown')).toBe(true);
+    vi.useRealTimers();await m.unmount();
   });
 });
