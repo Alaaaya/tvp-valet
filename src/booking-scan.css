@@ -25,3 +25,11 @@
 .bsc-btn:disabled{opacity:.5}
 .bsc-alts{display:flex;flex-wrap:wrap;gap:8px}
 .bsc-chip{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid #9bbab2;background:#eef6f3;font-size:16px;color:#1d3a35}
+/* landscape phone: the 4:3 viewfinder would be taller than the screen; size it to the height
+   that is left so the whole sheet fits without scrolling, and keep clear of the notch sides. */
+@media (orientation:landscape) and (max-height:540px){
+.bsc{max-height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);box-sizing:border-box}
+.bsc .bsc-handle{display:none}
+.bsc .bsc-head{padding-top:6px;padding-bottom:4px}
+.bsc .bsc-view{aspect-ratio:auto;height:max(150px,calc(100dvh - 150px));width:min(100%,calc((100dvh - 150px)*16/9));justify-self:center}
+}

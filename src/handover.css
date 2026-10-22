@@ -41,6 +41,33 @@
 .cam-status{margin:0;font-size:12px;color:#c3cad6;text-align:center;min-height:16px}
 .cam-fallback{position:absolute;inset:0;display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:30px;text-align:center;background:#111722;font-size:15px;line-height:1.5}
 .cam button:focus-visible,.gv button:focus-visible{outline:3px solid #7cc8f5}
+/* LANDSCAPE (phone on its side): preview fills the whole screen; top bar and a right-hand control
+   column float over it (solid dark pills, no translucency). Portrait rules above are untouched.
+   CSS-only, so rotating never remounts the screen or re-requests the camera; the stage
+   ResizeObserver refits the preview. */
+@media (orientation:landscape){
+.cam.cam{display:block;--cam-col:calc(116px + env(safe-area-inset-right))}
+.cam .cam-stage{position:absolute;inset:0;width:auto;height:auto}
+.cam .cam-top{position:absolute;top:0;left:0;right:var(--cam-col);z-index:2;height:auto;padding:max(6px,env(safe-area-inset-top)) 6px 0 max(10px,env(safe-area-inset-left));background:transparent;pointer-events:none}
+.cam .cam-top>*{pointer-events:auto}
+.cam .cam-title{flex:0 1 auto;background:#000;border-radius:16px;padding:7px 14px;font-size:13px}
+.cam .cam-rec{top:max(56px,calc(env(safe-area-inset-top) + 50px));left:calc((100% - var(--cam-col))/2)}
+.cam .cam-bottom{position:absolute;top:0;right:0;bottom:0;width:var(--cam-col);z-index:2;box-sizing:border-box;padding:max(10px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) 8px;gap:10px;justify-content:center;background:transparent;pointer-events:none}
+.cam .cam-bottom>*,.cam .cam-row>*{pointer-events:auto}
+.cam .cam-row{display:contents}
+.cam .cam-pill.blue{order:1;justify-self:auto;min-width:88px}
+.cam .cam-shutter{order:2;width:72px;height:72px;min-height:72px;flex:none}
+.cam .cam-modes{order:3;justify-self:auto}
+.cam .cam-modes button{min-width:84px;padding:0 10px;font-size:13px}
+.cam .cam-status{order:4;font-size:11px;line-height:1.25;min-height:0;max-width:100%;background:#000;border-radius:8px;padding:2px 6px}
+.cam .cam-status:empty{display:none}
+.cam .cam-zoom{position:absolute;right:calc(var(--cam-col) + 6px);bottom:max(10px,env(safe-area-inset-bottom));flex-wrap:nowrap;gap:4px;padding:4px 8px;max-width:none}
+.cam .cam-zoom span{min-width:32px}
+.cam .cam-zoom button{flex:none}
+.cam .cam-zoom input[type=range]{flex:none;width:96px}
+.cam .cam-zoom small{flex:none;max-width:110px;line-height:1.25}
+.cam .cam-strip{position:absolute;left:auto;right:calc(100% + 222px);bottom:max(0px,calc(env(safe-area-inset-bottom) - 8px));width:max-content;max-width:calc(100vw - var(--cam-col) - 232px - env(safe-area-inset-left));box-sizing:border-box;padding-left:max(10px,env(safe-area-inset-left))}
+}
 /* details */
 .ho-form{position:absolute;inset:0;background:#cce8e3;color:#1c3a36;display:flex;flex-direction:column}
 .ho-form>header{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:max(10px,env(safe-area-inset-top)) 12px 10px;background:#0f6b67;color:#fff;height:calc(62px + env(safe-area-inset-top));flex-shrink:0}
