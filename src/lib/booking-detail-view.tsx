@@ -4,7 +4,7 @@ import {PrintSheetsButton} from './print-sheets-button';
 import {day} from '../model';
 import {ReferenceIcon} from './reference-icon';
 import {OdometerCapture} from './odometer-capture';
-import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus,ParkingSquare} from 'lucide-react';
+import {Banknote,Camera,Car,Check,ChevronLeft,KeyRound,MessageSquare,Plus} from 'lucide-react';
 import {clock,money,stamp,type Booking} from '../model';
 import {displayComment} from './comments';
 import {paymentInstruction} from './payment-note';
@@ -94,7 +94,6 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
         {c.vehicle&&<span className="bd-vehicle">{c.vehicle}</span>}
-        <span className="bd-location"><bdi>{b.spot||c.location||"–"}</bdi><ParkingSquare size={16}/></span>
         <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>
         <button type="button" className="bd-outline" onClick={p.onEdit}><Fa name="plus" size={11}/>{tr("+ KM and comment").replace(/^\+\s*/,"")}</button>
         <OdometerCapture key={b.id} onEdit={p.onEdit}/></div>
