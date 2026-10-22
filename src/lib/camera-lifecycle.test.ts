@@ -38,12 +38,11 @@ describe('recorder final payload source guards',()=>{
     expect(onstop).toContain('finally{rec.current=null;finalizingRef.current=false;');
   });
   it('blocks done, mode changes, shutter restart and back while finalizing',()=>{
-    expect(source).toContain('const busy=recording||finalizing;');
-    expect(source).toContain('disabled={busy} onClick={onDone}');
+    expect(source).toContain('disabled={recording||finalizing} onClick={onDone}');
     expect(source).toContain('if(recording||finalizingRef.current||m===mode)return;');
     expect(source).toContain("async function toggleRecord(){\n    if(finalizingRef.current)return;");
     expect(source).toContain('disabled={!ready||finalizing}');
-    expect(source).toContain('aria-label={tr("Zurück")} disabled={busy}');
+    expect(source).toContain('aria-label={tr("Zurück")} disabled={recording||finalizing}');
   });
   it('uses the same finalization path for size and duration auto-stop',()=>{
     expect(source).toContain('setNote(tr("Video auf 45 MB begrenzt."));stopRecorder(false)');
