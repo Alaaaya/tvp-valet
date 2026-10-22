@@ -25,7 +25,7 @@ export function useObjectUrls(media:PendingMedia[]){
 
 export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
   const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
-  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false);
+  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false),[shown,setShown]=useState(false);
   const stageEl=useRef<HTMLDivElement>(null);
   // Size the preview to cover the stage with the frame's own aspect ratio (iOS can render a
   // rotated camera stream letterboxed/small when relying on object-fit alone).
@@ -35,11 +35,15 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     if(st&&typeof ResizeObserver!=='undefined'){ro=new ResizeObserver(fit);ro.observe(st)}
     return()=>{window.removeEventListener('resize',fit);window.removeEventListener('orientationchange',fit);ro?.disconnect()}},[fit]);
   const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;fit();if(stream.current&&v&&v.videoWidth>0)setReady(true)};
+  // Full-size by CSS from the start; stays invisible (black stage) until the first real frame, so the
+  // user never sees an intrinsic-size/small preview box.
+  const reveal=()=>{const v=videoEl.current;if(!stream.current||!v)return;markReady();setShown(true)};
+  const watchFirstFrame=(v:HTMLVideoElement)=>{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>reveal())}catch{/* events still reveal */}}};
   const full=media.length>=MAX_MEDIA;
   const canRecord=typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
-  // Detach only: the shared stream stays alive so reopening the camera does not re-prompt (camera-stream.ts).
-  const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false)},[]);
+  // Detach and release: the last release stops all tracks immediately (camera-stream.ts).
+  const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
   const stopRecorder=useCallback((drop:boolean)=>{
     window.clearInterval(timer.current);const r=rec.current;
     if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}
@@ -61,7 +65,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     const track=s.getVideoTracks()[0];let c:Caps={};
     try{const raw=(track.getCapabilities?.()||{}) as any;if(raw.zoom&&raw.zoom.max>raw.zoom.min)c.zoom={min:raw.zoom.min,max:raw.zoom.max,step:raw.zoom.step};if(raw.torch)c.torch=true}catch{}
     setCaps(c);setZoom(c.zoom?Math.max(c.zoom.min,1):1);setTorch(false);
-    const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
+    const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;watchFirstFrame(v);try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
     if(my===gen.current&&v&&v.videoWidth>0&&v.readyState>=2)setReady(true);
     fit();
   },[stopStream]);
@@ -121,7 +125,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   }
   const zs=caps.zoom;
   return <div className="cam" role="dialog" aria-modal="true" aria-label={title}>
-    <div className="cam-stage" ref={stageEl}><video ref={videoEl} className="cam-video" playsInline muted autoPlay onLoadedMetadata={markReady} onPlaying={markReady} onResize={fit}/>
+    <div className="cam-stage" ref={stageEl}><video ref={videoEl} className={'cam-video'+(shown?' is-shown':'')} playsInline muted autoPlay onLoadedMetadata={markReady} onLoadedData={reveal} onPlaying={reveal} onResize={fit}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>{tr("Foto / Video aufnehmen")}</button></div>}
     {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}</div>
     <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>

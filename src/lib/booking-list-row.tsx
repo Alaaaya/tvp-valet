@@ -53,15 +53,14 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
  const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
  const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
  const done=kind==='in'?b.checked_in_at:b.checked_out_at,m=moneyState(b),key=(b.key_cash||'').trim();
- return <article className={'blr '+kind+(completed?' done':'')+(pn?' pay-note':'')}>
+ return <article className={'blr '+kind+(completed?' done':'')+(pn?' pay-note':'')+(callCounterSlot?' called':'')+(callClearSlot?' has-call-clear':'')}>
   <button type="button" className="blr-main" onClick={()=>onOpen(b)} aria-label={(kind==='in'?tr("Annahme "):tr("Rückgabe "))+time+' '+b.plate+' '+b.customer_name}>
    <span className="blr-time">{completed&&done&&<span className="blr-check" role="img" aria-label={tr("erledigt")}><Check size={18} strokeWidth={3}/></span>}<span className="blr-ico"><Fa name="car-side" size={20}/><Fa name="person" className="blr-ico-person" size={16}/></span><strong>{time}</strong>{(flight||actualFlightClock)&&<span className="blr-tf">{kind==='in'?<Fa name="plane" size={14}/>:<Fa name="plane" size={14}/>}<span>{actualFlightClock&&<b className="blr-actual-flight">{actualFlightClock} </b>}{flight}</span></span>}</span>
    <span className="blr-body">
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
     <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><Fa name="key" size={13}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
-    <span className="blr-line blr-l3">{callCounterSlot&&<Fa name="phone" size={14} aria-label={tr("Kundenanruf")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span></span>
+    <span className="blr-line blr-l3">{callCounterSlot&&<Fa name="phone" size={14} aria-label={tr("Kundenanruf")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span>{callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}</span>
     {c&&<span className="blr-comment" title={c}>{c}</span>}
-    {callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}
    </span>
    <span className="blr-side">
     <span className={'blr-cover '+(b.covered?'cov':'free')}>{b.covered?tr("Über"):tr("Frei")}</span>

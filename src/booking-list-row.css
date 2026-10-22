@@ -49,6 +49,5 @@
 .blr-l2 .blr-key,.blr-l2 .blr-code{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .blr-l2 .blr-key{flex-shrink:2}
 
-/* Sibling action occupies its own strip: never covers plate, counter, or payment. */
-.blr>.row-call-clear{display:flex;align-items:center;justify-content:center;gap:3px;margin:0 6px 3px auto;min-width:32px;min-height:24px;padding:2px 6px;font-size:14px;color:#c9302c;background:#fff;border:1px solid #d9534f;border-radius:4px}
-[dir=rtl] .blr>.row-call-clear{margin-left:6px;margin-right:auto}
+/* Undo-call button is positioned inside the row (see row-call.css), never a strip below it. */
+.blr>.row-call-clear{position:absolute;top:50%;inset-inline-end:4px;transform:translateY(-50%);margin:0;min-width:32px;min-height:32px;color:#e53e3e;background:#fff;border:1px solid #e53e3e;border-radius:6px}
