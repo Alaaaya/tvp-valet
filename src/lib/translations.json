@@ -4073,25 +4073,5 @@
     "Only saved bookings are available. Offline changes are disabled.",
     "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.",
     "الحجوزات المحفوظة فقط متاحة. التعديلات دون اتصال معطّلة."
-  ],
-  "Fertig": [
-    "Done",
-    "Fertig",
-    "تم"
-  ],
-  "Noch keine Medien aufgenommen.": [
-    "No media captured yet.",
-    "Noch keine Medien aufgenommen.",
-    "لم يتم التقاط أي وسائط بعد."
-  ],
-  "Zoom zurücksetzen": [
-    "Reset zoom",
-    "Zoom zurücksetzen",
-    "إعادة ضبط التكبير"
-  ],
-  "1x": [
-    "1x",
-    "1x",
-    "1x"
   ]
 }
