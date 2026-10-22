@@ -1,12 +1,14 @@
 import {t as tr} from './i18n';
 import React,{useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
-import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
+import {ChevronLeft,Flashlight,FlashlightOff,Minus,Plus,Expand,Shrink,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 import {acquireCamera,releaseCamera} from './camera-stream';
 
 import {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES,validateVideoSize,validateFallbackVideo} from './camera-validation';
 export {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES} from './camera-validation';
 export const MAX_MEDIA=40;
+export const CAM_VIEW_KEY='tvp.camera.fullscreen.v1';
+export function readCamFullscreen():boolean{try{return window.localStorage.getItem(CAM_VIEW_KEY)==='1'}catch{return false}}
 const VIDEO_TYPES=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
 export function pickVideoMime(rec:{isTypeSupported?:(t:string)=>boolean}|undefined):string|null{
   if(!rec||typeof rec.isTypeSupported!=='function')return null;
@@ -25,7 +27,8 @@ export function useObjectUrls(media:PendingMedia[]){
 
 export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
   const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
-  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false),[shown,setShown]=useState(false);
+  const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false),[shown,setShown]=useState(false),[fs,setFs]=useState(readCamFullscreen);
+  const toggleFs=()=>setFs(v=>{const n=!v;try{window.localStorage.setItem(CAM_VIEW_KEY,n?'1':'0')}catch{}return n});
   const stageEl=useRef<HTMLDivElement>(null);
   // Size the preview to cover the stage with the frame's own aspect ratio (iOS can render a
   // rotated camera stream letterboxed/small when relying on object-fit alone).
@@ -130,25 +133,37 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
       try{if(kind==='video')await validateFallbackVideo(f);if(!mounted.current)return;onAdd(createPendingMedia(f,kind,f.name||kind+'-'+stamp()));n++;setNote('')}catch(er){if(!mounted.current)return;setNote(er instanceof Error?er.message:String(er))}}
   }
   const zs=caps.zoom;
-  return <div className="cam" role="dialog" aria-modal="true" aria-label={title}>
+  const busy=recording||finalizing;
+  const status=note||(err&&!fallback?err:'');
+  const countText=media.length+' / '+MAX_MEDIA+tr(" Medien aufgenommen")+(mode==='video'&&ready&&!hasAudio?tr(" · ohne Ton"):'');
+  const torchBtn=<button type="button" className={'cam-round cam-torch'+(torch?' on':'')} aria-label={caps.torch?(torch?tr("Blitz aus"):tr("Blitz an")):tr("Blitz nicht verfügbar")} aria-pressed={torch} disabled={!caps.torch} onClick={toggleTorch}>{caps.torch?<Flashlight size={20}/>:<FlashlightOff size={20}/>}</button>;
+  const strip=media.length>0&&<div className="cam-strip" aria-label={tr("Aufgenommene Medien")}>{media.map((m,i)=><div key={m.id} className="cam-thumb">{m.kind==='video'?<video src={urls.get(m.id)} muted playsInline/>:<img src={urls.get(m.id)} alt={tr("Aufnahme ")+(i+1)}/>}{m.kind==='video'&&<VideoIcon size={13}/>}<button type="button" aria-label={tr("Aufnahme ")+(i+1)+' entfernen'} onClick={()=>onRemove(m.id)}>{tr("×")}</button></div>)}</div>;
+  return <div className={'cam'+(fs?' fs':'')} role="dialog" aria-modal="true" aria-label={title}>
+    <div className="cam-top"><button type="button" className="cam-round" aria-label={tr("Zurück")} disabled={busy} onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
+      {fs&&torchBtn}
+      <button type="button" className="cam-round cam-expand" aria-label={fs?tr("Vollbild beenden"):tr("Vollbild")} aria-pressed={fs} onClick={toggleFs}>{fs?<Shrink size={20}/>:<Expand size={20}/>}</button></div>
     <div className="cam-stage" ref={stageEl}><video ref={videoEl} className={'cam-video'+(shown?' is-shown':'')} playsInline muted autoPlay onLoadedMetadata={markReady} onLoadedData={reveal} onPlaying={reveal} onResize={fit}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>{tr("Foto / Video aufnehmen")}</button></div>}
+    {!fs&&torchBtn}
     {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}</div>
     <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>
-    <div className="cam-top"><button type="button" className="cam-round" aria-label={tr("Zurück")} disabled={recording||finalizing} onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
-      <button type="button" className="cam-round" aria-label={caps.torch?(torch?tr("Blitz aus"):tr("Blitz an")):tr("Blitz nicht verfügbar")} aria-pressed={torch} disabled={!caps.torch} onClick={toggleTorch}>{caps.torch&&torch?<Zap size={20}/>:<ZapOff size={20}/>}</button></div>
     <div className="cam-bottom">
+      {fs&&strip}
       <div className={'cam-zoom'+(zs?'':' off')} aria-label={tr("Zoom")}><span>{zs?zoom.toFixed(1)+'x':'1.0x'}</span>
         <button type="button" aria-label={tr("Verkleinern")} disabled={!zs} onClick={()=>applyZoom(zoom-(zs?.step||.5))}><Minus size={16}/></button>
         <input type="range" aria-label={tr("Zoom")} disabled={!zs} min={zs?.min??1} max={zs?.max??1} step={zs?.step||.1} value={zs?zoom:1} onChange={e=>applyZoom(Number(e.target.value))}/>
         <button type="button" aria-label={tr("Vergrößern")} disabled={!zs} onClick={()=>applyZoom(zoom+(zs?.step||.5))}><Plus size={16}/></button>
+        <button type="button" className="cam-1x" aria-label={tr("Zoom zurücksetzen")} disabled={!zs} onClick={()=>applyZoom(1)}>{tr("1x")}</button>
         {!zs&&<small>{fallback?tr("Zoom in der Kamera-App"):tr("Zoom nicht verfügbar")}</small>}</div>
-      {media.length>0&&<div className="cam-strip" aria-label={tr("Aufgenommene Medien")}>{media.map((m,i)=><div key={m.id} className="cam-thumb">{m.kind==='video'?<video src={urls.get(m.id)} muted playsInline/>:<img src={urls.get(m.id)} alt={tr("Aufnahme ")+(i+1)}/>}{m.kind==='video'&&<VideoIcon size={13}/>}<button type="button" aria-label={tr("Aufnahme ")+(i+1)+' entfernen'} onClick={()=>onRemove(m.id)}>{tr("×")}</button></div>)}</div>}
       <div className="cam-row">
-        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={recording||finalizing} onClick={()=>chooseMode('photo')}>{tr("Photo")}</button><button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={recording||finalizing||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>{tr("Video")}</button></div>
+        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={busy} onClick={()=>chooseMode('photo')}>{tr("Photo")}</button><button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={busy||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>{tr("Video")}</button></div>
         {fallback?<button type="button" className="cam-shutter" aria-label={tr("Kamera-App öffnen")} onClick={()=>fileEl.current?.click()}><i/></button>
         :<button type="button" className={'cam-shutter'+(mode==='video'?' video':'')+(recording?' rec':'')} aria-label={mode==='photo'?tr("Foto aufnehmen"):recording?tr("Aufnahme stoppen"):tr("Aufnahme starten")} disabled={!ready||finalizing} onClick={mode==='photo'?take:toggleRecord}><i/></button>}
-        <button type="button" className="cam-pill blue" disabled={recording||finalizing} onClick={onDone}>{tr("Done")}</button></div>
-      <p className="cam-status" role="status">{note||(err&&!fallback?err:media.length?media.length+' / '+MAX_MEDIA+tr(" Medien aufgenommen")+(mode==='video'&&ready&&!hasAudio?tr(" · ohne Ton"):''):tr("No media captured yet"))}</p>
-    </div></div>;
+        <button type="button" className="cam-pill blue" disabled={busy} onClick={onDone}>{tr("Fertig")}</button></div>
+      {fs?<p className="cam-status" role="status">{status||(media.length?countText:tr("Noch keine Medien aufgenommen."))}</p>
+      :status&&<p className="cam-status" role="status">{status}</p>}
+    </div>
+    {!fs&&<section className="cam-media"><h3>{tr("Aufgenommene Medien")}{media.length>0&&<small>{media.length+' / '+MAX_MEDIA+(mode==='video'&&ready&&!hasAudio?tr(" · ohne Ton"):'')}</small>}</h3>
+      {strip||<p className="cam-empty">{tr("Noch keine Medien aufgenommen.")}</p>}</section>}
+  </div>;
 }
