@@ -42,8 +42,14 @@ it('reference typography keeps normal labels, links and flights with bold values
 it('legitimate optional metadata and payment remain visible in their original sections',()=>{
  const b=Object.freeze({...base,key_cash:'10€ Wael',spot:'P3'});const before=JSON.stringify(b);
  const h=r(<BookingDetailView {...props(b,{productLabel:'Actual catalog label',paymentSlot:<button id="existing-payment">Pay</button>})}/>);
- expect(h).not.toContain('bd-secondary');expect(h).toContain('206095322');expect(h).toContain('P3');expect(h).toContain('10€ Wael');expect(h).toContain('existing-payment');expect(h).toContain('Parken (Actual catalog label)');expect(JSON.stringify(b)).toBe(before);
- expect(h.indexOf('bd-location')).toBeLessThan(h.indexOf('split-handover'));expect(h.indexOf('existing-payment')).toBeLessThan(h.indexOf('summary-location'));
+ expect(h).not.toContain('bd-secondary');expect(h).toContain('206095322');expect(h).not.toContain('P3');expect(h).toContain('10€ Wael');expect(h).toContain('existing-payment');expect(h).toContain('Parken (Actual catalog label)');expect(JSON.stringify(b)).toBe(before);
+ expect(h).not.toContain('bd-location');expect(h.indexOf('bd-key')).toBeLessThan(h.indexOf('split-handover'));expect(h.indexOf('existing-payment')).toBeLessThan(h.indexOf('summary-location'));
+});
+
+it('parking area line is not shown under the plate in the detail identity block (data untouched)',()=>{
+ const b=Object.freeze({...base,spot:'P1 - Freiflächen',key_cash:'K7'});const before=JSON.stringify(b);
+ const h=r(<BookingDetailView {...props(b)}/>);const id=h.slice(h.indexOf('bd-identity'),h.indexOf('</section>',h.indexOf('bd-identity')));
+ expect(id).not.toContain('bd-location');expect(id).not.toContain('P1 - Freiflächen');expect(id).toContain('bd-key');expect(id).toContain('K7');expect(id).toContain('bd-outline');expect(JSON.stringify(b)).toBe(before);
 });
 
 it('uses filled reference icons without losing accessible action labels',()=>{
