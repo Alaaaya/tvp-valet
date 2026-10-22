@@ -6,7 +6,7 @@ describe('iOS status-bar edge: bookings topbar is pinned so iOS tints instead of
   const rule=css.match(/\.app\.fixed-top>\.workspace>\.topbar\{([^}]*)\}/)?.[1]??'';
   expect(rule).toMatch(/position:fixed;top:0;left:0;right:0/);
   expect(rule).toMatch(/height:var\(--tvp-topbar-h\)!important/);
-  expect(rule).toMatch(/background-color:#0d6b6b!important/);
+  expect(rule).toMatch(/background-color:#00756f!important/);
   expect(rule).toMatch(/opacity:1/);
   expect(css).not.toMatch(/blur\(|gradient|shadow|rgba\(/i);
  });
