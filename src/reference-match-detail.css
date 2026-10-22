@@ -1,0 +1,42 @@
+/* Exact colours sampled from the ParkingPro reference booking detail (IMG_0656, iPhone 3x). Colours only: no layout, size or text changes. */
+html body .bd .bd-head{background:#2f696a!important;color:#fff}
+html body .bd .bd-head h2,html body .bd .bd-head h2 bdi{color:#fff}
+html body .bd .bd-round{background:#3a7e7f!important;border-color:#053335!important;color:#fff}
+html body .bd .bd-round:before{background:#3a7e7f;border-color:#053335}
+html body .bd .bd-round svg{color:#fff}
+html body .bd .bd-round .reference-gear{fill:#fff}
+html body .bd .bd-round .lucide-settings>circle{fill:#3a7e7f;stroke:#3a7e7f}
+html body .bd .pp-strip.ext{background:#b1ded7!important;color:#19453e}
+/* identity */
+html body .bd .bd-identity{background:#fff;border-bottom-color:#cdeae6}
+html body .bd .bd-identity .bd-label{color:#213d37}
+html body .bd .bd-identity>div:first-child>strong{color:#122723}
+html body .bd .bd-identity>div+div>strong{color:#1f4038}
+html body .bd .bd-identity a,html body .bd .bd-identity .pp-link{color:#4b75ab}
+html body .bd .bd-contact-count{color:#2e5b50}
+html body .bd .bd-outline{border-color:#4770a6!important;color:#4877b2!important;background:#fff}
+html body .bd .bd-outline svg{color:#4877b2;fill:#4877b2}
+html body .bd .bd-outline small{color:#4b77ab}
+/* handover split */
+html body .bd .split-handover section.in,html body .bd .flight-panel.in{background:#579f6f!important}
+html body .bd .split-handover section.out,html body .bd .flight-panel.out{background:#d34c46!important}
+html body .bd .split-handover h3,html body .bd .split-handover h3 svg{color:#fff;fill:#fff}
+html body .bd .handover-date{background:#fff;color:#000}
+html body .bd .handover-date>strong{color:#112723}
+html body .bd .handover-date>span{color:#000}
+html body .bd .handover-date>button{background:#d0f4d8!important;border-color:#579669!important;color:#55956a!important}
+html body .bd .handover-date>button svg{color:#55956a;fill:#55956a}
+html body .bd .out .handover-date>button{background:#f7d8d6!important;border-color:#af4945!important;color:#c34b45!important}
+html body .bd .out .handover-date>button svg{color:#c34b45;fill:#c34b45}
+html body .bd .flight-panel,html body .bd .fp-head,html body .bd .fp-head svg{color:#fff;fill:#fff}
+html body .bd .flight-panel .fp-actions .op-btn,html body .bd .flight-panel .fp-actions .fp-act{background:#d0f4d8;color:#55956a}
+html body .bd .flight-panel .fp-actions .op-btn svg{color:#55956a;fill:#55956a}
+html body .bd .flight-panel.out .fp-actions .op-btn,html body .bd .flight-panel.out .fp-actions .fp-act{background:#f7d8d6;color:#c14a43}
+html body .bd .flight-panel.out .fp-actions .op-btn svg{color:#c14a43;fill:#c14a43}
+html body .bd .flight-panel .fp-actions .fp-driver,html body .bd .fp-driver{background:#fff;color:#27403b;box-shadow:inset 0 0 0 1px #bbdfd8}
+/* bands + cost overview */
+html body .bd .pp-called{background:#cdeae6}
+html body .bd .summary-cost,html body .bd .summary-location,html body .bd .summary-media{background:linear-gradient(#7cbaab,#7cbaab) left bottom/100% 1px no-repeat,linear-gradient(#cdeae6,#cdeae6) left bottom 1px/100% 4.5px no-repeat,linear-gradient(#7cbaab,#7cbaab) left bottom 5.5px/100% 1px no-repeat,#fff}
+html body .bd .summary-cost h3{color:#20433c}
+html body .bd .summary-cost h3 .reference-icon{color:#183833;fill:#183833}
+html body .bd .bd-identity>div+div{color:#1f4038}
