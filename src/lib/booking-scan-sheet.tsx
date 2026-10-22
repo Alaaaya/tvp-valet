@@ -1,10 +1,10 @@
 import {t as tr} from './i18n';
-import React,{useCallback,useEffect,useRef,useState} from 'react';
+import React,{useCallback,useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {X,QrCode,Car,ChevronLeft,Camera,Search} from 'lucide-react';
 import {parseQrPayload,isValidBookingCode,normalizePlate,type PlateCandidate} from './booking-scan-parse';
 import {createQrDecoder,decodeQrFromFile,validateImageFile,type QrDecoder} from './booking-scan-qr';
 import {trapTab} from './undo-controls';
-import {acquireCamera,releaseCamera} from './camera-stream';
+import {acquireCamera,releaseCamera,prewarmCamera,cancelPrewarm} from './camera-stream';
 import {useEdgeBack} from './use-edge-back';
 import '../booking-scan.css';
 
@@ -22,7 +22,9 @@ type Found={kind:'qr'|'plate';value:string;note?:string;confidence?:number;alts?
 export function BookingScanSheet(p:BookingScanSheetProps){
   const[view,setView]=useState<View>('menu');const[found,setFound]=useState<Found|null>(null);
   const box=useRef<HTMLDivElement>(null),opener=useRef<HTMLElement|null>(null);
-  useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;return()=>{const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
+  useEffect(()=>{opener.current=document.activeElement as HTMLElement|null;return()=>{cancelPrewarm();const o=opener.current;setTimeout(()=>o?.focus(),0)}},[]);
+  // Plate scanning uses the photo picker, not the live stream: drop a prewarmed stream right away.
+  useEffect(()=>{if(view==='plate')cancelPrewarm()},[view]);
   useEffect(()=>{box.current?.querySelector<HTMLElement>('[data-first],button:not(:disabled),input')?.focus()},[view,found]);
   const scrim=useRef<HTMLDivElement>(null);
   useEdgeBack(scrim,{enabled:true,blocked:true,priority:80,onBack:()=>{}});
@@ -44,7 +46,7 @@ export function BookingScanSheet(p:BookingScanSheetProps){
       </header>
       {found?<Confirm key={found.kind+found.value} f={found} onLookup={p.onLookup} onRetry={()=>setFound(null)}/>
         :view==='menu'?<div role="menu">
-          <button type="button" role="menuitem" className="bsc-item" data-first onClick={()=>setView('qr')}><QrCode size={22}/><span>{tr("QR code")}</span></button>
+          <button type="button" role="menuitem" className="bsc-item" data-first onClick={()=>{prewarmCamera();setView('qr')}}><QrCode size={22}/><span>{tr("QR code")}</span></button>
           <button type="button" role="menuitem" className="bsc-item" onClick={()=>setView('plate')}><Car size={22}/><span>{tr("License plate")}</span></button>
         </div>
         :view==='qr'?<QrPane hosts={p.expectedHosts} onFound={setFound}/>
@@ -79,8 +81,11 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
     if(!r.ok){setErr(r.reason);return false}
     stop();onFound({kind:'qr',value:r.code,note:r.alternatives?.length?tr("Mehrere Codes im QR-Link gefunden. Bitte den richtigen auswählen. Es wird kein Link geöffnet."):r.source==='plain'?undefined:tr("Code aus QR-Link gelesen. Es wird kein Link geöffnet."),alts:r.alternatives?.map(c=>({display:c,key:c}))});return true;
   },[hosts,onFound,stop]);
-  useEffect(()=>{
+  // Layout effect: join/start getUserMedia before the first paint. The QR decoder is created in
+  // parallel and never delays the preview.
+  useLayoutEffect(()=>{
     const my=++gen.current;let raf=0,timer=0,last='';
+    const decP=createQrDecoder().then(d=>{if(my===gen.current)dec.current=d;return d},()=>null);
     (async()=>{
       if(!navigator.mediaDevices?.getUserMedia){setState('nocam');return}
       let s:MediaStream;
@@ -89,9 +94,10 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
       if(my!==gen.current||!mounted.current){releaseCamera();return}
       stream.current=s;const v=video.current;if(!v){stream.current=null;releaseCamera();return}
       v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>{if(my===gen.current&&mounted.current)setShown(true)})}catch{/* events still reveal */}}}
-      try{await v.play()}catch{/* autoplay quirks; frames still decode once playing */}
+      const playing=(()=>{try{return v.play()}catch{return undefined}})();
+      setState('live');
+      try{await playing}catch{/* autoplay quirks; frames still decode once playing */}
       if(my!==gen.current||!mounted.current)return;
-      setState('live');dec.current=await createQrDecoder();
       let busy=false;
       const tick=async()=>{
         if(my!==gen.current||!mounted.current)return;
@@ -117,7 +123,7 @@ function QrPane({hosts,onFound}:{hosts?:string[];onFound:(f:Found)=>void}){
   };
   return <div className="bsc-body">
     <div className={'bsc-view'+(state==='live'?' live':'')}>
-      <video ref={video} className={shown?'is-shown':undefined} playsInline muted aria-label={tr("Kamera")} onLoadedData={()=>{if(stream.current)setShown(true)}} onPlaying={()=>{if(stream.current)setShown(true)}}/>
+      <video ref={video} className={shown?'is-shown':undefined} playsInline muted autoPlay aria-label={tr("Kamera")} onLoadedData={()=>{if(stream.current)setShown(true)}} onPlaying={()=>{if(stream.current)setShown(true)}}/>
       {state==='live'&&<div className="bsc-frame" aria-hidden="true"/>}
       {state==='starting'&&<p className="bsc-view-msg">{tr("Kamera wird gestartet…")}</p>}
       {state==='nocam'&&<p className="bsc-view-msg">{tr("Keine Live-Kamera")}</p>}

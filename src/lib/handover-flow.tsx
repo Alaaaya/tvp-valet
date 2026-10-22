@@ -5,6 +5,7 @@ import type {Booking} from '../model';
 import {createPendingMedia,type HandoverDetails,type PendingMedia} from './handover-api';
 import {saveOfflineHandover as saveHandover} from './offline-actions';
 import {CameraScreen} from './camera';
+import {prewarmCamera} from './camera-stream';
 import {SignatureField,renderSignature,type Stroke} from './signature';
 import {useEdgeBack} from './use-edge-back';
 
@@ -16,7 +17,7 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
   const sig=useRef<{n:number;item:PendingMedia}|null>(null),saving=useRef(false),alive=useRef(true);
   useEffect(()=>{alive.current=true;const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{alive.current=false;document.body.style.overflow=o}},[]);
   const root=useRef<HTMLDivElement>(null);
-  useEdgeBack(root,{enabled:step==='details',priority:70,blocked:step==='camera'||askLeave||busy,onBack:()=>{setStep('camera')}});
+  useEdgeBack(root,{enabled:step==='details',priority:70,blocked:step==='camera'||askLeave||busy,onBack:()=>{prewarmCamera();setStep('camera')}});
   const label=action==='in'?tr("Check-in"):tr("Check-out");
   const leave=()=>{if(busy)return;if(media.length||strokes.length||comment.trim()||km!==(booking.km==null?'':String(booking.km))||key!==(booking.key_cash||'')||flight!==((action==='in'?booking.flight_in:booking.flight_out)||'')||poor)setAskLeave(true);else onClose()};
 
@@ -43,7 +44,7 @@ export function HandoverFlow({booking,action,onClose,onDone}:{booking:Booking;ac
   return <div ref={root} className="ho">
     {step==='camera'&&<CameraScreen title={label+' · '+booking.plate} media={media} onAdd={m=>setMedia(x=>[...x,m])} onRemove={id=>setMedia(x=>x.filter(m=>m.id!==id))} onBack={leave} onDone={()=>setStep('details')}/>}
     {step==='details'&&<form className="ho-form" onSubmit={save} noValidate>
-      <header><button type="button" className="ho-back" aria-label={tr("Zurück zur Kamera")} disabled={busy} onClick={()=>setStep('camera')}><ChevronLeft size={22}/></button><h2>{tr("Booking")}</h2><span/></header>
+      <header><button type="button" className="ho-back" aria-label={tr("Zurück zur Kamera")} disabled={busy} onClick={()=>{prewarmCamera();setStep('camera')}}><ChevronLeft size={22}/></button><h2>{tr("Booking")}</h2><span/></header>
       {!media.length&&<div className="ho-banner" role="status"><Info size={17}/>  {tr("You skipped media. Proceeding to signature.")}</div>}
       <div className="ho-body">
         <p className="ho-label">{label} {tr("details ·")}{booking.plate}</p>

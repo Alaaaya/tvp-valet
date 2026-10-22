@@ -1,5 +1,5 @@
 import {t as tr} from './i18n';
-import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import React,{useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 import {acquireCamera,releaseCamera} from './camera-stream';
@@ -61,16 +61,22 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     try{s=await acquireCamera()}
     catch(e){if(my!==gen.current||!mounted.current)return;setFallback(true);const n=(e as DOMException)?.name;setErr(n==='NotAllowedError'||n==='SecurityError'?tr("Kamerazugriff verweigert. Aufnahme stattdessen über die Kamera-App."):tr("Kamera nicht verfügbar. Aufnahme stattdessen über die Kamera-App."));return}
     if(my!==gen.current||!mounted.current){releaseCamera();return}
-    stream.current=s;setHasAudio(s.getAudioTracks().length>0);setFallback(false);setErr('');
+    stream.current=s;
+    // Attach and start playback first (synchronously after the stream resolves); capabilities,
+    // state updates and sizing come after, so nothing delays the first frame.
+    const v=videoEl.current;let playing:Promise<void>|undefined;
+    if(v){v.muted=true;v.srcObject=s;watchFirstFrame(v);try{playing=v.play()}catch{playing=Promise.reject()}}
+    setHasAudio(s.getAudioTracks().length>0);setFallback(false);setErr('');
     const track=s.getVideoTracks()[0];let c:Caps={};
     try{const raw=(track.getCapabilities?.()||{}) as any;if(raw.zoom&&raw.zoom.max>raw.zoom.min)c.zoom={min:raw.zoom.min,max:raw.zoom.max,step:raw.zoom.step};if(raw.torch)c.torch=true}catch{}
     setCaps(c);setZoom(c.zoom?Math.max(c.zoom.min,1):1);setTorch(false);
-    const v=videoEl.current;if(v){v.srcObject=s;v.muted=true;watchFirstFrame(v);try{await v.play()}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
+    if(playing){try{await playing}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
     if(my===gen.current&&v&&v.videoWidth>0&&v.readyState>=2)setReady(true);
     fit();
   },[stopStream]);
 
-  useEffect(()=>{mounted.current=true;start();
+  // Layout effect: join/start getUserMedia during commit, before the first paint (not after it).
+  useLayoutEffect(()=>{mounted.current=true;start();
     // Hidden: finish a running recording but keep the stream (stopping it makes iOS ask again).
     // Visible: resume the preview, or re-acquire only if iOS ended the track meanwhile.
     const vis=()=>{if(document.visibilityState==='hidden'){stopRecorder(false)}else if(!fallbackRef.current){const s=stream.current;if(!s||!s.getVideoTracks().some(t=>t.readyState==='live'))start();else{const v=videoEl.current;if(v&&v.paused)v.play().catch(()=>{})}}};
