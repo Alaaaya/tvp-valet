@@ -101,12 +101,14 @@ function TorchButton({caps,on,onToggle,className}:{caps:TrackCaps;on:boolean;onT
 function QrScreen({hosts,onLookup,onBack,onClose}:{hosts?:string[];onLookup:(r:ScanLookup)=>void;onBack:()=>void;onClose:()=>void}){
   const video=useRef<HTMLVideoElement>(null),dec=useRef<QrDecoder|null>(null),file=useRef<HTMLInputElement>(null),done=useRef(false),root=useRef<HTMLDivElement>(null);
   const[manual,setManual]=useState('');const[bad,setBad]=useState('');
+  const photoJob=useRef(0);
+  useLayoutEffect(()=>()=>{photoJob.current++},[]);
   const cam=useScannerCamera(video,()=>{loop()});
   const handle=useCallback((raw:string):boolean=>{
     if(done.current)return true;
     const r=parseQrPayload(raw,{expectedHosts:hosts});
     if(!r.ok){setBad(r.reason);return false}
-    done.current=true;cam.stop();onLookup({kind:'qr',value:r.code});return true;
+    done.current=true;photoJob.current++;cam.stop();onLookup({kind:'qr',value:r.code});return true;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[hosts,onLookup]);
   const timer=useRef(0),raf=useRef(0),busy=useRef(false),last=useRef('');
@@ -128,8 +130,10 @@ function QrScreen({hosts,onLookup,onBack,onClose}:{hosts?:string[];onLookup:(r:S
   useEffect(()=>{const k=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.stopPropagation();onClose()}};document.addEventListener('keydown',k);return()=>document.removeEventListener('keydown',k)},[onClose]);
   const onFile=async(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0];e.target.value='';if(!f)return;
-    try{validateImageFile(f);const raw=await decodeQrFromFile(f,dec.current||undefined);if(!cam.mounted.current)return;if(!raw)setBad(tr("Kein QR-Code im Foto erkannt."));else handle(raw)}
-    catch(x){if(cam.mounted.current)setBad(x instanceof Error?x.message:tr("Foto konnte nicht gelesen werden."))}
+    const my=++photoJob.current;setBad('');
+    const current=()=>my===photoJob.current&&cam.mounted.current&&!done.current;
+    try{validateImageFile(f);const raw=await decodeQrFromFile(f,dec.current||undefined);if(!current())return;if(!raw)setBad(tr("Kein QR-Code im Foto erkannt."));else handle(raw)}
+    catch(x){if(current())setBad(x instanceof Error?x.message:tr("Foto konnte nicht gelesen werden."))}
   };
   return <Portal><div ref={root} className="ms-full ms-qr" role="dialog" aria-modal="true" aria-labelledby="ms-qt" data-live={cam.state==='live'?'1':undefined}>
     <header className="ms-bar">
