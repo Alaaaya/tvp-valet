@@ -1,0 +1,4 @@
+/* Check-in undo matches the green check-in palette; check-out undo stays red. */
+html body .undo-btn.undo-btn-in,html body .bas-undo .undo-btn.undo-btn-in{background:#d0f4d8;color:#1f6b3c;border-color:#2e7a4c}
+html body .undo-ok.undo-ok-in{background:#d0f4d8;color:#1f6b3c;border:2px solid #2e7a4c}
+html body .undo-ok.undo-ok-in:focus-visible,html body .undo-btn.undo-btn-in:focus-visible{outline:2px solid #1f6b3c;outline-offset:2px}
