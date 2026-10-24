@@ -30,8 +30,8 @@ export function useSignedUrls(){
   const bad=useCallback((m:MediaItem)=>{if(forced.current.has(m.id)){setErr(m.id,tr("Medium konnte nicht geladen werden."));return}forced.current.add(m.id);void ensure(m,true)},[ensure]);
   const good=useCallback((m:MediaItem)=>{forced.current.delete(m.id);setErr(m.id,null)},[]);
   const retry=useCallback((m:MediaItem)=>{forced.current.delete(m.id);setErr(m.id,null);return ensure(m,true)},[ensure]);
-  const evict=useCallback((id:string)=>{retired.current.add(id);const url=owned.current.get(id);if(url)URL.revokeObjectURL(url);owned.current.delete(id);forced.current.delete(id);delete mapRef.current[id];setMap(x=>{const{[id]:_,...rest}=x;return rest});setErrs(x=>{const{[id]:_,...rest}=x;return rest})},[]);
-  const prune=useCallback((items:MediaItem[])=>{for(const id of Object.keys(mapRef.current))if(!items.some(i=>i.id===id))evict(id)},[evict]);
+  const evict=useCallback((id:string,permanent=true)=>{if(permanent)retired.current.add(id);const url=owned.current.get(id);if(url)URL.revokeObjectURL(url);owned.current.delete(id);forced.current.delete(id);delete mapRef.current[id];setMap(x=>{const{[id]:_,...rest}=x;return rest});setErrs(x=>{const{[id]:_,...rest}=x;return rest})},[]);
+  const prune=useCallback((items:MediaItem[])=>{for(const id of Object.keys(mapRef.current))if(!items.some(i=>i.id===id))evict(id,false)},[evict]);
   return{map,errs,ensure,bad,good,retry,prune,evict};
 }
 

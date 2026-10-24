@@ -4398,5 +4398,10 @@
     "Permanently delete media?",
     "Medium endgültig löschen?",
     "حذف الملف نهائيًا؟"
+  ],
+  "Das Medium wird aus der Galerie entfernt. Bereits ausgestellte Links und zwischengespeicherte Kopien können bis zum Ablauf zugänglich bleiben.": [
+    "The media will be removed from the gallery. Existing links and cached copies may remain accessible until expiry.",
+    "Das Medium wird aus der Galerie entfernt. Bereits ausgestellte Links und zwischengespeicherte Kopien können bis zum Ablauf zugänglich bleiben.",
+    "سيُحذف الملف من المعرض. قد تبقى الروابط السابقة والنسخ المؤقتة متاحة حتى انتهاء صلاحيتها."
   ]
 }
