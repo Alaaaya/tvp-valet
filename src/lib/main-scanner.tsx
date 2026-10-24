@@ -8,6 +8,7 @@ import {trapTab} from './undo-controls';
 import {acquireCamera,releaseCamera,prewarmCamera,cancelPrewarm} from './camera-stream';
 import {useEdgeBack} from './use-edge-back';
 import '../main-scanner.css';
+import {startCameraPreview} from './camera-preview';
 
 export interface ScanLookup{kind:'qr'|'plate';value:string}
 export interface MainScannerProps{
@@ -34,10 +35,11 @@ function useMounted(){const m=useRef(true);useEffect(()=>{m.current=true;return(
 
 /** Starts the shared camera, reports capabilities, exposes torch/zoom. Always releases on unmount. */
 function useScannerCamera(video:React.RefObject<HTMLVideoElement|null>,onLive?:()=>void){
+  const preview=useRef<AbortController|null>(null);
   const gen=useRef(0),mounted=useMounted(),track=useRef<MediaStreamTrack|undefined>(undefined),held=useRef(false);
   const[state,setState]=useState<'starting'|'live'|'nocam'>('starting');const[err,setErr]=useState('');const[shown,setShown]=useState(false);
   const[caps,setCaps]=useState<TrackCaps>({torch:false,zoom:null});const[torchOn,setTorchOn]=useState(false);const[zoom,setZoomV]=useState(1);
-  const stop=useCallback(()=>{setShown(false);gen.current++;const v=video.current;if(v){try{v.pause()}catch{}v.srcObject=null}track.current=undefined;if(held.current){held.current=false;releaseCamera()}},[video]);
+  const stop=useCallback(()=>{setShown(false);gen.current++;preview.current?.abort();const v=video.current;if(v){try{v.pause()}catch{}v.srcObject=null}track.current=undefined;if(held.current){held.current=false;releaseCamera()}},[video]);
   useLayoutEffect(()=>{
     const my=++gen.current;
     (async()=>{
@@ -48,13 +50,15 @@ function useScannerCamera(video:React.RefObject<HTMLVideoElement|null>,onLive?:(
       if(my!==gen.current||!mounted.current){releaseCamera();return}
       held.current=true;const v=video.current;if(!v){held.current=false;releaseCamera();return}
       track.current=s.getVideoTracks()[0];setCaps(readTrackCaps(track.current));
-      v.srcObject=s;v.setAttribute('playsinline','true');v.muted=true;
-      const rv=(v as unknown as {requestVideoFrameCallback?:(cb:()=>void)=>void}).requestVideoFrameCallback;
-      if(typeof rv==='function'){try{rv.call(v,()=>{if(my===gen.current&&mounted.current)setShown(true)})}catch{/* events still reveal */}}
-      let p:Promise<void>|undefined;try{p=v.play()}catch{p=undefined}
-      setState('live');
-      try{await p}catch{/* autoplay quirk; frames decode once playing */}
-      if(my===gen.current&&mounted.current)onLive?.();
+      const controller=preview.current=new AbortController();
+      try{
+        await startCameraPreview(v,s,controller.signal);
+        if(my!==gen.current||!mounted.current)return;
+        setShown(true);setState('live');onLive?.();
+      }catch{
+        if(my!==gen.current||!mounted.current)return;
+        stop();setState('nocam');setErr(tr("Vorschau konnte nicht gestartet werden."));
+      }
     })();
     const vis=()=>{if(document.visibilityState==='hidden'){stop();setState('nocam');setErr(tr("Kamera pausiert. Zurück und erneut öffnen."))}};
     document.addEventListener('visibilitychange',vis);
