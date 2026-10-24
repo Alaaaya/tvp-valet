@@ -16,13 +16,17 @@ import {partnerBadge} from './booking-list-row';
 import type {Attribution} from './attribution';
 import {returnNeedsCall} from './call-phase';
 
-/** Small second line naming the staff member who did a step. */
-/** Return (Retour) call already recorded: same button look as "Hat angerufen", with the call time and who recorded it on one legible line.
- * Tapping opens the repeat/clear dialog. */
-export function ReturnCallDone({time,by,disabled,onClick}:{time:string;by?:string;disabled?:boolean;onClick:()=>void}){
-  return <button type="button" className="op-btn out fp-call-done" aria-label={tr("Kunde angerufen")+' '+time+(by?' · '+tr("von ")+by:'')} disabled={disabled} onClick={onClick}>
+/** Recorded customer call: same button look as "Hat angerufen" in the side's colour (green Anreise, pink Retour),
+ * with the call time and who recorded it as legible text. */
+export function CallDone({side,time,by,disabled,onClick}:{side:'in'|'out';time:string;by?:string;disabled?:boolean;onClick:()=>void}){
+  return <button type="button" className={'op-btn '+side+' fp-call-done'} data-side={side} aria-label={tr("Kunde angerufen")+' '+time+(by?' · '+tr("von ")+by:'')} disabled={disabled} onClick={onClick}>
     <span className="fp-call-done-text"><span className="fp-call-done-main"><ReferenceIcon name="phone" size={13}/><span className="fp-call-done-label">{tr("Has called")}{' '}<time>{time}</time></span></span>{by&&<span className="fp-call-done-by"><span className="fp-call-done-sep" aria-hidden="true">{' · '}</span>{tr("von ")}<bdi>{by}</bdi></span>}</span></button>;
 }
+/** Return (Retour) call already recorded. Tapping opens the repeat/clear dialog. */
+export function ReturnCallDone(p:{time:string;by?:string;disabled?:boolean;onClick:()=>void}){return <CallDone side="out" {...p}/>}
+/** Arrival (Anreise) call already recorded: green twin of ReturnCallDone. */
+export function ArrivalCallDone(p:{time:string;by?:string;disabled?:boolean;onClick:()=>void}){return <CallDone side="in" {...p}/>}
+/** Small second line naming the staff member who did a step. */
 export function ByLine({name,inline}:{name?:string;inline?:boolean}){return !name?null:inline?<span className="op-by inline">{" · "}{tr("von ")}<bdi>{name}</bdi></span>:<small className="op-by">{tr("von ")}<bdi>{name}</bdi></small>}
 
 export interface BookingDetailViewProps{
@@ -59,6 +63,8 @@ export interface BookingDetailViewProps{
   calledOutSlot?:React.ReactNode;
   /** Return call time (call recorded at/after check-in). Until set, the red panel offers only "Hat angerufen". */
   returnCalledAt?:string|null;
+  /** open the driver picker (green "Keinem Fahrer zugewiesen"); falls back to onEdit when absent */
+  onAssignDriver?:()=>void;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -113,7 +119,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
         <button type="button" className={at&&p.actors?.[k]?'has-by':undefined} disabled={!!p.busy||!!at||b.status!=='confirmed'} onClick={()=>p.onStartCheck(k)}>{at?<><Check size={17}/> {k==='in'?tr('Checked-in:'):tr('Checked-out:')} {clock(at)}<ByLine name={p.actors?.[k]}/></>:<>{<ReferenceIcon name={k==='in'?'checkin':'checkout'} size={15}/>} {k==='in'?tr('Check-in'):tr('Check-out')}</>}</button></div>
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
-        <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
+        <button type="button" className="fp-driver" aria-haspopup="dialog" onClick={p.onAssignDriver??p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
         :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>

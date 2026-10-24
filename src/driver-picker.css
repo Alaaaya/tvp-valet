@@ -1,0 +1,22 @@
+/* driver picker bottom sheet (reference IMG_0714) */
+.dps-scrim{position:fixed;inset:0;z-index:65;background:rgba(10,40,38,.55);display:flex;align-items:flex-end;justify-content:center}
+.dps{width:100%;max-width:700px;max-height:78dvh;display:flex;flex-direction:column;background:#fff;border-radius:22px 22px 0 0;padding:10px 0 max(12px,env(safe-area-inset-bottom));overscroll-behavior:contain;color:#0f2f2b}
+.dps-handle{flex:none;width:48px;height:5px;border-radius:3px;background:#9fe0cf;margin:4px auto 14px}
+.dps-head{flex:none;display:flex;align-items:center;gap:10px;padding:0 18px 12px;border-bottom:1px solid #cfe9e3}
+.dps-head h2{flex:1;margin:0;font-size:20px;font-weight:700;color:#0f3f39}
+.dps-sort{flex:none;height:30px;padding:0 13px;border:0;border-radius:15px;background:#e1f5ef;color:#0f4f46;font-size:13px;font-weight:600;letter-spacing:.2px}
+.dps-x{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:#e9f5f2;color:#0f4f46;display:grid;place-items:center}
+.dps-search{flex:none;padding:10px 18px;border-bottom:1px solid #cfe9e3}
+.dps .dps-search label{display:flex;flex-direction:row;align-items:center;margin:0;font-weight:400;gap:10px;height:44px;padding:0 14px;border-radius:8px;background:#ebf7f4;color:#1aa38a}
+.dps .dps-search input{flex:1;width:auto;min-width:0;height:100%;min-height:0;border:0;border-radius:0;background:transparent;font-size:17px!important;font-weight:400;color:#0f2f2b;outline:none;padding:0;-webkit-appearance:none;appearance:none}
+.dps .dps-search svg{flex:none}
+.dps .dps-search input::-webkit-search-cancel-button{-webkit-appearance:none}
+.dps-search input::placeholder{color:#3dbba3}
+.dps-list{flex:1;overflow-y:auto;list-style:none;margin:0;padding:0}
+.dps-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:54px;padding:0 18px;border:0;border-bottom:1px solid #e3efec;border-radius:0;background:#fff;color:#0f2f2b;font-size:17px;font-weight:400;text-align:start}
+.dps-row:disabled{color:#0f2f2b;opacity:.6}
+.dps-check{flex:none;width:20px;height:20px;border-radius:50%;background:#1fae95;color:#fff;display:grid;place-items:center}
+.dps-err,.dps-note{margin:8px 18px 0;padding:8px 12px;border-radius:8px;font-size:14px}
+.dps-err{background:#fbe0de;color:#a63732}.dps-note{background:#fff6dc;color:#6b5512}
+.dps-empty{padding:16px 18px;color:#5b6d69}
+.dps button:focus-visible,.dps input:focus-visible{outline:3px solid #2d696a;outline-offset:-3px}

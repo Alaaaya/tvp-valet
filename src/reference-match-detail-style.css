@@ -98,3 +98,13 @@ html body div.bd .flight-panel.out .fp-actions .op-btn.fp-call-done .fp-call-don
 html body div.bd .flight-panel.out .fp-actions .op-btn.fp-call-done .fp-call-done-sep{display:none}
 html body div.bd .flight-panel.out .fp-actions .op-btn.fp-call-done:disabled{opacity:1}
 html body div.bd .flight-panel.out .fp-actions .op-btn.fp-call-done .fp-call-done-label{flex:0 0 auto!important;width:auto!important;margin:0!important;white-space:nowrap;color:#c14a43!important;font-size:11.5px!important;font-weight:700!important}
+/* Anreise call recorded: green twin of the Retour call-done button (legible time + "von Name"). */
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done{display:flex!important;height:auto!important;min-height:38px!important;padding:4px 6px!important;flex-wrap:nowrap!important;justify-content:center!important;align-items:center!important;background:#d0f4d8!important;color:#2e7a4c!important}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-text{display:flex;flex-direction:column;align-items:center;flex:0 1 auto!important;width:auto!important;max-width:100%;margin:0!important;color:#2e7a4c!important;opacity:1!important}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-main{display:inline-flex;align-items:center;gap:0;white-space:nowrap;font-size:11.5px!important;font-weight:700!important;line-height:15px!important;color:#2e7a4c!important}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-main svg{color:#2e7a4c;fill:#2e7a4c;flex-shrink:0;margin-inline-end:6px}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done time{font-variant-numeric:tabular-nums;color:inherit}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-by{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px!important;font-weight:600!important;line-height:14px!important;color:#2e7a4c!important;opacity:1!important}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-sep{display:none}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done:disabled{opacity:1}
+html body div.bd .flight-panel.in .fp-actions .op-btn.fp-call-done .fp-call-done-label{flex:0 0 auto!important;width:auto!important;margin:0!important;white-space:nowrap;color:#2e7a4c!important;font-size:11.5px!important;font-weight:700!important}
