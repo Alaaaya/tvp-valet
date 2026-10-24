@@ -1,6 +1,5 @@
 import {t as tr} from './i18n';
 import {db} from '../api';
-import {mediaDeleteEnabled} from './media-delete-api';
 import type {Booking} from '../model';
 export type MediaKind='photo'|'video'|'signature';
 export type PendingMedia={id:string;blob:Blob;kind:MediaKind;mime_type:string;captured_at:string;name:string};
@@ -37,36 +36,15 @@ export function validateHandover(details:HandoverDetails,media:PendingMedia[]){
 export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  if(!uuid.test(bookingId))throw Error(tr("Ungültige Buchung."));
  const d=client();
- if(mediaDeleteEnabled()){
-  // This resolver is the sole gallery authority after activation. Never fall back
+ {
+  // Read safety is unconditional in this release, independent of action flags.
+  // Rolling back delete actions MUST NOT resurrect immutable tombstones. Never fall back
   // to raw ledgers or Storage listings, which could resurrect tombstoned media.
   const result=await d.rpc('resolve_booking_media_v4',{p_booking_id:bookingId});
   if(result.error)throw result.error;
   if(!Array.isArray(result.data))throw Error(tr("Medien konnten nicht geladen werden:"));
   return result.data.filter((m:any)=>m&&m.deleted!==true&&typeof m.path==='string'&&m.path.startsWith(bookingId+'/')).map((m:any)=>({id:m.id,path:m.path,bucket:'booking-media',kind:['photo','video','signature'].includes(m.kind)?m.kind:'unknown',mime_type:m.mime_type||'',captured_at:m.captured_at||'',size_bytes:Number(m.size_bytes||0),action:m.action,undone_at:m.undone_at||null,undone_by:m.undone_by||null}));
  }
- const result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action,booking_handovers!inner(undone_at,undone_by)').eq('booking_id',bookingId).order('captured_at');
- if(result.error)throw result.error;
- const items:MediaItem[]=(result.data||[]).map((row:MediaItem&{booking_handovers?:{undone_at:string|null;undone_by:string|null}|{undone_at:string|null;undone_by:string|null}[]})=>{const {booking_handovers,...item}=row;const history=Array.isArray(booking_handovers)?booking_handovers[0]:booking_handovers;return{...item,undone_at:history?.undone_at||null,undone_by:history?.undone_by||null}});
- const gallery=await d.from('booking_gallery_media').select('*').eq('booking_id',bookingId).order('captured_at');
- // The gallery ledger is optional: tolerate only a known-missing schema, keep legacy data, surface every other error.
- if(gallery.error&&!['PGRST205','42P01'].includes((gallery.error as {code?:string}).code||''))throw gallery.error;
- for(const row of gallery.error?[]:gallery.data||[]){
-  if(items.some(x=>x.id===row.id||x.path===row.path))continue;
-  items.push({id:row.id,path:row.path,bucket:row.bucket||'booking-media',kind:row.kind,mime_type:row.mime_type,captured_at:row.captured_at,size_bytes:Number(row.size_bytes??row.bytes??0)});
- }
- // Preserve pre-existing photos, but do not publish abandoned partial uploads as completed evidence.
- for(let offset=0;;offset+=100){
-  const r=await d.storage.from('booking-media').list(bookingId,{limit:100,offset,sortBy:{column:'created_at',order:'asc'}});
-  if(r.error)throw r.error;
-  for(const f of r.data||[]){
-   const path=bookingId+'/'+f.name,type=baseMime(f.metadata?.mimetype||'');
-   if(items.some(x=>x.path===path)||/^[0-9a-f-]{36}-[0-9a-f-]{36}\./i.test(f.name)||(!imageTypes.has(type)&&!videoTypes.has(type)))continue;
-   items.push({id:f.id||path,path,kind:videoTypes.has(type)?'video':'photo',mime_type:type,captured_at:f.created_at||'',size_bytes:Number(f.metadata?.size||0)});
-  }
-  if((r.data?.length||0)<100)break;
- }
- return items.sort((a,b)=>a.captured_at.localeCompare(b.captured_at));
 }
 export async function signedMediaUrl(item:MediaItem):Promise<string>{
  if(item.local_blob)return URL.createObjectURL(item.local_blob);
