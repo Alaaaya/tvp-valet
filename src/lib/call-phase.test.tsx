@@ -3,7 +3,7 @@ import {renderToStaticMarkup as r} from 'react-dom/server';
 import {readFileSync} from 'node:fs';
 import {describe,expect,it} from 'vitest';
 import {callPhaseOf,callFor,returnNeedsCall} from './call-phase';
-import {BookingDetailView} from './booking-detail-view';
+import {BookingDetailView,ReturnCallDone} from './booking-detail-view';
 import {blank} from '../model';
 
 const CI='2026-10-24T08:00:00Z';
@@ -41,7 +41,14 @@ describe('detail return panel: "Hat angerufen" first, then "Markiere als abgehol
  });
  it('return call recorded (e.g. from the list): pick-up action shown with existing behaviour',()=>{
   const o=outPanel(r(<BookingDetailView {...props({returnCalledAt:'2026-10-24T12:00:00Z'})}/>));
-  expect(o).toContain('Mark as taken away');expect(o).toContain('Mark as retrieved');expect(o.indexOf('cout')).toBeLessThan(o.indexOf('Mark as taken away'));
+  expect(o).toContain('Mark as taken away');expect(o).not.toContain('Mark as retrieved');expect(o.indexOf('cout')).toBeLessThan(o.indexOf('Mark as taken away'));
+ });
+ it('recorded return call shows time and caller on one legible line, styled like the call button',()=>{
+  const h=r(<ReturnCallDone time="15:18" by="Alaa" onClick={()=>{}}/>);
+  expect(h).toContain('op-btn out fp-call-done');expect(h).toMatch(/<span class="fp-call-done-label">Has called <time>15:18<\/time><\/span><\/span><span class="fp-call-done-by"><span class="fp-call-done-sep" aria-hidden="true"> · <\/span>von <bdi>Alaa<\/bdi><\/span>/);expect(h).toContain('aria-label="Kunde angerufen 15:18 · von Alaa"');
+  expect(h).not.toContain('op-by');
+  expect(r(<ReturnCallDone time="15:18" onClick={()=>{}}/>)).not.toContain('fp-call-done-by');
+  const m=readFileSync('src/main.tsx','utf8');expect(m).toContain('<ReturnCallDone time={callCounter({calledAt:own}).time} by={actors.call_out}');expect(m).not.toContain('fp-call-hint');
  });
  it('already taken away without a call keeps showing its stamped state',()=>{
   const ops={booking_id:'x',taken_away_at:'2026-10-24T12:10:00Z',retrieved_at:null,customer_called_at:null,ride_started_at:null,performed_by:'',updated_at:''};
