@@ -4323,5 +4323,60 @@
     "Please enter manually.",
     "Bitte manuell eingeben.",
     "يرجى الإدخال يدويًا."
+  ],
+  "Löschen nicht erlaubt. Nur Administratoren dürfen Medien löschen.": [
+    "Delete not allowed. Only administrators can delete media.",
+    "Löschen nicht erlaubt. Nur Administratoren dürfen Medien löschen.",
+    "تم رفض الحذف. يمكن للمسؤولين فقط حذف الوسائط."
+  ],
+  "Ungültige Löschanfrage.": [
+    "Invalid delete request.",
+    "Ungültige Löschanfrage.",
+    "طلب حذف غير صالح."
+  ],
+  "Ausstehende lokale Medien können nicht gelöscht werden.": [
+    "Pending local media cannot be deleted.",
+    "Ausstehende lokale Medien können nicht gelöscht werden.",
+    "لا يمكن حذف الوسائط المحلية المعلقة."
+  ],
+  "Löschen nicht bestätigt. Das Medium wurde möglicherweise nicht entfernt. ": [
+    "Deletion not confirmed. The item may not have been removed. ",
+    "Löschen nicht bestätigt. Das Medium wurde möglicherweise nicht entfernt. ",
+    "لم يتم تأكيد الحذف. قد لا تكون الوسائط قد أُزيلت. "
+  ],
+  "Löschen nicht bestätigt. Das Medium wurde möglicherweise nicht entfernt.": [
+    "Deletion not confirmed. The item may not have been removed.",
+    "Löschen nicht bestätigt. Das Medium wurde möglicherweise nicht entfernt.",
+    "لم يتم تأكيد الحذف. قد لا تكون الوسائط قد أُزيلت."
+  ],
+  "Unterschrift endgültig löschen?": [
+    "Delete signature permanently?",
+    "Unterschrift endgültig löschen?",
+    "حذف التوقيع نهائياً؟"
+  ],
+  "Foto endgültig löschen?": [
+    "Delete photo permanently?",
+    "Foto endgültig löschen?",
+    "حذف الصورة نهائياً؟"
+  ],
+  "Das Medium wird unwiderruflich entfernt und kann nicht wiederhergestellt werden.": [
+    "This item is removed irreversibly and cannot be restored.",
+    "Das Medium wird unwiderruflich entfernt und kann nicht wiederhergestellt werden.",
+    "ستتم إزالة الوسائط بشكل لا رجعة فيه ولا يمكن استعادتها."
+  ],
+  "Die Übergabe bleibt als gelöscht markiert; ein unveränderlicher Protokolleintrag bleibt bestehen.": [
+    "The handover stays marked as deleted; an immutable audit entry remains.",
+    "Die Übergabe bleibt als gelöscht markiert; ein unveränderlicher Protokolleintrag bleibt bestehen.",
+    "يبقى التسليم معلَّماً كمحذوف ويبقى سجل تدقيق غير قابل للتعديل."
+  ],
+  "Offline: Löschen ist nur online möglich.": [
+    "Offline: deleting is only possible online.",
+    "Offline: Löschen ist nur online möglich.",
+    "غير متصل: الحذف ممكن عند الاتصال فقط."
+  ],
+  "Endgültig löschen": [
+    "Delete permanently",
+    "Endgültig löschen",
+    "حذف نهائياً"
   ]
 }

@@ -4,6 +4,10 @@ import {ChevronLeft,ChevronRight,Maximize,Minimize,Download,Share2,Camera,Video 
 import {listBookingMedia,signedMediaUrl,mediaBlob,type MediaItem} from './handover-api';
 import {pendingOfflineMedia,subscribeOffline,offlineSnapshot} from './offline-client';
 import {useEdgeBack} from './use-edge-back';
+import {Trash2} from 'lucide-react';
+import {deleteBookingMedia} from './media-delete-api';
+import {MediaDeleteDialog} from './media-delete-dialog';
+import '../media-delete.css';
 
 const RENEW_MS=240000;
 type U={url:string;at:number;blob?:Blob};
@@ -29,10 +33,10 @@ export function useSignedUrls(){
 }
 
 type Undo={undone_at?:string|null;undone_by?:string|null};const undone=(m:MediaItem)=>(m as MediaItem&Undo).undone_at||null;
-type GalleryProps={bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];addTile?:React.ReactNode};
+type GalleryProps={bookingId:string;demo:boolean;refreshKey:number;local:{name:string;url:string}[];canDelete?:boolean;addTile?:React.ReactNode};
 /** Keyed by booking: items, open viewer, signed-URL cache and errors can never carry over to another booking, even if the parent forgets a key. */
 export function MediaGallery(p:GalleryProps){const account=useSyncExternalStore(subscribeOffline,()=>String(offlineSnapshot().accountId||'')+':'+String(offlineSnapshot().ready),()=>':false');return <MediaGalleryInner key={account+':'+p.bookingId} {...p}/>}
-function MediaGalleryInner({bookingId,demo,refreshKey,local,addTile}:GalleryProps){
+function MediaGalleryInner({bookingId,demo,refreshKey,local,canDelete,addTile}:GalleryProps){
   const[items,setItems]=useState<MediaItem[]>([]),[err,setErr]=useState(''),[open,setOpen]=useState<number|null>(null),[loading,setLoading]=useState(false);
   const{map,errs,ensure,bad,good,retry,prune}=useSignedUrls();const[reload,setReload]=useState(0);
   const offline=useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
@@ -58,14 +62,15 @@ function MediaGalleryInner({bookingId,demo,refreshKey,local,addTile}:GalleryProp
     {!loading&&!err&&!items.length&&<p className="mg-note">{tr("Noch keine Medien.")}</p>}
     <div className="mg-grid">{addTile}{items.map((m,i)=><button type="button" key={m.id} className={'mg-tile'+(undone(m)?' undone':'')} aria-label={tr("Medium ")+(i+1)+' öffnen, '+kindLabel(m.kind)+(undone(m)?tr(", rückgängig gemacht"):'')} onClick={()=>setOpen(i)}>
       {m.kind==='video'?<span className="mg-ico"><VideoIcon size={22}/></span>:map[m.id]&&!errs[m.id]?<img src={map[m.id].url} alt="" onLoad={()=>good(m)} onError={()=>bad(m)}/>:<span className="mg-ico" title={errs[m.id]}>{errs[m.id]?<AlertTriangle size={22}/>:<Camera size={22}/>}</span>}<b>{i+1}</b>{m.offline_pending&&<span className="mg-undone">{tr("Ausstehend")}</span>}{undone(m)&&<span className="mg-undone">{tr("Rückgängig gemacht")}</span>}</button>)}</div>
-    {open!==null&&items[open]&&<Viewer items={items} index={open} setIndex={setOpen} onClose={()=>setOpen(null)} map={map} errs={errs} ensure={ensure} bad={bad} good={good} retry={retry}/>}
+    {open!==null&&items[open]&&<Viewer items={items} index={open} setIndex={setOpen} onClose={()=>setOpen(null)} map={map} errs={errs} ensure={ensure} bad={bad} good={good} retry={retry} onDelete={canDelete&&!demo?async(m,rid)=>{await deleteBookingMedia({requestId:rid,bookingId,item:m});setServerItems(x=>x.filter(i=>i.id!==m.id));setOpen(null);setReload(x=>x+1)}:undefined}/>}
   </div>;
 }
 
-export function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
+export function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry,onDelete}:{onDelete?:(m:MediaItem,requestId:string)=>Promise<void>;items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
   const m=items[index],box=useRef<HTMLDivElement>(null),[full,setFull]=useState(false),[msg,setMsg]=useState(''),[busy,setBusy]=useState('');
+  const[confirm,setConfirm]=useState(false),[delErr,setDelErr]=useState(''),rids=useRef(new Map<string,string>()),offlineNow=useSyncExternalStore(subscribeOffline,()=>!offlineSnapshot().online,()=>false);
   const strip=useRef<HTMLDivElement>(null),root=useRef<HTMLDivElement>(null);
-  useEdgeBack(root,{enabled:true,priority:60,blocked:!!busy,key:m.id,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
+  useEdgeBack(root,{enabled:true,priority:60,blocked:!!busy||confirm,key:m.id,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
   useEffect(()=>{ensure(m);const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=o}},[]);
   useEffect(()=>{ensure(m);const t=window.setInterval(()=>ensure(m),30000);return()=>clearInterval(t)},[m,ensure]);
   useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const st=strip.current,el=st?.children[index] as HTMLElement|undefined;if(st&&el){const left=el.offsetLeft-st.offsetLeft-(st.clientWidth-el.offsetWidth)/2;if(typeof st.scrollTo==='function')st.scrollTo({left:Math.max(0,left)});else st.scrollLeft=Math.max(0,left)}},[index]);
@@ -76,6 +81,8 @@ export function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,re
   const name=()=>'tvp-'+(index+1)+'-'+m.captured_at.slice(0,10)+'.'+ext(m);
   async function download(){setBusy('dl');setMsg('');try{const b=await mediaBlob(m);const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}catch(e){setMsg(tr("Download fehlgeschlagen: ")+(e instanceof Error?e.message:String(e)))}finally{setBusy('')}}
   async function share(){setBusy('sh');setMsg('');try{const b=await mediaBlob(m);const f=new File([b],name(),{type:b.type||m.mime_type});if(navigator.canShare?.({files:[f]}))await navigator.share({files:[f]});else setMsg(tr("Teilen wird von diesem Gerät nicht unterstützt. Bitte Download nutzen."))}catch(e){if((e as DOMException)?.name!=='AbortError')setMsg(tr("Teilen fehlgeschlagen: ")+(e instanceof Error?e.message:String(e)))}finally{setBusy('')}}
+  async function doDelete(){if(offlineNow)return;setBusy('del');setDelErr('');let rid=rids.current.get(m.id);if(!rid){rid=crypto.randomUUID();rids.current.set(m.id,rid)}try{await onDelete!(m,rid);rids.current.delete(m.id);setConfirm(false)}catch(e){setDelErr(e instanceof Error?e.message:String(e))}finally{setBusy('')}}
+  const canDel=!!onDelete&&!m.offline_pending&&!m.local_blob;
   const canShare=typeof navigator!=='undefined'&&typeof navigator.share==='function'&&typeof navigator.canShare==='function';
   const u=map[m.id]?.url;
   const e=errs[m.id];
@@ -88,7 +95,8 @@ export function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,re
       {items.length>1&&<><button type="button" className="gv-nav l" aria-label={tr("Zurück")} onClick={()=>go(-1)}><ChevronLeft size={22}/></button><button type="button" className="gv-nav r" aria-label={tr("Weiter")} onClick={()=>go(1)}><ChevronRight size={22}/></button></>}
     </div></div>
     <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.offline_pending&&<span>{tr("Ausstehend")}</span>}{m.action&&<span>{m.action==='in'?tr("Check-in"):tr("Check-out")}</span>}{undone(m)&&<span>{tr("Rückgängig gemacht ·")}{fmt(undone(m)!)}</span>}</div>
-      <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label={tr("Teilen")} disabled={!!busy} onClick={share}><Share2 size={18}/></button>}<button type="button" className="gv-round" aria-label={tr("Herunterladen")} disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
+      <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label={tr("Teilen")} disabled={!!busy} onClick={share}><Share2 size={18}/></button>}{canDel&&<button type="button" className="gv-round gv-del" aria-label={tr("Löschen")} disabled={!!busy} onClick={()=>{setDelErr('');setConfirm(true)}}><Trash2 size={18}/></button>}<button type="button" className="gv-round" aria-label={tr("Herunterladen")} disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
+    {confirm&&canDel&&<MediaDeleteDialog item={m} busy={busy==='del'} error={delErr} blocked={offlineNow?tr("Offline: Löschen ist nur online möglich."):''} onCancel={()=>{setConfirm(false);setDelErr('')}} onConfirm={()=>void doDelete()}/>}
     {msg&&<p className="gv-msg" role="alert">{msg}</p>}
     <h3 className="gv-title">{tr("Media (")}{items.filter(i=>i.kind==='photo').length} {tr("photos")}{items.some(i=>i.kind==='video')?', '+items.filter(i=>i.kind==='video').length+' videos':''}{")"}</h3>
     <div className="gv-strip" ref={strip} data-edge-back-exclude>{items.map((i,n)=><button type="button" key={i.id} className={n===index?'on':''} aria-label={tr("Medium ")+(n+1)} aria-current={n===index} onClick={()=>{setMsg('');setIndex(n)}}>{i.kind==='video'?<span><VideoIcon size={20}/></span>:map[i.id]&&!errs[i.id]?<img src={map[i.id].url} alt="" loading="lazy" onLoad={()=>good(i)} onError={()=>bad(i)}/>:<span title={errs[i.id]}>{errs[i.id]?<AlertTriangle size={20}/>:<Camera size={20}/>}</span>}<b>{n+1}</b></button>)}</div>
