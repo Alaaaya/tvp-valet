@@ -4403,5 +4403,40 @@
     "The media will be removed from the gallery. Existing links and cached copies may remain accessible until expiry.",
     "Das Medium wird aus der Galerie entfernt. Bereits ausgestellte Links und zwischengespeicherte Kopien können bis zum Ablauf zugänglich bleiben.",
     "سيُحذف الملف من المعرض. قد تبقى الروابط السابقة والنسخ المؤقتة متاحة حتى انتهاء صلاحيتها."
+  ],
+  "Gefahren": [
+    "Gefahren",
+    "Gefahren",
+    "Gefahren"
+  ],
+  "Gefahren löschen": [
+    "Clear",
+    "Löschen",
+    "مسح"
+  ],
+  "Gefahren nur online speichern.": [
+    "Gefahren can only be saved online.",
+    "Gefahren nur online speichern.",
+    "حفظ Gefahren متاح أثناء الاتصال فقط."
+  ],
+  "1 gefahren": [
+    "1 gefahren",
+    "1 gefahren",
+    "1 gefahren"
+  ],
+  "2 gefahren": [
+    "2 gefahren",
+    "2 gefahren",
+    "2 gefahren"
+  ],
+  "3 gefahren": [
+    "3 gefahren",
+    "3 gefahren",
+    "3 gefahren"
+  ],
+  "4 gefahren": [
+    "4 gefahren",
+    "4 gefahren",
+    "4 gefahren"
   ]
 }

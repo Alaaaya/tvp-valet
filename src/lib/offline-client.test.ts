@@ -222,3 +222,17 @@ describe('offline runtime with actual IndexedDB',()=>{
   await syncing;expect(client.cachedOfflineBookings()).toEqual([]);expect(client.offlineSnapshot().accountId).toBe('bob');expect((await mock.store.list(scope))[0].state).not.toBe('confirmed');
  });
 });
+
+it('confirmed Gefahren updates only its field and own account cached booking',async()=>{
+ await seed([booking({gefahren:null}),booking({id:'other',gefahren:4})]);await boot(false);
+ await client.cacheConfirmedGefahren('bob',booking().id,2);
+ expect(client.cachedOfflineBooking(booking().id)?.gefahren).toBeNull();
+ await client.cacheConfirmedGefahren('alice',booking().id,3);
+ expect(client.cachedOfflineBooking(booking().id)).toMatchObject({gefahren:3,customer_name:'Original',sync_version:1});
+ expect(client.cachedOfflineBooking('other')?.gefahren).toBe(4);
+ expect(client.offlineSnapshot().pending).toBe(0);
+ await client.startOfflineAccount(null);await client.startOfflineAccount(alice);
+ expect(client.cachedOfflineBooking(booking().id)?.gefahren).toBe(3);
+ await client.cacheConfirmedGefahren('alice',booking().id,null);
+ expect(client.cachedOfflineBooking(booking().id)?.gefahren).toBeNull();
+});
