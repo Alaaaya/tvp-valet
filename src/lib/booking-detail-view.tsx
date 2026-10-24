@@ -44,6 +44,8 @@ export interface BookingDetailViewProps{
   opsLoadErr?:string;
   demo?:boolean;
   driverName?:string;
+  /** Retour driver (return_driver_id), independent of the arrival driver */
+  returnDriverName?:string;
   /** FlightHead elements built by the caller (preserves existing live behaviour) */
   flightIn:React.ReactNode;
   flightOut:React.ReactNode;
@@ -65,6 +67,8 @@ export interface BookingDetailViewProps{
   returnCalledAt?:string|null;
   /** open the driver picker (green "Keinem Fahrer zugewiesen"); falls back to onEdit when absent */
   onAssignDriver?:()=>void;
+  /** open the driver picker for the Retour driver (red "Keinem Fahrer zugewiesen"); button hidden when absent */
+  onAssignReturnDriver?:()=>void;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -95,6 +99,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
     const key=b.id+':'+a;
     return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> <span>{label}</span><small className="op-at">{stamp(at)}<ByLine inline name={a==='taken_away'||a==='retrieved'?p.actors?.[a]:undefined}/></small></>:p.opsBusy===key?tr("Wird gespeichert …"):label}</button>;
   };
+  const returnDriverBtn=p.onAssignReturnDriver?<button type="button" className="fp-driver fp-driver-out" aria-haspopup="dialog" aria-label={tr("Retour-Fahrer")+': '+(p.returnDriverName||tr("Not assigned to driver"))} onClick={p.onAssignReturnDriver}>{p.returnDriverName||tr("Not assigned to driver")}</button>:null;
   return <div className="bd">
     <header className="bd-head"><button type="button" aria-label={tr("Schließen")} className="bd-round" onClick={p.onBack}><ChevronLeft/></button><h2>{tr("Booking #")}<bdi>{b.code}</bdi></h2><button type="button" aria-label={tr("Bearbeiten")} className="bd-round" onClick={p.onEdit}><svg className="reference-gear" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M9.5 1.5h5l.7 3a8 8 0 0 1 1.4.8l3-.9 2.5 4.3-2.3 2.1a8 8 0 0 1 0 1.6l2.3 2.1-2.5 4.3-3-.9a8 8 0 0 1-1.4.8l-.7 3h-5l-.7-3a8 8 0 0 1-1.4-.8l-3 .9-2.5-4.3 2.3-2.1a8 8 0 0 1 0-1.6L1.9 8.7l2.5-4.3 3 .9a8 8 0 0 1 1.4-.8l.7-3ZM12 7.8a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 0 0 0-8.4Z"/></svg></button></header>
     {b.external_id?.trim()&&<div className="pp-strip ext">{tr("External ID:")}<bdi>{b.external_id}</bdi></div>}
@@ -120,7 +125,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" aria-haspopup="dialog" onClick={p.onAssignDriver??p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}</>}</div></div>
+        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}{returnDriverBtn}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{returnDriverBtn}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}

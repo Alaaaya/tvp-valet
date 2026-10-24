@@ -1,6 +1,6 @@
 import {t as tr} from './lib/i18n';
 import {createRecoveringFetch,refreshSessionSafely,TransientSessionError} from './lib/auth-recovery';
-import {createClient,type SupabaseClient} from '@supabase/supabase-js';import type {Booking,Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
+import {createClient,type SupabaseClient} from '@supabase/supabase-js';import {driverField,type Booking,type Employee} from './model';import {bookingWritePayload} from './lib/booking-payload';
 const url=import.meta.env.VITE_SUPABASE_URL,key=import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabaseUrl:string|undefined=url,supabaseAnonKey:string|undefined=key;
 // Keep the default SDK key so existing installations retain their login.
@@ -11,5 +11,6 @@ export async function load(signal?:AbortSignal){if(!db)throw Error(tr("Backend n
 export async function saveBooking(b:Booking,admin:boolean){if(!db)return;if(admin){const{error}=await db.from('bookings').upsert(bookingWritePayload(b));if(error)throw error}else{const{error}=await db.rpc('update_booking_ops',{p_id:b.id,p_patch:{key_cash:b.key_cash,spot:b.spot,km:b.km,comment:b.comment,driver_id:b.driver_id}});if(error)throw error}}
 /** Assign (or clear) the booking's driver. Patch carries ONLY driver_id, so no other operational field is overwritten
  * from a stale snapshot. Same staff RPC the edit form uses (update_booking_ops allows driver_id for every staff role). */
-export async function assignBookingDriver(id:string,driverId:string|null){if(!db)return;const{error}=await db.rpc('update_booking_ops',{p_id:id,p_patch:{driver_id:driverId}});if(error)throw error}
+/** side 'in' = arrival driver (driver_id), 'out' = Retour driver (return_driver_id); only that one field is patched. */
+export async function assignBookingDriver(id:string,driverId:string|null,side:'in'|'out'='in'){if(!db)return;const{error}=await db.rpc('update_booking_ops',{p_id:id,p_patch:{[driverField(side)]:driverId}});if(error)throw error}
 export async function checkBooking(id:string,action:'in'|'out'){if(!db)return;const{error}=await db.rpc('check_booking',{p_id:id,p_action:action});if(error)throw error}

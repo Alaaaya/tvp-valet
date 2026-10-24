@@ -144,10 +144,23 @@ describe('driver assignment',()=>{
   const x=runtime.enqueueOffline.mock.calls[0][0];expect(x.kind).toBe('update_ops');expect(x.payload).toEqual({patch:{driver_id:'abc'}});expect(x.projected.driver_id).toBe('abc');
   vi.unstubAllEnvs();
  });
+ it('Retour driver: durable path queues update_ops with ONLY return_driver_id, arrival driver untouched',async()=>{
+  vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','true');runtime.cachedOfflineBooking.mockReturnValue({...b,driver_id:'arr'});
+  const {offlineAssignDriver}=await import('./offline-actions');
+  await offlineAssignDriver(b,'ret','out');
+  const x=runtime.enqueueOffline.mock.calls[0][0];expect(x.kind).toBe('update_ops');expect(x.payload).toEqual({patch:{return_driver_id:'ret'}});expect(x.projected.return_driver_id).toBe('ret');expect(x.projected.driver_id).toBe('arr');
+  vi.unstubAllEnvs();
+ });
+ it('Retour driver: online path passes side out',async()=>{
+  vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','');runtime.cachedOfflineBooking.mockReturnValue(undefined);
+  const api=await import('../api');const {offlineAssignDriver}=await import('./offline-actions');
+  await offlineAssignDriver(b,'ret','out');expect(api.assignBookingDriver).toHaveBeenCalledWith(id,'ret','out');
+  vi.unstubAllEnvs();
+ });
  it('online legacy path uses the driver-only RPC helper',async()=>{
   vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','');runtime.cachedOfflineBooking.mockReturnValue(undefined);
   const api=await import('../api');const {offlineAssignDriver}=await import('./offline-actions');
-  await offlineAssignDriver(b,null);expect(api.assignBookingDriver).toHaveBeenCalledWith(id,null);expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+  await offlineAssignDriver(b,null);expect(api.assignBookingDriver).toHaveBeenCalledWith(id,null,'in');expect(runtime.enqueueOffline).not.toHaveBeenCalled();
   vi.unstubAllEnvs();
  });
 });

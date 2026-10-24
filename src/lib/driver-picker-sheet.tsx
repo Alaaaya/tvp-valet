@@ -49,6 +49,8 @@ export interface DriverPickerSheetProps{
   /** persist the assignment (caller owns the write); resolves when saved */
   onPick:(id:string|null)=>Promise<void>;
   onClose:()=>void;
+  /** sheet title; default "Fahrer zuweisen" (Retour uses "Retour-Fahrer zuweisen") */
+  title?:string;
 }
 export function DriverPickerSheet(p:DriverPickerSheetProps){
   const[list,setList]=useState<Employee[]>(p.staff),[query,setQuery]=useState(''),[dir,setDir]=useState<'asc'|'desc'>('asc');
@@ -74,13 +76,13 @@ export function DriverPickerSheet(p:DriverPickerSheetProps){
   return <div className="dps-scrim" onClick={()=>{close()}}>
     <div ref={box} className="dps" role="dialog" aria-modal="true" aria-labelledby="dps-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
       <div className="dps-handle" aria-hidden="true"/>
-      <header className="dps-head"><h2 id="dps-t">{tr("Fahrer zuweisen")}</h2>
+      <header className="dps-head"><h2 id="dps-t">{p.title??tr("Fahrer zuweisen")}</h2>
         <button type="button" className="dps-sort" aria-label={tr("Sortierung nach Vorname umkehren")} onClick={()=>setDir(d=>d==='asc'?'desc':'asc')}>{dir==='asc'?tr("A→Z Vorname"):tr("Z→A Vorname")}</button>
         <button type="button" className="dps-x" aria-label={tr("Schließen")} disabled={!!busy} onClick={()=>{close()}}><X size={22} strokeWidth={3}/></button></header>
       <div className="dps-search"><label><Search size={20} aria-hidden="true"/><input type="search" aria-label={tr("Suchen")} placeholder={tr("Suchen")} value={query} onChange={e=>setQuery(e.target.value)}/></label></div>
       {err&&<p className="dps-err" role="alert">{err}</p>}
       {loadErr&&<p className="dps-note" role="status">{tr("Liste evtl. nicht aktuell: ")}{loadErr}</p>}
-      <ul className="dps-list" role="listbox" aria-label={tr("Fahrer zuweisen")}>
+      <ul className="dps-list" role="listbox" aria-label={p.title??tr("Fahrer zuweisen")}>
         {rows.map(r=>{const on=r.id===p.assignedId;return <li key={r.key} role="none"><button type="button" role="option" aria-selected={on} className={'dps-row'+(on?' on':'')} data-key={r.key} disabled={!!busy} onClick={()=>void pick(r)}>
           <span>{busy===r.key?tr("Wird gespeichert …"):r.label}</span>{on&&<span className="dps-check" aria-hidden="true"><Check size={14} strokeWidth={4}/></span>}</button></li>})}
         {!rows.length&&<li className="dps-empty">{tr("Keine Treffer")}</li>}

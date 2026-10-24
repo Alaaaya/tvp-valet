@@ -4133,5 +4133,15 @@
     "An arrival call after check-in cannot be saved yet (database update needed).",
     "Anreise-Anruf nach dem Check-in kann noch nicht gespeichert werden (Datenbank-Update nötig).",
     "لا يمكن حفظ مكالمة الوصول بعد تسجيل الوصول بعد (يلزم تحديث قاعدة البيانات)."
+  ],
+  "Retour-Fahrer zuweisen": [
+    "Assign return driver",
+    "Retour-Fahrer zuweisen",
+    "تعيين سائق الإرجاع"
+  ],
+  "Retour-Fahrer": [
+    "Return driver",
+    "Retour-Fahrer",
+    "سائق الإرجاع"
   ]
 }
