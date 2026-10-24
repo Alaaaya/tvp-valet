@@ -35,7 +35,7 @@ async function processDelete(body,jwt){
   // Authenticate using service role. Accept explicit object-not-found only, not 403/network.
   const path=capability.path.split('/').map(encodeURIComponent).join('/');
   const absent=await request('/storage/v1/object/authenticated/booking-media/'+path,config.service_role,{method:'GET'});
-  const missing=!absent.ok&&(absent.status===404||String(absent.data?.statusCode)==='404'||absent.data?.error==='not_found');
+  const missing=!absent.ok&&(absent.status===404||(absent.status===400&&(String(absent.data?.statusCode)==='404'||absent.data?.error==='not_found')));
   if(!missing){await record('reconciliation_failure','api_absence_not_established');return {status:502,data:{request_id:intent.request_id,deleted:true,status:'removal_pending',code:'api_absence_not_established'}}}
   try{await rpc('record_media_storage_absence_v4',{p_request_id:intent.request_id,p_observation_id:crypto.randomUUID(),p_observed_at:new Date().toISOString(),p_http_status:404})}
   catch{await record('reconciliation_failure','metadata_not_removed');return {status:502,data:{request_id:intent.request_id,deleted:true,status:'removal_pending',code:'metadata_not_removed'}}}
