@@ -124,7 +124,7 @@ describe('long press gesture',()=>{
 });
 const dprops=(x:any={})=>({booking,known:true,ops,flightIn:<i/>,flightOut:<i/>,onBack:()=>{},onEdit:()=>{},onStartCheck:()=>{},onAction:vi.fn(),calledSlot:<b/>,calledOutSlot:<b/>,...x});
 describe('detail view',()=>{
- it('marked: short tap does nothing, visible accessible button opens, unmarked has none',async()=>{
+ it('marked: short tap does nothing, invisible keyboard button opens, unmarked has none',async()=>{
   const onAction=vi.fn(),open=vi.fn();
   await mount(<BookingDetailView {...dprops({onAction,onPickupUndo:open})}/>);
   const hold=host.querySelector('.pickup-hold')!;expect(hold).toBeTruthy();
