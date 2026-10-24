@@ -1,5 +1,6 @@
 import {t as tr} from './i18n';
 import React,{useEffect,useRef,useState} from 'react';
+import {createPortal} from 'react-dom';
 import {Plus,Camera,Images,Check,RotateCw,AlertTriangle} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 import {CameraScreen,useObjectUrls} from './camera';
@@ -33,11 +34,11 @@ export function MultiCapture({disabled,sessionKey,send,onUploaded}:{disabled:boo
   return <>
     <button type="button" className="upload" disabled={disabled||busy} aria-haspopup="dialog" onClick={()=>setMenu(true)}><Plus size={26}/><span className="sr-only">{tr("Medien hinzufügen")}</span></button>
     <input ref={fileEl} className="sr-only" type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={onFiles} aria-label={tr("Aus Galerie wählen")} tabIndex={-1}/>
-    {menu&&<div className="mc-sheet" role="dialog" aria-modal="true" aria-label={tr("Medien hinzufügen")} onClick={()=>setMenu(false)}><div onClick={e=>e.stopPropagation()}>
+    {menu&&createPortal(<div className="mc-sheet" role="dialog" aria-modal="true" aria-label={tr("Medien hinzufügen")} onClick={()=>setMenu(false)}><div onClick={e=>e.stopPropagation()}>
       <button type="button" onClick={()=>{setMenu(false);setCam(true)}}><Camera size={20}/> {tr("Kamera (mehrere Aufnahmen)")}</button>
       <button type="button" onClick={()=>fileEl.current?.click()}><Images size={20}/> {tr("Aus Galerie (mehrere)")}</button>
-      <button type="button" className="mc-cancel" onClick={()=>setMenu(false)}>{tr("Abbrechen")}</button></div></div>}
-    {cam&&<div className="ho"><CameraScreen title={tr("Medien")} photoOnly media={queue} onAdd={add} onRemove={id=>setQueue(q=>q.filter(m=>m.id!==id))} onBack={()=>reset()} onDone={()=>{setCam(false);void go(queue)}}/></div>}
+      <button type="button" className="mc-cancel" onClick={()=>setMenu(false)}>{tr("Abbrechen")}</button></div></div>,document.body)}
+    {cam&&createPortal(<div className="ho"><CameraScreen title={tr("Medien")} photoOnly media={queue} onAdd={add} onRemove={id=>setQueue(q=>q.filter(m=>m.id!==id))} onBack={()=>reset()} onDone={()=>{setCam(false);void go(queue)}}/></div>,document.body)}
     {(queue.length>0||note)&&!cam&&<div className="mc-q" role="status">
       {queue.length>0&&<div className="mc-thumbs">{queue.map(m=>{const s=st.get(m.id)?.status||'queued';return <div key={m.id} className={'mc-t '+s} title={st.get(m.id)?.error}><img src={urls.get(m.id)} alt=""/><span>{s==='done'?<Check size={14}/>:s==='failed'?<AlertTriangle size={14}/>:s==='uploading'?'…':''}</span></div>})}</div>}
       {busy&&<p>{tr("Wird hochgeladen … ")}{queue.filter(m=>st.get(m.id)?.status==='done').length} / {queue.length}</p>}
