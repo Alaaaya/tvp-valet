@@ -12,7 +12,7 @@ export function MediaDeleteDialog({item,busy,error,blocked,onCancel,onConfirm,in
  return <div className="md-scrim" role="alertdialog" aria-modal="true" aria-labelledby="md-t" aria-describedby="md-d" data-edge-back-exclude>
   <div className="md-card"><span className="md-ico"><Trash2 size={24}/></span>
    <h2 id="md-t">{sig?tr("Unterschrift endgültig löschen?"):item.kind==='photo'?tr("Foto endgültig löschen?"):tr("Medium endgültig löschen?")}</h2>
-   <p id="md-d">{tr("Das Medium wird unwiderruflich entfernt und kann nicht wiederhergestellt werden.")}</p>
+   <p id="md-d">{tr("Das Medium wird aus der Galerie entfernt. Bereits ausgestellte Links und zwischengespeicherte Kopien können bis zum Ablauf zugänglich bleiben.")}</p>
    <label htmlFor="md-reason">{tr("Grund der Löschung")}<textarea id="md-reason" maxLength={500} value={reason} disabled={busy||!!error||locked} onChange={e=>setReason(e.target.value)} /></label>
    {blocked&&<p className="md-err" role="alert">{blocked}</p>}{error&&<p className="md-err" role="alert">{error}</p>}
    <div className="md-acts"><button type="button" ref={cancel} className="md-cancel" disabled={busy} onClick={onCancel}>{tr("Abbrechen")}</button>
