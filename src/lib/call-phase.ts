@@ -18,3 +18,17 @@ export function callFor(phase:CallPhase,calledAt:string|null|undefined,checkedIn
 export function returnNeedsCall(o:{returnCalledAt?:string|null;takenAwayAt?:string|null;retrievedAt?:string|null;checkedOutAt?:string|null}){
   return !o.returnCalledAt&&!o.takenAwayAt&&!o.retrievedAt&&!o.checkedOutAt;
 }
+/** What tapping the green (Anreise) "Hat angerufen" does.
+ * - record: no arrival call yet and not checked in -> record it (stored as customer_called_at before check-in).
+ * - manage: arrival call exists and booking not checked in -> repeat/clear dialog (a repeat stays an arrival call).
+ * - recorded: arrival call exists and the booking is checked in -> already done; a repeat now would be stamped
+ *   after check-in and count as the RETURN call, so it is not written.
+ * - needs-column: checked in without an arrival call. The single customer_called_at column cannot store an
+ *   arrival call after check-in without it turning into the return call, so nothing is written (the UI explains why);
+ *   proper storage needs a separate arrival column (SQL handed to the owner, not deployed). */
+export type ArrivalCallTap='record'|'manage'|'recorded'|'needs-column';
+export function arrivalCallTap(calledAt:string|null|undefined,checkedInAt:string|null|undefined):ArrivalCallTap{
+  const own=callFor('in',calledAt,checkedInAt);
+  if(own)return checkedInAt?'recorded':'manage';
+  return checkedInAt?'needs-column':'record';
+}

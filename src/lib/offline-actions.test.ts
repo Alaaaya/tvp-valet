@@ -2,7 +2,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {blank,type Booking} from '../model';
 const runtime=vi.hoisted(()=>({enqueueOffline:vi.fn(),cachedOfflineBooking:vi.fn(),cachedOfflineOperations:vi.fn()}));
 vi.mock('./offline-client',()=>runtime);
-vi.mock('../api',()=>({db:null,saveBooking:vi.fn()}));
+vi.mock('../api',()=>({db:null,saveBooking:vi.fn(),assignBookingDriver:vi.fn()}));
 import {saveBooking} from '../api';
 import {offlineAppendPhoto,saveOfflineEdit,offlineChangeSpot,offlineTransitionStatus,offlineRecordPayment,offlineRecordCustomerCall,offlineClearCustomerCall,saveOfflineHandover,offlineUndoHandover,offlineRecordOperation,saveOfflineBooking} from './offline-actions';
 const id='12345678-1234-4234-8234-123456789012';
@@ -134,5 +134,20 @@ describe('gallery photo append',()=>{
  it('requires a valid sync snapshot before staging photo',async()=>{
   await expect(offlineAppendPhoto({...b,sync_version:undefined},new Blob(['x'],{type:'image/png'}))).rejects.toThrow();
   expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+ });
+});
+describe('driver assignment',()=>{
+ it('durable path queues update_ops with ONLY driver_id',async()=>{
+  vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','true');
+  const {offlineAssignDriver}=await import('./offline-actions');
+  await offlineAssignDriver(b,'abc');
+  const x=runtime.enqueueOffline.mock.calls[0][0];expect(x.kind).toBe('update_ops');expect(x.payload).toEqual({patch:{driver_id:'abc'}});expect(x.projected.driver_id).toBe('abc');
+  vi.unstubAllEnvs();
+ });
+ it('online legacy path uses the driver-only RPC helper',async()=>{
+  vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','');runtime.cachedOfflineBooking.mockReturnValue(undefined);
+  const api=await import('../api');const {offlineAssignDriver}=await import('./offline-actions');
+  await offlineAssignDriver(b,null);expect(api.assignBookingDriver).toHaveBeenCalledWith(id,null);expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+  vi.unstubAllEnvs();
  });
 });

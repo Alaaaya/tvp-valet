@@ -4073,5 +4073,65 @@
     "Only saved bookings are available. Offline changes are disabled.",
     "Nur gespeicherte Buchungen verfügbar. Offline-Änderungen sind deaktiviert.",
     "الحجوزات المحفوظة فقط متاحة. التعديلات دون اتصال معطّلة."
+  ],
+  "Fahrer zuweisen": [
+    "Assign driver",
+    "Fahrer zuweisen",
+    "تعيين سائق"
+  ],
+  "A→Z Vorname": [
+    "A→Z first name",
+    "A→Z Vorname",
+    "أ→ي الاسم الأول"
+  ],
+  "Z→A Vorname": [
+    "Z→A first name",
+    "Z→A Vorname",
+    "ي→أ الاسم الأول"
+  ],
+  "Sortierung nach Vorname umkehren": [
+    "Reverse first-name sort",
+    "Sortierung nach Vorname umkehren",
+    "عكس الترتيب حسب الاسم الأول"
+  ],
+  "du selbst": [
+    "yourself",
+    "du selbst",
+    "أنت"
+  ],
+  "Nicht dem Fahrer zugeordnet": [
+    "Not assigned to a driver",
+    "Nicht dem Fahrer zugeordnet",
+    "غير مخصص لسائق"
+  ],
+  "Liste evtl. nicht aktuell: ": [
+    "List may be out of date: ",
+    "Liste evtl. nicht aktuell: ",
+    "قد لا تكون القائمة محدّثة: "
+  ],
+  "Keine Treffer": [
+    "No matches",
+    "Keine Treffer",
+    "لا توجد نتائج"
+  ],
+  "Fahrer zugewiesen": [
+    "Driver assigned",
+    "Fahrer zugewiesen",
+    "تم تعيين السائق"
+  ],
+  "Fahrerzuweisung entfernt": [
+    "Driver unassigned",
+    "Fahrerzuweisung entfernt",
+    "تمت إزالة تعيين السائق"
+  ],
+  "Anreise-Anruf ist bereits gespeichert.": [
+    "Arrival call is already recorded.",
+    "Anreise-Anruf ist bereits gespeichert.",
+    "تم حفظ مكالمة الوصول بالفعل."
+  ],
+  "Anreise-Anruf nach dem Check-in kann noch nicht gespeichert werden (Datenbank-Update nötig).": [
+    "An arrival call after check-in cannot be saved yet (database update needed).",
+    "Anreise-Anruf nach dem Check-in kann noch nicht gespeichert werden (Datenbank-Update nötig).",
+    "لا يمكن حفظ مكالمة الوصول بعد تسجيل الوصول بعد (يلزم تحديث قاعدة البيانات)."
   ]
 }
