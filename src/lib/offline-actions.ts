@@ -1,5 +1,5 @@
 import {t as tr} from './i18n';
-import {saveBooking,assignBookingDriver,db} from '../api';
+import {saveBooking,assignBookingDriver,assignBookingReturnDriver,db} from '../api';
 import type {Booking} from '../model';
 import {bookingEditFields} from './booking-safe-edit';
 import {hasLegacyCashConflict,type PaymentInput} from './booking-payments';
@@ -186,6 +186,11 @@ export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
 export const offlineAssignDriver=(booking:Booking,driverId:string|null):Promise<void>=>{
  const original=cachedOfflineBooking(booking.id);
  return routeWrite(original,async()=>{await queue(original!,crypto.randomUUID(),'update_ops',{patch:{driver_id:driverId}},{...original!,driver_id:driverId})},()=>assignBookingDriver(booking.id,driverId));
+};
+/** Online-only until the separately approved sync contract supports return_driver_id. Never enqueue. */
+export const offlineAssignReturnDriver=async(booking:Booking,driverId:string|null):Promise<void>=>{
+ if(!isOnline())throw offlineWritesDisabledError();
+ await assignBookingReturnDriver(booking.id,driverId);
 };
 export const offlineAppendPhoto=(booking:Booking,file:Blob):Promise<Booking>=>routeWrite(booking,()=>durablePhoto(booking,file),async()=>{
  if(!db)throw Error(tr('Backend nicht eingerichtet'));

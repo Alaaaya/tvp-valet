@@ -2,7 +2,7 @@ import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {blank,type Booking} from '../model';
 const runtime=vi.hoisted(()=>({enqueueOffline:vi.fn(),cachedOfflineBooking:vi.fn(),cachedOfflineOperations:vi.fn()}));
 vi.mock('./offline-client',()=>runtime);
-vi.mock('../api',()=>({db:null,saveBooking:vi.fn(),assignBookingDriver:vi.fn()}));
+vi.mock('../api',()=>({db:null,saveBooking:vi.fn(),assignBookingDriver:vi.fn(),assignBookingReturnDriver:vi.fn()}));
 import {saveBooking} from '../api';
 import {offlineAppendPhoto,saveOfflineEdit,offlineChangeSpot,offlineTransitionStatus,offlineRecordPayment,offlineRecordCustomerCall,offlineClearCustomerCall,saveOfflineHandover,offlineUndoHandover,offlineRecordOperation,saveOfflineBooking} from './offline-actions';
 const id='12345678-1234-4234-8234-123456789012';
@@ -149,5 +149,24 @@ describe('driver assignment',()=>{
   const api=await import('../api');const {offlineAssignDriver}=await import('./offline-actions');
   await offlineAssignDriver(b,null);expect(api.assignBookingDriver).toHaveBeenCalledWith(id,null);expect(runtime.enqueueOffline).not.toHaveBeenCalled();
   vi.unstubAllEnvs();
+ });
+});
+describe('return driver assignment',()=>{
+ it('never queues even if durable writes are enabled',async()=>{
+  vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','true');
+  try{const api=await import('../api');const {offlineAssignReturnDriver}=await import('./offline-actions');
+   await offlineAssignReturnDriver(b,'abc');
+   expect(api.assignBookingReturnDriver).toHaveBeenCalledWith(id,'abc');expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+  }finally{vi.unstubAllEnvs()}
+ });
+ it('online clear calls only return-driver helper',async()=>{
+  const api=await import('../api');const {offlineAssignReturnDriver}=await import('./offline-actions');
+  await offlineAssignReturnDriver(b,null);expect(api.assignBookingReturnDriver).toHaveBeenCalledWith(id,null);expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+ });
+ it('offline rejects without RPC or queue even if durable writes are enabled',async()=>{
+  vi.stubGlobal('navigator',{onLine:false});vi.stubEnv('VITE_DURABLE_OFFLINE_WRITES','true');
+  try{const api=await import('../api');const {offlineAssignReturnDriver}=await import('./offline-actions');
+   await expect(offlineAssignReturnDriver(b,'abc')).rejects.toThrow();expect(api.assignBookingReturnDriver).not.toHaveBeenCalled();expect(runtime.enqueueOffline).not.toHaveBeenCalled();
+  }finally{vi.unstubAllGlobals();vi.unstubAllEnvs()}
  });
 });

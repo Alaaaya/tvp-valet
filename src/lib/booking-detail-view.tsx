@@ -44,6 +44,8 @@ export interface BookingDetailViewProps{
   opsLoadErr?:string;
   demo?:boolean;
   driverName?:string;
+  /** return driver (red Rückgabe column); undefined = none */
+  returnDriverName?:string;
   /** FlightHead elements built by the caller (preserves existing live behaviour) */
   flightIn:React.ReactNode;
   flightOut:React.ReactNode;
@@ -65,6 +67,8 @@ export interface BookingDetailViewProps{
   returnCalledAt?:string|null;
   /** open the driver picker (green "Keinem Fahrer zugewiesen"); falls back to onEdit when absent */
   onAssignDriver?:()=>void;
+  /** open the return-driver picker (red column) */
+  onAssignReturnDriver?:()=>void;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -120,7 +124,8 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" aria-haspopup="dialog" onClick={p.onAssignDriver??p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}</>}</div></div>
+        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}</>}
+        {k==='out'&&p.onAssignReturnDriver&&<button type="button" className="fp-driver fp-return-driver" aria-haspopup="dialog" onClick={p.onAssignReturnDriver}>{p.returnDriverName||tr("Not assigned to return driver")}</button>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}

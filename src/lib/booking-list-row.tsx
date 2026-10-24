@@ -6,6 +6,7 @@ import {displayComment,omitExternalReference} from './comments';
 import {paymentInstruction} from './payment-note';
 import '../booking-list-row.css';
 import {Fa} from './fa-icons';
+import {UserRound} from 'lucide-react';
 import '../payment-note.css';
 
 export interface PartnerBadge{label:string;product:string;cls:'ag'|'ap'|'fsp'|'pl'|'pr'|'f2m'|'web'}
@@ -40,6 +41,8 @@ export interface BookingListRowProps{
  callClearSlot?:React.ReactNode;
  /** Small standalone delete-call button (sibling of the row button so it never opens the row). */
  callUndoSlot?:React.ReactNode;
+ /** Name of the assigned return driver; shown only on Rückgabe rows. */
+ returnDriverName?:string;
 }
 /** Counter helper: done/total for one direction over the (done-inclusive) population. */
 export function directionCounts(events:readonly {kind:'in'|'out';completed?:boolean}[],kind:'in'|'out'){const k=events.filter(e=>e.kind===kind);return{done:k.filter(e=>!!e.completed).length,total:k.length}}
@@ -48,7 +51,7 @@ export function directionCounts(events:readonly {kind:'in'|'out';completed?:bool
 export function rowComment(b:Pick<Booking,'comment'|'external_id'|'code'>){
  return omitExternalReference(displayComment(b.comment,true).text.trim(),b.external_id,b.code);
 }
-export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot,callClearSlot}:BookingListRowProps){
+export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,callCounterSlot,callClearSlot,returnDriverName}:BookingListRowProps){
  const badge=partnerBadge(b),flight=kind==='in'?b.flight_in:b.flight_out,c=rowComment(b),pn=!!paymentInstruction(b);
  const actualFlight=kind==='in'?b.actual_flight_in:b.actual_flight_out;
  const actualFlightClock=actualFlight&&Number.isFinite(Date.parse(actualFlight))?clock(actualFlight):null;
@@ -59,7 +62,7 @@ export function BookingListRow({b,kind,time,completed,onOpen,live,commentCount,c
    <span className="blr-body">
     <span className="blr-line blr-l1">{badge&&<em className={'blr-badge '+badge.cls} title={badge.label}>{badge.product||badge.label}</em>}{badge&&badge.product&&<small className="blr-prov">{badge.label}</small>}</span>
     <span className="blr-line blr-l2" title={[b.plate,key,b.code].filter(Boolean).join(" · ")}><strong className="blr-plate">{b.plate||'–'}</strong>{key&&<span className="blr-key"><Fa name="key" size={13}/><span className="blr-keycode">{key}</span></span>}<span className="blr-code">#{b.code}</span></span>
-    <span className="blr-line blr-l3">{callCounterSlot&&<Fa name="phone" size={14} aria-label={tr("Kundenanruf")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span>{callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}</span>
+    <span className="blr-line blr-l3">{callCounterSlot&&<Fa name="phone" size={14} aria-label={tr("Kundenanruf")}/>}<span className="blr-name" title={b.customer_name}>{b.customer_name}</span>{callCounterSlot&&<span className="blr-calls">{callCounterSlot}</span>}{kind==='out'&&returnDriverName&&<span className="blr-rd" title={tr("Rückgabe-Fahrer")+': '+returnDriverName}><UserRound size={13} aria-hidden="true"/><span className="visually-hidden-rd">{tr("Rückgabe-Fahrer")}: </span><bdi>{returnDriverName}</bdi></span>}</span>
     {c&&<span className="blr-comment" title={c}>{c}</span>}
    </span>
    <span className="blr-side">

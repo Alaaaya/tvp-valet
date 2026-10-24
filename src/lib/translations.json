@@ -4133,5 +4133,45 @@
     "An arrival call after check-in cannot be saved yet (database update needed).",
     "Anreise-Anruf nach dem Check-in kann noch nicht gespeichert werden (Datenbank-Update nötig).",
     "لا يمكن حفظ مكالمة الوصول بعد تسجيل الوصول بعد (يلزم تحديث قاعدة البيانات)."
+  ],
+  "Not assigned to return driver": [
+    "Not assigned to return driver",
+    "Kein Rückgabe-Fahrer zugewiesen",
+    "غير مُسند إلى سائق الإرجاع"
+  ],
+  "Rückgabe-Fahrer": [
+    "Return driver",
+    "Rückgabe-Fahrer",
+    "سائق الإرجاع"
+  ],
+  "Rückgabe-Fahrer zuweisen": [
+    "Assign return driver",
+    "Rückgabe-Fahrer zuweisen",
+    "تعيين سائق الإرجاع"
+  ],
+  "Kein Rückgabe-Fahrer": [
+    "No return driver",
+    "Kein Rückgabe-Fahrer",
+    "بدون سائق إرجاع"
+  ],
+  "Rückgabe-Fahrer zugewiesen": [
+    "Return driver assigned",
+    "Rückgabe-Fahrer zugewiesen",
+    "تم تعيين سائق الإرجاع"
+  ],
+  "Rückgabe-Fahrer entfernt": [
+    "Return driver removed",
+    "Rückgabe-Fahrer entfernt",
+    "تمت إزالة سائق الإرجاع"
+  ],
+  "Inaktiver Mitarbeiter": [
+    "Inactive employee",
+    "Inaktiver Mitarbeiter",
+    "موظف غير نشط"
+  ],
+  "inaktiv": [
+    "inactive",
+    "inaktiv",
+    "غير نشط"
   ]
 }
