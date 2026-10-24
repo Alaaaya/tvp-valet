@@ -1,3 +1,3 @@
-# Only this public, read-only flight endpoint is exempt from user JWT verification.
-[functions.dus-flights]
+[functions.media-delete-v4]
 verify_jwt = false
+entrypoint = "./functions/media-delete-v4/index.js"
