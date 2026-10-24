@@ -1,11 +1,16 @@
 import {t as tr} from './i18n';
-import {db} from '../api';
+import {db,supabaseUrl,supabaseAnonKey} from '../api';
 import {offlineSnapshot} from './offline-client';
 import type {MediaItem} from './handover-api';
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 /** Disabled by default. Deployment and database approval are separate from building UI. */
 export function mediaDeleteEnabled(){return import.meta.env.VITE_MEDIA_DELETE_V4==='true'&&!!gatewayUrl()}
-function gatewayUrl(){try{const u=new URL(import.meta.env.VITE_MEDIA_DELETE_GATEWAY_URL||'');if(u.pathname!=='/v4/media-delete'||u.search||u.hash||u.username||u.password)return '';if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['127.0.0.1','localhost'].includes(u.hostname)))return '';return u.href}catch{return ''}}
+function gatewayUrl(){try{
+ const u=new URL(supabaseUrl||'');
+ if(u.protocol!=='https:'||u.search||u.hash||u.username||u.password||u.pathname!=='/'||!u.hostname.endsWith('.supabase.co'))return '';
+ return u.origin+'/functions/v1/media-delete-v4';
+}catch{return ''}}
+
 export type DeleteInput={requestId:string;bookingId:string;item:MediaItem;confirmed:true;reason:string};
 export type DeleteResult={request_id:string;deleted:true;status:'api_absence_observed';bytes_erasure_verified:false};
 export class DeleteDenied extends Error{constructor(){super(tr("Löschen nicht erlaubt. Nur Administratoren dürfen Medien löschen."));this.name='DeleteDenied'}}
@@ -30,7 +35,7 @@ export async function deleteBookingMedia({requestId,bookingId,item,confirmed,rea
   context={account,booking:bookingId,path:item.path,reason:reason.trim(),objectId:matches[0].id!};intents.set(requestId,context);
  }
  active();
- const response=await fetch(gatewayUrl(),{method:'POST',redirect:'error',credentials:'omit',cache:'no-store',headers:{Authorization:'Bearer '+session.data.session.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_request_id:requestId,p_booking_id:bookingId,p_object_id:context.objectId,p_path:item.path,p_confirmed:true,p_reason:context.reason}),signal:AbortSignal.timeout(30000)});
+ const response=await fetch(gatewayUrl(),{method:'POST',redirect:'error',credentials:'omit',cache:'no-store',headers:{apikey:supabaseAnonKey||'',Authorization:'Bearer '+session.data.session.access_token,'Content-Type':'application/json'},body:JSON.stringify({p_request_id:requestId,p_booking_id:bookingId,p_object_id:context.objectId,p_path:item.path,p_confirmed:true,p_reason:context.reason}),signal:AbortSignal.timeout(30000)});
  active();const result=await response.json().catch(()=>null);active();
  if(response.status===401||response.status===403)throw new DeleteDenied();
  if(!response.ok||result?.request_id!==requestId||result?.deleted!==true||result?.status!=='api_absence_observed'||result?.bytes_erasure_verified!==false)throw Error(tr("Löschen nicht bestätigt. Das Medium wurde möglicherweise nicht entfernt."));
