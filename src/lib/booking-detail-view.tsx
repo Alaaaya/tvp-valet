@@ -14,6 +14,7 @@ import '../booking-detail.css';
 import {Fa} from './fa-icons';
 import {partnerBadge} from './booking-list-row';
 import type {Attribution} from './attribution';
+import {returnNeedsCall} from './call-phase';
 
 /** Small second line naming the staff member who did a step. */
 export function ByLine({name,inline}:{name?:string;inline?:boolean}){return !name?null:inline?<span className="op-by inline">{" · "}{tr("von ")}<bdi>{name}</bdi></span>:<small className="op-by">{tr("von ")}<bdi>{name}</bdi></small>}
@@ -50,6 +51,8 @@ export interface BookingDetailViewProps{
   calledSlot?:React.ReactNode;
   /** Return-phase call button (calls recorded after check-in), shown in the red column. */
   calledOutSlot?:React.ReactNode;
+  /** Return call time (call recorded at/after check-in). Until set, the red panel offers only "Hat angerufen". */
+  returnCalledAt?:string|null;
   /** payment UI (caller-supplied, e.g. booking-payment-view) rendered under the cost overview */
   paymentSlot?:React.ReactNode;
   /** show raw import provenance (admins) */
@@ -105,7 +108,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
+        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}

@@ -86,3 +86,10 @@ html body div.bd .bd-comments>p.bd-no-comments{font-style:italic}
 html body div.bd .flight-panel .fp-actions{height:auto!important;min-height:86px}
 html body div.bd .flight-panel .fp-actions>*{flex-shrink:0!important}
 html body div.bd .flight-panel .fp-actions .op-btn:has(.call-counter),html body div.bd .flight-panel .fp-actions .op-btn:has(.op-by),html body div.bd .flight-panel .fp-actions .op-btn:has(.op-at){row-gap:1px!important;padding-block:5px!important}
+/* Return call recorded: small hint above the pick-up action (tap = existing repeat/clear dialog). */
+html body div.bd .flight-panel .fp-actions .fp-call-hint{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;min-height:28px;margin:0;padding:4px 8px;border:1px solid rgba(255,255,255,.55);border-radius:3px;background:transparent;color:#fff;font-size:11px;font-weight:600;line-height:14px}
+html body div.bd .flight-panel .fp-actions .fp-call-hint svg{color:#fff;fill:#fff;flex-shrink:0}
+html body div.bd .flight-panel .fp-actions .fp-call-hint .op-by{color:rgba(255,255,255,.85);font-weight:400}
+html body div.bd .flight-panel .fp-actions .fp-call-hint:disabled{opacity:.7}
+html body div.bd .flight-panel .fp-actions .fp-call-hint>span{flex:0 1 auto!important;width:auto!important;white-space:nowrap;margin:0!important}
+html body div.bd .flight-panel .fp-actions .fp-call-hint .op-by{overflow:hidden;text-overflow:ellipsis}
