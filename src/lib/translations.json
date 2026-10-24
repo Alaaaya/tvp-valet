@@ -4173,5 +4173,75 @@
     "inactive",
     "inaktiv",
     "غير نشط"
+  ],
+  "Zum Rückgängigmachen ist eine Internetverbindung nötig.": [
+    "An internet connection is required to undo.",
+    "Zum Rückgängigmachen ist eine Internetverbindung nötig.",
+    "يلزم الاتصال بالإنترنت للتراجع."
+  ],
+  "Diese Abholung kann nicht rückgängig gemacht werden.": [
+    "This pickup cannot be undone.",
+    "Diese Abholung kann nicht rückgängig gemacht werden.",
+    "لا يمكن التراجع عن هذا الاستلام."
+  ],
+  "Die ursprüngliche Abholmarkierung wurde nicht eindeutig gefunden. Nichts wurde geändert.": [
+    "The original pickup mark was not found unambiguously. Nothing was changed.",
+    "Die ursprüngliche Abholmarkierung wurde nicht eindeutig gefunden. Nichts wurde geändert.",
+    "لم يتم العثور على علامة الاستلام الأصلية بشكل واضح. لم يتغير شيء."
+  ],
+  "Rücknahme fehlgeschlagen.": [
+    "Undo failed.",
+    "Rücknahme fehlgeschlagen.",
+    "فشل التراجع."
+  ],
+  "Abholung wirklich rückgängig machen?": [
+    "Really undo pickup?",
+    "Abholung wirklich rückgängig machen?",
+    "هل تريد التراجع عن الاستلام فعلاً؟"
+  ],
+  "Abholung": [
+    "Pickup",
+    "Abholung",
+    "الاستلام"
+  ],
+  "Die Markierung „Als abgeholt markiert“ wird entfernt. Alle anderen Angaben bleiben unverändert.": [
+    "The “marked as taken away” status will be removed. Everything else stays unchanged.",
+    "Die Markierung „Als abgeholt markiert“ wird entfernt. Alle anderen Angaben bleiben unverändert.",
+    "ستتم إزالة علامة «تم الأخذ». تبقى كل البيانات الأخرى دون تغيير."
+  ],
+  "Diese Buchung ist als abgeholt markiert.": [
+    "This booking is marked as taken away.",
+    "Diese Buchung ist als abgeholt markiert.",
+    "هذا الحجز معلّم كمأخوذ."
+  ],
+  "Wird geprüft …": [
+    "Checking …",
+    "Wird geprüft …",
+    "جارٍ التحقق …"
+  ],
+  "Abholung rückgängig machen": [
+    "Undo pickup",
+    "Abholung rückgängig machen",
+    "التراجع عن الاستلام"
+  ],
+  "Ja, rückgängig machen": [
+    "Yes, undo",
+    "Ja, rückgängig machen",
+    "نعم، تراجع"
+  ],
+  "Abholung rückgängig machen …": [
+    "Undo pickup …",
+    "Abholung rückgängig machen …",
+    "التراجع عن الاستلام …"
+  ],
+  "Lange drücken, um die Abholung rückgängig zu machen.": [
+    "Long press to undo the pickup.",
+    "Lange drücken, um die Abholung rückgängig zu machen.",
+    "اضغط مطولاً للتراجع عن الاستلام."
+  ],
+  "Abholung rückgängig gemacht.": [
+    "Pickup undone.",
+    "Abholung rückgängig gemacht.",
+    "تم التراجع عن الاستلام."
   ]
 }

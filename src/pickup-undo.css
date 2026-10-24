@@ -1,0 +1,5 @@
+.bd .flight-panel .pickup-hold{display:flex;gap:6px;align-items:stretch;margin-top:auto;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.bd .flight-panel .pickup-hold .op-btn{flex:1 1 auto;width:auto;margin-top:0;min-width:0;cursor:default;touch-action:pan-y}
+.pickup-more{flex:0 0 44px;width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:7px;background:#fff;color:#1c3a36;border:1px solid #c9d6d3;padding:0;touch-action:manipulation}
+.pickup-more:focus-visible{outline:2px solid #1c3a36;outline-offset:2px}
+.pickup-undo-dlg .undo-ok svg{vertical-align:-3px}
