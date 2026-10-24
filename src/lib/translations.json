@@ -4243,5 +4243,35 @@
     "Pickup undone.",
     "Abholung rückgängig gemacht.",
     "تم التراجع عن الاستلام."
+  ],
+  " Medien nicht hochgeladen. Erneut versuchen.": [
+    " media not uploaded. Try again.",
+    " Medien nicht hochgeladen. Erneut versuchen.",
+    " وسائط لم يتم رفعها. حاول مرة أخرى."
+  ],
+  "Medien hinzufügen": [
+    "Add media",
+    "Medien hinzufügen",
+    "إضافة وسائط"
+  ],
+  "Aus Galerie wählen": [
+    "Choose from gallery",
+    "Aus Galerie wählen",
+    "اختيار من المعرض"
+  ],
+  "Kamera (mehrere Aufnahmen)": [
+    "Camera (multiple shots)",
+    "Kamera (mehrere Aufnahmen)",
+    "الكاميرا (عدة لقطات)"
+  ],
+  "Aus Galerie (mehrere)": [
+    "From gallery (multiple)",
+    "Aus Galerie (mehrere)",
+    "من المعرض (متعدد)"
+  ],
+  "Keine Buchung ausgewählt.": [
+    "No booking selected.",
+    "Keine Buchung ausgewählt.",
+    "لم يتم اختيار حجز."
   ]
 }
