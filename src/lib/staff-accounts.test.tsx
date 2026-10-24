@@ -135,7 +135,7 @@ describe('attribution',()=>{
     const b={...blank(),code:'X',customer_name:'K',plate:'D-X 1',arrival_at:ci,departure_at:co,checked_in_at:ci};
     const h=r(<BookingDetailView booking={b} known ops={{booking_id:b.id,taken_away_at:'2026-10-21T09:00:00Z',retrieved_at:'2026-10-21T10:00:00Z',customer_called_at:null,ride_started_at:null,performed_by:'u2',updated_at:co}}
       actors={{in:'Wael',taken_away:'Saleh',retrieved:'Alaa'}} flightIn={null} flightOut={null} onBack={()=>{}} onEdit={()=>{}} onStartCheck={()=>{}} onAction={()=>{}}/>);
-    expect(h.match(/class="op-by( inline)?"/g)?.length).toBe(3);
+    expect(h.match(/class="op-by( inline)?"/g)?.length).toBe(2);expect(h).not.toContain('<bdi>Alaa</bdi>');
     expect(h).toMatch(/class="op-by">[^<]*<bdi>Wael<\/bdi>/);expect(h).toMatch(/class="op-at">[^<]*<span class="op-by inline">/);expect(h).toContain('<bdi>Saleh</bdi>');expect(h).toContain('has-by');
     const none=r(<BookingDetailView booking={{...b,checked_in_at:null}} known flightIn={null} flightOut={null} onBack={()=>{}} onEdit={()=>{}} onStartCheck={()=>{}} onAction={()=>{}} actors={{in:'Wael'}}/>);
     expect(none).not.toContain('op-by');

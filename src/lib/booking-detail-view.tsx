@@ -17,6 +17,12 @@ import type {Attribution} from './attribution';
 import {returnNeedsCall} from './call-phase';
 
 /** Small second line naming the staff member who did a step. */
+/** Return (Retour) call already recorded: same button look as "Hat angerufen", with the call time and who recorded it on one legible line.
+ * Tapping opens the repeat/clear dialog. */
+export function ReturnCallDone({time,by,disabled,onClick}:{time:string;by?:string;disabled?:boolean;onClick:()=>void}){
+  return <button type="button" className="op-btn out fp-call-done" aria-label={tr("Kunde angerufen")+' '+time+(by?' · '+tr("von ")+by:'')} disabled={disabled} onClick={onClick}>
+    <span className="fp-call-done-text"><span className="fp-call-done-main"><ReferenceIcon name="phone" size={13}/><span className="fp-call-done-label">{tr("Has called")}{' '}<time>{time}</time></span></span>{by&&<span className="fp-call-done-by"><span className="fp-call-done-sep" aria-hidden="true">{' · '}</span>{tr("von ")}<bdi>{by}</bdi></span>}</span></button>;
+}
 export function ByLine({name,inline}:{name?:string;inline?:boolean}){return !name?null:inline?<span className="op-by inline">{" · "}{tr("von ")}<bdi>{name}</bdi></span>:<small className="op-by">{tr("von ")}<bdi>{name}</bdi></small>}
 
 export interface BookingDetailViewProps{
@@ -108,7 +114,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       <div className={'flight-panel '+k}>{k==='in'?p.flightIn:p.flightOut}
         <div className="fp-actions">{k==='in'?<>{p.calledSlot}
         <button type="button" className="fp-driver" onClick={p.onEdit}>{p.driverName||tr("Not assigned to driver")}</button></>
-        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}{b.checked_in_at&&act('retrieved',tr("Mark as retrieved"),o?.retrieved_at,'fp-act')}</>}</div></div>
+        :returnNeedsCall({returnCalledAt:p.returnCalledAt,takenAwayAt:o?.taken_away_at,retrievedAt:o?.retrieved_at,checkedOutAt:b.checked_out_at})?<>{p.calledOutSlot}</>:<>{p.calledOutSlot}{act('taken_away',tr("Mark as taken away"),o?.taken_away_at,'fp-act')}</>}</div></div>
     </section>})}</div>
     <section className="pp-called" aria-label={tr("Kundenanruf")}>
       {p.opsErr&&<p className="error" role="alert">{p.opsErr}</p>}
