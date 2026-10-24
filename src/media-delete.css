@@ -5,3 +5,4 @@
 .md-acts{display:flex;gap:10px;margin-top:6px}.md-acts button{flex:1;min-height:48px;border-radius:12px;font-weight:600}
 .md-cancel{background:#2a3a4d;color:#fff}.md-go{background:#c8323f;color:#fff}.md-acts button:disabled{opacity:.55}
 .gv-acts .gv-del{background:#3a1a22;border-color:#8a3a46;color:#ff9aa5}
+.md-card label{display:flex;flex-direction:column;gap:6px;font-size:14px}.md-card textarea{width:100%;box-sizing:border-box;min-height:70px;resize:vertical;border:1px solid #45577a;border-radius:8px;padding:8px;background:#0e182c;color:#fff;font:inherit}.md-card textarea:focus-visible{outline:2px solid #8cbcff}

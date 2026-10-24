@@ -1,9 +1,10 @@
 import {t as tr} from './i18n';
 import {db} from '../api';
+import {mediaDeleteEnabled} from './media-delete-api';
 import type {Booking} from '../model';
 export type MediaKind='photo'|'video'|'signature';
 export type PendingMedia={id:string;blob:Blob;kind:MediaKind;mime_type:string;captured_at:string;name:string};
-export type MediaItem={id:string;path:string;kind:MediaKind;mime_type:string;captured_at:string;size_bytes:number;bucket?:string;local_blob?:Blob;offline_pending?:boolean;action?:'in'|'out';undone_at?:string|null;undone_by?:string|null};
+export type MediaItem={id:string;path:string;kind:MediaKind|'unknown';mime_type:string;captured_at:string;size_bytes:number;bucket?:string;local_blob?:Blob;offline_pending?:boolean;action?:'in'|'out';undone_at?:string|null;undone_by?:string|null};
 export type HandoverDetails={km:number|null;key_cash:string;flight_number:string;comment:string;poor_visibility:boolean};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const imageTypes=new Set(['image/jpeg','image/png','image/webp']),videoTypes=new Set(['video/mp4','video/webm','video/quicktime']);
@@ -35,7 +36,16 @@ export function validateHandover(details:HandoverDetails,media:PendingMedia[]){
 }
 export async function listBookingMedia(bookingId:string):Promise<MediaItem[]>{
  if(!uuid.test(bookingId))throw Error(tr("Ungültige Buchung."));
- const d=client(),result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action,booking_handovers!inner(undone_at,undone_by)').eq('booking_id',bookingId).order('captured_at');
+ const d=client();
+ if(mediaDeleteEnabled()){
+  // This resolver is the sole gallery authority after activation. Never fall back
+  // to raw ledgers or Storage listings, which could resurrect tombstoned media.
+  const result=await d.rpc('resolve_booking_media_v4',{p_booking_id:bookingId});
+  if(result.error)throw result.error;
+  if(!Array.isArray(result.data))throw Error(tr("Medien konnten nicht geladen werden:"));
+  return result.data.filter((m:any)=>m&&m.deleted!==true&&typeof m.path==='string'&&m.path.startsWith(bookingId+'/')).map((m:any)=>({id:m.id,path:m.path,bucket:'booking-media',kind:['photo','video','signature'].includes(m.kind)?m.kind:'unknown',mime_type:m.mime_type||'',captured_at:m.captured_at||'',size_bytes:Number(m.size_bytes||0),action:m.action,undone_at:m.undone_at||null,undone_by:m.undone_by||null}));
+ }
+ const result=await d.from('booking_media').select('id,path,kind,mime_type,captured_at,size_bytes,action,booking_handovers!inner(undone_at,undone_by)').eq('booking_id',bookingId).order('captured_at');
  if(result.error)throw result.error;
  const items:MediaItem[]=(result.data||[]).map((row:MediaItem&{booking_handovers?:{undone_at:string|null;undone_by:string|null}|{undone_at:string|null;undone_by:string|null}[]})=>{const {booking_handovers,...item}=row;const history=Array.isArray(booking_handovers)?booking_handovers[0]:booking_handovers;return{...item,undone_at:history?.undone_at||null,undone_by:history?.undone_by||null}});
  const gallery=await d.from('booking_gallery_media').select('*').eq('booking_id',bookingId).order('captured_at');

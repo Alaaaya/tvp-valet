@@ -4378,5 +4378,20 @@
     "Delete permanently",
     "Endgültig löschen",
     "حذف نهائياً"
+  ],
+  "Medienlöschung ist noch nicht freigegeben.": [
+    "Media deletion is not enabled yet.",
+    "Medienlöschung ist noch nicht freigegeben.",
+    "حذف الوسائط غير مفعّل بعد."
+  ],
+  "Medienidentität konnte nicht bestätigt werden.": [
+    "Media identity could not be confirmed.",
+    "Medienidentität konnte nicht bestätigt werden.",
+    "تعذّر تأكيد هوية الملف."
+  ],
+  "Grund der Löschung": [
+    "Reason for deletion",
+    "Grund der Löschung",
+    "سبب الحذف"
   ]
 }
