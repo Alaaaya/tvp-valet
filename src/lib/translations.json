@@ -4273,5 +4273,55 @@
     "No booking selected.",
     "Keine Buchung ausgewählt.",
     "لم يتم اختيار حجز."
+  ],
+  "Scannen": [
+    "Scan",
+    "Scannen",
+    "مسح"
+  ],
+  "Scan QR": [
+    "Scan QR",
+    "Scan QR",
+    "مسح رمز QR"
+  ],
+  "Kennzeichen scannen (beta)": [
+    "Scan license plate (beta)",
+    "Kennzeichen scannen (beta)",
+    "مسح لوحة السيارة (تجريبي)"
+  ],
+  "Kennzeichen im Rahmen ausrichten": [
+    "Align the license plate in the frame",
+    "Kennzeichen im Rahmen ausrichten",
+    "وجّه اللوحة داخل الإطار"
+  ],
+  "Blitz": [
+    "Torch",
+    "Blitz",
+    "الفلاش"
+  ],
+  "Blitz nicht unterstützt": [
+    "Torch not supported",
+    "Blitz nicht unterstützt",
+    "الفلاش غير مدعوم"
+  ],
+  "Blitz nicht verfügbar.": [
+    "Torch unavailable.",
+    "Blitz nicht verfügbar.",
+    "الفلاش غير متاح."
+  ],
+  "Zoom nicht unterstützt": [
+    "Zoom not supported",
+    "Zoom nicht unterstützt",
+    "التكبير غير مدعوم"
+  ],
+  "Kennzeichen scannen": [
+    "Scan license plate",
+    "Kennzeichen scannen",
+    "مسح اللوحة"
+  ],
+  "Bitte manuell eingeben.": [
+    "Please enter manually.",
+    "Bitte manuell eingeben.",
+    "يرجى الإدخال يدويًا."
   ]
 }

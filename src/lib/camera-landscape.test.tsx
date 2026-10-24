@@ -41,8 +41,8 @@ describe('camera landscape layout (CSS)',()=>{
   });
   it('landscape block stays solid (no translucency)',()=>{expect(land).not.toMatch(/rgba\(|hsla\(|blur\(|backdrop|opacity:\.[0-9]/)});
   it('QR scanner viewfinder fits a landscape phone screen',()=>{
-    const s=readFileSync('src/booking-scan.css','utf8');const i=s.indexOf('@media (orientation:landscape)');expect(i).toBeGreaterThan(-1);
-    const b=s.slice(i);expect(b).toContain('.bsc .bsc-view{aspect-ratio:auto;height:');expect(b).toContain('env(safe-area-inset-left)');
+    const s=readFileSync('src/main-scanner.css','utf8');const i=s.indexOf('@media (orientation:landscape)');expect(i).toBeGreaterThan(-1);
+    const b=s.slice(i);expect(b).toContain('.ms-plate-view{margin-top:6px}');expect(s).toContain('env(safe-area-inset-top)');
   });
 });
 

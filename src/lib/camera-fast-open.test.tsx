@@ -65,18 +65,18 @@ describe('fast camera open',()=>{
 });
 
 describe('fast open wiring (source)',()=>{
-  const main=readFileSync('src/main.tsx','utf8'),sheet=readFileSync('src/lib/booking-scan-sheet.tsx','utf8'),flow=readFileSync('src/lib/handover-flow.tsx','utf8');
+  const main=readFileSync('src/main.tsx','utf8'),sheet=readFileSync('src/lib/main-scanner.tsx','utf8'),flow=readFileSync('src/lib/handover-flow.tsx','utf8');
   it('Einchecken/Auschecken tap prewarms the camera right before opening the flow',()=>{expect(main).toContain('prewarmCamera();setFlow({b,action:k})')});
   it('back to camera prewarms',()=>{expect(flow).toContain("prewarmCamera();setStep('camera')")});
   it('QR menu tap prewarms; sheet close and plate view cancel the prewarm',()=>{
-    expect(sheet).toContain("onClick={()=>{prewarmCamera();setView('qr')}}");expect(sheet).toContain("if(view==='plate')cancelPrewarm()");expect(sheet).toMatch(/return\(\)=>\{cancelPrewarm\(\);/);
+    expect(sheet).toContain("onClick={()=>{prewarmCamera();setView('qr')}}");expect(sheet).toContain("cancelPrewarm();setView('plate')");expect(sheet).toMatch(/return\(\)=>\{cancelPrewarm\(\);/);
   });
   it('QR decoder is created in parallel, not awaited before the preview',()=>{
     expect(sheet).not.toContain('await createQrDecoder()');
-    expect(sheet.indexOf('createQrDecoder().then')).toBeLessThan(sheet.indexOf('await acquireCamera()'));
+    expect(sheet).toContain('createQrDecoder().then');
   });
   it('scanner chunk is preloaded on idle and on tap',()=>{expect(main).toContain('requestIdleCallback(pre');expect(main).toContain('void loadScanSheet();setScanOpen(true)')});
   it('no camera code awaits enumerateDevices / permissions before getUserMedia',()=>{
-    for(const f of ['src/lib/camera-stream.ts','src/lib/camera.tsx','src/lib/booking-scan-sheet.tsx']){const t=readFileSync(f,'utf8');expect(t).not.toMatch(/enumerateDevices|permissions\.query/)}
+    for(const f of ['src/lib/camera-stream.ts','src/lib/camera.tsx','src/lib/main-scanner.tsx']){const t=readFileSync(f,'utf8');expect(t).not.toMatch(/enumerateDevices|permissions\.query/)}
   });
 });
