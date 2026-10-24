@@ -4393,5 +4393,10 @@
     "Reason for deletion",
     "Grund der Löschung",
     "سبب الحذف"
+  ],
+  "Medium endgültig löschen?": [
+    "Permanently delete media?",
+    "Medium endgültig löschen?",
+    "حذف الملف نهائيًا؟"
   ]
 }
