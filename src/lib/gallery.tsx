@@ -1,6 +1,6 @@
 import {t as tr} from './i18n';
 import React,{useCallback,useEffect,useRef,useState,useSyncExternalStore} from 'react';
-import {ChevronLeft,ChevronRight,Maximize2,Minimize2,Download,Share2,Camera,Video as VideoIcon,PenLine,Calendar,AlertTriangle} from 'lucide-react';
+import {ChevronLeft,ChevronRight,Maximize,Minimize,Download,Share2,Camera,Video as VideoIcon,PenLine,Calendar,AlertTriangle} from 'lucide-react';
 import {listBookingMedia,signedMediaUrl,mediaBlob,type MediaItem} from './handover-api';
 import {pendingOfflineMedia,subscribeOffline,offlineSnapshot} from './offline-client';
 import {useEdgeBack} from './use-edge-back';
@@ -62,13 +62,13 @@ function MediaGalleryInner({bookingId,demo,refreshKey,local,addTile}:GalleryProp
   </div>;
 }
 
-function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
+export function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{items:MediaItem[];index:number;setIndex:(i:number)=>void;onClose:()=>void;map:Record<string,U>;errs:Record<string,string>;ensure:(m:MediaItem,f?:boolean)=>Promise<void>;bad:(m:MediaItem)=>void;good:(m:MediaItem)=>void;retry:(m:MediaItem)=>Promise<void>}){
   const m=items[index],box=useRef<HTMLDivElement>(null),[full,setFull]=useState(false),[msg,setMsg]=useState(''),[busy,setBusy]=useState('');
   const strip=useRef<HTMLDivElement>(null),root=useRef<HTMLDivElement>(null);
   useEdgeBack(root,{enabled:true,priority:60,blocked:!!busy,key:m.id,onBack:()=>{if(document.fullscreenElement){void document.exitFullscreen?.();return}if(full){setFull(false);return}onClose()}});
   useEffect(()=>{ensure(m);const o=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=o}},[]);
   useEffect(()=>{ensure(m);const t=window.setInterval(()=>ensure(m),30000);return()=>clearInterval(t)},[m,ensure]);
-  useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const el=strip.current?.children[index] as HTMLElement|undefined;el?.scrollIntoView?.({inline:'center',block:'nearest'})},[index]);
+  useEffect(()=>{items.forEach(i=>{if(i.kind!=='video')ensure(i)});const st=strip.current,el=st?.children[index] as HTMLElement|undefined;if(st&&el){const left=el.offsetLeft-st.offsetLeft-(st.clientWidth-el.offsetWidth)/2;if(typeof st.scrollTo==='function')st.scrollTo({left:Math.max(0,left)});else st.scrollLeft=Math.max(0,left)}},[index]);
   useEffect(()=>{const k=(e:KeyboardEvent)=>{const t=e.target as HTMLElement|null;if(t&&(t.tagName==='VIDEO'||t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1);else if(e.key==='Escape'){if(document.fullscreenElement)return;if(full){setFull(false);return}onClose()}};window.addEventListener('keydown',k);return()=>window.removeEventListener('keydown',k)});
   useEffect(()=>{const f=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',f);return()=>document.removeEventListener('fullscreenchange',f)},[]);
   function go(d:number){setMsg('');setIndex((index+d+items.length)%items.length)}
@@ -81,12 +81,12 @@ function Viewer({items,index,setIndex,onClose,map,errs,ensure,bad,good,retry}:{i
   const e=errs[m.id];
   return <div ref={root} className={'gv'+(full?' full':'')} role="dialog" aria-modal="true" aria-label={tr("Medien")}>
     <header className="gv-head"><button type="button" className="gv-round" aria-label={tr("Schließen")} onClick={onClose}><ChevronLeft size={22}/></button><h2>{tr("Existing media")}</h2><span/></header>
-    <div className="gv-stage" ref={box}>
+    <div className="gv-card"><div className={'gv-stage'+(m.kind==='photo'?' is-photo':'')} ref={box}>
       <div className="gv-frame">{e?<div className="gv-load err" role="alert"><p>{e}</p><button type="button" className="gv-retry" onClick={()=>void retry(m)}>{tr("Erneut versuchen")}</button></div>:!u?<p className="gv-load" role="status">{tr("Wird geladen …")}</p>:m.kind==='video'?<video data-edge-back-exclude key={m.id+u.slice(-12)} src={u} controls playsInline preload="metadata" onLoadedMetadata={()=>good(m)} onError={()=>bad(m)}/>:<img key={m.id} src={u} alt={kindLabel(m.kind)+' '+(index+1)} onLoad={()=>good(m)} onError={()=>bad(m)} className={m.kind==='signature'?'sig-img':''}/>}</div>
       <span className="gv-count">{index+1} {"/"}{items.length}</span>
-      <button type="button" className="gv-fs" aria-label={full?tr("Vollbild beenden"):tr("Vollbild")} onClick={toggleFull}>{full?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button>
+      <button type="button" className="gv-fs" aria-label={full?tr("Vollbild beenden"):tr("Vollbild")} onClick={toggleFull}>{full?<Minimize size={18}/>:<Maximize size={18}/>}</button>
       {items.length>1&&<><button type="button" className="gv-nav l" aria-label={tr("Zurück")} onClick={()=>go(-1)}><ChevronLeft size={22}/></button><button type="button" className="gv-nav r" aria-label={tr("Weiter")} onClick={()=>go(1)}><ChevronRight size={22}/></button></>}
-    </div>
+    </div></div>
     <div className="gv-meta"><div className="gv-pills"><span>{m.kind==='photo'?<Camera size={14}/>:m.kind==='video'?<VideoIcon size={14}/>:<PenLine size={14}/>} {kindLabel(m.kind)}</span><span><Calendar size={14}/> {fmt(m.captured_at)}</span>{m.offline_pending&&<span>{tr("Ausstehend")}</span>}{m.action&&<span>{m.action==='in'?tr("Check-in"):tr("Check-out")}</span>}{undone(m)&&<span>{tr("Rückgängig gemacht ·")}{fmt(undone(m)!)}</span>}</div>
       <div className="gv-acts">{canShare&&<button type="button" className="gv-round" aria-label={tr("Teilen")} disabled={!!busy} onClick={share}><Share2 size={18}/></button>}<button type="button" className="gv-round" aria-label={tr("Herunterladen")} disabled={!!busy} onClick={download}><Download size={18}/></button></div></div>
     {msg&&<p className="gv-msg" role="alert">{msg}</p>}
