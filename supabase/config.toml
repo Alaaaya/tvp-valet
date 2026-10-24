@@ -1,3 +1,6 @@
+[functions.dus-flights]
+verify_jwt = false
+
 [functions.media-delete-v4]
 verify_jwt = false
 entrypoint = "./functions/media-delete-v4/index.js"

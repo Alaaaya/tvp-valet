@@ -6,7 +6,7 @@ if(!ORIGIN||!config.anon||!config.service_role)throw Error('Missing integrated S
 const allowedOrigins=new Set(['https://alaaaya.github.io',ORIGIN]);
 const headers={apikey:config.anon,'Content-Type':'application/json'};
 async function request(path,token,{method='POST',body}={}){
- const r=await fetch(ORIGIN+path,{method,redirect:'error',headers:{...headers,Authorization:'Bearer '+token},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
+ const r=await fetch(ORIGIN+path,{method,redirect:'error',headers:{...headers,apikey:token===config.service_role?config.service_role:config.anon,Authorization:'Bearer '+token},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
  let data;try{data=await r.json()}catch{data=null}
  return {ok:r.ok,status:r.status,data};
 }
