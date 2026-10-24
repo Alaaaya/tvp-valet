@@ -51,3 +51,7 @@
 
 /* Undo-call button is positioned inside the row (see row-call.css), never a strip below it. */
 .blr>.row-call-clear{position:absolute;top:50%;inset-inline-end:4px;transform:translateY(-50%);margin:0;min-width:32px;min-height:32px;color:#e53e3e;background:#fff;border:1px solid #e53e3e;border-radius:6px}
+.blr-rd{flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;gap:3px;margin-inline-start:8px;padding:1px 7px;border-radius:9px;background:#f7d8d6;color:#7a1f1b;font-size:12px;font-weight:700;white-space:nowrap}
+.blr-rd bdi{overflow:hidden;text-overflow:ellipsis}
+.blr-rd svg{flex:none}
+.visually-hidden-rd{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

@@ -5,16 +5,20 @@ import {db} from '../api';
 import type {Employee} from '../model';
 import {trapTab} from './undo-controls';
 import {useEdgeBack} from './use-edge-back';
+import {staffNames,rememberStaffNames,staffNamesGeneration} from './staff-names';
 import '../driver-picker.css';
 
 /** Every active staff account (any role), read fresh from profiles when the picker opens, so accounts added
  * later appear without an app update. No driver role is required. */
 export async function loadAssignableStaff():Promise<Employee[]>{
+  const namesGeneration=staffNamesGeneration();
   if(!db)throw new Error(tr("Backend nicht eingerichtet"));
   const {data,error}=await db.from('profiles').select('id,full_name,role,active');
   if(error)throw error;
+  rememberStaffNames(data,namesGeneration);
   return (data??[]).filter(x=>x.active).map(({id,full_name,role})=>({id,full_name,role}));
 }
+const errorText=(e:unknown)=>e&&typeof e==='object'&&'message' in e&&typeof e.message==='string'?e.message:String(e);
 const firstName=(n:string)=>(n||'').trim().split(/\s+/)[0]||'';
 /** A→Z (or Z→A) by first name, then full name; stable and locale aware. */
 export function sortByFirstName(list:Employee[],dir:'asc'|'desc'='asc'){
@@ -24,21 +28,27 @@ export function sortByFirstName(list:Employee[],dir:'asc'|'desc'='asc'){
 }
 export type PickerRow={key:string;id:string|null;label:string};
 /** Rows in display order: "du selbst", every other account (sorted), "Nicht dem Fahrer zugeordnet" last. */
-export function pickerRows(staff:Employee[],meId:string|undefined,query:string,dir:'asc'|'desc'='asc'):PickerRow[]{
+export function pickerRows(staff:Employee[],meId:string|undefined,query:string,dir:'asc'|'desc'='asc',noneLabel:string=tr("Nicht dem Fahrer zugeordnet"),staleId?:string|null,activeOnly=false):PickerRow[]{
   const q=query.trim().toLocaleLowerCase('de');
   const seen=new Set<string>();const others=staff.filter(e=>e.id!==meId&&e.full_name?.trim()&&!seen.has(e.id)&&(seen.add(e.id),true));
   const me=meId?staff.find(e=>e.id===meId):undefined;
   const hit=(...s:(string|undefined)[])=>!q||s.some(x=>x&&x.toLocaleLowerCase('de').includes(q));
   const rows:PickerRow[]=[];
-  if(meId&&hit(tr("du selbst"),me?.full_name))rows.push({key:'me',id:meId,label:tr("du selbst")});
+  if(meId&&(!activeOnly||me)&&hit(tr("du selbst"),me?.full_name))rows.push({key:'me',id:meId,label:tr("du selbst")});
   for(const e of sortByFirstName(others,dir))if(hit(e.full_name))rows.push({key:e.id,id:e.id,label:e.full_name});
-  if(hit(tr("Nicht dem Fahrer zugeordnet")))rows.push({key:'none',id:null,label:tr("Nicht dem Fahrer zugeordnet")});
+  // current assignment whose account is no longer active/known: shown (checked), never offered as a new choice
+  if(staleId&&!staff.some(e=>e.id===staleId)){const n=staffNames.get(staleId)||tr("Inaktiver Mitarbeiter");if(hit(n))rows.splice(me&&rows[0]?.key==='me'?1:0,0,{key:'stale',id:staleId,label:n+' ('+tr("inaktiv")+')'})}
+  if(hit(noneLabel))rows.push({key:'none',id:null,label:noneLabel});
   return rows;
 }
 
 export interface DriverPickerSheetProps{
   /** currently assigned driver id (null = unassigned) */
   assignedId:string|null;
+  /** heading and 'none' row text; default = arrival driver wording */
+  title?:string;noneLabel?:string;
+  /** keep showing a current assignment whose account is inactive (return driver) */
+  keepStale?:boolean;
   /** signed-in account; shown as "du selbst" */
   meId?:string;
   /** accounts known right now (shown immediately; replaced by the fresh load) */
@@ -54,16 +64,16 @@ export function DriverPickerSheet(p:DriverPickerSheetProps){
   const[list,setList]=useState<Employee[]>(p.staff),[query,setQuery]=useState(''),[dir,setDir]=useState<'asc'|'desc'>('asc');
   const[busy,setBusy]=useState<string|null>(null),[err,setErr]=useState(''),[loadErr,setLoadErr]=useState('');
   const box=useRef<HTMLDivElement>(null),saving=useRef(false);
-  useEffect(()=>{let live=true;if(p.load)p.load().then(l=>{if(!live)return;setList(l);setLoadErr('');p.onLoaded?.(l)}).catch(e=>{if(live)setLoadErr(e instanceof Error?e.message:String(e))});return()=>{live=false}},[]);// eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(()=>{let live=true;if(p.load)p.load().then(l=>{if(!live)return;setList(l);setLoadErr('');p.onLoaded?.(l)}).catch(e=>{if(live)setLoadErr(errorText(e))});return()=>{live=false}},[]);// eslint-disable-line react-hooks/exhaustive-deps
   useEffect(()=>{const o=document.activeElement as HTMLElement|null;box.current?.querySelector<HTMLElement>('.dps-x')?.focus();return()=>{setTimeout(()=>o?.focus?.(),0)}},[]);
-  const rows=useMemo(()=>pickerRows(list,p.meId,query,dir),[list,p.meId,query,dir]);
+  const rows=useMemo(()=>pickerRows(list,p.meId,query,dir,p.noneLabel,p.keepStale?p.assignedId:null,!!p.keepStale),[list,p.meId,query,dir,p.noneLabel,p.assignedId,p.keepStale]);
   const close=()=>{if(saving.current)return false;p.onClose();return true};
   useEdgeBack(box,{enabled:true,priority:45,blocked:!!busy,onBack:()=>{if(!close())return false}});
   async function pick(r:PickerRow){
     if(saving.current)return;
     if(r.id===p.assignedId){p.onClose();return}
     saving.current=true;setBusy(r.key);setErr('');
-    try{await p.onPick(r.id);saving.current=false;p.onClose()}catch(e){setErr(e instanceof Error?e.message:String(e))}finally{saving.current=false;setBusy(null)}
+    try{await p.onPick(r.id);saving.current=false;p.onClose()}catch(e){setErr(errorText(e))}finally{saving.current=false;setBusy(null)}
   }
   const keys=(e:React.KeyboardEvent)=>{
     if(e.key==='Escape'){e.stopPropagation();e.preventDefault();close();return}
@@ -74,14 +84,14 @@ export function DriverPickerSheet(p:DriverPickerSheetProps){
   return <div className="dps-scrim" onClick={()=>{close()}}>
     <div ref={box} className="dps" role="dialog" aria-modal="true" aria-labelledby="dps-t" onKeyDown={keys} onClick={e=>e.stopPropagation()}>
       <div className="dps-handle" aria-hidden="true"/>
-      <header className="dps-head"><h2 id="dps-t">{tr("Fahrer zuweisen")}</h2>
+      <header className="dps-head"><h2 id="dps-t">{p.title??tr("Fahrer zuweisen")}</h2>
         <button type="button" className="dps-sort" aria-label={tr("Sortierung nach Vorname umkehren")} onClick={()=>setDir(d=>d==='asc'?'desc':'asc')}>{dir==='asc'?tr("A→Z Vorname"):tr("Z→A Vorname")}</button>
         <button type="button" className="dps-x" aria-label={tr("Schließen")} disabled={!!busy} onClick={()=>{close()}}><X size={22} strokeWidth={3}/></button></header>
       <div className="dps-search"><label><Search size={20} aria-hidden="true"/><input type="search" aria-label={tr("Suchen")} placeholder={tr("Suchen")} value={query} onChange={e=>setQuery(e.target.value)}/></label></div>
       {err&&<p className="dps-err" role="alert">{err}</p>}
       {loadErr&&<p className="dps-note" role="status">{tr("Liste evtl. nicht aktuell: ")}{loadErr}</p>}
-      <ul className="dps-list" role="listbox" aria-label={tr("Fahrer zuweisen")}>
-        {rows.map(r=>{const on=r.id===p.assignedId;return <li key={r.key} role="none"><button type="button" role="option" aria-selected={on} className={'dps-row'+(on?' on':'')} data-key={r.key} disabled={!!busy} onClick={()=>void pick(r)}>
+      <ul className="dps-list" role="listbox" aria-label={p.title??tr("Fahrer zuweisen")}>
+        {rows.map(r=>{const on=r.id===p.assignedId;return <li key={r.key} role="none"><button type="button" role="option" aria-selected={on} className={'dps-row'+(on?' on':'')} data-key={r.key} disabled={!!busy||r.key==='stale'} onClick={()=>void pick(r)}>
           <span>{busy===r.key?tr("Wird gespeichert …"):r.label}</span>{on&&<span className="dps-check" aria-hidden="true"><Check size={14} strokeWidth={4}/></span>}</button></li>})}
         {!rows.length&&<li className="dps-empty">{tr("Keine Treffer")}</li>}
       </ul>
