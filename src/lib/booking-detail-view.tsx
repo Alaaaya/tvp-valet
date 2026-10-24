@@ -1,4 +1,5 @@
 import {t as tr,getLanguage} from './i18n';
+import {useHold,PickupMenuButton} from './pickup-undo-view';
 import React,{useState} from 'react';
 import {PrintSheetsButton} from './print-sheets-button';
 import {day} from '../model';
@@ -53,6 +54,8 @@ export interface BookingDetailViewProps{
   onEdit:()=>void;
   onStartCheck:(k:'in'|'out')=>void;
   onAction:(a:BookingOperationAction)=>void;
+  /** opens the pickup-undo dialog; only offered for an already-marked taken_away (long press or visible button) */
+  onPickupUndo?:()=>void;
   /** existing secure UndoControls element, rendered unchanged */
   undoSlot?:React.ReactNode;
   /** MediaGallery element; caller passes the upload label as its addTile prop so + is the FIRST tile in the grid */
@@ -95,8 +98,11 @@ const dateLong=(v:string)=>new Date(v).toLocaleDateString(getLanguage()==='ar'?'
 export function BookingDetailView(p:BookingDetailViewProps){
   const[printError,setPrintError]=useState('');
   const b=p.booking,o=p.ops,due=Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100,c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
+  const hold=useHold({onHold:()=>p.onPickupUndo?.(),enabled:!!p.onPickupUndo});
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
     const key=b.id+':'+a;
+    const undoable=a==='taken_away'&&!!at&&!!p.onPickupUndo&&p.known&&!p.opsBusy&&b.status==='confirmed'&&!!b.checked_in_at;
+    if(undoable)return <span className="pickup-hold" {...hold}><button type="button" className={'op-btn '+cls} aria-disabled="true" aria-describedby="pickup-hold-hint" onClick={e=>e.preventDefault()}><Check size={16}/> <span>{label}</span><small className="op-at">{stamp(at)}<ByLine inline name={p.actors?.[a]}/></small></button><PickupMenuButton onClick={()=>p.onPickupUndo?.()}/><span id="pickup-hold-hint" className="sr-only">{tr("Lange drücken, um die Abholung rückgängig zu machen.")}</span></span>;
     return <button type="button" className={'op-btn '+cls} aria-busy={p.opsBusy===key} disabled={!!p.opsBusy||!!at||!p.known||b.status!=='confirmed'||!!b.checked_out_at||(a!=='customer_called'&&!b.checked_in_at)} onClick={()=>p.onAction(a)}>{at?<><Check size={16}/> <span>{label}</span><small className="op-at">{stamp(at)}<ByLine inline name={a==='taken_away'||a==='retrieved'?p.actors?.[a]:undefined}/></small></>:p.opsBusy===key?tr("Wird gespeichert …"):label}</button>;
   };
   return <div className="bd">
