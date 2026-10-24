@@ -1,6 +1,6 @@
 import {t as tr} from './i18n';
 import {saveBooking,assignBookingDriver,db} from '../api';
-import type {Booking} from '../model';
+import {driverField,type Booking} from '../model';
 import {bookingEditFields} from './booking-safe-edit';
 import {hasLegacyCashConflict,type PaymentInput} from './booking-payments';
 import {createPendingMedia,mediaPath,validateHandover,type HandoverSave} from './handover-api';
@@ -183,9 +183,9 @@ export async function saveOfflineBooking(b:Booking,admin:boolean):Promise<void>{
  await saveBooking(b,admin);
 }
 /** Driver assignment from the detail picker: durable update_ops with only driver_id, else the online RPC. */
-export const offlineAssignDriver=(booking:Booking,driverId:string|null):Promise<void>=>{
- const original=cachedOfflineBooking(booking.id);
- return routeWrite(original,async()=>{await queue(original!,crypto.randomUUID(),'update_ops',{patch:{driver_id:driverId}},{...original!,driver_id:driverId})},()=>assignBookingDriver(booking.id,driverId));
+export const offlineAssignDriver=(booking:Booking,driverId:string|null,side:'in'|'out'='in'):Promise<void>=>{
+ const original=cachedOfflineBooking(booking.id),field=driverField(side);
+ return routeWrite(original,async()=>{await queue(original!,crypto.randomUUID(),'update_ops',{patch:{[field]:driverId}},{...original!,[field]:driverId})},()=>assignBookingDriver(booking.id,driverId,side));
 };
 export const offlineAppendPhoto=(booking:Booking,file:Blob):Promise<Booking>=>routeWrite(booking,()=>durablePhoto(booking,file),async()=>{
  if(!db)throw Error(tr('Backend nicht eingerichtet'));

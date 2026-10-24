@@ -60,10 +60,10 @@ describe('driver button',()=>{
  it('shows the assigned driver name',()=>{expect(r(<BookingDetailView {...props({driverName:'Fahrer 1 Fahrer 1'})}/>)).toContain('Fahrer 1 Fahrer 1')});
  it('main wires picker to fresh profiles, the ops RPC and the button',()=>{
   const m=readFileSync('src/main.tsx','utf8');
-  expect(m).toContain('onAssignDriver={()=>setDriverPick(true)}');
+  expect(m).toContain("onAssignDriver={()=>setDriverPick('in')}");
   expect(m).toContain('load={demo?undefined:loadAssignableStaff}');
-  expect(m).toContain('offlineAssignDriver(selected,id)');
-  const api=readFileSync('src/api.ts','utf8');expect(api).toContain("db.rpc('update_booking_ops',{p_id:id,p_patch:{driver_id:driverId}})");
+  expect(m).toContain('offlineAssignDriver(selected,id,side)');
+  const api=readFileSync('src/api.ts','utf8');expect(api).toContain("db.rpc('update_booking_ops',{p_id:id,p_patch:{[driverField(side)]:driverId}})");
   const sheet=readFileSync('src/lib/driver-picker-sheet.tsx','utf8');expect(sheet).toContain("from('profiles').select('id,full_name,role,active')");
   expect(sheet).not.toMatch(/eq\('role'/);
  });

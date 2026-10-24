@@ -1,4 +1,4 @@
-import {type Booking} from '../model';
+import {directionDriver,type Booking} from '../model';
 import {inDateWindow,resolveEventTime} from './flightview';
 import type {FlightUpdate} from './flights';
 export const SERVICE_TYPES=['Shuttle','Valet','Terminal','Cruise','Valet/Shuttle','Shuttle/Valet'] as const;
@@ -28,7 +28,6 @@ export function mainBookingEvents(rows:readonly Booking[],date:string,input:Main
   if(seen.has(b.id))continue;seen.add(b.id);
   const noShow=b.status==='no_show'||(b.status==='confirmed'&&sameMinuteNoShow(b));
   if(noShow?!f.noshow:b.status==='cancelled'?!f.cancelled:b.status!=='confirmed')continue;
-  if(f.assigned&&(!userId||b.driver_id!==userId))continue;
   if(f.products.length&&!f.products.includes(b.product))continue;
   if(f.placements.length&&!f.placements.includes(b.covered?'covered':'open'))continue;
   if(f.services.length&&!f.services.includes(bookingService(b) as ServiceType))continue;
@@ -36,6 +35,8 @@ export function mainBookingEvents(rows:readonly Booking[],date:string,input:Main
   if(q&&![b.plate,b.code,b.customer_name,b.external_id].join(' ').toLocaleLowerCase('de-DE').includes(q))continue;
   for(const kind of ['in','out'] as const){
    if(f.type!=='all'&&f.type!==kind)continue;
+   // "Nur meine": arrival row = arrival driver, Retour row = Retour driver (independent, no fallback).
+   if(f.assigned&&(!userId||directionDriver(b,kind)!==userId))continue;
    const completed=!!(kind==='in'?b.checked_in_at:b.checked_out_at);
    // Explicit exceptional-status switches should reveal those records even if their legacy timestamps are filled.
    if(completed&&!f.done&&!noShow&&b.status==='confirmed')continue;
@@ -53,7 +54,7 @@ export const BLOCKING_LABELS:Record<BlockingKey,string>={noshow:'No-Shows',cance
 export function blockingMainFilters(b:Booking,f:MainBookingFilters,userId:string):BlockingKey[]{
  const k:BlockingKey[]=[],ns=b.status==='no_show'||(b.status==='confirmed'&&sameMinuteNoShow(b));
  if(ns){if(!f.noshow)k.push('noshow')}else if(b.status==='cancelled'){if(!f.cancelled)k.push('cancelled')}else if(b.status!=='confirmed')k.push('status');
- if(f.assigned&&(!userId||b.driver_id!==userId))k.push('assigned');
+ if(f.assigned&&(!userId||(b.driver_id!==userId&&(b.return_driver_id??null)!==userId)))k.push('assigned');
  if(f.products.length&&!f.products.includes(b.product))k.push('products');
  if(f.placements.length&&!f.placements.includes(b.covered?'covered':'open'))k.push('placements');
  if(f.services.length&&!f.services.includes(bookingService(b) as ServiceType))k.push('services');

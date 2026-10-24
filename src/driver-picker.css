@@ -20,3 +20,5 @@
 .dps-err{background:#fbe0de;color:#a63732}.dps-note{background:#fff6dc;color:#6b5512}
 .dps-empty{padding:16px 18px;color:#5b6d69}
 .dps button:focus-visible,.dps input:focus-visible{outline:3px solid #2d696a;outline-offset:-3px}
+/* red Retour panel: driver button styled like the green one (white, panel-tinted ring + text) */
+html body .bd .flight-panel.out .fp-actions .fp-driver.fp-driver-out,html body .bd .fp-driver.fp-driver-out{background:#fff;color:#8f2f2a;box-shadow:inset 0 0 0 1px #f0bfbb}
