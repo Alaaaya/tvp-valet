@@ -23,7 +23,7 @@ export function useObjectUrls(media:PendingMedia[]){
   return urls;
 }
 
-export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
+export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title,photoOnly}:{photoOnly?:boolean;media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
   const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
   const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false),[shown,setShown]=useState(false);
   const stageEl=useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
   const reveal=()=>{const v=videoEl.current;if(!stream.current||!v)return;markReady();setShown(true)};
   const watchFirstFrame=(v:HTMLVideoElement)=>{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>reveal())}catch{/* events still reveal */}}};
   const full=media.length>=MAX_MEDIA;
-  const canRecord=typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
+  const canRecord=!photoOnly&&typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
   // Detach and release: the last release stops all tracks immediately (camera-stream.ts).
   const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
@@ -134,7 +134,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
     <div className="cam-stage" ref={stageEl}><video ref={videoEl} className={'cam-video'+(shown?' is-shown':'')} playsInline muted autoPlay onLoadedMetadata={markReady} onLoadedData={reveal} onPlaying={reveal} onResize={fit}/>
     {fallback&&<div className="cam-fallback"><p>{err}</p><button type="button" className="cam-pill blue" onClick={()=>fileEl.current?.click()}>{tr("Foto / Video aufnehmen")}</button></div>}
     {recording&&<div className="cam-rec" role="status"><i/>{String(Math.floor(secs/60)).padStart(2,'0')}{tr(":")}{String(secs%60).padStart(2,'0')}</div>}</div>
-    <input ref={fileEl} className="cam-file" type="file" accept={mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>
+    <input ref={fileEl} className="cam-file" type="file" accept={photoOnly?'image/jpeg,image/png,image/webp':mode==='video'?'video/*':'image/*,video/*'} capture="environment" multiple onChange={onFiles} aria-label={tr("Aufnahme über Kamera-App")}/>
     <div className="cam-top"><button type="button" className="cam-round" aria-label={tr("Zurück")} disabled={recording||finalizing} onClick={onBack}><ChevronLeft size={22}/></button><span className="cam-title">{title}</span>
       <button type="button" className="cam-round" aria-label={caps.torch?(torch?tr("Blitz aus"):tr("Blitz an")):tr("Blitz nicht verfügbar")} aria-pressed={torch} disabled={!caps.torch} onClick={toggleTorch}>{caps.torch&&torch?<Zap size={20}/>:<ZapOff size={20}/>}</button></div>
     <div className="cam-bottom">
@@ -145,7 +145,7 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title}:{media:P
         {!zs&&<small>{fallback?tr("Zoom in der Kamera-App"):tr("Zoom nicht verfügbar")}</small>}</div>
       {media.length>0&&<div className="cam-strip" aria-label={tr("Aufgenommene Medien")}>{media.map((m,i)=><div key={m.id} className="cam-thumb">{m.kind==='video'?<video src={urls.get(m.id)} muted playsInline/>:<img src={urls.get(m.id)} alt={tr("Aufnahme ")+(i+1)}/>}{m.kind==='video'&&<VideoIcon size={13}/>}<button type="button" aria-label={tr("Aufnahme ")+(i+1)+' entfernen'} onClick={()=>onRemove(m.id)}>{tr("×")}</button></div>)}</div>}
       <div className="cam-row">
-        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={recording||finalizing} onClick={()=>chooseMode('photo')}>{tr("Photo")}</button><button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={recording||finalizing||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>{tr("Video")}</button></div>
+        <div className="cam-modes" role="tablist"><button role="tab" aria-selected={mode==='photo'} className={mode==='photo'?'on':''} disabled={recording||finalizing} onClick={()=>chooseMode('photo')}>{tr("Photo")}</button>{!photoOnly&&<button role="tab" aria-selected={mode==='video'} className={mode==='video'?'on':''} disabled={recording||finalizing||(!canRecord&&!fallback)} onClick={()=>chooseMode('video')}>{tr("Video")}</button>}</div>
         {fallback?<button type="button" className="cam-shutter" aria-label={tr("Kamera-App öffnen")} onClick={()=>fileEl.current?.click()}><i/></button>
         :<button type="button" className={'cam-shutter'+(mode==='video'?' video':'')+(recording?' rec':'')} aria-label={mode==='photo'?tr("Foto aufnehmen"):recording?tr("Aufnahme stoppen"):tr("Aufnahme starten")} disabled={!ready||finalizing} onClick={mode==='photo'?take:toggleRecord}><i/></button>}
         <button type="button" className="cam-pill blue" disabled={recording||finalizing} onClick={onDone}>{tr("Done")}</button></div>
