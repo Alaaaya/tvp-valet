@@ -42,13 +42,13 @@ export function UndoControls({booking,onDone}:{booking:Booking;onDone:(b:Booking
     finally{saving.current=false;if(alive.current)setBusy(false)}
   }
   return <section className="undo" aria-label={tr("Übergabe rückgängig")}>
-    {shown.map(a=><button key={a} type="button" className="undo-btn" onClick={e=>{opener.current=e.currentTarget;setErr('');setSnap({a,b:{...booking}})}}><Undo2 size={18}/> {NAME[a]} {tr("rückgängig")}</button>)}
+    {shown.map(a=><button key={a} type="button" className={"undo-btn undo-btn-"+a} onClick={e=>{opener.current=e.currentTarget;setErr('');setSnap({a,b:{...booking}})}}><Undo2 size={18}/> {NAME[a]} {tr("rückgängig")}</button>)}
     {ask&&<div className="undo-scrim" onClick={close}><div ref={dlg} tabIndex={-1} onKeyDown={keys} className="undo-dlg" role="alertdialog" aria-modal="true" aria-labelledby="undo-t" aria-describedby="undo-d" onClick={e=>e.stopPropagation()}>
       <h3 id="undo-t">{NAME[ask]} {tr("rückgängig machen?")}</h3>
       <p id="undo-d">{undoCopy(ask,snap!.b)}</p>
       {err&&<div className="undo-err" role="alert">{err}</div>}
       <button ref={cancel} type="button" className="undo-cancel" disabled={busy} onClick={close}>{tr("Abbrechen")}</button>
-      <button type="button" className="undo-ok" disabled={busy} aria-busy={busy} onClick={go}>{busy?tr("Wird rückgängig gemacht …"):err?tr("Erneut versuchen"):NAME[ask]+' rückgängig'}</button>
+      <button type="button" className={"undo-ok undo-ok-"+ask} disabled={busy} aria-busy={busy} onClick={go}>{busy?tr("Wird rückgängig gemacht …"):err?tr("Erneut versuchen"):NAME[ask]+' rückgängig'}</button>
     </div></div>}
   </section>;
 }
