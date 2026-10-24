@@ -219,3 +219,12 @@ export async function purgeOfflineAccount(userId=scope?.userId){
  snapshot={rows:[],staff:[],operations:[],at:0,complete:false};canonicalSnapshot=snapshot;
  emit({events:[],pending:0,cacheAt:null,cacheCount:0,complete:false});
 }
+
+/** Only a confirmed narrow RPC result. Never enqueue Gefahren, never copy unrelated stale booking fields. */
+export async function cacheConfirmedGefahren(uid:string,id:string,value:Booking['gefahren']){
+ const s=scope,gen=epoch;if(!s||s.userId!==uid)return;
+ const st=await store();assertScope(s,gen);
+ const canonical=await st.getSnapshot<Snapshot>(s,'data');assertScope(s,gen);if(!canonical)return;
+ const next={...canonical,rows:canonical.rows.map(b=>b.id===id?{...b,gefahren:value}:b)};
+ await st.putSnapshot(s,'data',next);assertScope(s,gen);await hydrate(s,gen);
+}

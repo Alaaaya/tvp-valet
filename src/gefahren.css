@@ -1,0 +1,7 @@
+html body div.bd .bd-print.bd-print-gefahren{display:flex;flex-wrap:wrap;gap:8px}
+html body div.bd .bd-print.bd-print-gefahren>.bd-outline{flex:1 1 0;min-width:0;width:calc(50% - 4px);max-width:none;height:auto;min-height:44px!important;white-space:normal}
+html body div.bd .bd-print.bd-print-gefahren>.error{flex-basis:100%}
+.gefahren-scrim{z-index:1800}
+.gefahren-picker .dps-head{gap:12px}
+.gefahren-picker .dps-head h2{flex:1;min-width:0}
+.gefahren-options .dps-row{width:100%;min-height:48px;justify-content:space-between;text-align:start}
