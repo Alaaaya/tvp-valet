@@ -3,6 +3,7 @@ import React,{useCallback,useEffect,useLayoutEffect,useMemo,useRef,useState} fro
 import {ChevronLeft,Zap,ZapOff,Minus,Plus,Video as VideoIcon} from 'lucide-react';
 import {createPendingMedia,type PendingMedia} from './handover-api';
 import {acquireCamera,releaseCamera} from './camera-stream';
+import {startCameraPreview} from './camera-preview';
 
 import {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES,validateVideoSize,validateFallbackVideo} from './camera-validation';
 export {MAX_VIDEO_SECONDS,MAX_VIDEO_BYTES} from './camera-validation';
@@ -24,6 +25,7 @@ export function useObjectUrls(media:PendingMedia[]){
 }
 
 export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title,photoOnly}:{photoOnly?:boolean;media:PendingMedia[];onAdd:(m:PendingMedia)=>void;onRemove:(id:string)=>void;onBack:()=>void;onDone:()=>void;title:string}){
+  const preview=useRef<AbortController|null>(null);
   const videoEl=useRef<HTMLVideoElement>(null),stream=useRef<MediaStream|null>(null),rec=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),bytes=useRef(0),timer=useRef<number|undefined>(undefined),discard=useRef(false),fileEl=useRef<HTMLInputElement>(null),mounted=useRef(true),gen=useRef(0),finalizingRef=useRef(false);
   const[mode,setMode]=useState<'photo'|'video'>('photo'),[ready,setReady]=useState(false),[fallback,setFallback]=useState(false),[err,setErr]=useState(''),[caps,setCaps]=useState<Caps>({}),[zoom,setZoom]=useState(1),[torch,setTorch]=useState(false),[recording,setRecording]=useState(false),[finalizing,setFinalizing]=useState(false),[secs,setSecs]=useState(0),[note,setNote]=useState(''),[hasAudio,setHasAudio]=useState(false),[shown,setShown]=useState(false);
   const stageEl=useRef<HTMLDivElement>(null);
@@ -35,15 +37,14 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title,photoOnly
     if(st&&typeof ResizeObserver!=='undefined'){ro=new ResizeObserver(fit);ro.observe(st)}
     return()=>{window.removeEventListener('resize',fit);window.removeEventListener('orientationchange',fit);ro?.disconnect()}},[fit]);
   const urls=useObjectUrls(media);const markReady=()=>{const v=videoEl.current;fit();if(stream.current&&v&&v.videoWidth>0)setReady(true)};
-  // Full-size by CSS from the start; stays invisible (black stage) until the first real frame, so the
-  // user never sees an intrinsic-size/small preview box.
+  // Full-size and visible from the start: WebKit must not gate playback on an invisible video.
   const reveal=()=>{const v=videoEl.current;if(!stream.current||!v)return;markReady();setShown(true)};
   const watchFirstFrame=(v:HTMLVideoElement)=>{const rv=(v as any).requestVideoFrameCallback;if(typeof rv==='function'){try{rv.call(v,()=>reveal())}catch{/* events still reveal */}}};
   const full=media.length>=MAX_MEDIA;
   const canRecord=!photoOnly&&typeof MediaRecorder!=='undefined'&&pickVideoMime(MediaRecorder)!==null&&pickVideoMime(MediaRecorder)!=='';
 
   // Detach and release: the last release stops all tracks immediately (camera-stream.ts).
-  const stopStream=useCallback(()=>{const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
+  const stopStream=useCallback(()=>{preview.current?.abort();const v=videoEl.current;if(v){try{v.pause()}catch{}v.srcObject=null}if(stream.current){stream.current=null;releaseCamera()}setReady(false);setShown(false)},[]);
   const stopRecorder=useCallback((drop:boolean)=>{
     window.clearInterval(timer.current);const r=rec.current;
     if(drop){discard.current=true;chunks.current=[];finalizingRef.current=false;if(mounted.current){setFinalizing(false);setRecording(false)}}
@@ -65,12 +66,16 @@ export function CameraScreen({media,onAdd,onRemove,onBack,onDone,title,photoOnly
     // Attach and start playback first (synchronously after the stream resolves); capabilities,
     // state updates and sizing come after, so nothing delays the first frame.
     const v=videoEl.current;let playing:Promise<void>|undefined;
-    if(v){v.muted=true;v.srcObject=s;watchFirstFrame(v);try{playing=v.play()}catch{playing=Promise.reject()}}
+    if(v){const controller=preview.current=new AbortController();playing=startCameraPreview(v,s,controller.signal);watchFirstFrame(v)}
     setHasAudio(s.getAudioTracks().length>0);setFallback(false);setErr('');
     const track=s.getVideoTracks()[0];let c:Caps={};
     try{const raw=(track.getCapabilities?.()||{}) as any;if(raw.zoom&&raw.zoom.max>raw.zoom.min)c.zoom={min:raw.zoom.min,max:raw.zoom.max,step:raw.zoom.step};if(raw.torch)c.torch=true}catch{}
     setCaps(c);setZoom(c.zoom?Math.max(c.zoom.min,1):1);setTorch(false);
-    if(playing){try{await playing}catch{if(my===gen.current)setNote(tr("Vorschau konnte nicht gestartet werden."))}}
+    if(playing){try{await playing}catch{
+      if(my!==gen.current||!mounted.current)return;
+      stopStream();setFallback(true);setErr(tr("Vorschau konnte nicht gestartet werden."));return;
+    }}
+    if(my!==gen.current||!mounted.current)return;
     if(my===gen.current&&v&&v.videoWidth>0&&v.readyState>=2)setReady(true);
     fit();
   },[stopStream]);

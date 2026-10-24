@@ -71,9 +71,9 @@ describe('CameraScreen uses the shared stream',()=>{
   it('preview sits in a stage between top bar and controls',async()=>{
     const m=await mount();expect(m.host.querySelector('.cam-stage .cam-video')).toBeTruthy();await m.unmount();
   });
-  it('preview is full-size via CSS and hidden until the first frame, then shown',async()=>{
+  it('preview is full-size and visible before playback; frame events mark it shown',async()=>{
     const css=(await import('node:fs')).readFileSync('src/handover.css','utf8');
-    expect(css).toMatch(/\.cam-video\{position:absolute;inset:0;[^}]*width:100%;height:100%;min-width:100%;min-height:100%;[^}]*object-fit:cover;[^}]*opacity:0\}/);
+    expect(css).toMatch(/\.cam-video\{position:absolute;inset:0;[^}]*width:100%;height:100%;min-width:100%;min-height:100%;[^}]*object-fit:cover;[^}]*opacity:1\}/);
     expect(css).toContain('.cam-video.is-shown{opacity:1}');
     const m=await mount();const v=m.host.querySelector('.cam-video') as HTMLVideoElement;
     expect(v.classList.contains('is-shown')).toBe(false);
