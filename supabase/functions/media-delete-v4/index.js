@@ -1,5 +1,5 @@
 // Same-project Edge handler. No external server, credentials file, domain or test flags.
-// verify_jwt=false supports asymmetric signing keys; Auth /user verifies every request.
+// Gateway verification is disabled explicitly; mandatory Auth /user and DB admin checks authorize every deletion.
 const ORIGIN=Deno.env.get('SUPABASE_URL');
 const config={anon:Deno.env.get('SUPABASE_ANON_KEY'),service_role:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')};
 if(!ORIGIN||!config.anon||!config.service_role)throw Error('Missing integrated Supabase environment');
