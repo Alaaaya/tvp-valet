@@ -72,6 +72,7 @@ const loadScanSheet=()=>import('./lib/main-scanner');
 const BookingScanSheet=React.lazy(()=>loadScanSheet().then(m=>({default:m.MainScanner})));
 import {useTheme,ThemeSetting} from './lib/theme';
 import './nana-theme.css';
+import './zaitoun-theme.css';
 function App(){useLanguage();const [theme,changeTheme]=useTheme();
 const offline=React.useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
 const[authUid,setAuthUid]=useState('');

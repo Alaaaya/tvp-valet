@@ -1,0 +1,86 @@
+/* Opt-in glossy Zaitoun skin. Existing themes retain their exact selectors. */
+.zaitoun-note-pin{display:none}
+.theme-swatch.zaitoun{background:linear-gradient(145deg,#29d566,#008744)}
+html body .app[data-theme=zaitoun]{--zaitoun-bg:#eef9f5;--zaitoun-ink:#122b28;--zaitoun-mint:#d2eee4;--zaitoun-green:#00ad38;--zaitoun-red:#e7251b;direction:ltr;color:var(--zaitoun-ink);background:var(--zaitoun-bg)}
+html body .app[data-theme=zaitoun] .workspace,html body .app[data-theme=zaitoun] .page{background:var(--zaitoun-bg)}
+html body .app[data-theme=zaitoun] .topbar{background:#005a43!important}
+html body .app[data-theme=zaitoun].fixed-top .topbar::after{background:var(--zaitoun-bg)!important}
+html body .app[data-theme=zaitoun].fixed-top .counters{padding:10px 12px;gap:10px;background:var(--zaitoun-bg)!important}
+html body .app[data-theme=zaitoun].fixed-top .counter{height:65px;border-radius:16px;box-shadow:0 3px 8px #176a5c14;padding:8px 12px}
+html body .app[data-theme=zaitoun].fixed-top .counter.incoming{background:var(--zaitoun-green)!important}
+html body .app[data-theme=zaitoun].fixed-top .counter.outgoing{background:var(--zaitoun-red)!important}
+html body .app[data-theme=zaitoun].fixed-top .counter strong{font-size:26px}
+html body .app[data-theme=zaitoun].fixed-top .search-row{background:#c9e9dd!important;margin:0 12px 8px;padding:5px 6px;height:54px;border-radius:14px}
+html body .app[data-theme=zaitoun].fixed-top .search,html body .app[data-theme=zaitoun].fixed-top .cam-search{border-radius:10px}
+html body .app[data-theme=zaitoun].fixed-top .date-strip{background:var(--zaitoun-bg);border:0}
+html body .app[data-theme=zaitoun].fixed-top .booking-list{background:var(--zaitoun-bg);padding:8px 10px max(12px,env(safe-area-inset-bottom))}
+html body .app[data-theme=zaitoun].fixed-top .blr{border:1px solid #d7e9e2;border-radius:17px;margin-bottom:9px;box-shadow:0 3px 9px #194f4210;overflow:hidden}
+html body .app[data-theme=zaitoun].fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale)) minmax(0,1fr) auto;min-height:calc(100px * var(--list-scale));height:calc(100px * var(--list-scale));max-height:calc(100px * var(--list-scale));padding-right:8px;gap:7px}
+html body .app[data-theme=zaitoun].fixed-top .blr-time,html body .app[data-theme=zaitoun].fixed-top .blr.done .blr-time{background:#c2f8d5!important;border-left:0;border-radius:15px 0 0 15px}
+html body .app[data-theme=zaitoun].fixed-top .blr.out .blr-time{background:#ffd1ce!important}
+html body .app[data-theme=zaitoun].fixed-top .blr-time strong{font-size:calc(15px * var(--list-scale));font-weight:700}
+html body .app[data-theme=zaitoun].fixed-top .blr-body{justify-content:center;gap:3px;max-height:100%;padding:6px 0}
+html body .app[data-theme=zaitoun].fixed-top .blr-l1{min-height:12px}
+html body .app[data-theme=zaitoun].fixed-top .blr-l2{flex-wrap:wrap;min-height:21px;line-height:20px;overflow:visible}
+html body .app[data-theme=zaitoun].fixed-top .blr-plate{background:#d5f1ef;border:1px solid #a7d2c9;border-radius:8px;padding:0 5px;color:#122b28;font-size:calc(13px * var(--list-scale))}
+html body .app[data-theme=zaitoun].fixed-top .blr-code{font-size:10px}
+html body .app[data-theme=zaitoun].fixed-top .blr-name{color:#172923;font-size:calc(14px * var(--list-scale));font-weight:650}
+html body .app[data-theme=zaitoun].fixed-top .blr-side{justify-content:space-between;padding:9px 0;max-width:82px}
+html body .app[data-theme=zaitoun].fixed-top .blr-cover{border-radius:10px;padding:1px 7px}
+html body .app[data-theme=zaitoun].fixed-top .blr-pay{border-radius:12px;padding:2px 6px}
+html body .app[data-theme=zaitoun] .detail{background:var(--zaitoun-bg);direction:ltr}
+html body .app[data-theme=zaitoun] div.bd{background:var(--zaitoun-bg)!important;padding-bottom:max(12px,env(safe-area-inset-bottom));direction:ltr}
+html body .app[data-theme=zaitoun] div.bd .bd-head{background:#005a43!important;padding-top:env(safe-area-inset-top)!important}
+html body .app[data-theme=zaitoun] div.bd .pp-strip.ext{background:#cceadd!important}
+html body .app[data-theme=zaitoun] div.bd .bd-identity,
+html body .app[data-theme=zaitoun] div.bd .summary-cost,
+html body .app[data-theme=zaitoun] div.bd .summary-location,
+html body .app[data-theme=zaitoun] div.bd .summary-media{background:#fff!important;border:1px solid #dcebe4!important;border-radius:17px;margin:10px 10px 0;padding:14px 12px!important;box-shadow:0 3px 9px #194f4210;min-width:0}
+html body .app[data-theme=zaitoun] div.bd .bd-identity{gap:12px}
+html body .app[data-theme=zaitoun] div.bd .bd-identity .bd-outline{background:#def2e9!important;border-color:#8dbdaf!important;color:#20594a!important;border-radius:10px!important;min-height:38px!important;height:auto;line-height:16px!important;padding:6px!important;white-space:normal}
+html body .app[data-theme=zaitoun] div.bd .bd-identity .bd-contact a:before{display:inline-block;width:15px;color:#26785f}
+html body .app[data-theme=zaitoun] div.bd .bd-identity a[href^="tel:"]:before{content:"☎"}
+html body .app[data-theme=zaitoun] div.bd .bd-identity a[href^="mailto:"]:before{content:"✉"}
+html body .app[data-theme=zaitoun] div.bd .split-handover{gap:10px;padding:10px 10px 0;background:transparent!important;direction:ltr}
+html body .app[data-theme=zaitoun] div.bd .split-handover>section{border-radius:15px;overflow:hidden;min-width:0;background:#fff!important;box-shadow:0 3px 9px #194f4210}
+html body .app[data-theme=zaitoun] div.bd .split-handover h3{background:var(--zaitoun-green)!important}
+html body .app[data-theme=zaitoun] div.bd .split-handover>.out h3{background:var(--zaitoun-red)!important}
+html body .app[data-theme=zaitoun] div.bd .handover-date{background:#fff!important;min-width:0}
+html body .app[data-theme=zaitoun] div.bd .handover-date>button{border-radius:10px!important}
+html body .app[data-theme=zaitoun] div.bd .flight-panel.in{background:var(--zaitoun-green)!important}
+html body .app[data-theme=zaitoun] div.bd .flight-panel.out{background:var(--zaitoun-red)!important}
+html body .app[data-theme=zaitoun] div.bd .flight-panel .fp-actions .op-btn,
+html body .app[data-theme=zaitoun] div.bd .flight-panel .fp-actions .fp-driver{border-radius:10px!important;min-height:40px!important;height:auto;overflow-wrap:anywhere}
+html body .app[data-theme=zaitoun] div.bd .bd-print-gefahren{padding:10px 10px 0!important;gap:10px}
+html body .app[data-theme=zaitoun] div.bd .bd-print-gefahren>button{border-radius:13px!important;min-height:42px!important;background:#d2eee4!important}
+html body .app[data-theme=zaitoun] div.bd .bd-due{border-radius:10px;background:#d4eee2!important}
+html body .app[data-theme=zaitoun] div.bd .detail-media .mg-grid>.upload,
+html body .app[data-theme=zaitoun] div.bd .add-comment{border-radius:12px!important;background:#d2eee4!important}
+html body .app[data-theme=zaitoun] .soon-panel{border-radius:18px;background:#fff}
+html body .app[data-theme=zaitoun] .theme-setting{border-radius:14px}
+html body .app[data-theme=zaitoun] .bd-head>button:first-child svg,html body .app[data-theme=zaitoun] .date-strip svg{transform:none}
+@media print{html body .app[data-theme=zaitoun]{background:#fff}}
+html body .app[data-theme=zaitoun].fixed-top .counters.counters{height:85px}
+html body .app[data-theme=zaitoun] .bd-identity .pp-link{display:flex;align-items:center;gap:4px}
+
+html body .app[data-theme=zaitoun]{--zaitoun-gloss-green:linear-gradient(160deg,#37db65 0%,#00b43b 48%,#008b2d 100%);--zaitoun-gloss-red:linear-gradient(160deg,#ff6751 0%,#ed2b20 48%,#ce150e 100%)}
+html body .app[data-theme=zaitoun].fixed-top .counter.incoming{background:var(--zaitoun-gloss-green)!important}
+html body .app[data-theme=zaitoun].fixed-top .counter.outgoing{background:var(--zaitoun-gloss-red)!important}
+html body .app[data-theme=zaitoun].fixed-top .counter{box-shadow:inset 0 1px 0 #ffffff80,0 4px 9px #005a4326;border:1px solid #ffffff40}
+html body .app[data-theme=zaitoun].fixed-top .search-row{background:#004838!important;border-radius:25px}
+html body .app[data-theme=zaitoun].fixed-top .time-trigger,html body .app[data-theme=zaitoun].fixed-top .cam-search{color:white;background:transparent!important}
+html body .app[data-theme=zaitoun].fixed-top .blr{border:0;box-shadow:0 3px 10px #194f4221}
+html body .app[data-theme=zaitoun].fixed-top .blr-plate{background:#e3faf0!important;color:#101c28!important;border:1px solid #00a859;border-radius:20px;padding:1px 7px;font-weight:800}
+html body .app[data-theme=zaitoun].fixed-top .blr[data-checked-in=true] .blr-plate{background:#008744!important;color:#fff!important;border-color:#008744}
+html body .app[data-theme=zaitoun].fixed-top .blr-pay{background:#009a3e!important;color:#fff!important;border:0;border-radius:20px;padding:3px 8px;font-weight:800}
+html body .app[data-theme=zaitoun].fixed-top .blr-name{font-weight:800;color:#0a192f}
+html body .app[data-theme=zaitoun].fixed-top .blr-time strong{font-weight:800;color:#0a192f}
+html body .app[data-theme=zaitoun].fixed-top .blr-cover{border:1.5px solid #16382d;background:#fff;color:#101c28;border-radius:20px;font-weight:700}
+html body .app[data-theme=zaitoun].fixed-top .blr-comment{color:#0052cc;font-weight:600;display:flex;align-items:center;gap:3px}
+html body .app[data-theme=zaitoun] .zaitoun-note-pin{display:inline-block;flex:none}
+html body .app[data-theme=zaitoun] div.bd .split-handover h3,html body .app[data-theme=zaitoun] div.bd .flight-panel.in{background:var(--zaitoun-gloss-green)!important}
+html body .app[data-theme=zaitoun] div.bd .split-handover>.out h3,html body .app[data-theme=zaitoun] div.bd .flight-panel.out{background:var(--zaitoun-gloss-red)!important}
+html body .app[data-theme=zaitoun] div.bd .bd-identity>div:nth-child(2)>strong{display:inline-block;background:#e3faf0!important;color:#101c28!important;border:1px solid #00a859;border-radius:20px;padding:3px 9px;max-width:100%;overflow-wrap:anywhere;font-weight:800}
+html body .app[data-theme=zaitoun] div.bd[data-checked-in=true] .bd-identity>div:nth-child(2)>strong{background:#008744!important;color:#fff!important}
+html body .app[data-theme=zaitoun] div.bd .bd-due{background:#009a3e!important;color:#fff!important;padding:5px 9px;border-radius:20px}
+@media print{html body .app[data-theme=zaitoun] .zaitoun-note-pin{display:none}}
