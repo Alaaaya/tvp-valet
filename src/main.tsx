@@ -74,6 +74,7 @@ import {useTheme,ThemeSetting} from './lib/theme';
 import './nana-theme.css';
 import './zaitoun-theme.css';
 import './layl-theme.css';
+import './safa-theme.css';
 function App(){useLanguage();const [theme,changeTheme]=useTheme();
 const offline=React.useSyncExternalStore(subscribeOffline,offlineSnapshot,offlineSnapshot);
 const[authUid,setAuthUid]=useState('');
