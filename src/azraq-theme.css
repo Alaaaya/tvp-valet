@@ -159,3 +159,22 @@ html body .app[data-theme=azraq] div.bd .split-handover>.out h3{background:#0d3a
 html body .app[data-theme=azraq] div.bd .handover-date>button,html body .app[data-theme=azraq] div.bd .split-handover>.out .handover-date>button{background:#0b57d0!important}
 @keyframes azraq-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){html body .app[data-theme=azraq] *{animation:none!important}}
+
+html body .app[data-theme=azraq].fixed-top .counters{display:flex}
+html body .app[data-theme=azraq].fixed-top .counter{flex:1 1 0;min-width:0;padding:8px 12px}
+html body .app[data-theme=azraq].fixed-top .search-row .time-trigger,html body .app[data-theme=azraq].fixed-top .search-row .time-trigger *{background:#0b57d0!important;color:#fff!important;border-radius:14px}
+html body .app[data-theme=azraq].fixed-top .search-row .time-trigger svg *{background:transparent!important;stroke:#fff!important}
+html body .app[data-theme=azraq].fixed-top .blr-time small,html body .app[data-theme=azraq].fixed-top .blr-time em{color:#35568f!important}
+
+html body .app.fixed-top[data-theme=azraq] .topbar,html body .app[data-theme=azraq] .topbar{background:linear-gradient(180deg,#05236b,#0a2f85)!important;box-shadow:none}
+html body .app[data-theme=azraq] .workspace .date-strip .today-btn,html body .app[data-theme=azraq] .workspace .cam-search{background:#0b57d0!important;color:#fff!important;border-radius:14px}
+html body .app[data-theme=azraq] .workspace .date-strip .today-btn *,html body .app[data-theme=azraq] .workspace .cam-search *{color:#fff!important}
+html body .app[data-theme=azraq] .workspace .date-strip button{color:#0a3e92}
+
+html body .app[data-theme=azraq].fixed-top .search-row button,html body .app[data-theme=azraq].fixed-top .search-row button *{background:#0b57d0!important;color:#fff!important;border-radius:14px}
+html body .app[data-theme=azraq].fixed-top .search-row button svg *{background:transparent!important;stroke:#fff}
+
+html body .app[data-theme=azraq].fixed-top .blr .blr-time :is(.blr-ico,.blr-tf,span,svg,svg *,small){color:#35568f!important;stroke:#35568f!important;fill:none!important}
+html body .app[data-theme=azraq].fixed-top .blr .blr-time strong{color:#0a3e92!important}
+html body .app[data-theme=azraq] div.bd .bd-head .bd-round{background:#0b57d0!important}
+html body .app[data-theme=azraq] div.bd .bd-head .bd-round svg *{stroke:#fff!important}
