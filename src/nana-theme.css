@@ -1,0 +1,69 @@
+/* Local opt-in skin. No classic rules are overridden without the explicit root. */
+.theme-setting{margin-block:18px;padding:12px;border:1px solid #cfd8dc}
+.theme-options{display:flex;gap:10px;flex-wrap:wrap}
+.theme-options label{display:flex;align-items:center;gap:8px;min-height:48px;flex:1;padding:8px;border:1px solid #cfd8dc;border-radius:12px;cursor:pointer}
+.theme-options label:has(:checked){outline:2px solid #176a5c;outline-offset:1px}
+.theme-options input{width:18px;min-height:18px;height:18px;accent-color:#176a5c}
+.theme-swatch{width:24px;height:24px;flex:none;border-radius:6px;border:1px solid #92bdb4;background:#0d6b6b}
+.theme-swatch.nana{background:#d6f4e9}
+html body .app[data-theme=nana]{--nana-bg:#e5f5ef;--nana-ink:#122b28;--nana-mint:#d2eee4;--nana-green:#2aa662;--nana-red:#ee5755;direction:ltr;color:var(--nana-ink);background:var(--nana-bg)}
+html body .app[data-theme=nana] .workspace,html body .app[data-theme=nana] .page{background:var(--nana-bg)}
+html body .app[data-theme=nana] .topbar{background:#086358!important}
+html body .app[data-theme=nana].fixed-top .topbar::after{background:var(--nana-bg)!important}
+html body .app[data-theme=nana].fixed-top .counters{padding:10px 12px;gap:10px;background:var(--nana-bg)!important}
+html body .app[data-theme=nana].fixed-top .counter{height:65px;border-radius:16px;box-shadow:0 3px 8px #176a5c14;padding:8px 12px}
+html body .app[data-theme=nana].fixed-top .counter.incoming{background:var(--nana-green)!important}
+html body .app[data-theme=nana].fixed-top .counter.outgoing{background:var(--nana-red)!important}
+html body .app[data-theme=nana].fixed-top .counter strong{font-size:26px}
+html body .app[data-theme=nana].fixed-top .search-row{background:#c9e9dd!important;margin:0 12px 8px;padding:5px 6px;height:54px;border-radius:14px}
+html body .app[data-theme=nana].fixed-top .search,html body .app[data-theme=nana].fixed-top .cam-search{border-radius:10px}
+html body .app[data-theme=nana].fixed-top .date-strip{background:var(--nana-bg);border:0}
+html body .app[data-theme=nana].fixed-top .booking-list{background:var(--nana-bg);padding:8px 10px max(12px,env(safe-area-inset-bottom))}
+html body .app[data-theme=nana].fixed-top .blr{border:1px solid #d7e9e2;border-radius:17px;margin-bottom:9px;box-shadow:0 3px 9px #194f4210;overflow:hidden}
+html body .app[data-theme=nana].fixed-top .blr-main{grid-template-columns:calc(62px * var(--list-scale)) minmax(0,1fr) auto;min-height:calc(100px * var(--list-scale));height:calc(100px * var(--list-scale));max-height:calc(100px * var(--list-scale));padding-right:8px;gap:7px}
+html body .app[data-theme=nana].fixed-top .blr-time,html body .app[data-theme=nana].fixed-top .blr.done .blr-time{background:#d8f2e3!important;border-left:0;border-radius:15px 0 0 15px}
+html body .app[data-theme=nana].fixed-top .blr.out .blr-time{background:#fbe0db!important}
+html body .app[data-theme=nana].fixed-top .blr-time strong{font-size:calc(15px * var(--list-scale));font-weight:700}
+html body .app[data-theme=nana].fixed-top .blr-body{justify-content:center;gap:3px;max-height:100%;padding:6px 0}
+html body .app[data-theme=nana].fixed-top .blr-l1{min-height:12px}
+html body .app[data-theme=nana].fixed-top .blr-l2{flex-wrap:wrap;min-height:21px;line-height:20px;overflow:visible}
+html body .app[data-theme=nana].fixed-top .blr-plate{background:#d5f1ef;border:1px solid #a7d2c9;border-radius:8px;padding:0 5px;color:#122b28;font-size:calc(13px * var(--list-scale))}
+html body .app[data-theme=nana].fixed-top .blr-code{font-size:10px}
+html body .app[data-theme=nana].fixed-top .blr-name{color:#172923;font-size:calc(14px * var(--list-scale));font-weight:650}
+html body .app[data-theme=nana].fixed-top .blr-side{justify-content:space-between;padding:9px 0;max-width:82px}
+html body .app[data-theme=nana].fixed-top .blr-cover{border-radius:10px;padding:1px 7px}
+html body .app[data-theme=nana].fixed-top .blr-pay{border-radius:12px;padding:2px 6px}
+html body .app[data-theme=nana] .detail{background:var(--nana-bg);direction:ltr}
+html body .app[data-theme=nana] div.bd{background:var(--nana-bg)!important;padding-bottom:max(12px,env(safe-area-inset-bottom));direction:ltr}
+html body .app[data-theme=nana] div.bd .bd-head{background:#086358!important;padding-top:env(safe-area-inset-top)!important}
+html body .app[data-theme=nana] div.bd .pp-strip.ext{background:#cceadd!important}
+html body .app[data-theme=nana] div.bd .bd-identity,
+html body .app[data-theme=nana] div.bd .summary-cost,
+html body .app[data-theme=nana] div.bd .summary-location,
+html body .app[data-theme=nana] div.bd .summary-media{background:#fff!important;border:1px solid #dcebe4!important;border-radius:17px;margin:10px 10px 0;padding:14px 12px!important;box-shadow:0 3px 9px #194f4210;min-width:0}
+html body .app[data-theme=nana] div.bd .bd-identity{gap:12px}
+html body .app[data-theme=nana] div.bd .bd-identity .bd-outline{background:#def2e9!important;border-color:#8dbdaf!important;color:#20594a!important;border-radius:10px!important;min-height:38px!important;height:auto;line-height:16px!important;padding:6px!important;white-space:normal}
+html body .app[data-theme=nana] div.bd .bd-identity .bd-contact a:before{display:inline-block;width:15px;color:#26785f}
+html body .app[data-theme=nana] div.bd .bd-identity a[href^="tel:"]:before{content:"☎"}
+html body .app[data-theme=nana] div.bd .bd-identity a[href^="mailto:"]:before{content:"✉"}
+html body .app[data-theme=nana] div.bd .split-handover{gap:10px;padding:10px 10px 0;background:transparent!important;direction:ltr}
+html body .app[data-theme=nana] div.bd .split-handover>section{border-radius:15px;overflow:hidden;min-width:0;background:#fff!important;box-shadow:0 3px 9px #194f4210}
+html body .app[data-theme=nana] div.bd .split-handover h3{background:var(--nana-green)!important}
+html body .app[data-theme=nana] div.bd .split-handover>.out h3{background:var(--nana-red)!important}
+html body .app[data-theme=nana] div.bd .handover-date{background:#fff!important;min-width:0}
+html body .app[data-theme=nana] div.bd .handover-date>button{border-radius:10px!important}
+html body .app[data-theme=nana] div.bd .flight-panel.in{background:var(--nana-green)!important}
+html body .app[data-theme=nana] div.bd .flight-panel.out{background:var(--nana-red)!important}
+html body .app[data-theme=nana] div.bd .flight-panel .fp-actions .op-btn,
+html body .app[data-theme=nana] div.bd .flight-panel .fp-actions .fp-driver{border-radius:10px!important;min-height:40px!important;height:auto;overflow-wrap:anywhere}
+html body .app[data-theme=nana] div.bd .bd-print-gefahren{padding:10px 10px 0!important;gap:10px}
+html body .app[data-theme=nana] div.bd .bd-print-gefahren>button{border-radius:13px!important;min-height:42px!important;background:#d2eee4!important}
+html body .app[data-theme=nana] div.bd .bd-due{border-radius:10px;background:#d4eee2!important}
+html body .app[data-theme=nana] div.bd .detail-media .mg-grid>.upload,
+html body .app[data-theme=nana] div.bd .add-comment{border-radius:12px!important;background:#d2eee4!important}
+html body .app[data-theme=nana] .soon-panel{border-radius:18px;background:#fff}
+html body .app[data-theme=nana] .theme-setting{border-radius:14px}
+html body .app[data-theme=nana] .bd-head>button:first-child svg,html body .app[data-theme=nana] .date-strip svg{transform:none}
+@media print{html body .app[data-theme=nana]{background:#fff}}
+html body .app[data-theme=nana].fixed-top .counters.counters{height:85px}
+html body .app[data-theme=nana] .bd-identity .pp-link{display:flex;align-items:center;gap:4px}
