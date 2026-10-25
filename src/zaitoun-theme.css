@@ -84,3 +84,10 @@ html body .app[data-theme=zaitoun] div.bd .bd-identity>div:nth-child(2)>strong{d
 html body .app[data-theme=zaitoun] div.bd[data-checked-in=true] .bd-identity>div:nth-child(2)>strong{background:#008744!important;color:#fff!important}
 html body .app[data-theme=zaitoun] div.bd .bd-due{background:#009a3e!important;color:#fff!important;padding:5px 9px;border-radius:20px}
 @media print{html body .app[data-theme=zaitoun] .zaitoun-note-pin{display:none}}
+
+/* EU plate (decorative) */
+html body .app[data-theme=zaitoun] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong){position:relative;display:inline-flex;align-items:center;box-sizing:border-box;background:#fff!important;color:#000!important;border:1.5px solid #000!important;border-radius:6px!important;padding:1px 8px 1px 28px!important;font-family:"FE-Schrift","Saira Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;font-weight:700;font-stretch:condensed;letter-spacing:.5px;white-space:nowrap;overflow:hidden;max-width:none;min-height:22px;line-height:20px}
+html body .app[data-theme=zaitoun] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::before{content:"D";position:absolute;left:0;top:0;bottom:0;width:21px;flex:0 0 auto;background:#003399;color:#fff;font:700 8px/1 Arial,sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;box-sizing:border-box}
+html body .app[data-theme=zaitoun] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::after{content:"";position:absolute;left:5px;top:3px;width:9px;height:9px;border:1.5px dotted #ffcc00;border-radius:50%}
+html body .app[data-theme=zaitoun].fixed-top .blr[data-checked-in=true] .blr-plate{background:#fff!important;color:#000!important;border-color:#000!important}
+
