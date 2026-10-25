@@ -64,3 +64,25 @@ html body .app[data-theme=layl] div.bd .detail-media .mg-grid>.upload,html body 
 html body .app[data-theme=layl] .bd-head>button:first-child svg,html body .app[data-theme=layl] .date-strip svg{transform:none}
 @keyframes layl-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){html body .app[data-theme=layl] *{animation:none!important;transition:none!important}}
+
+/* contrast pass: light ink on every dark surface */
+html body .app[data-theme=layl] div.bd :is(div,span,small,p,label,b,em,dt,dd,li,td,th,strong,h2,h3,h4){color:var(--layl-ink)}
+html body .app[data-theme=layl] div.bd :is(small,label,dt,.muted){color:var(--layl-mute)}
+html body .app[data-theme=layl] div.bd .bd-identity>div:nth-child(2)>strong{color:#000!important}
+html body .app[data-theme=layl] div.bd .split-handover h3{color:#06121a!important}
+html body .app[data-theme=layl] div.bd .bd-due,html body .app[data-theme=layl] div.bd .bd-due *{color:var(--layl-em)!important}
+html body .app[data-theme=layl] div.bd .bd-identity .bd-outline,html body .app[data-theme=layl] div.bd .bd-print-gefahren>button,html body .app[data-theme=layl] div.bd .bd-print-gefahren>button *{color:var(--layl-ink)!important}
+html body .app[data-theme=layl] div.bd .bd-identity a,html body .app[data-theme=layl] div.bd .summary-cost *,html body .app[data-theme=layl] div.bd :is(.handover-date,.flight-panel) *{color:var(--layl-ink)}
+html body .app[data-theme=layl] div.bd .bd-identity,html body .app[data-theme=layl] div.bd .summary-cost{overflow-wrap:anywhere}
+html body .app[data-theme=layl].fixed-top .blr-time :is(span,small,div,em){color:#e6eefb!important;opacity:1}
+html body .app[data-theme=layl].fixed-top .blr-time svg{color:#e6eefb!important;opacity:.9}
+html body .app[data-theme=layl].fixed-top .blr-code{color:#b9c6dc}
+
+html body .app[data-theme=layl] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a){background:#1a2640!important;color:var(--layl-ink)!important;border:1px solid #ffffff2e!important}
+html body .app[data-theme=layl] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a) *{color:inherit!important}
+html body .app[data-theme=layl] div.bd .fp-actions .primary,html body .app[data-theme=layl] div.bd .flight-panel.in .fp-actions .op-btn:first-child{border-color:var(--layl-em)!important}
+html body .app[data-theme=layl].fixed-top .blr-time svg,html body .app[data-theme=layl].fixed-top .blr-time svg *{color:#e6eefb!important;stroke:#e6eefb!important}
+html body .app[data-theme=layl] div.bd .summary-cost{margin-bottom:max(16px,env(safe-area-inset-bottom));overflow:visible}
+html body .app[data-theme=layl] div.bd .bd-identity :is(a,span,div){overflow-wrap:anywhere;word-break:break-word}
+html body .app[data-theme=layl] div.bd :is(.summary-cost,.bd-identity) svg{color:#b9c6dc}
+html body .app[data-theme=layl] div.bd small,html body .app[data-theme=layl] div.bd .bd-identity span{color:#b9c6dc}
