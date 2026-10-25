@@ -17,7 +17,7 @@ html body .app[data-theme=layl] input,html body .app[data-theme=layl] select,htm
 html body .app[data-theme=layl] input::placeholder,html body .app[data-theme=layl] textarea::placeholder{color:#8393ad}
 html body .app[data-theme=layl].fixed-top .date-strip{background:var(--layl-bg);border:0;color:var(--layl-ink)}
 html body .app[data-theme=layl].fixed-top .booking-list{background:var(--layl-bg);padding:8px 10px max(12px,env(safe-area-inset-bottom))}
-html body .app[data-theme=layl].fixed-top .blr{background:var(--layl-card);border:1px solid var(--layl-line);border-radius:16px;margin-bottom:9px;box-shadow:var(--layl-glow);overflow:hidden;color:var(--layl-ink);animation:layl-in .35s ease both}
+html body .app[data-theme=layl].fixed-top .blr{background:var(--layl-card);border:1px solid var(--layl-line);border-radius:16px;margin-bottom:9px;box-shadow:var(--layl-glow);overflow:hidden;color:var(--layl-ink);animation:layl-in .35s ease backwards}
 html body .app[data-theme=layl].fixed-top .blr:nth-child(2){animation-delay:.04s}
 html body .app[data-theme=layl].fixed-top .blr:nth-child(3){animation-delay:.08s}
 html body .app[data-theme=layl].fixed-top .blr:nth-child(4){animation-delay:.12s}
@@ -42,7 +42,7 @@ html body .app[data-theme=layl] .theme-setting legend{color:var(--layl-ink)}
 html body .app[data-theme=layl] div.bd{background:var(--layl-bg)!important;color:var(--layl-ink);padding-bottom:max(12px,env(safe-area-inset-bottom));direction:ltr}
 html body .app[data-theme=layl] div.bd .bd-head{background:#0b1220!important;border-bottom:1px solid var(--layl-line);color:var(--layl-ink);padding-top:env(safe-area-inset-top)!important}
 html body .app[data-theme=layl] div.bd .pp-strip.ext{background:#1a2640!important;color:var(--layl-ink)}
-html body .app[data-theme=layl] div.bd .bd-identity,html body .app[data-theme=layl] div.bd .summary-cost,html body .app[data-theme=layl] div.bd .summary-location,html body .app[data-theme=layl] div.bd .summary-media{background:var(--layl-card)!important;color:var(--layl-ink);border:1px solid var(--layl-line)!important;border-radius:16px;margin:10px 10px 0;padding:14px 12px!important;box-shadow:var(--layl-glow);min-width:0;animation:layl-in .35s ease both}
+html body .app[data-theme=layl] div.bd .bd-identity,html body .app[data-theme=layl] div.bd .summary-cost,html body .app[data-theme=layl] div.bd .summary-location,html body .app[data-theme=layl] div.bd .summary-media{background:var(--layl-card)!important;color:var(--layl-ink);border:1px solid var(--layl-line)!important;border-radius:16px;margin:10px 10px 0;padding:14px 12px!important;box-shadow:var(--layl-glow);min-width:0;animation:layl-in .35s ease backwards}
 html body .app[data-theme=layl] div.bd .bd-identity>div:nth-child(2)>strong{display:inline-block;background:var(--layl-gold)!important;color:#000!important;border-radius:20px;padding:3px 10px;max-width:100%;overflow-wrap:anywhere;font-weight:800}
 html body .app[data-theme=layl] div.bd .bd-identity .bd-outline{background:transparent!important;border:1px solid #ffffff38!important;color:var(--layl-ink)!important;border-radius:10px!important;min-height:38px!important;height:auto;line-height:16px!important;padding:6px!important;white-space:normal}
 html body .app[data-theme=layl] div.bd a{color:#8fc5ff}
@@ -82,7 +82,6 @@ html body .app[data-theme=layl] div.bd :is(.op-btn,.fp-driver,.fp-actions button
 html body .app[data-theme=layl] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a) *{color:inherit!important}
 html body .app[data-theme=layl] div.bd .fp-actions .primary,html body .app[data-theme=layl] div.bd .flight-panel.in .fp-actions .op-btn:first-child{border-color:var(--layl-em)!important}
 html body .app[data-theme=layl].fixed-top .blr-time svg,html body .app[data-theme=layl].fixed-top .blr-time svg *{color:#e6eefb!important;stroke:#e6eefb!important}
-html body .app[data-theme=layl] div.bd .summary-cost{margin-bottom:max(16px,env(safe-area-inset-bottom));overflow:visible}
 html body .app[data-theme=layl] div.bd .bd-identity :is(a,span,div){overflow-wrap:anywhere;word-break:break-word}
 html body .app[data-theme=layl] div.bd :is(.summary-cost,.bd-identity) svg{color:#b9c6dc}
 html body .app[data-theme=layl] div.bd small,html body .app[data-theme=layl] div.bd .bd-identity span{color:#b9c6dc}
