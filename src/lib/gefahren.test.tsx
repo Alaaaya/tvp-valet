@@ -47,3 +47,20 @@ for(const lang of ['de','en','ar'] as const)it('labels and clear reload '+lang,a
  setLanguage(lang);await mount(<GefahrenButton value={3}/>);expect(host.textContent).toContain('3 gefahren');
  await act(async()=>root!.render(<GefahrenButton value={null}/>));expect(host.textContent).toBe('Gefahren');
 });
+it('reference sheet has local decorative flight, subtitle and five badges',async()=>{
+ setLanguage('de');await mount(<GefahrenPicker value={4} onSave={vi.fn()} onClose={vi.fn()}/>);
+ expect(host.querySelector('.gefahren-flight')?.getAttribute('aria-hidden')).toBe('true');
+ expect(host.querySelectorAll('.gefahren-badge')).toHaveLength(5);
+ expect(host.querySelector('#gefahren-description')?.textContent).toBe('Bitte wählen Sie die Anzahl der gefahrenen Kilometer.');
+ expect(host.querySelector('[aria-pressed=true]')?.textContent).toContain('4 gefahren');
+ expect(host.querySelector('.gefahren-trash')).not.toBeNull();
+ expect(host.querySelector('[role=dialog]')?.getAttribute('aria-describedby')).toBe('gefahren-description');
+});
+it('close returns focus to the opening button',async()=>{
+ await mount(<GefahrenButton value={null} onSave={vi.fn()}/>);
+ const trigger=host.querySelector<HTMLButtonElement>('.gefahren-button')!;trigger.focus();
+ await act(async()=>trigger.click());
+ expect(document.activeElement).toBe(host.querySelector('.dps-x'));
+ await act(async()=>host.querySelector<HTMLButtonElement>('.dps-x')!.click());
+ expect(document.activeElement).toBe(trigger);
+});
