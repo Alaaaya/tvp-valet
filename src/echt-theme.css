@@ -11,3 +11,7 @@ html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-
 html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=DE]::after,html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::after{content:"";position:absolute;left:3px;top:1px;width:4px;height:4px;border:1px dotted #ffcc00;border-radius:50%;box-sizing:content-box}
 html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country]::after{left:4px;top:2px;width:5px;height:5px}
 html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country=unknown]{padding-left:4px}
+
+/* Echt keeps Klassisch layout; Arabic text stays inside its own element but structure starts from the LEFT */
+html body .app[data-theme=echt]{direction:ltr}
+html body .app[data-theme=echt] .detail,html body .app[data-theme=echt] div.bd,html body .app[data-theme=echt] div.bd .split-handover{direction:ltr}
