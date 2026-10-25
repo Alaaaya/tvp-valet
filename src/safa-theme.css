@@ -93,3 +93,13 @@ html body .app[data-theme=safa] div.bd :is(small,label,dt,.muted,.pp-strip *){co
 html body .app[data-theme=safa] div.bd .bd-head :is(span,strong,small){color:var(--sf-ink)!important}
 html body .app[data-theme=safa] div.bd .split-handover h3 *{color:#fff!important}
 html body .app[data-theme=safa] div.bd :is(.fp-actions button,.fp-driver) {font-weight:700}
+
+/* reference shape pass: capsules, rounded time box, 18px cards */
+html body .app[data-theme=safa].fixed-top .counter{border-radius:999px;padding:8px 18px}
+html body .app[data-theme=safa].fixed-top .search-row{border-radius:999px;padding:5px 10px;margin:0 12px 12px}
+html body .app[data-theme=safa].fixed-top .blr{border-radius:18px;margin-bottom:12px}
+html body .app[data-theme=safa].fixed-top .blr-main{padding:10px 12px 10px 10px;gap:12px;grid-template-columns:calc(62px * var(--list-scale)) minmax(0,1fr) auto}
+html body .app[data-theme=safa].fixed-top .blr-time,html body .app[data-theme=safa].fixed-top .blr.done .blr-time{border-radius:16px;min-height:0;height:calc(62px * var(--list-scale));align-self:center;padding:4px 2px}
+html body .app[data-theme=safa].fixed-top .blr-plate{border-radius:999px;padding:2px 11px}
+html body .app[data-theme=safa].fixed-top .blr-side{justify-content:center;align-items:flex-end;gap:6px}
+html body .app[data-theme=safa].fixed-top .blr-pay{border-radius:999px;padding:5px 12px}
