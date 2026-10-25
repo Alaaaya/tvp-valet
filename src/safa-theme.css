@@ -82,3 +82,14 @@ html body .app[data-theme=safa] div.bd :is(.op-btn,.fp-driver,.fp-actions button
 html body .app[data-theme=safa] div.bd .flight-panel.in .fp-actions .op-btn:first-child{border-color:var(--sf-green)!important}
 html body .app[data-theme=safa] div.bd .bd-identity :is(a,span,div){overflow-wrap:anywhere;word-break:break-word}
 html body .app[data-theme=safa] div.bd :is(.summary-cost,.bd-identity) svg{color:var(--sf-mute)}
+
+/* contrast pass 2 */
+html body .app[data-theme=safa].fixed-top .blr-time *,html body .app[data-theme=safa].fixed-top .blr-tf{color:#fff!important;fill:currentColor;opacity:1}
+html body .app[data-theme=safa].fixed-top .blr-time svg *{fill:none}
+html body .app[data-theme=safa].fixed-top .blr{border:1px solid #b8c0cc}
+html body .app[data-theme=safa] div.bd .flight-panel svg{color:#0a0a0a!important}
+html body .app[data-theme=safa] div.bd .flight-panel :is(.op-btn,.fp-driver,.fp-actions button) svg{color:inherit!important}
+html body .app[data-theme=safa] div.bd :is(small,label,dt,.muted,.pp-strip *){color:#374151!important}
+html body .app[data-theme=safa] div.bd .bd-head :is(span,strong,small){color:var(--sf-ink)!important}
+html body .app[data-theme=safa] div.bd .split-handover h3 *{color:#fff!important}
+html body .app[data-theme=safa] div.bd :is(.fp-actions button,.fp-driver) {font-weight:700}
