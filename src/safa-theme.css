@@ -110,3 +110,10 @@ html body .app[data-theme=safa] :is(.blr-plate,.bd-identity>div:nth-child(2)>str
 html body .app[data-theme=safa] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::after{content:"";position:absolute;left:5px;top:3px;width:9px;height:9px;border:1.5px dotted #ffcc00;border-radius:50%}
 html body .app[data-theme=safa].fixed-top .blr[data-checked-in=true] .blr-plate{background:#fff!important;color:#000!important;border-color:#000!important}
 
+
+/* detail plate specificity + icon contrast */
+html body .app[data-theme=safa] div.bd .bd-identity>div:nth-child(2)>strong{background:#fff!important;color:#000!important;border:1.5px solid #000!important;border-radius:6px!important;padding:1px 8px 1px 28px!important}
+html body .app[data-theme=safa] div.bd .split-handover :is(h3,.handover-date>button) :is(svg,svg *){color:#fff!important;stroke:#fff!important}
+html body .app[data-theme=safa] div.bd .flight-panel>:not(.fp-actions) :is(svg,svg *){color:#0a0a0a!important;stroke:#0a0a0a!important;fill:#0a0a0a!important;opacity:1!important}
+html body .app[data-theme=safa] div.bd .flight-panel .fp-actions :is(svg,svg *){color:inherit!important}
+html body .app[data-theme=safa] div.bd .flight-panel.in .fp-actions .op-btn:first-child :is(svg,svg *){color:#16a34a!important}
