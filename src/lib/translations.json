@@ -4438,5 +4438,10 @@
     "4 gefahren",
     "4 gefahren",
     "4 gefahren"
+  ],
+  "Bitte wählen Sie die Anzahl der gefahrenen Kilometer.": [
+    "Please select the number of kilometres driven.",
+    "Bitte wählen Sie die Anzahl der gefahrenen Kilometer.",
+    "يرجى اختيار عدد الكيلومترات المقطوعة."
   ]
 }

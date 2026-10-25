@@ -5,3 +5,30 @@ html body div.bd .bd-print.bd-print-gefahren>.error{flex-basis:100%}
 .gefahren-picker .dps-head{gap:12px}
 .gefahren-picker .dps-head h2{flex:1;min-width:0}
 .gefahren-options .dps-row{width:100%;min-height:48px;justify-content:space-between;text-align:start}
+/* Owner reference IMG_0752, deliberately scoped to this sheet only. */
+.gefahren-scrim{background:rgba(9,28,23,.48);animation:gefahren-shade .24s ease-out}
+.gefahren-picker.dps{position:relative;direction:ltr;max-width:540px;max-height:calc(100dvh - 16px);padding:0 0 max(22px,env(safe-area-inset-bottom));border-radius:32px 32px 0 0;background:linear-gradient(180deg,#e4f1e8 0,#f6faf7 210px,#fff 370px);color:#183f30;overflow-y:auto;overscroll-behavior:contain;animation:gefahren-rise .36s cubic-bezier(.22,1,.36,1);box-shadow:0 -12px 60px #0c25151a}
+.gefahren-handle{flex:none;width:40px;height:4px;background:#b8c5bd;border-radius:99px;margin:12px auto 0}
+.gefahren-picker .dps-head{position:relative;display:block;flex:none;text-align:center;border:0;padding:112px 20px 24px}
+.gefahren-flight{position:absolute;top:0;left:0;width:100%;height:122px;pointer-events:none}
+.gefahren-picker .dps-head h2{position:relative;margin:0;font-size:29px;line-height:1.2;letter-spacing:-.7px;font-weight:750;color:#173e2f}
+.gefahren-picker .dps-head p{position:relative;margin:9px auto 0;max-width:350px;font-size:14px;line-height:1.5;color:#405c4d;text-wrap:balance}
+.gefahren-picker .dps-x{position:absolute;right:16px;top:13px;width:42px;height:42px;background:#d4e9db;color:#214e37}
+.gefahren-options{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+.gefahren-options .dps-row{display:flex;flex:none;width:100%;min-height:64px;height:auto;padding:11px 17px 11px 12px;gap:12px;justify-content:space-between;text-align:left;border:1.5px solid #edf3ee;border-radius:23px;background:#fff;box-shadow:0 3px 10px #234f3510;color:#214431;font-size:18px;line-height:1.35;font-weight:550;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.gefahren-option-main{display:flex;align-items:center;gap:15px;min-width:0}
+.gefahren-option-main>span:last-child{overflow-wrap:anywhere}
+.gefahren-badge{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#dceee1;color:#235039;font-size:19px;font-weight:650}
+.gefahren-options .dps-row.on{border-color:#285d40;background:#edf6ef;font-weight:650}
+.gefahren-options .dps-row.on .gefahren-badge{background:#24543a;color:#fff}
+.gefahren-options .dps-row>svg{flex:none;color:#275e40}
+.gefahren-options .dps-row>.gefahren-trash{color:#7e9588}
+.gefahren-options .dps-row:disabled{opacity:.65;color:#214431;cursor:wait}
+.gefahren-options .dps-row:not(:disabled):active{transform:scale(.985)}
+.gefahren-picker .dps-err,.gefahren-picker .dps-note{flex:none;margin:0 20px 12px}
+.gefahren-picker .dps-note{margin-top:12px;margin-bottom:0}
+.gefahren-picker button:focus-visible{outline:3px solid #327858;outline-offset:3px}
+@keyframes gefahren-rise{from{transform:translateY(65px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes gefahren-shade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.gefahren-scrim,.gefahren-picker.dps{animation:none}.gefahren-options .dps-row{transition:none}}
+@media(max-height:620px){.gefahren-picker .dps-head{padding-top:86px;padding-bottom:16px}.gefahren-flight{height:96px}.gefahren-options{gap:9px}.gefahren-options .dps-row{min-height:58px}}
