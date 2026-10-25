@@ -6,6 +6,7 @@ describe('local opt-in theme',()=>{
  expect(readTheme()).toBe('classic');
  });
  it('reads only explicit nana',()=>expect(readTheme({getItem:()=> 'nana'})).toBe('nana'));
+ it('reads explicit zaitoun without changing previous choices',()=>{expect(readTheme({getItem:()=> 'zaitoun'})).toBe('zaitoun');expect(readTheme({getItem:()=> 'nana'})).toBe('nana')});
  it('survives blocked local storage',()=>{
  expect(readTheme({getItem:()=>{throw Error('blocked')}})).toBe('classic');
  expect(()=>writeTheme({setItem:()=>{throw Error('blocked')}},'nana')).not.toThrow();
