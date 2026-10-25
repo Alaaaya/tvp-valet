@@ -91,3 +91,6 @@ html body .app[data-theme=zaitoun] :is(.blr-plate,.bd-identity>div:nth-child(2)>
 html body .app[data-theme=zaitoun] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::after{content:"";position:absolute;left:5px;top:3px;width:9px;height:9px;border:1.5px dotted #ffcc00;border-radius:50%}
 html body .app[data-theme=zaitoun].fixed-top .blr[data-checked-in=true] .blr-plate{background:#fff!important;color:#000!important;border-color:#000!important}
 
+
+/* detail plate specificity + icon contrast */
+html body .app[data-theme=zaitoun] div.bd .bd-identity>div:nth-child(2)>strong{background:#fff!important;color:#000!important;border:1.5px solid #000!important;border-radius:6px!important;padding:1px 8px 1px 28px!important}
