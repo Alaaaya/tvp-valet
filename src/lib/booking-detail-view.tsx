@@ -1,3 +1,4 @@
+import {plateKind} from './plate-country';
 import {t as tr,getLanguage} from './i18n';
 import {useHold,PickupMenuButton} from './pickup-undo-view';
 import React,{useState} from 'react';
@@ -119,7 +120,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
         {b.phone&&<span className="bd-contact"><a href={'tel:'+b.phone}><bdi>{b.phone}</bdi></a>{p.contactCounts&&<span className="bd-contact-count">({p.contactCounts.phone})</span>}</span>}
         {b.email&&<span className="bd-contact"><a href={'mailto:'+b.email}><bdi>{b.email}</bdi></a>{p.contactCounts&&<span className="bd-contact-count">({p.contactCounts.email})</span>}</span>}
         <button type="button" className="pp-link" onClick={p.onEdit}>{personsLabel(b.persons)}</button></div>
-      <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr">{b.plate}</strong>
+      <div><span className="bd-label">{tr("Car")}</span><strong dir="ltr" data-plate-country={plateKind(b.plate)}>{b.plate}</strong>
         {b.checked_in_at&&<span className="pp-check" aria-label={tr("Eingecheckt")}><Check size={15}/></span>}
         {c.vehicle&&<span className="bd-vehicle">{c.vehicle}</span>}
         <span className="bd-key"><KeyRound size={13}/> <bdi>{b.key_cash||'–'}</bdi></span>

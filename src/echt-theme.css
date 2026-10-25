@@ -1,0 +1,13 @@
+/* Klassisch Echt: identical to Klassisch; only the plate text becomes a real EU plate graphic with the original plate height. */
+.theme-swatch.echt{background:linear-gradient(90deg,#003399 0 22%,#fff 22% 62%,#f7c600 62%);border-color:#111}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country]{position:relative;display:inline-flex;align-items:center;box-sizing:border-box;border:1px solid #000;border-radius:3px;background:#fff;color:#000;padding:0 3px 0 15px;overflow:hidden;white-space:nowrap;letter-spacing:.2px;font-weight:800;font-family:"FE-Schrift","Saira Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;font-stretch:condensed;line-height:1;vertical-align:top}
+html body .app[data-theme=echt] .blr-plate[data-plate-country]{height:15px}
+html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country]{height:17px;padding-left:17px}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]{background:#f7c600}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=unknown]{padding-left:4px}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=DE]::before,html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::before{content:"D";position:absolute;left:0;top:0;bottom:0;width:12px;background:#003399;color:#fff;font:700 5px/1 Arial,sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:1px;box-sizing:border-box;letter-spacing:0}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::before{content:"NL"}
+html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country]::before{width:14px;font-size:6px}
+html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=DE]::after,html body .app[data-theme=echt] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::after{content:"";position:absolute;left:3px;top:1px;width:4px;height:4px;border:1px dotted #ffcc00;border-radius:50%;box-sizing:content-box}
+html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country]::after{left:4px;top:2px;width:5px;height:5px}
+html body .app[data-theme=echt] .bd-identity>div:nth-child(2)>strong[data-plate-country=unknown]{padding-left:4px}
