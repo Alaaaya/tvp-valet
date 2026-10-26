@@ -1,0 +1,160 @@
+/* Claude opt-in reference theme. No selector changes any previous theme. */
+.theme-swatch.claude{background:#0a4f4c;border-color:#0a4f4c}
+html body .app[data-theme=claude]{--cl-sans:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;--cl-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;--cl-bg:#edf5f2;--cl-ink:#111827;--cl-green:#0a4f4c;background:var(--cl-bg);color:var(--cl-ink);direction:ltr;color-scheme:light;font-family:var(--cl-sans);font-synthesis:none;accent-color:#0a4f4c;caret-color:#0a4f4c;scrollbar-color:#99b6a8 #edf5f2}
+html body .app[data-theme=claude] :focus-visible{outline:2px solid #267d60;outline-offset:3px}
+html body .app[data-theme=claude] :is(.workspace,.page,.detail){direction:ltr;background:var(--cl-bg);color:var(--cl-ink)}
+html body .app[data-theme=claude].fixed-top>.workspace{--tvp-topbar-h:calc(90px + env(safe-area-inset-top));padding-top:var(--tvp-topbar-h)}
+html body .app[data-theme=claude] .topbar{background:#0a4f4c!important;color:#fff}
+html body .app[data-theme=claude].fixed-top .topbar{display:flex!important;height:var(--tvp-topbar-h)!important;padding:calc(17px + env(safe-area-inset-top)) 17.333px 12px!important;gap:21.333px;border:0;align-items:center}
+html body .app[data-theme=claude] .topbar::after{display:none}
+html body .app[data-theme=claude] .topbar>button,html body .app[data-theme=claude] .header-actions>button{background:rgb(255 255 255 / 17%)!important;border:1px solid rgb(255 255 255 / 11%)!important;box-shadow:inset 0 1px 0 #ffffff0a!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex-shrink:0!important;border-radius:13px!important;width:44px;min-width:44px;height:44px;min-height:44px;padding:10px;color:#fff}
+html body .app[data-theme=claude] .topbar button svg{border:0;padding:0;fill:currentColor}
+html body .app[data-theme=claude] .header-actions{margin-left:auto}
+html body .app[data-theme=claude] .cl-title{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1;letter-spacing:0}
+html body .app[data-theme=claude] .cl-title>strong{font:800 23px/30px var(--cl-sans);color:#fff;letter-spacing:-.5px}
+html body .app[data-theme=claude] .cl-title>small{font:500 11px/16px var(--cl-sans);color:#c3ddda;white-space:nowrap}
+html body .app[data-theme=claude] .cl-date{display:inline;position:relative;cursor:pointer;font:inherit}
+html body .app[data-theme=claude] .cl-date input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;cursor:pointer}
+html body .app[data-theme=claude].fixed-top .counters.counters{display:grid;grid-template-columns:1fr 1fr;height:98px;background:#0a4f4c!important;padding:0 17.333px 22px!important;gap:13.333px;margin:0;border-radius:0 0 25px 25px}
+html body .app[data-theme=claude].fixed-top .counters .counter{position:relative;display:grid;grid-template-columns:47px 1fr;grid-template-rows:22px 34px;align-content:center;column-gap:11px;row-gap:0;text-align:left;background:#286362!important;border:0;border-radius:17px;height:76px;min-height:76px;padding:9px 12px!important;color:#fff;box-shadow:inset 0 0 0 1px #ffffff0a}
+html body .app[data-theme=claude].fixed-top .counter::before{content:"";grid-row:1/3;width:45px;height:45px;align-self:center;border-radius:12px;background:#74dfc2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='%230a4f4c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18M6 6v12h12'/%3E%3C/svg%3E") center/28px no-repeat}
+html body .app[data-theme=claude].fixed-top .counter.outgoing::before{background-color:#ff9a80;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='%239c3d2c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 18 12-12M6 6h12v12'/%3E%3C/svg%3E")}
+html body .app[data-theme=claude].fixed-top .counter>div{grid-column:2;grid-row:1;justify-content:flex-start}
+html body .app[data-theme=claude].fixed-top .counter>div>span{font-size:12px;color:#d4e8e5;font-weight:600;letter-spacing:0}
+html body .app[data-theme=claude].fixed-top .counter>strong,html body .app[data-theme=claude].fixed-top .counter>strong small{font:800 26px/34px var(--cl-sans)!important;letter-spacing:0!important;white-space:nowrap;color:#fff;opacity:1}
+html body .app[data-theme=claude].fixed-top .counter>strong{grid-column:2;grid-row:2}
+html body .app[data-theme=claude].fixed-top .counter.chosen{outline:2px solid #b3ecd2;outline-offset:-3px}
+html body .app[data-theme=claude].fixed-top .search-row{height:81px;padding:16px 17.333px!important;gap:11px;background:var(--cl-bg)!important;overflow:visible;flex:none}
+html body .app[data-theme=claude].fixed-top .now-button{background:#0c4e4e!important;border:0;border-radius:24px;color:#fff;min-width:88px;padding:0 12px;min-height:46px;height:46px;font-size:14px;font-weight:600;gap:6px}
+html body .app[data-theme=claude].fixed-top .now-button::before{display:none}
+html body .app[data-theme=claude].fixed-top .search{position:relative;background:#fff;border:1px solid #d6e4de;border-radius:25px;padding:0 13px!important;gap:8px;min-height:46px;height:46px;min-width:0;flex:1;color:#627c71}
+html body .app[data-theme=claude].fixed-top .search>svg{position:static!important;inset:auto;width:17px;height:17px;flex:none;fill:#76958a;color:#76958a}
+html body .app[data-theme=claude].fixed-top .search input{background:transparent;border-radius:0;color:#243b31;font:500 14px/20px var(--cl-sans);height:44px;min-height:44px;padding:0;outline-offset:0}
+html body .app[data-theme=claude].fixed-top .search input::placeholder{color:#70877b}
+html body .app[data-theme=claude].fixed-top .cam-search{background:#fff!important;border:1px solid #d6e4de;border-radius:13px;width:46px;min-width:46px;height:46px;min-height:46px;flex:0 0 46px;padding:10px}
+html body .app[data-theme=claude].fixed-top .cam-search>svg{fill:none!important;stroke:#174b3c!important;border:0!important;border-radius:0!important;padding:0!important;width:24px;height:24px;flex:none}
+html body .app[data-theme=claude].fixed-top .date-strip{display:none}
+html body .app[data-theme=claude].fixed-top .booking-list{display:block;background:var(--cl-bg);padding:0 17.333px 28px}
+html body .app[data-theme=claude] .cl-row{position:relative;background:#fff;border:1px solid #dce6e0;border-radius:20px;overflow:hidden;margin-bottom:13.333px;box-shadow:0 4px 8px #153d2c13}
+html body .app[data-theme=claude].fixed-top .cl-main{display:grid;grid-template-columns:90px minmax(0,1fr);gap:0;padding:0!important;width:100%;border:0;background:transparent;min-height:99px;height:auto;max-height:none;color:var(--cl-ink);text-align:left;font-family:inherit;overflow:hidden;cursor:pointer}
+html body .app[data-theme=claude].fixed-top .with-note .cl-main{min-height:119px}
+html body .app[data-theme=claude] .cl-time{position:relative;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:7px 2px;color:#126245;background:#d9f2e5}
+html body .app[data-theme=claude] .out .cl-time{color:#a7412d;background:#fce2db}
+html body .app[data-theme=claude] .cl-time>svg{flex:none}
+html body .app[data-theme=claude] .cl-time>strong{font:800 calc(20.5px * var(--list-scale,1))/26px var(--cl-sans);letter-spacing:0;font-stretch:normal;transform:none;color:inherit;white-space:nowrap}
+html body .app[data-theme=claude] .cl-flight{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;font-size:11.5px;font-weight:800;line-height:15px;max-width:100%;color:inherit}
+html body .app[data-theme=claude] .cl-flight svg{fill:currentColor;flex:none}
+html body .app[data-theme=claude] .cl-covered{background:#145d49;color:#fff;border-radius:5px;padding:3px 6px;font-size:9px;font-weight:800;line-height:13px}
+html body .app[data-theme=claude] .cl-time>.cl-check{position:absolute;left:5px;top:5px;width:12px;height:12px}
+html body .app[data-theme=claude] .cl-content{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:11px 15px;min-width:0;line-height:1.15}
+html body .app[data-theme=claude] .cl-line{display:flex;align-items:center;gap:5px;min-width:0}
+html body .app[data-theme=claude] .cl-first{justify-content:flex-start;column-gap:7px;row-gap:4px;flex-wrap:wrap}
+html body .app[data-theme=claude] .cl-plate{font:600 calc(17.75px * var(--list-scale,1))/20px var(--cl-mono);letter-spacing:-.1px;color:#111827;white-space:nowrap}
+html body .app[data-theme=claude] .cl-tags{margin-left:0;display:flex;align-items:center;gap:5px;max-width:100%}
+html body .app[data-theme=claude] .cl-badge{display:inline-flex;align-items:center;justify-content:center;min-height:21px;box-sizing:border-box;font-size:11.5px;line-height:15px;font-style:normal;font-weight:800;background:#f2e2f4;color:#793d77;border:0;border-radius:6px;padding:3px 7px;white-space:nowrap}
+html body .app[data-theme=claude] .cl-badge.ap{background:#dce8fb;color:#254e87}
+html body .app[data-theme=claude] .cl-badge.web{background:#fce3ed;color:#993752}
+html body .app[data-theme=claude] .cl-badge.ag{background:#f0dff1;color:#8e4784}
+html body .app[data-theme=claude] .cl-cover{font-size:11px;font-weight:700;border:1px solid #111827;border-radius:6px;padding:2px 5px;line-height:13px;color:#111827;white-space:nowrap}
+html body .app[data-theme=claude] .cl-person{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:center;gap:6px}
+html body .app[data-theme=claude] .cl-name{flex:1;min-width:0;white-space:nowrap;font-size:calc(15.25px * var(--list-scale,1));font-weight:700;color:#111827;overflow:hidden;text-overflow:ellipsis}
+html body .app[data-theme=claude] .cl-meta{display:flex;gap:9px;align-items:center;color:#0e7665;font-size:11px;font-weight:800}
+html body .app[data-theme=claude] .cl-meta>span{display:flex;gap:4px;align-items:center;white-space:nowrap}
+html body .app[data-theme=claude] .cl-meta svg{flex:none}
+html body .app[data-theme=claude] .cl-chat{fill:currentColor;stroke:none}
+html body .app[data-theme=claude] .cl-people{fill:none;stroke:currentColor}
+html body .app[data-theme=claude] .cl-notes{display:flex;flex-direction:column;align-items:stretch;gap:3px;min-width:0;line-height:14px}
+html body .app[data-theme=claude] .cl-note{display:block;min-height:14px;font-size:13px;font-weight:500;color:#374151;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-align:left;align-self:stretch}
+html body .app[data-theme=claude] .cl-key{color:#374151;text-align:left}
+html body .app[data-theme=claude] .cl-bottom{justify-content:space-between;gap:5px;margin-top:0;align-items:center;min-height:22px}
+html body .app[data-theme=claude] .cl-ref{font-size:12px;font-weight:500;color:#657168;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .app[data-theme=claude] .cl-pay{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;height:22px;min-height:22px;flex:none;text-transform:uppercase;padding:0 9px;font-family:var(--cl-sans);font-size:12px;line-height:14px;font-weight:700;letter-spacing:0;border:1.4px solid #289663;background:#E6F6EC;color:#197a4c;border-radius:14px;white-space:nowrap}
+html body .app[data-theme=claude] .cl-pay.due{border-color:#b9644b;color:#8b3823}
+html body .app[data-theme=claude] .cl-ops{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:10px;color:#285e47}
+html body .app[data-theme=claude] .cl-row>.row-call-clear{position:absolute;right:5px;bottom:4px;min-width:28px;min-height:28px}
+html body .app[data-theme=claude] .cl-row.has-call-clear .cl-content{padding-bottom:30px}
+@media(prefers-reduced-motion:reduce){html body .app[data-theme=claude] *,html body .app[data-theme=claude] *::before{animation:none!important;transition:none!important}}
+@media(min-width:700px){html body .app[data-theme=claude].fixed-top .booking-list{padding-left:max(22px,calc((100% - 680px)/2));padding-right:max(22px,calc((100% - 680px)/2))}}
+
+html body .app[data-theme=claude] .cl-flight svg{transform:none}
+html body .app[data-theme=claude] .cl-flight{color:inherit;font-size:11.5px}
+html body .app[data-theme=claude] .cl-meta{flex:none;white-space:nowrap}
+html body .app[data-theme=claude] .cl-key{unicode-bidi:plaintext}
+html body .app[data-theme=claude] .cl-time>strong{font-variant-numeric:tabular-nums}
+
+html body .app[data-theme=claude] .cl-note.cl-note-ar{text-align:right}
+
+html body .app[data-theme=claude] .cl-name{letter-spacing:-.1px;line-height:18px}
+
+html body .app[data-theme=claude] .cl-flight .cl-plane{transform:rotate(45deg)}
+
+html body .app[data-theme=claude] .cl-row.in:not(.with-note){margin-bottom:10.333px}
+html body .app[data-theme=claude] .cl-first,html body .app[data-theme=claude] .cl-person{position:relative;top:-1.667px}
+html body .app[data-theme=claude] .cl-time{padding-top:0;padding-bottom:8px;gap:4px}
+html body .app[data-theme=claude].fixed-top .counter>div,html body .app[data-theme=claude].fixed-top .counter>strong{position:relative;top:-9px;left:2px}
+
+html body .app[data-theme=claude] .cl-note.cl-note-ar{direction:ltr;unicode-bidi:normal}
+
+/* Native-scale reference geometry corrections. */
+html body .app[data-theme=claude].fixed-top .topbar{background:#0a4f4c!important}
+html body .app[data-theme=claude] .cl-title>strong{font-size:24px;letter-spacing:-.6px}
+html body .app[data-theme=claude] .cl-title>small{font-size:11.5px;line-height:16px}
+html body .app[data-theme=claude] .cl-content{padding-left:15.667px;padding-right:14.667px}
+html body .app[data-theme=claude] .cl-pay{height:21px;min-height:21px;padding:0 8.5px}
+html body .app[data-theme=claude] .cl-bottom{position:relative;top:2px}
+html body .app[data-theme=claude] .cl-flight{font-size:10.5px}
+html body .app[data-theme=claude] .cl-note{font-size:14px}
+html body .app[data-theme=claude] .cl-title>strong{font-size:23.375px;letter-spacing:-.15px}
+html body .app[data-theme=claude] .cl-title>small{font-size:14px;line-height:16px}
+html body .app[data-theme=claude] .cl-tags{margin-left:auto}
+html body .app[data-theme=claude] .cl-note.cl-note-ar{direction:rtl;unicode-bidi:plaintext}
+html body .app[data-theme=claude] .cl-ref{font-size:11.875px}
+html body .app[data-theme=claude] .cl-flight{font-size:11.5px;font-weight:700;gap:2px}
+html body .app[data-theme=claude] .cl-flight .cl-plane{width:14px;height:14px;transform:rotate(45deg)}
+html body .app[data-theme=claude].fixed-top .topbar{gap:13.667px}
+html body .app[data-theme=claude] .topbar>button,html body .app[data-theme=claude] .header-actions>button{width:47.667px;min-width:47.667px;height:47.667px;min-height:47.667px;border-radius:15.667px!important}
+html body .app[data-theme=claude].fixed-top .counter>div,html body .app[data-theme=claude].fixed-top .counter>strong{top:-8.333px;left:1.667px}
+html body .app[data-theme=claude].fixed-top .counter>div>span{font-size:14px}
+html body .app[data-theme=claude].fixed-top .search-row{padding-top:17px!important}
+html body .app[data-theme=claude].fixed-top .now-button{min-width:86.667px;height:49px;min-height:49px}
+html body .app[data-theme=claude].fixed-top .search,html body .app[data-theme=claude].fixed-top .cam-search{height:49px;min-height:49px}
+html body .app[data-theme=claude] .cl-row{border-width:.333333px;margin-bottom:13px}
+html body .app[data-theme=claude].fixed-top .cl-main{min-height:99.667px;grid-template-columns:90.333px minmax(0,1fr)}
+html body .app[data-theme=claude].fixed-top .with-note .cl-main{min-height:119.667px}
+html body .app[data-theme=claude] .cl-row{margin-bottom:13.333px}
+html body .app[data-theme=claude] .cl-row:first-child{margin-bottom:12px}
+html body .app[data-theme=claude].fixed-top .cl-main{min-height:100.333px}
+html body .app[data-theme=claude].fixed-top .with-note .cl-main{min-height:120.333px}
+html body .app[data-theme=claude].fixed-top .in.with-note .cl-main{min-height:121.667px}
+html body .app[data-theme=claude].fixed-top .search input{font-size:13px}
+html body .app[data-theme=claude].fixed-top .cl-plate{transform:translate(-0.16666800000000004px,1.166666px)!important;font-size:17.875px!important;letter-spacing:-0.07500000000000001px!important}
+html body .app[data-theme=claude].fixed-top .cl-name{transform:translate(-1.0000000000287557e-06px,0.999999px)!important;font-size:15.3125px!important;letter-spacing:-0.1px!important}
+html body .app[data-theme=claude].fixed-top .cl-time>strong{transform:translate(0.166667px,0px)!important;font-size:20.5px!important;letter-spacing:0.2px!important}
+html body .app[data-theme=claude].fixed-top .cl-ref{transform:translate(0.166667px,-0.333333px)!important;font-size:11.875px!important;letter-spacing:0px!important}
+html body .app[data-theme=claude].fixed-top .cl-pay{transform:translate(1.0000000000287557e-06px,-0.5px)!important;font-size:12.25px!important;letter-spacing:0.05px!important}
+html body .app[data-theme=claude].fixed-top .cl-badge{transform:translate(-0.833333px,0.999999px)!important;font-size:11.0625px!important;letter-spacing:-0.025px!important}
+html body .app[data-theme=claude].fixed-top .cl-title>small{transform:translate(-0.16666599999999998px,-0.999999px)!important;font-size:14px!important;letter-spacing:0px!important}
+html body .app[data-theme=claude].fixed-top .cl-covered{transform:translate(1.5px,-1.5px)!important;font-size:9.0625px!important;letter-spacing:-0.07500000000000001px!important}
+html body .app[data-theme=claude].fixed-top .cl-cover{transform:translate(0.999999px,1.166666px)!important;font-size:10.8125px!important;letter-spacing:-0.17500000000000002px!important}
+html body .app[data-theme=claude].fixed-top .search-row{padding-top:18px!important;gap:9px}
+html body .app[data-theme=claude].fixed-top .now-button{min-width:88px;border-radius:20px;font-weight:700;gap:7px}
+html body .app[data-theme=claude].fixed-top .now-button>svg{width:17px;height:17px}
+html body .app[data-theme=claude].fixed-top .search{border-radius:18px;gap:9px}
+html body .app[data-theme=claude].fixed-top .search input{font-size:12.5px;font-weight:600;transform:translateY(1px)}
+html body .app[data-theme=claude].fixed-top .search input::placeholder{color:#687c72}
+html body .app[data-theme=claude].fixed-top .cam-search{width:48px;min-width:48px;flex-basis:48px}
+html body .app[data-theme=claude].fixed-top .cam-search>svg{stroke-width:2.2;transform:translate(-1px,1px)}
+html body .app[data-theme=claude] .cl-time>svg.cl-material{transform:translateY(5.167px) scale(.62)}
+html body .app[data-theme=claude].fixed-top .counter::before{background-size:20px;background-position:calc(50% + 2.5px) calc(50% + 1px)}
+/* Native iOS fonts are intentionally not overridden by downloadable fonts. */
+html body .app[data-theme=claude] :is(button,input,select,textarea){font-family:var(--cl-sans)}
+html body .app[data-theme=claude] .cl-note.cl-note-ar{font-family:var(--cl-sans)}
+html body .app[data-theme=claude] .topbar button svg{fill:none}
+html body .app[data-theme=claude] .topbar>button svg{width:22px;height:22px;transform:translate(-1px,1px)}
+html body .app[data-theme=claude] .header-actions button svg{width:22px;height:22px}
+html body .app[data-theme=claude] .cl-time>svg.cl-arrow{transform:translateY(5.167px) scale(.72);fill:none}
+html body .app[data-theme=claude] .cl-flight .cl-plane{width:11px;height:11px;transform:none;fill:currentColor;stroke-width:2.5}
+html body .app[data-theme=claude] .cl-chat{width:14px;height:14px;fill:currentColor}
+html body .app[data-theme=claude] .cl-people{fill:none}
+html body .app[data-theme=claude].fixed-top .cam-search>svg{fill:none!important;stroke:currentColor!important;stroke-width:2.5}
+html body .app[data-theme=claude].fixed-top .search>svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5}
