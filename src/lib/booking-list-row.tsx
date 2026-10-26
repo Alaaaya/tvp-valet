@@ -32,7 +32,6 @@ export function moneyState(b:Pick<Booking,'total'|'paid'>):{kind:'paid'|'due'|'n
  return due>0?{kind:'due',text:tr("Offen | ")+money(due)}:{kind:'paid',text:tr("Bezahlt | ")+money(b.paid||0)};
 }
 export interface BookingListRowProps{
- timelineHour?:string;
  b:Booking;kind:'in'|'out';time:string;completed:boolean;onOpen:(b:Booking)=>void;
  /** Compatibility slot retained for callers; separate status is deliberately not rendered. */
  live?:React.ReactNode;
