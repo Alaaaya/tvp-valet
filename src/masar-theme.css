@@ -1,0 +1,120 @@
+/* Masar: an opt-in airport day timeline. All new visual rules are root-scoped. */
+.theme-swatch.masar{background:#171a20;border-color:#f5a524}
+html body .app[data-theme=masar]{--ms-bg:#0f1115;--ms-card:#171a20;--ms-line:#262a33;--ms-ink:#f2f3f5;--ms-muted:#a8afbc;--ms-accent:#f5a524;direction:ltr;background:var(--ms-bg);color:var(--ms-ink);color-scheme:dark;font-variant-numeric:tabular-nums;accent-color:var(--ms-accent);caret-color:var(--ms-accent);scrollbar-color:#454b58 #0f1115}
+html body .app[data-theme=masar] ::selection{background:#f5a524;color:#0f1115}
+html body .app[data-theme=masar] :focus-visible{outline:2px solid #f5a524;outline-offset:3px}
+html body .app[data-theme=masar] :is(.workspace,.page,.detail){direction:ltr;background:var(--ms-bg);color:var(--ms-ink)}
+html body .app[data-theme=masar].fixed-top .topbar{background:var(--ms-bg)!important;border-bottom:1px solid var(--ms-line);height:calc(58px + env(safe-area-inset-top))!important;color:var(--ms-ink)}
+html body .app[data-theme=masar] .topbar :is(h1,h2,strong){color:var(--ms-ink);font-size:20px;letter-spacing:-.5px}
+html body .app[data-theme=masar] .topbar button{color:var(--ms-muted)}
+html body .app[data-theme=masar] .topbar::after{display:none}
+html body .app[data-theme=masar] .masar-summary{display:grid;grid-template-columns:1fr 1fr .85fr;gap:0;margin:0 16px;padding:16px 0 14px;border-bottom:1px solid var(--ms-line);background:var(--ms-bg)}
+html body .app[data-theme=masar] .masar-summary>button,html body .app[data-theme=masar] .masar-summary>div{border:0;background:transparent;color:var(--ms-ink);display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:66px;padding:0 12px;text-align:left}
+html body .app[data-theme=masar] .masar-summary>button:first-child{padding-left:0}
+html body .app[data-theme=masar] .masar-summary>div{border-left:1px solid var(--ms-line)}
+html body .app[data-theme=masar] .masar-summary>*>span{color:var(--ms-muted);font-size:12px;font-weight:600}
+html body .app[data-theme=masar] .masar-summary strong{font-size:30px;line-height:1.05;font-weight:750;display:flex;align-items:center;gap:12px}
+html body .app[data-theme=masar] .masar-summary small{display:flex;align-items:center;gap:2px;font-size:12px;color:#9fc5ac}
+html body .app[data-theme=masar] .masar-summary>div strong{color:var(--ms-accent)}
+html body .app[data-theme=masar] .masar-summary .chosen>span{color:var(--ms-accent)}
+html body .app[data-theme=masar].fixed-top .search-row{background:var(--ms-bg)!important;padding:12px 16px 4px;height:60px;gap:8px}
+html body .app[data-theme=masar].fixed-top .search{border:1px solid var(--ms-line);background:var(--ms-card);border-radius:10px;color:var(--ms-muted)}
+html body .app[data-theme=masar].fixed-top .search input{background:transparent;color:var(--ms-ink);font-size:14px}
+html body .app[data-theme=masar] input::placeholder{color:var(--ms-muted)}
+html body .app[data-theme=masar].fixed-top .cam-search,html body .app[data-theme=masar].fixed-top .now-button{background:var(--ms-card)!important;color:var(--ms-accent);border-radius:10px;border:1px solid var(--ms-line)}
+html body .app[data-theme=masar].fixed-top .cam-search svg{color:var(--ms-accent);stroke:currentColor;width:22px}
+html body .app[data-theme=masar].fixed-top .now-button:before{display:none}
+html body .app[data-theme=masar].fixed-top .date-strip{background:var(--ms-bg);color:var(--ms-ink);border:0;padding:4px 12px;height:52px}
+html body .app[data-theme=masar].fixed-top .date-strip button{color:var(--ms-muted)}
+html body .app[data-theme=masar] .date-strip svg{transform:none}
+html body .app[data-theme=masar] .date-text{font-size:14px}
+html body .app[data-theme=masar].fixed-top .booking-list{background:var(--ms-bg);padding:0 16px 24px}
+html body .app[data-theme=masar] .masar-event.blr{background:none;border:0;margin:0;overflow:visible;border-radius:0;box-shadow:none}
+html body .app[data-theme=masar] .masar-hour{display:flex;gap:14px;align-items:center;padding:16px 0 12px}
+html body .app[data-theme=masar] .masar-hour time{font-size:13px;color:var(--ms-accent);font-weight:700;width:48px}
+html body .app[data-theme=masar] .masar-hour>span{color:var(--ms-muted);font-size:11px}
+html body .app[data-theme=masar] .masar-row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;width:100%;border:0;padding:0 0 12px;background:none;color:var(--ms-ink);text-align:left;animation:masar-arrive .42s cubic-bezier(.16,1,.3,1) backwards}
+html body .app[data-theme=masar] .masar-event:nth-child(2) .masar-row{animation-delay:45ms}
+html body .app[data-theme=masar] .masar-event:nth-child(n+3) .masar-row{animation-delay:90ms}
+html body .app[data-theme=masar] .masar-rail{display:flex;position:relative;flex-direction:column;align-items:center;padding-top:20px;gap:12px;color:var(--ms-muted)}
+html body .app[data-theme=masar] .masar-rail:after{content:'';position:absolute;top:0;bottom:-12px;left:23px;width:1px;background:var(--ms-line);z-index:0}
+html body .app[data-theme=masar] .masar-rail>*{z-index:1;background:var(--ms-bg)}
+html body .app[data-theme=masar] .masar-rail time{font-size:16px;font-weight:750;color:var(--ms-ink);line-height:24px;padding:2px 0}
+html body .app[data-theme=masar] .masar-dot{width:7px;height:7px;border-radius:50%;background:#9fc5ac;box-shadow:0 0 0 5px var(--ms-bg)}
+html body .app[data-theme=masar] .out .masar-dot{background:#e7a398}
+html body .app[data-theme=masar] .masar-ticket{display:flex;flex-direction:column;gap:10px;min-width:0;padding:14px;border:1px solid var(--ms-line);border-radius:12px;background:var(--ms-card);transition:transform 160ms cubic-bezier(.16,1,.3,1),border-color 160ms}
+html body .app[data-theme=masar] .masar-row:active .masar-ticket{transform:translateY(-2px);border-color:#f5a524}
+@media(hover:hover){html body .app[data-theme=masar] .masar-row:hover .masar-ticket{transform:translateY(-2px);border-color:#6a532c}}
+html body .app[data-theme=masar] .masar-ticket-top{display:flex;justify-content:space-between;gap:8px;align-items:center;min-width:0}
+html body .app[data-theme=masar] .masar-status{color:#9fc5ac;background:#22362c;font-size:10px;font-weight:650;padding:4px 6px;border-radius:5px;display:inline-flex;align-items:center;white-space:nowrap}
+html body .app[data-theme=masar] .masar-status.out{background:#382824;color:#e7a398}
+html body .app[data-theme=masar] .masar-name{font-size:15px;font-weight:650;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .app[data-theme=masar] .masar-meta{display:flex;gap:10px;color:var(--ms-muted);font-size:11px;align-items:center}
+html body .app[data-theme=masar] .masar-meta>span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html body .app[data-theme=masar] .masar-meta svg{margin-left:auto;flex:none}
+html body .app[data-theme=masar] .masar-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--ms-line);padding-top:9px;color:var(--ms-muted);font-size:11px;gap:8px}
+html body .app[data-theme=masar] .masar-money{display:flex;gap:4px;align-items:center;color:#9fc5ac;white-space:nowrap;font-size:12px;font-weight:650}
+html body .app[data-theme=masar] .masar-money.due{color:#e7a398}
+html body .app[data-theme=masar] .masar-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+html body .app[data-theme=masar] .masar-call{font-size:11px;color:#f5a524}
+html body .app[data-theme=masar] :is(input,select,textarea){background:var(--ms-card);border-color:var(--ms-line);color:var(--ms-ink)}
+html body .app[data-theme=masar] :is(.sidebar,.soon-panel,.theme-setting,.language-setting,.list-size-setting){background:var(--ms-card);border-color:var(--ms-line);color:var(--ms-ink)}
+html body .app[data-theme=masar] .sidebar nav button{color:var(--ms-ink)}
+html body .app[data-theme=masar] .sidebar nav button.active{background:#382e1b;color:var(--ms-accent)}
+html body .app[data-theme=masar] div.bd{direction:ltr;background:var(--ms-bg)!important;color:var(--ms-ink)}
+html body .app[data-theme=masar] div.bd .bd-head{background:var(--ms-bg)!important;color:var(--ms-ink);border-bottom:1px solid var(--ms-line)}
+html body .app[data-theme=masar] div.bd .pp-strip.ext{background:#262a33!important;color:var(--ms-muted)}
+html body .app[data-theme=masar] div.bd :is(.bd-identity,.summary-cost,.summary-location,.summary-media){background:var(--ms-card)!important;border:1px solid var(--ms-line)!important;border-radius:12px;margin:12px 14px 0;padding:16px 12px!important;color:var(--ms-ink)}
+html body .app[data-theme=masar] div.bd :is(div,span,small,p,label,b,em,dt,dd,li,td,th,strong,h2,h3,h4){color:var(--ms-ink)}
+html body .app[data-theme=masar] div.bd :is(small,label,dt,.muted){color:var(--ms-muted)}
+html body .app[data-theme=masar] div.bd a{color:var(--ms-accent)}
+html body .app[data-theme=masar] div.bd .bd-identity .bd-outline{background:#22262e!important;border:1px solid #3a414e!important;color:var(--ms-ink)!important;border-radius:8px;min-height:40px;white-space:normal}
+html body .app[data-theme=masar] div.bd .split-handover{direction:ltr;gap:10px;padding:14px 14px 0;background:none!important}
+html body .app[data-theme=masar] div.bd .split-handover>section{background:var(--ms-card)!important;border:1px solid var(--ms-line);border-radius:12px;overflow:hidden;min-width:0}
+html body .app[data-theme=masar] div.bd .split-handover h3{background:#22362c!important;color:#9fc5ac!important}
+html body .app[data-theme=masar] div.bd .split-handover>.out h3{background:#382824!important;color:#e7a398!important}
+html body .app[data-theme=masar] div.bd .handover-date{background:var(--ms-card)!important}
+html body .app[data-theme=masar] div.bd .handover-date>button{background:#262a33!important;color:var(--ms-ink)!important;border-radius:8px}
+html body .app[data-theme=masar] div.bd :is(.flight-panel.in,.flight-panel.out){background:var(--ms-card)!important}
+html body .app[data-theme=masar] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a){background:#22262e!important;color:var(--ms-ink)!important;border:1px solid #3a414e!important;border-radius:8px;min-height:40px}
+html body .app[data-theme=masar] div.bd .bd-print-gefahren{padding:12px 14px 0!important;gap:10px}
+html body .app[data-theme=masar] div.bd .bd-print-gefahren>button{background:var(--ms-card)!important;color:var(--ms-ink)!important;border:1px solid #3a414e!important;border-radius:8px;min-height:44px}
+html body .app[data-theme=masar] div.bd .bd-due{background:#382824!important;color:#e7a398!important;border:0;padding:5px 9px;border-radius:5px}
+html body .app[data-theme=masar] div.bd .bd-due *{color:#e7a398!important}
+html body .app[data-theme=masar] div.bd :is(.detail-media .mg-grid>.upload,.add-comment){background:#262a33!important;color:var(--ms-ink)!important;border-radius:8px}
+html body .app[data-theme=masar] .bd-head>button:first-child svg{transform:none}
+@keyframes masar-arrive{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){html body .app[data-theme=masar] *,html body .app[data-theme=masar] *::before,html body .app[data-theme=masar] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country]{position:relative;display:inline-flex;align-items:center;box-sizing:border-box;border:1px solid #000;border-radius:3px;background:#fff;color:#000;padding:0 3px 0 15px;overflow:hidden;white-space:nowrap;letter-spacing:.2px;font-weight:800;font-family:"FE-Schrift","Saira Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;font-stretch:condensed;line-height:1;vertical-align:top}
+html body .app[data-theme=masar] .blr-plate[data-plate-country]{height:23px}
+html body .app[data-theme=masar] .bd-identity>div:nth-child(2)>strong[data-plate-country]{height:26px;padding-left:17px}
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]{background:#f7c600}
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=unknown]{padding-left:4px}
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=DE]::before,html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::before{content:"D";position:absolute;left:0;top:0;bottom:0;width:12px;background:#003399;color:#fff;font:700 5px/1 Arial,sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:1px;box-sizing:border-box;letter-spacing:0}
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::before{content:"NL"}
+html body .app[data-theme=masar] .bd-identity>div:nth-child(2)>strong[data-plate-country]::before{width:14px;font-size:6px}
+html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=DE]::after,html body .app[data-theme=masar] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)[data-plate-country=NL]::after{content:"";position:absolute;left:3px;top:1px;width:4px;height:4px;border:1px dotted #ffcc00;border-radius:50%;box-sizing:content-box}
+html body .app[data-theme=masar] .bd-identity>div:nth-child(2)>strong[data-plate-country]::after{left:4px;top:2px;width:5px;height:5px}
+html body .app[data-theme=masar] .bd-identity>div:nth-child(2)>strong[data-plate-country=unknown]{padding-left:4px}
+
+
+html body .app[data-theme=masar] .masar-ticket .blr-plate[data-plate-country]{font-size:15px;flex:none;color:#111!important;background:#fff!important;line-height:1;padding-right:5px}
+html body .app[data-theme=masar] .masar-ticket .blr-plate[data-plate-country=NL]{background:#f7c600!important}
+/* Keep inherited reference colors from leaking into the opt-in dark detail. */
+html body .app[data-theme=masar] div.bd .summary-cost>p span,html body .app[data-theme=masar] div.bd .summary-cost .bd-cost-total span,html body .app[data-theme=masar] div.bd .summary-cost .bd-due strong{color:var(--ms-ink)!important}
+html body .app[data-theme=masar] div.bd .summary-cost .bd-days{color:var(--ms-muted)!important}
+html body .app[data-theme=masar] div.bd .summary-cost>p{border-color:var(--ms-line)!important}
+html body .app[data-theme=masar] div.bd .bd-round{background:#262a33!important;border-color:#454b58!important;color:var(--ms-ink)!important}
+html body .app[data-theme=masar] div.bd .bd-round *{color:var(--ms-ink)!important;fill:currentColor}
+html body .app[data-theme=masar] div.bd .bd-identity .bd-contact{display:flex;align-items:baseline;gap:4px;min-width:0}
+html body .app[data-theme=masar] div.bd .bd-contact a{min-width:0;overflow-wrap:anywhere}
+html body .app[data-theme=masar] div.bd .bd-contact-count{flex:none;color:var(--ms-muted)!important}
+html body .app[data-theme=masar] div.bd .park-label{background:#262a33!important;color:var(--ms-muted)!important}
+html body .app[data-theme=masar] div.bd .handover-date>button{background:#382e1b!important;border-color:#6a532c!important;color:var(--ms-accent)!important}
+html body .app[data-theme=masar] div.bd .handover-date>button *{color:var(--ms-accent)!important;fill:currentColor}
+html body .app[data-theme=masar] div.bd .reference-icon{color:var(--ms-muted)!important;fill:currentColor}
+html body .app[data-theme=masar] div.bd .split-handover .fp-driver{min-height:48px!important}
+html body .app[data-theme=masar] .masar-ticket .flight-status{align-self:flex-start;background:#262a33!important;border:1px solid #454b58;color:var(--ms-muted)!important;border-radius:5px;padding:4px 6px;line-height:1.4;white-space:normal;font-size:11px}
+html body .app[data-theme=masar] .masar-hour>span{display:none}
+html body .app[data-theme=masar] .masar-hour:after{content:'';height:1px;background:var(--ms-line);flex:1}
