@@ -1,9 +1,9 @@
 import React,{useState} from 'react';
 import {useLanguage} from './i18n';
 export const THEME_KEY='tvp.theme.v1';
-export type Theme='classic'|'nana'|'zaitoun'|'layl'|'safa'|'echt'|'azraq'|'samawi'|'masar';
+export type Theme='classic'|'nana'|'zaitoun'|'layl'|'safa'|'echt'|'azraq'|'samawi'|'masar'|'claude';
 export function readTheme(storage?:Pick<Storage,'getItem'>):Theme{
-  try{const value=storage?.getItem(THEME_KEY);return value==='nana'||value==='zaitoun'||value==='layl'||value==='safa'||value==='echt'||value==='azraq'||value==='samawi'||value==='masar'?value:'classic'}catch{return 'classic'}
+  try{const value=storage?.getItem(THEME_KEY);return value==='nana'||value==='zaitoun'||value==='layl'||value==='safa'||value==='echt'||value==='azraq'||value==='samawi'||value==='masar'||value==='claude'?value:'classic'}catch{return 'classic'}
 }
 export function writeTheme(storage:Pick<Storage,'setItem'>|undefined,value:Theme){
   try{storage?.setItem(THEME_KEY,value)}catch{/* The preference still works in this session. */}
@@ -15,10 +15,10 @@ export function useTheme(){
 export function ThemeSetting({value,onChange}:{value:Theme;onChange:(value:Theme)=>void}){
   const lang=useLanguage();
   return <fieldset className="theme-setting" dir="ltr"><legend>{lang==='ar'?'التصميم':lang==='en'?'Design':'Design'}</legend>
-    <div className="theme-options">{(['classic','nana','zaitoun','layl','safa','echt','azraq','samawi','masar'] as const).map(theme=><label key={theme}>
+    <div className="theme-options">{(['classic','nana','zaitoun','layl','safa','echt','azraq','samawi','masar','claude'] as const).map(theme=><label key={theme}>
       <input type="radio" name="theme" value={theme} checked={value===theme} onChange={()=>onChange(theme)}/>
       <span className={'theme-swatch '+theme} aria-hidden="true"/>
-      <span>{theme==='classic'?'Klassisch':theme==='nana'?"Na’na":theme==='zaitoun'?'Zaitoun':theme==='layl'?'Layl':theme==='safa'?'Safa':theme==='azraq'?'Azraq':theme==='masar'?'Masar':theme==='samawi'?'Samawi':'Klassisch Echt'}{lang==='ar'?(theme==='nana'?' · نعناع':theme==='zaitoun'?' · زيتون':theme==='layl'?' · ليل':theme==='safa'?' · صفاء':theme==='azraq'?' · أزرق':theme==='masar'?' · مسار':theme==='samawi'?' · سماوي':' · كلاسيك حقيقي'):''}</span>
+      <span>{theme==='classic'?'Klassisch':theme==='nana'?"Na’na":theme==='zaitoun'?'Zaitoun':theme==='layl'?'Layl':theme==='safa'?'Safa':theme==='azraq'?'Azraq':theme==='claude'?'Claude':theme==='masar'?'Masar':theme==='samawi'?'Samawi':'Klassisch Echt'}{lang==='ar'?(theme==='claude'?'':theme==='nana'?' · نعناع':theme==='zaitoun'?' · زيتون':theme==='layl'?' · ليل':theme==='safa'?' · صفاء':theme==='azraq'?' · أزرق':theme==='masar'?' · مسار':theme==='samawi'?' · سماوي':' · كلاسيك حقيقي'):''}</span>
     </label>)}</div>
   </fieldset>;
 }
