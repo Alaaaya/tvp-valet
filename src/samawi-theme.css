@@ -1,5 +1,4 @@
-/* Opt-in Samawi sky travel skin. Scoped to [data-theme=samawi]; other themes untouched. Layout language: pill counters with progress rings, capsule search, circular time badges, squircle cards. */
-.theme-swatch.samawi{background:linear-gradient(145deg,#eef0f3 45%,#16a34a 46%,#16a34a 58%,#dc2626 59%,#dc2626 70%,#0b2a5b 71%)}
+/* Opt-in Samawi sky travel skin. Scoped to [data-theme=samawi]; other themes untouched. Layout: ring counters, capsule search, circular time badges, squircle cards. */
 html body .app[data-theme=samawi]{--sf-bg:#eef0f3;--sf-card:#fff;--sf-line:#d3d8e0;--sf-ink:#0a0a0a;--sf-mute:#4b5563;--sf-green:#16a34a;--sf-red:#dc2626;--sf-navy:#0b2a5b;--sf-shadow:0 2px 8px #0f172a1f,0 1px 2px #0f172a14;direction:ltr;color:var(--sf-ink);background:var(--sf-bg);color-scheme:light}
 html body .app[data-theme=samawi] .workspace,html body .app[data-theme=samawi] .page,html body .app[data-theme=samawi] .detail{background:var(--sf-bg);color:var(--sf-ink);direction:ltr}
 html body .app[data-theme=samawi] .topbar{background:var(--sf-bg)!important;border-bottom:0;color:var(--sf-ink)}
@@ -10,8 +9,8 @@ html body .app[data-theme=samawi].fixed-top .counters.counters{height:85px}
 html body .app[data-theme=samawi].fixed-top .counter{height:65px;border-radius:16px;padding:8px 12px;color:#fff;border:0;transition:transform .12s ease}
 html body .app[data-theme=samawi].fixed-top .counter *{color:#fff}
 html body .app[data-theme=samawi].fixed-top .counter:active{transform:scale(.97)}
-html body .app[data-theme=samawi].fixed-top .counter.incoming{background:var(--sf-green)!important;box-shadow:var(--sf-shadow)}
-html body .app[data-theme=samawi].fixed-top .counter.outgoing{background:var(--sf-red)!important;box-shadow:var(--sf-shadow)}
+html body .app[data-theme=samawi].fixed-top .counter.incoming{box-shadow:var(--sf-shadow)}
+html body .app[data-theme=samawi].fixed-top .counter.outgoing{box-shadow:var(--sf-shadow)}
 html body .app[data-theme=samawi].fixed-top .counter strong{font-size:26px;font-weight:800}
 html body .app[data-theme=samawi].fixed-top .search-row{background:#fff!important;border:1px solid var(--sf-line);margin:0 12px 8px;padding:5px 6px;height:54px;border-radius:16px;box-shadow:var(--sf-shadow)}
 html body .app[data-theme=samawi].fixed-top .search,html body .app[data-theme=samawi].fixed-top .cam-search,html body .app[data-theme=samawi].fixed-top .time-trigger{border-radius:12px;color:var(--sf-ink);background:transparent!important}
@@ -78,107 +77,6 @@ html body .app[data-theme=samawi] div.bd .bd-identity .bd-outline,html body .app
 html body .app[data-theme=samawi] div.bd .bd-identity a{color:#1d4ed8}
 html body .app[data-theme=samawi] div.bd .bd-identity,html body .app[data-theme=samawi] div.bd .summary-cost{overflow-wrap:anywhere}
 html body .app[data-theme=samawi] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a){background:#fff!important;color:var(--sf-ink)!important;border:1px solid #9ca3af!important}
-html body .app[data-theme=samawi] div.bd :is(.op-btn,.fp-driver,.fp-actions button,.fp-actions a) *{color:inherit!important}
-html body .app[data-theme=samawi] div.bd .flight-panel.in .fp-actions .op-btn:first-child{border-color:var(--sf-green)!important}
-html body .app[data-theme=samawi] div.bd .bd-identity :is(a,span,div){overflow-wrap:anywhere;word-break:break-word}
-html body .app[data-theme=samawi] div.bd :is(.summary-cost,.bd-identity) svg{color:var(--sf-mute)}
-
-/* contrast pass 2 */
-html body .app[data-theme=samawi].fixed-top .blr-time *,html body .app[data-theme=samawi].fixed-top .blr-tf{color:#fff!important;fill:currentColor;opacity:1}
-html body .app[data-theme=samawi].fixed-top .blr-time svg *{fill:none}
-html body .app[data-theme=samawi].fixed-top .blr{border:1px solid #b8c0cc}
-html body .app[data-theme=samawi] div.bd .flight-panel svg{color:#0a0a0a!important}
-html body .app[data-theme=samawi] div.bd .flight-panel :is(.op-btn,.fp-driver,.fp-actions button) svg{color:inherit!important}
-html body .app[data-theme=samawi] div.bd :is(small,label,dt,.muted,.pp-strip *){color:#374151!important}
-html body .app[data-theme=samawi] div.bd .bd-head :is(span,strong,small){color:var(--sf-ink)!important}
-html body .app[data-theme=samawi] div.bd .split-handover h3 *{color:#fff!important}
-html body .app[data-theme=samawi] div.bd :is(.fp-actions button,.fp-driver) {font-weight:700}
-
-/* reference shape pass: capsules, rounded time box, 18px cards */
-html body .app[data-theme=samawi].fixed-top .counter{border-radius:999px;padding:8px 18px}
-html body .app[data-theme=samawi].fixed-top .search-row{border-radius:999px;padding:5px 10px;margin:0 12px 12px}
-html body .app[data-theme=samawi].fixed-top .blr{border-radius:18px;margin-bottom:12px}
-html body .app[data-theme=samawi].fixed-top .blr-main{padding:10px 12px 10px 10px;gap:12px;grid-template-columns:calc(62px * var(--list-scale)) minmax(0,1fr) auto}
-html body .app[data-theme=samawi].fixed-top .blr-time,html body .app[data-theme=samawi].fixed-top .blr.done .blr-time{border-radius:16px;min-height:0;height:calc(62px * var(--list-scale));align-self:center;padding:4px 2px}
-html body .app[data-theme=samawi].fixed-top .blr-plate{border-radius:999px;padding:2px 11px}
-html body .app[data-theme=samawi].fixed-top .blr-side{justify-content:center;align-items:flex-end;gap:6px}
-html body .app[data-theme=samawi].fixed-top .blr-pay{border-radius:999px;padding:5px 12px}
-
-/* EU plate (decorative) */
-html body .app[data-theme=samawi] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong){position:relative;display:inline-flex;align-items:center;box-sizing:border-box;background:#fff!important;color:#000!important;border:1.5px solid #000!important;border-radius:6px!important;padding:1px 8px 1px 28px!important;font-family:"FE-Schrift","Saira Condensed","Arial Narrow","Roboto Condensed",Impact,sans-serif;font-weight:700;font-stretch:condensed;letter-spacing:.5px;white-space:nowrap;overflow:hidden;max-width:none;min-height:22px;line-height:20px}
-html body .app[data-theme=samawi] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::before{content:"D";position:absolute;left:0;top:0;bottom:0;width:21px;flex:0 0 auto;background:#003399;color:#fff;font:700 8px/1 Arial,sans-serif;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;box-sizing:border-box}
-html body .app[data-theme=samawi] :is(.blr-plate,.bd-identity>div:nth-child(2)>strong)::after{content:"";position:absolute;left:5px;top:3px;width:9px;height:9px;border:1.5px dotted #ffcc00;border-radius:50%}
-html body .app[data-theme=samawi].fixed-top .blr[data-checked-in=true] .blr-plate{background:#fff!important;color:#000!important;border-color:#000!important}
-
-
-/* detail plate specificity + icon contrast */
-html body .app[data-theme=samawi] div.bd .bd-identity>div:nth-child(2)>strong{background:#fff!important;color:#000!important;border:1.5px solid #000!important;border-radius:6px!important;padding:1px 8px 1px 28px!important}
-html body .app[data-theme=samawi] div.bd .split-handover :is(h3,.handover-date>button) :is(svg,svg *){color:#fff!important;stroke:#fff!important}
-html body .app[data-theme=samawi] div.bd .flight-panel>:not(.fp-actions) :is(svg,svg *){color:#0a0a0a!important;stroke:#0a0a0a!important;fill:#0a0a0a!important;opacity:1!important}
-html body .app[data-theme=samawi] div.bd .flight-panel .fp-actions :is(svg,svg *){color:inherit!important}
-html body .app[data-theme=samawi] div.bd .flight-panel.in .fp-actions .op-btn:first-child :is(svg,svg *){color:#16a34a!important}
-
-/* ===== Azraq layout overrides: cobalt gradient header, glass tiles, icy sheet, divider rows ===== */
-.theme-swatch.samawi{background:linear-gradient(160deg,#05236b 0 40%,#d9e8fd 41% 100%)}
-html body .app[data-theme=samawi]{--sf-bg:#d9e8fd;--sf-card:#e6f0ff;--sf-line:#b8d5fa;--sf-ink:#0a2a66;--sf-mute:#35568f;--sf-green:#22c55e;--sf-red:#f87171;--sf-navy:#0b3c9c;--sf-shadow:none;background:linear-gradient(180deg,#05236b 0,#0d3a9d 190px,#1652c5 260px)}
-html body .app[data-theme=samawi] .workspace,html body .app[data-theme=samawi] .page{background:transparent}
-html body .app[data-theme=samawi] .topbar{background:transparent!important}
-html body .app[data-theme=samawi] .topbar :is(h1,h2,strong,span,svg){color:#fff;font-weight:800}
-html body .app[data-theme=samawi].fixed-top .topbar::after{background:transparent!important}
-html body .app[data-theme=samawi].fixed-top .counters{background:transparent!important;padding:6px 14px 18px;gap:12px}
-html body .app[data-theme=samawi].fixed-top .counter{border-radius:16px;height:65px;background:rgba(255,255,255,.12)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),0 0 18px rgba(120,170,255,.18);padding:8px 16px;position:relative;border:0}
-html body .app[data-theme=samawi].fixed-top .counter.incoming,html body .app[data-theme=samawi].fixed-top .counter.outgoing{background:rgba(255,255,255,.12)!important}
-html body .app[data-theme=samawi].fixed-top .counter::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:#34c759;margin-right:8px;flex:none}
-html body .app[data-theme=samawi].fixed-top .counter.outgoing::before{background:#ff5b5b}
-html body .app[data-theme=samawi].fixed-top .counter,html body .app[data-theme=samawi].fixed-top .counter *{color:#fff!important}
-html body .app[data-theme=samawi].fixed-top .counter strong{font-size:28px;font-weight:800}
-html body .app[data-theme=samawi].fixed-top .date-strip{background:transparent;color:#a6c2f7}
-html body .app[data-theme=samawi].fixed-top .date-strip :is(span,strong,svg,button){color:#fff}
-html body .app[data-theme=samawi].fixed-top .search-row{background:#bdd7fb!important;border:0;box-shadow:none;border-radius:20px;margin:0 14px 8px;height:48px}
-html body .app[data-theme=samawi].fixed-top .search-row :is(input,span,svg,button){color:#0b47a4!important;background:transparent!important}
-html body .app[data-theme=samawi].fixed-top .search-row input::placeholder{color:#0b47a4}
-html body .app[data-theme=samawi].fixed-top .booking-list{background:#d9e8fd;border-radius:30px 30px 0 0;margin-top:-4px;padding:14px 14px max(12px,env(safe-area-inset-bottom));box-shadow:0 -6px 22px rgba(5,35,107,.25)}
-html body .app[data-theme=samawi].fixed-top .blr{background:transparent;border:0;border-bottom:1px solid #b8d5fa;border-radius:0;margin:0;box-shadow:none;animation:samawi-in .3s ease backwards}
-html body .app[data-theme=samawi].fixed-top .blr:nth-child(odd){background:rgba(234,241,255,.7)}
-html body .app[data-theme=samawi].fixed-top .blr-main{grid-template-columns:auto calc(64px * var(--list-scale)) minmax(0,1fr) auto;padding:8px 4px;min-height:calc(76px * var(--list-scale));height:auto;max-height:none;gap:10px}
-html body .app[data-theme=samawi].fixed-top .blr-main::before{content:"";width:4px;height:28px;border-radius:2px;background:#22c55e;align-self:center;order:-1}
-html body .app[data-theme=samawi].fixed-top .blr.out .blr-main::before{background:#f87171}
-html body .app[data-theme=samawi].fixed-top .blr-time,html body .app[data-theme=samawi].fixed-top .blr.done .blr-time,html body .app[data-theme=samawi].fixed-top .blr.out .blr-time{background:transparent!important;border-radius:0;height:auto;padding:0}
-html body .app[data-theme=samawi].fixed-top .blr-time strong,html body .app[data-theme=samawi].fixed-top .blr-time *,html body .app[data-theme=samawi].fixed-top .blr-tf{color:#0a3e92!important;stroke:#0a3e92!important}
-html body .app[data-theme=samawi].fixed-top .blr-time strong{font-size:calc(17px * var(--list-scale));font-weight:800}
-html body .app[data-theme=samawi].fixed-top .blr-name{color:#0f3879;font-weight:600}
-html body .app[data-theme=samawi].fixed-top .blr-pay{background:transparent!important;color:#0b57d0!important;font-size:18px;padding:0;border:0}
-html body .app[data-theme=samawi].fixed-top .blr-cover{background:#fff;color:#0a2a66;border-color:#93b4ea}
-html body .app[data-theme=samawi] div.bd .bd-head{background:linear-gradient(180deg,#05236b,#0d3a9d)!important;border:0}
-html body .app[data-theme=samawi] div.bd .bd-head :is(span,strong,small,h2,svg){color:#fff!important}
-html body .app[data-theme=samawi] div.bd :is(.bd-identity,.summary-cost,.summary-location,.summary-media),html body .app[data-theme=samawi] div.bd .split-handover>section,html body .app[data-theme=samawi] div.bd .handover-date{background:#eaf1ff!important;border-color:#b8d5fa!important}
-html body .app[data-theme=samawi] div.bd .split-handover h3{background:#0d3a9d!important}
-html body .app[data-theme=samawi] div.bd .split-handover h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:#34c759;margin-right:6px}
-html body .app[data-theme=samawi] div.bd .split-handover>.out h3::before{background:#ff5b5b}
-html body .app[data-theme=samawi] div.bd .split-handover>.out h3{background:#0d3a9d!important}
-html body .app[data-theme=samawi] div.bd .handover-date>button,html body .app[data-theme=samawi] div.bd .split-handover>.out .handover-date>button{background:#0b57d0!important}
-@keyframes samawi-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){html body .app[data-theme=samawi] *{animation:none!important}}
-
-html body .app[data-theme=samawi].fixed-top .counters{display:flex}
-html body .app[data-theme=samawi].fixed-top .counter{flex:1 1 0;min-width:0;padding:8px 12px}
-html body .app[data-theme=samawi].fixed-top .search-row .time-trigger,html body .app[data-theme=samawi].fixed-top .search-row .time-trigger *{background:#0b57d0!important;color:#fff!important;border-radius:14px}
-html body .app[data-theme=samawi].fixed-top .search-row .time-trigger svg *{background:transparent!important;stroke:#fff!important}
-html body .app[data-theme=samawi].fixed-top .blr-time small,html body .app[data-theme=samawi].fixed-top .blr-time em{color:#35568f!important}
-
-html body .app.fixed-top[data-theme=samawi] .topbar,html body .app[data-theme=samawi] .topbar{background:linear-gradient(180deg,#05236b,#0a2f85)!important;box-shadow:none}
-html body .app[data-theme=samawi] .workspace .date-strip .today-btn,html body .app[data-theme=samawi] .workspace .cam-search{background:#0b57d0!important;color:#fff!important;border-radius:14px}
-html body .app[data-theme=samawi] .workspace .date-strip .today-btn *,html body .app[data-theme=samawi] .workspace .cam-search *{color:#fff!important}
-html body .app[data-theme=samawi] .workspace .date-strip button{color:#0a3e92}
-
-html body .app[data-theme=samawi].fixed-top .search-row button,html body .app[data-theme=samawi].fixed-top .search-row button *{background:#0b57d0!important;color:#fff!important;border-radius:14px}
-html body .app[data-theme=samawi].fixed-top .search-row button svg *{background:transparent!important;stroke:#fff}
-
-html body .app[data-theme=samawi].fixed-top .blr .blr-time :is(.blr-ico,.blr-tf,span,svg,svg *,small){color:#35568f!important;stroke:#35568f!important;fill:none!important}
-html body .app[data-theme=samawi].fixed-top .blr .blr-time strong{color:#0a3e92!important}
-html body .app[data-theme=samawi] div.bd .bd-head .bd-round{background:#0b57d0!important}
-html body .app[data-theme=samawi] div.bd .bd-head .bd-round svg *{stroke:#fff!important}
-
 /* Samawi sky palette and distinct layout language */
 .theme-swatch.samawi{background:radial-gradient(circle at 30% 35%,#fff 0 14%,#0000 15%),linear-gradient(160deg,#b2e2f8,#a0d7f5 60%,#1e8ce6)}
 html body .app[data-theme=samawi]{--sf-bg:#b2e2f8;--sf-card:#e9f6fd;--sf-line:#8cc5e6;--sf-ink:#0d3d6c;--sf-mute:#2f5f86;--sf-green:#1f9e6a;--sf-red:#d93a45;--sf-navy:#0e5b9e;--sf-blue:#1e8ce6;--sf-shadow:0 8px 20px #0d3d6c26,0 1px 3px #0d3d6c1f;background:linear-gradient(180deg,#b9e5f9,#9fd5f3 60%,#b2e2f8);}
@@ -221,4 +119,38 @@ html body .app[data-theme=samawi] .soon-panel,html body .app[data-theme=samawi] 
 html body .app[data-theme=samawi] input,html body .app[data-theme=samawi] select,html body .app[data-theme=samawi] textarea{border-color:#8cc5e6}
 html body .app[data-theme=samawi] div.bd .bd-identity a,html body .app[data-theme=samawi] div.bd a{color:#0e5b9e}
 html body .app[data-theme=samawi].fixed-top .blr-comment{color:#0e5b9e}
+
+
+/* Samawi contrast and control overrides */
+html body .app[data-theme=samawi].fixed-top .counters .counter.incoming,html body .app[data-theme=samawi].fixed-top .counters .counter.outgoing{background:#e9f6fd!important}
+html body .app[data-theme=samawi].fixed-top .search-row .now-button,html body .app[data-theme=samawi].fixed-top .search-row .now-button *{background:#d3ebf9!important;color:#0d3d6c!important}
+html body .app[data-theme=samawi].fixed-top .blr-time svg,html body .app[data-theme=samawi].fixed-top .blr-time svg *{color:#fff!important;stroke:#fff!important;opacity:1}
+html body .app[data-theme=samawi] div.bd .flight-panel :is(svg,svg *){color:#0d3d6c!important;stroke:#0d3d6c!important}
+html body .app[data-theme=samawi] div.bd .op-btn svg *{stroke:#0d3d6c!important}
+html body .app[data-theme=samawi] .topbar :is(h1,h2,strong,span,svg){color:#0d3d6c}
+html body .app[data-theme=samawi] .date-strip :is(span,strong,svg,button){color:#0d3d6c}
+html body .app[data-theme=samawi].fixed-top .counter,html body .app[data-theme=samawi].fixed-top .counter *{color:#0d3d6c!important}
+html body .app[data-theme=samawi].fixed-top .counter strong,html body .app[data-theme=samawi].fixed-top .counter strong small{font-size:12px}
+html body .app[data-theme=samawi].fixed-top .blr-time,html body .app[data-theme=samawi].fixed-top .blr-time *{color:#fff!important}
+html body .app[data-theme=samawi].fixed-top .blr-time strong{font-size:calc(15px * var(--list-scale))}
+html body .app[data-theme=samawi].fixed-top .blr-plate{color:#fff!important}
+html body .app[data-theme=samawi].fixed-top .blr-pay,html body .app[data-theme=samawi].fixed-top .blr-pay *{color:#fff!important}
+html body .app[data-theme=samawi].fixed-top .blr-pay{font-size:calc(13px * var(--list-scale))}
+html body .app[data-theme=samawi] .workspace .date-strip .today-btn,html body .app[data-theme=samawi] .workspace .cam-search{background:#1e8ce6!important;color:#fff!important;border-radius:999px}
+html body .app[data-theme=samawi] .workspace .cam-search svg *,html body .app[data-theme=samawi] .workspace .date-strip .today-btn *{color:#fff!important;stroke:#fff}
+html body .app[data-theme=samawi].fixed-top .search-row .now-button{background:#d3ebf9!important;color:#0d3d6c!important;border-radius:999px}
+html body .app[data-theme=samawi] div.bd .bd-head :is(span,strong,small,h2,svg){color:#0d3d6c!important}
+html body .app[data-theme=samawi] div.bd .split-handover h3,html body .app[data-theme=samawi] div.bd .split-handover h3 *,html body .app[data-theme=samawi] div.bd .handover-date>button *,html body .app[data-theme=samawi] div.bd .bd-identity>div:nth-child(2)>strong,html body .app[data-theme=samawi] div.bd .bd-due *{color:#fff!important}
+html body .app[data-theme=samawi] div.bd .bd-identity>div:nth-child(2)>strong{overflow-wrap:anywhere}
+html body .app[data-theme=samawi] div.bd :is(.bd-identity,.summary-cost) :is(a,span,div,strong){overflow-wrap:anywhere;min-width:0}
+html body .app[data-theme=samawi] div.bd .summary-cost{margin-bottom:max(14px,env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){html body .app[data-theme=samawi] *{animation:none!important;transition:none!important}}
+
+/* Samawi: pseudo-element buttons and header text */
+html body .app[data-theme=samawi].fixed-top .now-button:before{background:#d3ebf9;border-radius:999px;inset:4px 0}
+html body .app[data-theme=samawi].fixed-top .now-button,html body .app[data-theme=samawi].fixed-top .now-button *{color:#0d3d6c!important;background:transparent!important}
+html body .app[data-theme=samawi].fixed-top .now-button svg.fa,html body .app[data-theme=samawi].fixed-top .now-button svg.fa *{fill:#0d3d6c!important}
+html body .app[data-theme=samawi] div.bd .bd-head *{color:#0d3d6c!important}
+html body .app[data-theme=samawi] div.bd .bd-head svg *{stroke:#0d3d6c!important}
+html body .app[data-theme=samawi].fixed-top .search svg,html body .app[data-theme=samawi].fixed-top .search svg *{color:#2b87bd!important;fill:#2b87bd!important}
+html body .app[data-theme=samawi].fixed-top .search input{background:transparent!important;color:#0d3d6c}
