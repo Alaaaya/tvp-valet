@@ -9,7 +9,7 @@ import {useEdgeBackBlock} from './use-edge-back';
 export function BookingPrintDialog({booking,onClose}:{booking:Booking;onClose:()=>void}){
  const[format,setFormat]=useState<'normal'|'short'>('normal');
  const[busy,setBusy]=useState(false),[error,setError]=useState(''),[ready,setReady]=useState<File|null>(null);
- const identity=JSON.stringify([format,booking]),current=useRef(identity),alive=useRef(true),locked=useRef(false);
+ const identity=JSON.stringify([format,booking]),current=useRef(identity),alive=useRef(true),locked=useRef(false),closed=useRef(false);
  const root=useRef<HTMLElement>(null);
  current.current=identity;
  useEdgeBackBlock(true,100);
@@ -20,12 +20,12 @@ export function BookingPrintDialog({booking,onClose}:{booking:Booking;onClose:()
   root.current?.focus();
   return()=>{previous?.isConnected&&previous.focus()};
  },[]);
- const close=()=>{if(!locked.current)onClose()};
+ const close=()=>{closed.current=true;onClose()};
  const print=async()=>{
-  if(locked.current||error)return;
+  if(locked.current)return;
   locked.current=true;setBusy(true);setError('');
   const selection=identity,items=[{b:booking}],date=day(booking.arrival_at);
-  const fresh=()=>alive.current&&current.current===selection;
+  const fresh=()=>alive.current&&!closed.current&&current.current===selection;
   try{
    let file=ready;
    if(!file){
@@ -35,7 +35,7 @@ export function BookingPrintDialog({booking,onClose}:{booking:Booking;onClose:()
    if(!fresh())return;
    const outcome=await deliverPdf(file);
    if(!fresh())return;
-   if(outcome==='needs-tap')setReady(file);else onClose();
+   if(outcome==='needs-tap')setReady(file);else close();
   }catch(e){if(fresh())setError(tr("PDF konnte nicht erstellt werden")+(e instanceof Error?': '+e.message:''))}
   finally{locked.current=false;if(alive.current)setBusy(false)}
  };
@@ -54,7 +54,7 @@ export function BookingPrintDialog({booking,onClose}:{booking:Booking;onClose:()
     {(['normal','short'] as const).map(k=><label key={k}><input type="radio" name="print-format" value={k} checked={format===k} onChange={()=>setFormat(k)}/>{k==='normal'?tr("Normal"):tr("Kurz")}</label>)}
    </fieldset>
    {error&&<p className="error" role="alert">{error}</p>}
-   <div className="day-print-actions"><button disabled={busy} onClick={close}>{tr("Abbrechen")}</button><button className="primary" aria-busy={busy} disabled={busy||!!error} onClick={()=>void print()}>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):tr("Drucken")}</button></div>
+   <div className="day-print-actions"><button onClick={close}>{tr("Abbrechen")}</button><button className="primary" aria-busy={busy} disabled={busy} onClick={()=>void print()}>{busy?tr("PDF wird erstellt …"):ready?tr("PDF öffnen"):tr("Drucken")}</button></div>
   </section>
  </div>,document.body);
 }

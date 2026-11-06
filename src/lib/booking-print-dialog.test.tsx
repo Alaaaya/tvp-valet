@@ -38,3 +38,15 @@ it('drops stale result after booking change',async()=>{
  await act(async()=>root.render(<BookingPrintDialog booking={b({id:'y'})} onClose={()=>{}}/>));
  await act(async()=>res(new File(['P'],'s.pdf')));expect(mocks.deliver).not.toHaveBeenCalled();
 });
+it('Escape/backdrop while busy closes and the pending PDF is never delivered',async()=>{
+ let res!:(f:File)=>void;mocks.pdf.mockReturnValue(new Promise<File>(r=>res=r));const close=vi.fn();
+ await act(async()=>root.render(<BookingPrintDialog booking={b()} onClose={close}/>));await act(async()=>go().click());
+ await act(async()=>{document.querySelector('section')!.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))});
+ expect(close).toHaveBeenCalledOnce();await act(async()=>res(new File(['P'],'s.pdf')));expect(mocks.deliver).not.toHaveBeenCalled();
+});
+it('error allows retry without changing format',async()=>{
+ mocks.pdf.mockRejectedValueOnce(new Error('boom'));
+ await act(async()=>root.render(<BookingPrintDialog booking={b()} onClose={()=>{}}/>));await act(async()=>go().click());
+ expect(document.querySelector('[role=alert]')).not.toBeNull();expect(go().disabled).toBe(false);
+ await act(async()=>go().click());expect(mocks.deliver).toHaveBeenCalledOnce();
+});
