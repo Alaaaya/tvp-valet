@@ -1,7 +1,7 @@
 import {plateKind} from './plate-country';
 import {t as tr,getLanguage} from './i18n';
 import {useHold,PickupMenuButton} from './pickup-undo-view';
-import React,{useState} from 'react';
+import React,{useEffect,useState} from 'react';
 import {Printer} from 'lucide-react';
 import {BookingPrintDialog} from './booking-print-dialog';
 import {GefahrenButton} from './gefahren-picker';
@@ -102,6 +102,7 @@ const dateLong=(v:string)=>new Date(v).toLocaleDateString(getLanguage()==='ar'?'
 
 export function BookingDetailView(p:BookingDetailViewProps){
   const[printOpen,setPrintOpen]=useState<string|null>(null);
+  useEffect(()=>{setPrintOpen(null)},[p.booking.id,p.gefahrenAccount]);
   const b=p.booking,o=p.ops,due=Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100,c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
   const hold=useHold({onHold:()=>p.onPickupUndo?.(),enabled:!!p.onPickupUndo});
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
