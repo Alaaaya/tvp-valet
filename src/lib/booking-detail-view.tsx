@@ -2,7 +2,8 @@ import {plateKind} from './plate-country';
 import {t as tr,getLanguage} from './i18n';
 import {useHold,PickupMenuButton} from './pickup-undo-view';
 import React,{useState} from 'react';
-import {PrintSheetsButton} from './print-sheets-button';
+import {Printer} from 'lucide-react';
+import {BookingPrintDialog} from './booking-print-dialog';
 import {GefahrenButton} from './gefahren-picker';
 import {day} from '../model';
 import {ReferenceIcon} from './reference-icon';
@@ -100,7 +101,7 @@ export function detailMoney(n:number){
 const dateLong=(v:string)=>new Date(v).toLocaleDateString(getLanguage()==='ar'?'ar-EG':getLanguage()==='de'?'de-DE':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Europe/Berlin'}).replace(',','');
 
 export function BookingDetailView(p:BookingDetailViewProps){
-  const[printError,setPrintError]=useState('');
+  const[printOpen,setPrintOpen]=useState<string|null>(null);
   const b=p.booking,o=p.ops,due=Math.max(0,Math.round(b.total*100)-Math.round(b.paid*100))/100,c=displayComment(b.comment,true),pn=paymentInstruction(b),info=serviceInfo(b,c.location);
   const hold=useHold({onHold:()=>p.onPickupUndo?.(),enabled:!!p.onPickupUndo});
   const act=(a:BookingOperationAction,label:string,at:string|null|undefined,cls:string)=>{
@@ -142,7 +143,7 @@ export function BookingDetailView(p:BookingDetailViewProps){
       {p.opsLoadErr&&!p.demo&&<small role="status">{tr("Ablauf konnte nicht geladen werden:")}{p.opsLoadErr}</small>}
       {p.demo&&<small>{tr("Demo, nur lokal")}</small>}</section>
     {p.undoSlot}
-    <div className="bd-print bd-print-gefahren"><GefahrenButton key={(p.gefahrenAccount??'')+':'+b.id} value={b.gefahren??null} disabled={!p.known||!!p.busy||!!p.demo||!p.onGefahren} onSave={p.onGefahren}/><PrintSheetsButton items={[{b}]} date={day(b.arrival_at)} detail onDone={()=>setPrintError('')} onError={setPrintError}/>{printError&&<p role="alert" className="error">{printError}</p>}</div>
+    <div className="bd-print bd-print-gefahren"><GefahrenButton key={(p.gefahrenAccount??'')+':'+b.id} value={b.gefahren??null} disabled={!p.known||!!p.busy||!!p.demo||!p.onGefahren} onSave={p.onGefahren}/><button type="button" className="bd-outline" onClick={()=>setPrintOpen(b.id)}><Printer size={16}/><span>{tr("Drucken")}</span></button>{printOpen===b.id&&<BookingPrintDialog key={(p.gefahrenAccount??'')+':'+b.id} booking={b} onClose={()=>setPrintOpen(null)}/>}</div>
     <section className="summary-cost"><h3><ReferenceIcon name="calculator" size={14}/>{tr("Cost overview")}</h3>
       <p><span>{getLanguage()==='ar'?tr("Parking ("):"Parken ("}{p.productLabel||b.product||b.platform}{")"}<small className="bd-days"> · {parkingDays(b)} {tr("days")}</small></span><span>{detailMoney(b.total)}</span></p>
       <p className="bd-cost-total"><span>{tr("Total amount")}</span><span>{detailMoney(b.total)}</span></p>
