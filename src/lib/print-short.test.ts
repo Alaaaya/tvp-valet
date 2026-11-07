@@ -3,16 +3,16 @@ import fs from 'node:fs';
 import {PDFDocument} from 'pdf-lib';
 import {blank,utc,type Booking} from '../model';
 import {buildShortPdf,shortSheet,SHORT_PAGE} from './print-short';
-const row=(patch:Partial<Booking>={}):Booking=>({...blank(),id:'a',code:'NOT-A-SHEET-NUMBER',external_id:'NEVER-NUMBER',spot:'17',plate:'d-ä 12',customer_name:'Kaplan Hüseyin',arrival_at:'2026-10-18T02:20Z',departure_at:'2026-10-23T22:25Z',flight_out:'EW9547',...patch});
+const row=(patch:Partial<Booking>={}):Booking=>({...blank(),id:'a',code:'NOT-A-SHEET-NUMBER',external_id:'NEVER-NUMBER',spot:'17',plate:'d-ä 12',customer_name:'Kaplan Hüseyin',arrival_at:'2026-10-18T02:20Z',departure_at:'2026-10-23T22:25Z',flight_out:'EW9547',phone:'+49 170 1234567',...patch});
 it('uses the actual numeric Parkplatzcode, never a selection index or booking identifier',()=>{
  expect(shortSheet(row()).number).toBe('17');
  for(const spot of ['',null,'QA-FEATURE-ONLY','A12']as any[])expect(shortSheet(row({spot})).number).toBe('');
  expect(shortSheet(row({spot:'004'})).number).toBe('004');
 });
 it('uses scheduled Berlin stamps, return flight, real name and omits fake or missing plates',()=>{
- expect(shortSheet(row())).toEqual({number:'17',plate:'D-Ä 12',arrivalDate:'18.10',arrivalTime:'04:20',returnDate:'24.10',returnTime:'00:25',flight:'EW9547',name:'Kaplan Hüseyin'});
+ expect(shortSheet(row())).toEqual({number:'17',plate:'D-Ä 12',arrivalDate:'18.10',arrivalTime:'04:20',returnDate:'24.10',returnTime:'00:25',phone:'+49 170 1234567',name:'Kaplan Hüseyin'});
  for(const plate of ['',null,' aa-test-bb ']as any[])expect(shortSheet(row({plate})).plate).toBe('');
- expect(shortSheet(row({customer_name:'',first_name:'Aya',last_name:'Müller',flight_in:'WRONG',flight_out:''}))).toMatchObject({name:'Aya Müller',flight:''});
+ expect(shortSheet(row({customer_name:'',first_name:'Aya',last_name:'Müller',flight_in:'WRONG',flight_out:''}))).toMatchObject({name:'Aya Müller',phone:'+49 170 1234567'});expect(shortSheet(row({phone:null as never})).phone).toBe('');expect(shortSheet(row({phone:''})).phone).toBe('');
 });
 it('two real bookings per A4, odd final half blank, deduplication and no data mutations',async()=>{
  for(const n of [1,2,3,4,5]){
@@ -49,4 +49,14 @@ it('prints Arabic-only, mixed, emoji, NFC and long mixed fields without mutating
    const doc=await buildShortPdf(items,fonts);expect((await doc.save()).length).toBeGreaterThan(1000);
   }expect(JSON.stringify(items)).toBe(before);
  }
+});
+
+it('draws one #d00 3pt underline per sheet under the return block, no ellipse',async()=>{
+ const doc=await buildShortPdf([{b:row()},{b:row({id:'b',phone:null as never})}]);
+  const {PDFDocument,PDFRawStream,decodePDFRawStream}=await import('pdf-lib');
+ const re=await PDFDocument.load(await doc.save());let txt='';
+ for(const [,o] of re.context.enumerateIndirectObjects())if(o instanceof PDFRawStream)txt+=Buffer.from(decodePDFRawStream(o).decode()).toString('latin1');
+ expect((txt.match(/0\.8667 0 0 RG/g)||[]).length).toBe(2);
+ expect(txt).toContain('3 w');
+ expect(txt).not.toMatch(/ c\n.* c\n.* c\n.* c\n/);
 });

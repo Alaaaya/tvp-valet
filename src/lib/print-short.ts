@@ -5,7 +5,7 @@ import type {Booking} from '../model';
 import {COMPANY,sheetStamp} from './print-sheets-data';
 import {printableText} from './print-text';
 
-export type ShortSheet={number:string;plate:string;arrivalDate:string;arrivalTime:string;returnDate:string;returnTime:string;flight:string;name:string};
+export type ShortSheet={number:string;plate:string;arrivalDate:string;arrivalTime:string;returnDate:string;returnTime:string;phone:string;name:string};
 const clean=(value:string|null|undefined)=>(value||'').replace(/[\u0000-\u001f\u007f]/g,' ').trim();
 /** spot is the stored Parkplatzcode. Never substitute a booking code or this selection's index. */
 export function shortSheet(b:Booking):ShortSheet{
@@ -13,7 +13,7 @@ export function shortSheet(b:Booking):ShortSheet{
  const spot=clean(b.spot);
  return{number:/^\d+$/.test(spot)?spot:'',plate:plate==='AA-TEST-BB'?'':plate,
   arrivalDate:(arrival[0]||'').slice(0,5),arrivalTime:arrival[1]||'',returnDate:(back[0]||'').slice(0,5),returnTime:back[1]||'',
-  flight:clean(b.flight_out),name:clean(b.customer_name)||[clean(b.first_name),clean(b.last_name)].filter(Boolean).join(' ')};
+  phone:typeof b.phone==='string'?b.phone:'',name:clean(b.customer_name)||[clean(b.first_name),clean(b.last_name)].filter(Boolean).join(' ')};
 }
 export const SHORT_PAGE={width:595.2755905511812,height:841.8897637795277};
 export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regular:Uint8Array;bold:Uint8Array}):Promise<PDFDocument>{
@@ -35,10 +35,10 @@ export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regu
   return Array.from(printableText(normalized,ff)).length>Array.from(standard).length?ff:f;
  };
  const text=async(page:PDFPage,value:string,x:number,y:number,size:number,isBold=false,center=false,maxWidth=SHORT_PAGE.width-100)=>{
-  if(!value)return;
+  if(!value)return 0;
   const font=await fontFor(value,isBold);
   value=printableText(value,font);
-  if(!value)return;
+  if(!value)return 0;
   if(value.length>6000)throw new Error('Text zu lang für ein Kurz-Blatt.');
   // ReportLab drawCentredString uses unkerned Helvetica advances; pdf-lib's width helper
   // includes kerning even though drawText emits a plain Tj. Sum advances to match gut.py.
@@ -48,6 +48,7 @@ export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regu
   const fitted=width>maxWidth?size*maxWidth/width:size;
   if(fitted<7)throw new Error('Text zu lang für ein Kurz-Blatt.');
   page.drawText(value,{x:center?x-measure(fitted)/2:x,y,size:fitted,font,color:rgb(0,0,0)});
+  return measure(fitted);
  };
  const {width:W,height:H}=SHORT_PAGE;let page!:PDFPage;
  for(let i=0;i<sheets.length;i++){
@@ -55,13 +56,15 @@ export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regu
   const top=H-20-slot*(H/2),y=top-135,L=W*.27,R=W*.73;
   await text(page,s.number,40,top-45,24,true,false,70);
   await text(page,s.plate,W/2,top-50,48,true,true,W-170);
-  await text(page,s.arrivalDate,L,y,44,true,true,190);await text(page,s.returnDate,R,y,44,true,true,190);
+  await text(page,s.arrivalDate,L,y,44,true,true,190);const dateW=await text(page,s.returnDate,R,y,44,true,true,190);
   await text(page,s.arrivalTime?s.arrivalTime+' Uhr':'',L,y-32,24,true,true,190);
-  await text(page,s.returnTime?s.returnTime+' Uhr':'',R,y-32,24,true,true,190);
-  page.drawEllipse({x:R,y:y-1,xScale:95,yScale:49,borderColor:rgb(.85,0,0),borderWidth:3});
+  const timeW=await text(page,s.returnTime?s.returnTime+' Uhr':'',R,y-32,24,true,true,190);
+  // Red underline: actual text block (widest of return date/time), 4 CSS px = 3pt thick, 4px = 3pt gap below the time's descender.
+  const lineW=Math.max(dateW,timeW);
+  if(lineW>0){const ly=y-32-24*.207-3-1.5;page.drawLine({start:{x:R-lineW/2,y:ly},end:{x:R+lineW/2,y:ly},thickness:3,color:rgb(.8667,0,0)})}
   page.drawLine({start:{x:W/2,y:y+40},end:{x:W/2,y:y-40},thickness:1,color:rgb(0,0,0)});
   let nameY=y-90;
-  if(s.flight){await text(page,'Rückflug:',50,nameY,14);await text(page,s.flight,170,nameY,18,true,false,W-220);nameY-=40}
+  await text(page,'Telefon:',50,nameY,14);await text(page,s.phone,170,nameY,18,true,false,W-220);nameY-=40;
   await text(page,'Name:',50,nameY,14);await text(page,s.name,170,nameY,18,true,false,W-220);
   if(slot===0)page.drawLine({start:{x:20,y:H/2},end:{x:W-20,y:H/2},thickness:1,color:rgb(0,0,0),dashArray:[6,4]});
  }
