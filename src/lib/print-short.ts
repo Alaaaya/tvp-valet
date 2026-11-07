@@ -59,9 +59,9 @@ export async function buildShortPdf(items:readonly {b:Booking}[],fallback?:{regu
   await text(page,s.arrivalDate,L,y,44,true,true,190);const dateW=await text(page,s.returnDate,R,y,44,true,true,190);
   await text(page,s.arrivalTime?s.arrivalTime+' Uhr':'',L,y-32,24,true,true,190);
   const timeW=await text(page,s.returnTime?s.returnTime+' Uhr':'',R,y-32,24,true,true,190);
-  // Red underline: actual text block (widest of return date/time), 4 CSS px = 3pt thick, 4px = 3pt gap below the time's descender.
+  // Red underline: actual text block (widest of return date/time), 4 CSS px = 3pt thick, measured top-edge to time-bbox gap = 3.0pt (4 CSS px).
   const lineW=Math.max(dateW,timeW);
-  if(lineW>0){const ly=y-32-24*.207-3-1.5;page.drawLine({start:{x:R-lineW/2,y:ly},end:{x:R+lineW/2,y:ly},thickness:3,color:rgb(.8667,0,0)})}
+  if(lineW>0){const ly=y-32-24*.207-3-1.5-.9;page.drawLine({start:{x:R-lineW/2,y:ly},end:{x:R+lineW/2,y:ly},thickness:3,color:rgb(.8667,0,0)})}
   page.drawLine({start:{x:W/2,y:y+40},end:{x:W/2,y:y-40},thickness:1,color:rgb(0,0,0)});
   let nameY=y-90;
   await text(page,'Telefon:',50,nameY,14);await text(page,s.phone,170,nameY,18,true,false,W-220);nameY-=40;
